@@ -13,37 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.lyncode.jtwig.tree;
+package com.lyncode.jtwig.render;
 
-import java.util.Map;
-
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-
-import com.lyncode.jtwig.render.JtwigRender;
-import com.lyncode.jtwig.render.JtwigVariableRender;
+import com.lyncode.jtwig.tree.JtwigElement;
 
 /**
  * @author "João Melo <jmelo@lyncode.com>"
  *
  */
-public class JtwigVariable extends JtwigValue {
-	private static Logger log = LogManager.getLogger(JtwigVariable.class);
-	private String variable;
+public class JtwigNullRender extends JtwigRender<JtwigElement> {
 
-	public JtwigVariable(String variable) {
-		super();
-		this.variable = variable;
-		log.debug("Variable: "+ variable);
+	public JtwigNullRender() {
+		super(null, null);
 	}
 
-	public String getVariable() {
-		return variable;
-	}
-
+	/* (non-Javadoc)
+	 * @see com.lyncode.jtwig.render.JtwigRender#render()
+	 */
 	@Override
-	public JtwigRender<? extends JtwigElement> renderer(Map<String, Object> map) {
-		return new JtwigVariableRender(map, this);
+	public String render() {
+		return "";
 	}
-	
+
 }

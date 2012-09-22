@@ -15,6 +15,11 @@
  */
 package com.lyncode.jtwig.tree;
 
+import java.util.Map;
+
+import com.lyncode.jtwig.render.JtwigIfRender;
+import com.lyncode.jtwig.render.JtwigRender;
+
 /**
  * @author "João Melo <jmelo@lyncode.com>"
  *
@@ -40,6 +45,11 @@ public class JtwigIf extends JtwigContent {
 	public JtwigElse getElseContent() {
 		return elseContent;
 	}
-	
+
+	@Override
+	public JtwigRender<? extends JtwigElement> renderer(Map<String, Object> map) {
+		return new JtwigIfRender(map, this);
+		
+	}
 	
 }

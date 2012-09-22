@@ -18,6 +18,10 @@ package com.lyncode.jtwig.tree;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+
+import com.lyncode.jtwig.render.JtwigContentRender;
+import com.lyncode.jtwig.render.JtwigRender;
 
 /**
  * @author "João Melo <jmelo@lyncode.com>"
@@ -49,4 +53,10 @@ public class JtwigContent extends JtwigElement {
 	public void replace(JtwigElement icl, JtwigContent content) {
 		Collections.replaceAll(childs, icl, content);
 	}
+
+	@Override
+	public JtwigRender<? extends JtwigElement> renderer(Map<String, Object> map) {
+		return new JtwigContentRender(map, this);
+	}
+	
 }

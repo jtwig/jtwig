@@ -13,36 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.lyncode.jtwig.tree;
+package com.lyncode.jtwig.render;
 
 import java.util.Map;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-
-import com.lyncode.jtwig.render.JtwigNullRender;
-import com.lyncode.jtwig.render.JtwigRender;
+import com.lyncode.jtwig.tree.JtwigConstant;
 
 /**
  * @author "João Melo <jmelo@lyncode.com>"
  *
  */
-public class JtwigInclude extends JtwigElement {
-	private static Logger log = LogManager.getLogger(JtwigInclude.class);
-	private String templateName;
-	
-	public JtwigInclude(String templateName) {
-		super();
-		this.templateName = templateName;
-		log.debug("Include "+templateName);
-	}
+public class JtwigConstantRender extends JtwigRender<JtwigConstant<?>> {
 
-	public String getTemplateName() {
-		return templateName;
+	public JtwigConstantRender(Map<String, Object> model, JtwigConstant<?> e) {
+		super(model, e);
 	}
 
 	@Override
-	public JtwigRender<? extends JtwigElement> renderer(Map<String, Object> map) {
-		return new JtwigNullRender();
+	public String render() {
+		return this.resolveExpression(this.getElement().getLiteral().toString()).toString();
 	}
+	
 }

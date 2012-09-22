@@ -15,6 +15,12 @@
  */
 package com.lyncode.jtwig.tree;
 
+import java.util.Map;
+
+import com.lyncode.jtwig.render.JtwigForRender;
+import com.lyncode.jtwig.render.JtwigRender;
+
+
 /**
  * @author "João Melo <jmelo@lyncode.com>"
  *
@@ -48,5 +54,9 @@ public class JtwigFor extends JtwigContent {
 		return container;
 	}
 	
-	
+
+	@Override
+	public JtwigRender<? extends JtwigElement> renderer(Map<String, Object> map) {
+		return new JtwigForRender(map, this);
+	}
 }

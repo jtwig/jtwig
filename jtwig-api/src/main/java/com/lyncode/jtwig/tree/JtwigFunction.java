@@ -17,9 +17,13 @@ package com.lyncode.jtwig.tree;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+
+import com.lyncode.jtwig.render.JtwigFunctionRender;
+import com.lyncode.jtwig.render.JtwigRender;
 
 /**
  * @author "João Melo <jmelo@lyncode.com>"
@@ -49,5 +53,10 @@ public class JtwigFunction extends JtwigElement {
 		log.debug("Adding parameter: "+parameter.toString());
 		this.parameters.add(parameter);
 		return true;
+	}
+
+	@Override
+	public JtwigRender<? extends JtwigElement> renderer(Map<String, Object> map) {
+		return new JtwigFunctionRender(map, this);
 	}
 }

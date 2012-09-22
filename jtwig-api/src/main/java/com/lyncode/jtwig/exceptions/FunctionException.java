@@ -13,34 +13,45 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.lyncode.jtwig.tree;
-
+package com.lyncode.jtwig.exceptions;
 
 /**
  * @author "João Melo <jmelo@lyncode.com>"
  *
  */
-public class JtwigBlock extends JtwigContent {
-	private String name;
+public class FunctionException extends Exception {
 
-	public JtwigBlock(String name) {
-		super();
-		this.name = name;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5177281978219460271L;
+
+	/**
+	 * 
+	 */
+	public FunctionException() {
 	}
 
-	public String getName() {
-		return name;
+	/**
+	 * @param message
+	 */
+	public FunctionException(String message) {
+		super(message);
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof JtwigBlock) {
-			return ((JtwigBlock) obj).getName().equals(this.getName());
-		}
-		if (obj instanceof String)
-			return ((String) obj).equals(this.getName());
-		
-		return false;
+	/**
+	 * @param cause
+	 */
+	public FunctionException(Throwable cause) {
+		super(cause);
 	}
-	
+
+	/**
+	 * @param message
+	 * @param cause
+	 */
+	public FunctionException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
 }

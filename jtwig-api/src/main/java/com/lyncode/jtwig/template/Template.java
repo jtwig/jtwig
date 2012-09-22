@@ -27,6 +27,7 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.lyncode.jtwig.compiler.ResourceManager;
 import com.lyncode.jtwig.exceptions.JtwigParsingException;
+import com.lyncode.jtwig.exceptions.JtwigRenderException;
 import com.lyncode.jtwig.exceptions.TemplateBuildException;
 import com.lyncode.jtwig.parser.JtwigParser;
 import com.lyncode.jtwig.tree.JtwigBlock;
@@ -41,15 +42,24 @@ import com.lyncode.jtwig.tree.JtwigRoot;
  *
  */
 public class Template {
+	
 	private String filename;
 	private ResourceManager resources;
+	private JtwigRoot resolved;
 	
-	public Template (String filename) throws IOException {
+	public Template (String filename) throws TemplateBuildException  {
 		this.filename = filename;
-		this.resources = new ResourceManager(filename);
+		try {
+			this.resources = new ResourceManager(filename);
+			resolved = this.resolve();
+		} catch (IOException e) {
+			throw new TemplateBuildException(e);
+		} catch (TemplateBuildException e) {
+			throw new TemplateBuildException(e);
+		}
 	}
 
-	private void replaceIncludes (JtwigContent content) throws IOException, JtwigParsingException, TemplateBuildException {
+	private void replaceIncludes (JtwigContent content) throws TemplateBuildException {
 		Collection<JtwigElement> includes = Collections2.filter(content.getChilds(), new Predicate<JtwigElement>() {
 			public boolean apply(JtwigElement input) {
 				return (input instanceof JtwigInclude);
@@ -75,9 +85,14 @@ public class Template {
 		}
 	}
 	
-	private JtwigRoot resolve () throws JtwigParsingException, IOException, TemplateBuildException {
+	private JtwigRoot resolve () throws TemplateBuildException {
 		String input = new String(FileUtils.readAllBytes(filename));
-		JtwigRoot root = JtwigParser.parse(input);
+		JtwigRoot root;
+		try {
+			root = JtwigParser.parse(input);
+		} catch (JtwigParsingException e) {
+			throw new TemplateBuildException(e);
+		}
 		if (root.getChilds().isEmpty()) {
 			return root;
 		} else {
@@ -122,7 +137,11 @@ public class Template {
 		return root;
 	}
 	
-	public void process (Map<String, Object> model, OutputStream out) {
-		// TODO: HEY
+	public void process (Map<String, Object> model, OutputStream out) throws JtwigRenderException {
+		try {
+			out.write(this.resolved.renderer(model).render().getBytes());
+		} catch (IOException e) {
+			throw new JtwigRenderException(e);
+		}
 	}
 }

@@ -22,6 +22,7 @@ import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.web.servlet.view.AbstractTemplateView;
 
 import com.lyncode.jtwig.exceptions.JtwigParsingException;
+import com.lyncode.jtwig.exceptions.JtwigRenderException;
 import com.lyncode.jtwig.exceptions.TemplateBuildException;
 import com.lyncode.jtwig.template.Template;
 
@@ -77,8 +78,12 @@ public class JtwigView extends AbstractTemplateView {
 	
 	
 	private void processTemplate(Template template, Map<String, Object> model,
-			HttpServletResponse response) throws IOException {
-		template.process(model, response.getOutputStream());
+			HttpServletResponse response) throws JtwigRenderException {
+		try {
+			template.process(model, response.getOutputStream());
+		} catch (IOException e) {
+			throw new JtwigRenderException(e);
+		}
 	}
 	
 	@SuppressWarnings("serial")

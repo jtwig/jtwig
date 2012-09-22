@@ -1,4 +1,4 @@
-jtwig
-=====
+# JTwig 1.0 Beta
 
-Fork of jangod
+
+Port of Twig/Jangod to Java.

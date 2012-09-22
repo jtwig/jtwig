@@ -15,10 +15,15 @@
  */
 package com.lyncode.jtwig.tree;
 
+import java.util.Map;
+
+import com.lyncode.jtwig.render.JtwigRender;
+
+
 /**
  * @author "João Melo <jmelo@lyncode.com>"
  *
  */
 public abstract class JtwigElement {
-
+	public abstract JtwigRender<? extends JtwigElement> renderer (Map<String, Object> map);
 }

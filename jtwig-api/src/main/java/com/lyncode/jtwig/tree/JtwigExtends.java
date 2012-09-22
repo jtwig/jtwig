@@ -15,8 +15,13 @@
  */
 package com.lyncode.jtwig.tree;
 
+import java.util.Map;
+
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+
+import com.lyncode.jtwig.render.JtwigNullRender;
+import com.lyncode.jtwig.render.JtwigRender;
 
 /**
  * @author "João Melo <jmelo@lyncode.com>"
@@ -34,5 +39,10 @@ public class JtwigExtends extends JtwigElement {
 
 	public String getTemplateName() {
 		return templateName;
+	}
+
+	@Override
+	public JtwigRender<? extends JtwigElement> renderer(Map<String, Object> map) {
+		return new JtwigNullRender();
 	}
 }
