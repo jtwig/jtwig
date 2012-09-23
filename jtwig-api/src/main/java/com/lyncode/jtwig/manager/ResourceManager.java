@@ -13,29 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.lyncode.jtwig.render;
+package com.lyncode.jtwig.manager;
 
-import java.util.Map;
-
-import com.lyncode.jtwig.exceptions.JtwigRenderException;
-import com.lyncode.jtwig.tree.JtwigVariable;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * @author "João Melo <jmelo@lyncode.com>"
  *
  */
-public class JtwigVariableRender extends JtwigRender<JtwigVariable> {
-
-	public JtwigVariableRender(Map<String, Object> model, JtwigVariable e) {
-		super(model, e);
-	}
-
-	/* (non-Javadoc)
-	 * @see com.lyncode.jtwig.render.JtwigRender#render()
-	 */
-	@Override
-	public String render() throws JtwigRenderException {
-		 return this.resolveExpression(this.getElement().getVariable()).toString();
-	}
-
+public abstract class ResourceManager {
+	public abstract InputStream getResource () throws IOException;
+	public abstract String getFile (String relative) throws IOException;
+	public abstract String getPath();
 }

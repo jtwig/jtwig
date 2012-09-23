@@ -33,8 +33,9 @@ public class JtwigExtends extends JtwigElement {
 	
 	public JtwigExtends(String templateName) {
 		super();
-		this.templateName = templateName;
-		log.debug("Include "+templateName);
+		templateName = templateName.trim();
+		this.templateName = templateName.substring(1, templateName.length() - 1);
+		log.debug("Include "+this.templateName);
 	}
 
 	public String getTemplateName() {

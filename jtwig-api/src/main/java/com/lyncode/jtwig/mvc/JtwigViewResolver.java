@@ -32,17 +32,6 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver  {
 	protected Class<?> requiredViewClass() {
 		return JtwigView.class;
 	}
-
-	@Override
-	protected String getPrefix() {
-		// TODO Auto-generated method stub
-		return super.getPrefix();
-	}
-
-	@Override
-	protected String getSuffix() {
-		return SUFFIX;
-	}
 	
 	
 }

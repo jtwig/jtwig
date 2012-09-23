@@ -17,6 +17,7 @@ package com.lyncode.jtwig.render;
 
 import java.util.Map;
 
+import com.lyncode.jtwig.exceptions.JtwigRenderException;
 import com.lyncode.jtwig.tree.JtwigConstant;
 
 /**
@@ -30,7 +31,7 @@ public class JtwigConstantRender extends JtwigRender<JtwigConstant<?>> {
 	}
 
 	@Override
-	public String render() {
+	public String render() throws JtwigRenderException {
 		return this.resolveExpression(this.getElement().getLiteral().toString()).toString();
 	}
 	

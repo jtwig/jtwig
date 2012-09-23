@@ -21,14 +21,18 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.ServletContext;
+
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.parboiled.common.FileUtils;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
-import com.lyncode.jtwig.compiler.ResourceManager;
 import com.lyncode.jtwig.exceptions.JtwigParsingException;
 import com.lyncode.jtwig.exceptions.JtwigRenderException;
 import com.lyncode.jtwig.exceptions.TemplateBuildException;
+import com.lyncode.jtwig.manager.ResourceManager;
+import com.lyncode.jtwig.manager.ServletContextResourceManager;
 import com.lyncode.jtwig.parser.JtwigParser;
 import com.lyncode.jtwig.tree.JtwigBlock;
 import com.lyncode.jtwig.tree.JtwigContent;
@@ -42,19 +46,24 @@ import com.lyncode.jtwig.tree.JtwigRoot;
  *
  */
 public class Template {
-	
-	private String filename;
+	private ServletContext servletContext;
 	private ResourceManager resources;
 	private JtwigRoot resolved;
 	
-	public Template (String filename) throws TemplateBuildException  {
-		this.filename = filename;
+	public Template (ServletContext servletContext, String filename) throws TemplateBuildException  {
 		try {
-			this.resources = new ResourceManager(filename);
+			this.servletContext = servletContext;
+			this.resources = new ServletContextResourceManager(servletContext, filename);
 			resolved = this.resolve();
-		} catch (IOException e) {
-			throw new TemplateBuildException(e);
 		} catch (TemplateBuildException e) {
+			throw new TemplateBuildException(e);
+		}
+	}
+	
+	private Template loadTemplate (String relativePath) throws TemplateBuildException {
+		try {
+			return new Template(servletContext, resources.getFile(relativePath));
+		} catch (IOException e) {
 			throw new TemplateBuildException(e);
 		}
 	}
@@ -68,7 +77,7 @@ public class Template {
 		
 		for (JtwigElement inc : includes) {
 			JtwigInclude icl = (JtwigInclude) inc;
-			Template t = new Template(this.resources.getFile(icl.getTemplateName()));
+			Template t = this.loadTemplate(icl.getTemplateName());
 			JtwigRoot parent = t.resolve();
 			content.replace(icl, parent);
 		}
@@ -86,7 +95,13 @@ public class Template {
 	}
 	
 	private JtwigRoot resolve () throws TemplateBuildException {
-		String input = new String(FileUtils.readAllBytes(filename));
+		byte[] readed;
+		try {
+			readed = FileUtils.readAllBytes(resources.getResource());
+		} catch (IOException e1) {
+			throw new TemplateBuildException(e1);
+		}
+		String input = new String(readed);
 		JtwigRoot root;
 		try {
 			root = JtwigParser.parse(input);
@@ -104,7 +119,7 @@ public class Template {
 			if (elements.get(0) instanceof JtwigExtends) {
 				// Extension template
 				JtwigExtends ext = (JtwigExtends) elements.get(0);
-				Template t = new Template(this.resources.getFile(ext.getTemplateName()));
+				Template t = this.loadTemplate(ext.getTemplateName());
 				JtwigRoot parent = t.resolve();
 				
 				Collection<JtwigElement> masterBlocks = Collections2.filter(parent.getChilds(), new Predicate<JtwigElement>() {
@@ -120,7 +135,7 @@ public class Template {
 				});
 				
 				if (thisBlocks.size() > elements.size() + 1)
-					throw new TemplateBuildException(filename+ " template with unexpected constructions");
+					throw new TemplateBuildException(this.resources.getPath() + " template with unexpected constructions");
 				
 				for (JtwigElement elem : thisBlocks) {
 					JtwigBlock block = (JtwigBlock) elem;
@@ -140,6 +155,8 @@ public class Template {
 	public void process (Map<String, Object> model, OutputStream out) throws JtwigRenderException {
 		try {
 			out.write(this.resolved.renderer(model).render().getBytes());
+			out.flush();
+			out.close();
 		} catch (IOException e) {
 			throw new JtwigRenderException(e);
 		}

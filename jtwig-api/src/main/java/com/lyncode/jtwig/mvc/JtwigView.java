@@ -64,14 +64,14 @@ public class JtwigView extends AbstractTemplateView {
 			log.debug("Rendering Jtwig template [" + getUrl() + "] in JtwigView '" + getBeanName() + "'");
 		}
 		
-		processTemplate(getTemplate(getUrl()), model, response);
+		processTemplate(getTemplate(request.getServletContext(), getUrl()), model, response);
 	}
 	
 	private static Map<String, Template> templates = new HashMap<String, Template>();
 	
-	private static Template getTemplate (String url) throws IOException, JtwigParsingException, TemplateBuildException {
+	private static Template getTemplate (ServletContext servletContext, String url) throws IOException, JtwigParsingException, TemplateBuildException {
 		if (!templates.containsKey(url)) {
-			templates.put(url, new Template(url));
+			templates.put(url, new Template(servletContext, url));
 		}
 		return templates.get(url);
 	}

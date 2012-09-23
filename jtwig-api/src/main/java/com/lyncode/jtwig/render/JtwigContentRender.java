@@ -35,7 +35,7 @@ public class JtwigContentRender extends JtwigRender<JtwigContent> {
 	public String render() throws JtwigRenderException {
 		String res = "";
 		for (JtwigElement e : this.getElement().getChilds()) {
-			e.renderer(this.getModel()).render();
+			res += e.renderer(this.getModel()).render();
 		}
 		return res;
 	}

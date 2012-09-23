@@ -23,6 +23,7 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
 import com.lyncode.jtwig.exceptions.JtwigRenderException;
+import com.lyncode.jtwig.expression.JtwigExpressionEvaluator;
 import com.lyncode.jtwig.tree.JtwigElement;
 
 /**
@@ -31,19 +32,18 @@ import com.lyncode.jtwig.tree.JtwigElement;
  */
 public abstract class JtwigRender<T extends JtwigElement> {
 	private Map<String, Object> model;
-	private EvaluationContext context;
-	private ExpressionParser parser;
+	private JtwigExpressionEvaluator evaluator;
 	private T e;
 	
 	public JtwigRender (Map<String, Object> model, T e) {
 		this.model = model;
-		context = new StandardEvaluationContext(model);
-		parser = new SpelExpressionParser();
+		this.evaluator = new JtwigExpressionEvaluator(model);
 		this.e = e;
+		System.out.println("Render of "+e.getClass());
 	}
 
-	protected Object resolveExpression (String expression) {
-		return parser.parseExpression(expression).getValue(context);
+	protected Object resolveExpression (String expression) throws JtwigRenderException {
+		return this.evaluator.evaluate(expression);
 	}
 	
 	public T getElement () {
