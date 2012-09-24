@@ -23,6 +23,7 @@ import org.parboiled.annotations.MemoMismatches;
 import org.parboiled.annotations.SuppressNode;
 import org.parboiled.annotations.SuppressSubnodes;
 import org.parboiled.parserunners.BasicParseRunner;
+import org.parboiled.parserunners.TracingParseRunner;
 import org.parboiled.support.ParsingResult;
 
 import com.lyncode.jtwig.exceptions.JtwigParsingException;
@@ -50,13 +51,28 @@ import com.lyncode.jtwig.tree.JtwigVariable;
 public class JtwigParser extends BaseParser<JtwigElement> {
 	private static JtwigParser parser = null;
 	
-    public static JtwigRoot parse (String input) throws JtwigParsingException {
+	
+	
+    @Override
+	public boolean push(JtwigElement value) {
+    	System.out.println("Pushing "+value.toString());
+		return super.push(value);
+	}
+
+	@Override
+	public JtwigElement pop() {
+		JtwigElement e = super.pop();
+    	System.out.println("Poping "+e.toString());
+		return e;
+	}
+
+	public static JtwigRoot parse (String input) throws JtwigParsingException {
     	if (parser == null)
     		parser = Parboiled.createParser(JtwigParser.class);
         // String input = "{{ 'aaaa' | trans 'asdasd' | make | aaa }}            ";
         // String input = "<div asdda><asd> {% hello 'boy' %} <asdasd>";
 
-        //ParsingResult<JtwigElement> result = new TracingParseRunner<JtwigElement>(parser.JtwigExpression()).run(input);
+        //ParsingResult<JtwigElement> result = new TracingParseRunner<JtwigElement>(parser.JtwigContentRoot()).run(input);
         ParsingResult<JtwigElement> result = new BasicParseRunner<JtwigElement>(parser.JtwigContentRoot()).run(input);
         
         JtwigElement e = result.valueStack.pop();
@@ -74,12 +90,12 @@ public class JtwigParser extends BaseParser<JtwigElement> {
 						FirstOf(
 								JtwigExtendsRule(),
 								JtwigTextRule(),
-								JtwigFunctionRule(),
-								JtwigExpressionRule(),
 								JtwigIfRule(),
 								JtwigForRule(),
 								JtwigBlockRule(),
-								JtwigIncludeRule()
+								JtwigIncludeRule(),
+								JtwigFunctionRule(),
+								JtwigExpressionRule()
 						),
 						((JtwigContent) peek(1)).add((JtwigElement)pop())
 					)
@@ -109,7 +125,7 @@ public class JtwigParser extends BaseParser<JtwigElement> {
 				LWING,
 				PERCENT,
 				Keyword(IF),
-				JtwigValue(),
+				JtwigFirstValue(),
 				push(new JtwigIf((JtwigValue)pop())),
 				PERCENT,
 				RWINGFINAL,
@@ -143,13 +159,13 @@ public class JtwigParser extends BaseParser<JtwigElement> {
 				push(new JtwigFor(match())),
 				Keyword(IN),
 				JtwigVariable(),
-				((JtwigFor) peek()).setContainer((JtwigVariable)pop()), 
+				((JtwigFor) peek(1)).setContainer((JtwigVariable)pop()), 
 				PERCENT,
 				RWINGFINAL,
 				JtwigContentRule(),
 				LWING,
 				PERCENT,
-				Keyword(ENDBLOCK),
+				Keyword(ENDFOR),
 				PERCENT,
 				RWINGFINAL
 		);
@@ -187,6 +203,14 @@ public class JtwigParser extends BaseParser<JtwigElement> {
                                 Sequence(TestNot(LWING), ANY)
                         )
                 ).suppressSubnodes();
+	}
+	
+	Rule JtwigExpressionFunction () {
+		return Sequence (
+				Identifier(),
+				push(new JtwigFunction(match())),
+				OneOrMore(Sequence(JtwigValue(), ((JtwigFunction) peek(1)).add((JtwigValue) pop())))
+		);
 	}
 	
 	Rule JtwigExpressionRule () {
@@ -228,12 +252,24 @@ public class JtwigParser extends BaseParser<JtwigElement> {
 		);
 	}
 	
+
+	Rule JtwigFirstValue () {
+		return FirstOf(
+				JtwigExpressionFunction(),
+				JtwigVariable(),
+				JtwigStringValue(),
+				JtwigIntegerValue(),
+				JtwigBooleanValue()
+		);
+	}
+	
 	Rule JtwigValue () {
 		return FirstOf(
 				JtwigVariable(),
 				JtwigStringValue(),
 				JtwigIntegerValue(),
-				JtwigBooleanValue()
+				JtwigBooleanValue(),
+				Sequence(LPARENT, JtwigExpressionFunction(), RPARENT)
 		);
 	}
 	
@@ -265,9 +301,7 @@ public class JtwigParser extends BaseParser<JtwigElement> {
 		return Sequence (
 			LWING,
 			PERCENT,
-			Identifier(),
-			push(new JtwigFunction(match())),
-			ZeroOrMore(Sequence(JtwigValue(), ((JtwigFunction) peek(1)).add((JtwigValue) pop()))),
+			JtwigExpressionFunction(),
 			PERCENT,
 			RWINGFINAL
 		);
@@ -426,6 +460,8 @@ public class JtwigParser extends BaseParser<JtwigElement> {
     final Rule RWING = Terminal("}");
     final Rule RWINGFINAL = Terminal("}", false);
     final Rule LWING = Terminal("{");
+    final Rule LPARENT = Terminal("(");
+    final Rule RPARENT = Terminal(")");
     final Rule OR = Terminal("|");
     final Rule DOT = Terminal(".");
     final Rule PERCENT = Terminal("%");

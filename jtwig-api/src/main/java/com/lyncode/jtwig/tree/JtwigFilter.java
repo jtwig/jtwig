@@ -36,7 +36,7 @@ public class JtwigFilter extends JtwigElement {
 	
 	public JtwigFilter(String filterName) {
 		super();
-		this.filterName = filterName;
+		this.filterName = filterName.trim();
 		this.parameters = new ArrayList<JtwigValue>();
 		log.debug("Filter "+filterName);
 	}

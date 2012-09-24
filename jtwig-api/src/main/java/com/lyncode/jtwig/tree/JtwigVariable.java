@@ -33,7 +33,7 @@ public class JtwigVariable extends JtwigValue {
 
 	public JtwigVariable(String variable) {
 		super();
-		this.variable = variable;
+		this.variable = variable.trim();
 		log.debug("Variable: "+ variable);
 	}
 

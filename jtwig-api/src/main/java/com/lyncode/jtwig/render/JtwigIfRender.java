@@ -35,11 +35,18 @@ public class JtwigIfRender extends JtwigRender<JtwigIf> {
 	 */
 	@Override
 	public String render() throws JtwigRenderException {
-		String testResult = this.getElement().getName().renderer(getModel()).render().toLowerCase();
+		String testResult;
+		try {
+			testResult = this.getElement().getName().renderer(getModel()).render().toLowerCase();
+		} catch (JtwigRenderException e) {
+			testResult = "";
+		}
 		if (testResult.equals("true")) {
 			return (new JtwigContentRender(getModel(), getElement())).render();
 		} else {
-			return (new JtwigContentRender(getModel(), getElement().getElseContent())).render();
+			if (getElement().getElseContent() != null)
+				return (new JtwigContentRender(getModel(), getElement().getElseContent())).render();
+			return "";
 		}
 	}
 

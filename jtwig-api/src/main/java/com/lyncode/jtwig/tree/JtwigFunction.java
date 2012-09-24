@@ -29,14 +29,14 @@ import com.lyncode.jtwig.render.JtwigRender;
  * @author "João Melo <jmelo@lyncode.com>"
  *
  */
-public class JtwigFunction extends JtwigElement {
+public class JtwigFunction extends JtwigValue {
 	private static Logger log = LogManager.getLogger(JtwigFunction.class);
 	private String functionName;
 	private List<JtwigValue> parameters;
 	
 	public JtwigFunction(String functionName) {
 		super();
-		this.functionName = functionName;
+		this.functionName = functionName.trim();
 		this.parameters = new ArrayList<JtwigValue>();
 		log.debug("Function "+functionName);
 	}

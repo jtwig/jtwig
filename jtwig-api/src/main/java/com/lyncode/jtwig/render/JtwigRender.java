@@ -17,11 +17,6 @@ package com.lyncode.jtwig.render;
 
 import java.util.Map;
 
-import org.springframework.expression.EvaluationContext;
-import org.springframework.expression.ExpressionParser;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
-import org.springframework.expression.spel.support.StandardEvaluationContext;
-
 import com.lyncode.jtwig.exceptions.JtwigRenderException;
 import com.lyncode.jtwig.expression.JtwigExpressionEvaluator;
 import com.lyncode.jtwig.tree.JtwigElement;
@@ -39,7 +34,7 @@ public abstract class JtwigRender<T extends JtwigElement> {
 		this.model = model;
 		this.evaluator = new JtwigExpressionEvaluator(model);
 		this.e = e;
-		System.out.println("Render of "+e.getClass());
+		// System.out.println("Render of "+e.getClass());
 	}
 
 	protected Object resolveExpression (String expression) throws JtwigRenderException {

@@ -32,12 +32,13 @@ public class JtwigFor extends JtwigContent {
 
 	public JtwigFor(String variableName, JtwigVariable container) {
 		super();
-		this.variableName = variableName;
+		this.variableName = variableName.trim();
 		this.container = container;
 	}
+	
 	public JtwigFor(String variableName) {
 		super();
-		this.variableName = variableName;
+		this.variableName = variableName.trim();
 	}
 
 	public boolean setContainer (JtwigVariable c) {

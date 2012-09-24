@@ -65,16 +65,20 @@ public class JtwigExpressionEvaluator {
 			if (((Map<?, ?>) context).containsKey(part))
 				return ((Map<?, ?>) context).get(part);
 			else
-				throw new JtwigRenderException("Unable to find Key '"+part+"' in Map");
+				throw new JtwigRenderException("Unable to find Key '"+part+"' in Map "+context.toString());
 		} else {
 			Field f = ReflectionUtils.findField(context.getClass(), part);
 			if (f != null) return ReflectionUtils.getField(f, context);
 			
-			String name = WordUtils.capitalizeFully(part);
-			
-			Method m = ReflectionUtils.findMethod(context.getClass(), "get" + name);
-			if (m == null) m = ReflectionUtils.findMethod(context.getClass(), "is" + name);
-			if (m != null) return ReflectionUtils.invokeMethod(m, context);
+			Method[] methods = context.getClass().getMethods();
+			for (Method met : methods) {
+				if (met.getName().toLowerCase().equals(part.toLowerCase()))
+					return ReflectionUtils.invokeMethod(met, context);
+				if (met.getName().toLowerCase().equals("get" + part.toLowerCase()))
+					return ReflectionUtils.invokeMethod(met, context);
+				if (met.getName().toLowerCase().equals("is" + part.toLowerCase()))
+					return ReflectionUtils.invokeMethod(met, context);
+			}
 			
 			throw new JtwigRenderException();
 		}
