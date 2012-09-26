@@ -15,21 +15,32 @@
  */
 package com.lyncode.jtwig.elements;
 
+import java.util.Map;
+
+import com.lyncode.jtwig.exceptions.JtwigRenderException;
+import com.lyncode.jtwig.expression.JtwigExpressionEvaluator;
+import com.lyncode.jtwig.render.Calculable;
+
 /**
  * @author "João Melo <jmelo@lyncode.com>"
  *
  */
-public class Extends {
-	private String path;
+public class Variable implements Calculable {
+	private String name;
 
-	public Extends(String path) {
+	public Variable(String name) {
 		super();
-		this.path = path;
+		System.out.println("VARIABLE: "+name);
+		this.name = name;
 	}
 
-	public String getPath() {
-		return path;
+	public String getName() {
+		return name;
 	}
-	
-	
+
+	public Object calculate(Map<String, Object> values)
+			throws JtwigRenderException {
+		JtwigExpressionEvaluator evaluator = new JtwigExpressionEvaluator(values);
+		return evaluator.evaluate(this.getName());
+	}
 }

@@ -18,7 +18,6 @@ package com.lyncode.jtwig.elements;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import com.lyncode.jtwig.exceptions.JtwigRenderException;
 import com.lyncode.jtwig.expression.JtwigExpressionEvaluator;
@@ -35,6 +34,7 @@ public class FastExpression implements Renderable {
 	private List<FunctionExpr> functions;
 	
 	public FastExpression (Object value) {
+		System.out.println("FAST EXPRESSION: "+value.toString());
 		this.value = value;
 		this.functions = new ArrayList<FunctionExpr>();
 	}

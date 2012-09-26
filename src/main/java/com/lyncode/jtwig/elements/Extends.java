@@ -19,11 +19,12 @@ package com.lyncode.jtwig.elements;
  * @author "João Melo <jmelo@lyncode.com>"
  *
  */
-public class Include {
+public class Extends {
 	private String path;
 
-	public Include(String path) {
+	public Extends(String path) {
 		super();
+		System.out.println("EXTENDS: "+path);
 		this.path = path;
 	}
 

@@ -24,6 +24,9 @@ import java.util.TreeMap;
 public class ObjectMap extends TreeMap<String, Object> {
 	private static final long serialVersionUID = -5599558472927362564L;
 
+	public ObjectMap () {
+		System.out.println("MAP");
+	}
 	
 	public boolean add (String key, Object value) {
 		super.put(key, value);

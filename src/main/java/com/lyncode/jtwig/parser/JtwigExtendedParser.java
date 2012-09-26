@@ -15,6 +15,8 @@
  */
 package com.lyncode.jtwig.parser;
 
+import java.util.regex.Pattern;
+
 import org.parboiled.BaseParser;
 import org.parboiled.Parboiled;
 import org.parboiled.Rule;
@@ -70,13 +72,24 @@ public class JtwigExtendedParser extends BaseParser<Object> {
     	System.out.println("Stack Size: " + this.getContext().getValueStack().size());
 		return e;
 	}
+	
+	public static void main (String... str) throws JtwigParsingException {
+		String input = "     {% block boy %}     <asdasd>\n     {% endblock %}";
+		System.out.println(input);
+		System.out.println(parse(input));
+	}
 
 	public static ObjectList parse (String input) throws JtwigParsingException {
     	if (parser == null)
     		parser = Parboiled.createParser(JtwigExtendedParser.class);
         // String input = "{{ 'aaaa' | trans 'asdasd' | make | aaa }}            ";
-        // String input = "<div asdda><asd> {% hello 'boy' %} <asdasd>";
+        // 
 
+    	// Tratar do Input
+    	input = input.replaceAll("\\n\\s*"+Pattern.quote("{%"), "{%");
+    	input = input.replaceAll(Pattern.quote("{%")+"\\s*\\n", "%}");
+    	System.out.println(input);
+    	
         //ParsingResult<JtwigElement> result = new TracingParseRunner<JtwigElement>(parser.JtwigContentRoot()).run(input);
         ParsingResult<Object> result = new BasicParseRunner<Object>(parser.Start()).run(input);
         
@@ -131,7 +144,7 @@ public class JtwigExtendedParser extends BaseParser<Object> {
     	return Sequence(
     			Spacing(),
     			push(new ObjectList()),
-    			Content(true),
+    			Content(),
     			EOI
     	);
     }
@@ -168,7 +181,7 @@ public class JtwigExtendedParser extends BaseParser<Object> {
     		Identifier(),
     		push(new Block((String)pop())),
     		CODECLOSE,
-    		Content(false),
+    		Content(),
     		CODEOPEN,
     		Keyword(ENDBLOCK),
     		CODECLOSE
@@ -210,31 +223,18 @@ public class JtwigExtendedParser extends BaseParser<Object> {
      * 
      * @return
      */
-    Rule Content (boolean allowBlocks) {
-    	if (allowBlocks) {
-	    	return ZeroOrMore(
-	    			FirstOf(
-	    					FastExpression(),
-	    					ForExpression(allowBlocks),
-	    					IfExpression(allowBlocks),
-	    					BlockExpression(),
-	    					IncludeExpression(),
-	    					TextRule()
-	    			),
-	    			((ObjectList)peek(1)).add(pop())
-	    	);
-    	} else {
-	    	return ZeroOrMore(
-	    			FirstOf(
-	    					TextRule(),
-	    					FastExpression(),
-	    					ForExpression(allowBlocks),
-	    					IfExpression(allowBlocks),
-	    					IncludeExpression()
-	    			),
-	    			((ObjectList)peek(1)).add(pop())
-	    	);
-    	}
+    Rule Content () {
+    	return ZeroOrMore(
+    			FirstOf(
+    					FastExpression(),
+    					ForExpression(),
+    					IfExpression(),
+    					BlockExpression(),
+    					IncludeExpression(),
+    					TextRule()
+    			),
+    			((ObjectList)peek(1)).add(pop())
+    	);
     }
 
     /**
@@ -261,7 +261,7 @@ public class JtwigExtendedParser extends BaseParser<Object> {
 	 */
 	Rule BooleanExpression () {
 		return FirstOf(
-			Function(),
+			FunctionOneArgument(),
 			Variable(),
 			Boolean()
 		);
@@ -272,21 +272,21 @@ public class JtwigExtendedParser extends BaseParser<Object> {
 	 * 
 	 * @return
 	 */
-	Rule IfExpression (boolean allowblocks) {
+	Rule IfExpression () {
 		return Sequence(
 				CODEOPEN,
 				Keyword(IF),
 				BooleanExpression(),
 				push(new If(pop())),
 				CODECLOSE,
-				Content(allowblocks),
+				Content(),
 				Optional(
 						Sequence(
 							CODEOPEN,
 							Keyword(ELSE),
 							CODECLOSE,
 							push(new ObjectList()),
-							Content(allowblocks),
+							Content(),
 							((If)peek(1)).setElse((ObjectList)pop())
 						)
 				),
@@ -301,7 +301,7 @@ public class JtwigExtendedParser extends BaseParser<Object> {
      * 
      * @return
      */
-    Rule ForExpression (boolean allowblocks) {
+    Rule ForExpression () {
     	return Sequence(
     		CODEOPEN,
     		Keyword(FOR),
@@ -309,12 +309,12 @@ public class JtwigExtendedParser extends BaseParser<Object> {
     		Keyword(IN),
     		FirstOf(
     				ListExpression(),
-    				Variable(),
-    				Function()
+    				FunctionOneArgument(),
+    				Variable()
     		),
     		CODECLOSE,
     		push(new For((String)pop(1), pop())),
-    		Content(allowblocks),
+    		Content(),
     		CODEOPEN,
     		Keyword(ENDFOR),
     		CODECLOSE
@@ -350,8 +350,8 @@ public class JtwigExtendedParser extends BaseParser<Object> {
     			Integer(),
     			Boolean(),
     			StringLiteral(),
+    			FunctionOneArgument(),
     			Variable(),
-    			Function(),
     			ListExpression(),
     			MapExpression()
     	);
@@ -369,13 +369,47 @@ public class JtwigExtendedParser extends BaseParser<Object> {
     							Integer(),
     							Boolean(),
     							StringLiteral(),
-    							Sequence(LPARENT, Function(), RPARENT),
+    							Sequence(LPARENT, FunctionOneArgument(), RPARENT),
     							ListExpression(),
     							MapExpression(),
     							Variable()
     					),
     					ACTION(((FunctionExpr)peek(1)).add(pop()))
     			)
+    	);
+    }
+    /**
+     * No pushes!
+     * 
+     * @return
+     */
+    Rule FunctionOneArguments () {
+    	return OneOrMore(
+    			Sequence(
+    					FirstOf(
+    							Integer(),
+    							Boolean(),
+    							StringLiteral(),
+    							Sequence(LPARENT, FunctionOneArgument(), RPARENT),
+    							ListExpression(),
+    							MapExpression(),
+    							Variable()
+    					),
+    					ACTION(((FunctionExpr)peek(1)).add(pop()))
+    			)
+    	);
+    }
+
+    /**
+     * Pushes a Function
+     * 
+     * @return
+     */
+    Rule FunctionOneArgument () {
+    	return Sequence(
+    			Identifier(),
+    			push(new FunctionExpr((String) pop())),
+    			FunctionOneArguments()
     	);
     }
     

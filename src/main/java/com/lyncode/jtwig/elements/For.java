@@ -29,38 +29,26 @@ import com.lyncode.jtwig.render.Renderable;
  * @author "João Melo <jmelo@lyncode.com>"
  *
  */
-public class If extends ObjectList {
-	private static final long serialVersionUID = -8676097057249972628L;
+public class For extends ObjectList {
+	private static final long serialVersionUID = 4648580478468941354L;
+	private String variable;
 	private Object value;
-	private ObjectList elseContent;
-	public If(Object value, ObjectList elseContent) {
-		super();
-		this.value = value;
-		this.elseContent = elseContent;
-	}
 	
-	public If(Object value) {
-		super();
+	public For (String variable, Object value) {
+		System.out.println("FOR: "+variable+", VALUE: "+value.toString());
+		this.variable = variable;
 		this.value = value;
 	}
-	
+
+	public String getVariable() {
+		return variable;
+	}
+
 	public Object getValue() {
 		return value;
 	}
-	public ObjectList getElseContent() {
-		return elseContent;
-	}
 	
-	public boolean hasElse () {
-		return this.elseContent != null;
-	}
-	
-	public boolean setElse (ObjectList l) {
-		this.elseContent = l;
-		return true;
-	}
-	
-
+	@SuppressWarnings("unchecked")
 	public String render(Map<String, Object> model, ResourceManager manager) throws JtwigRenderException {
 		String result = "";
 		Object values = null;
@@ -68,34 +56,27 @@ public class If extends ObjectList {
 			values = ((Calculable) this.value).calculate(model);
 		} else values = this.value;
 		
-		boolean test = false;
+		List<Object> forValues = null;
 		
-		if (values != null) {
-			if (!(values instanceof List<?>)) {
-				test = (((List<?>)values).size() > 0);
-			} else if (values instanceof Boolean) {
-				test = ((Boolean) values);
-			} else test = true; // Non null object
-		}
-		if (test) {
+		if (values == null) forValues = new ObjectList();
+		else if (!(values instanceof List<?>)) {
+			forValues = new ArrayList<Object>();
+			forValues.add(values);
+		} else forValues = (List<Object>) values;
+		
+		for (Object val : forValues) {
+			Map<String, Object> newModel = new TreeMap<String, Object>();
+			newModel.putAll(model);
+			newModel.put(variable, val);
 			for (Object obj : this) {
 				if (obj instanceof Renderable) {
-					result += ((Renderable) obj).render(model, manager);
+					result += ((Renderable) obj).render(newModel, manager);
 				} else if (obj instanceof String) {
 					result += (String) obj;
 				} else throw new JtwigRenderException("Unable to render object "+obj.toString());
 			}
-		} else {
-			if (this.hasElse()) {
-				for (Object obj : this.getElseContent()) {
-					if (obj instanceof Renderable) {
-						result += ((Renderable) obj).render(model, manager);
-					} else if (obj instanceof String) {
-						result += (String) obj;
-					} else throw new JtwigRenderException("Unable to render object "+obj.toString());
-				}
-			}
 		}
 		return result;
 	}
+	
 }

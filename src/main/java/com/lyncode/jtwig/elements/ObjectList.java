@@ -16,7 +16,6 @@
 package com.lyncode.jtwig.elements;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Map;
 
 import com.lyncode.jtwig.exceptions.JtwigRenderException;
@@ -30,9 +29,30 @@ import com.lyncode.jtwig.render.Renderable;
 public class ObjectList extends ArrayList<Object> implements Renderable {
 	private static final long serialVersionUID = 6581105515775675565L;
 	
+	public ObjectList () {
+		super();
+		System.out.println("Container");
+	}
+
+	private boolean block = false;
+	
+	public boolean hasBlock () {
+		return block;
+	}
+	
+	public void setBlock () {
+		block = true;
+	}
+	
 	public String render(Map<String, Object> model, ResourceManager manager) throws JtwigRenderException {
 		String result = "";
 		for (Object obj : this) {
+			if (this.hasBlock()) {
+				if (obj instanceof Block)
+					throw new JtwigRenderException("Cannot have nested blocks");
+				else if (obj instanceof ObjectList)
+					((ObjectList) obj).setBlock();
+			}
 			if (obj instanceof Renderable) {
 				result += ((Renderable) obj).render(model, manager);
 			} else if (obj instanceof String) {

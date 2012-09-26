@@ -15,6 +15,11 @@
  */
 package com.lyncode.jtwig.elements;
 
+import java.util.Map;
+
+import com.lyncode.jtwig.exceptions.JtwigRenderException;
+import com.lyncode.jtwig.manager.ResourceManager;
+
 
 /**
  * @author "João Melo <jmelo@lyncode.com>"
@@ -26,11 +31,22 @@ public class Block extends ObjectList {
 
 	public Block(String name) {
 		super();
+		System.out.println("BLOCK: "+name);
 		this.name = name;
 	}
 
 	public String getName() {
 		return name;
 	}
+
+	public String render(Map<String, Object> model, ResourceManager manager) throws JtwigRenderException {
+		this.setBlock();
+		return super.render(model, manager);
+	}
 	
+	public boolean equals (Object obj) {
+		if (obj instanceof Block)
+			return ((Block) obj).getName().equals(name);
+		return false;
+	}
 }

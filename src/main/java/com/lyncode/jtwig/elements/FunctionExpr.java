@@ -37,6 +37,7 @@ public class FunctionExpr implements Calculable {
 
 	public FunctionExpr(String name) {
 		super();
+		System.out.println("FUNCTION: "+name);
 		this.name = name;
 		this.arguments = new ArrayList<Object>();
 	}
