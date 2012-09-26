@@ -13,31 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.lyncode.jtwig.render;
+package com.lyncode.jtwig.elements;
 
-import java.util.Map;
-
-import com.lyncode.jtwig.exceptions.JtwigRenderException;
-import com.lyncode.jtwig.tree.JtwigContent;
-import com.lyncode.jtwig.tree.JtwigElement;
+import java.util.TreeMap;
 
 /**
  * @author "João Melo <jmelo@lyncode.com>"
  *
  */
-public class JtwigContentRender extends JtwigRender<JtwigContent> {
+public class ObjectMap extends TreeMap<String, Object> {
+	private static final long serialVersionUID = -5599558472927362564L;
 
-	public JtwigContentRender(Map<String, Object> model, JtwigContent c) {
-		super(model, c);
+	
+	public boolean add (String key, Object value) {
+		super.put(key, value);
+		return true;
 	}
-
-	@Override
-	public String render() throws JtwigRenderException {
-		String res = "";
-		for (JtwigElement e : this.getElement().getChilds()) {
-			res += e.renderer(this.getModel()).render();
-		}
-		return res;
-	}
-
 }

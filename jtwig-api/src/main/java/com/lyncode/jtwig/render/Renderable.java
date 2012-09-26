@@ -15,24 +15,14 @@
  */
 package com.lyncode.jtwig.render;
 
-import com.lyncode.jtwig.tree.JtwigElement;
+import java.util.Map;
+
+import com.lyncode.jtwig.manager.ResourceManager;
 
 /**
  * @author "João Melo <jmelo@lyncode.com>"
  *
  */
-public class JtwigNullRender extends JtwigRender<JtwigElement> {
-
-	public JtwigNullRender() {
-		super(null, null);
-	}
-
-	/* (non-Javadoc)
-	 * @see com.lyncode.jtwig.render.JtwigRender#render()
-	 */
-	@Override
-	public String render() {
-		return "";
-	}
-
+public interface Renderable {
+	String render (Map<String, Object> model, ResourceManager manager);
 }

@@ -13,26 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.lyncode.jtwig.render;
+package com.lyncode.jtwig.elements;
 
-import java.util.Map;
-
-import com.lyncode.jtwig.exceptions.JtwigRenderException;
-import com.lyncode.jtwig.tree.JtwigConstant;
 
 /**
  * @author "João Melo <jmelo@lyncode.com>"
  *
  */
-public class JtwigConstantRender extends JtwigRender<JtwigConstant<?>> {
+public class Block extends ObjectList {
+	private static final long serialVersionUID = -3386153290112843228L;
+	private String name;
 
-	public JtwigConstantRender(Map<String, Object> model, JtwigConstant<?> e) {
-		super(model, e);
+	public Block(String name) {
+		super();
+		this.name = name;
 	}
 
-	@Override
-	public String render() throws JtwigRenderException {
-		return this.resolveExpression(this.getElement().getLiteral().toString()).toString();
+	public String getName() {
+		return name;
 	}
 	
 }

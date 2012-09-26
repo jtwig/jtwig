@@ -13,34 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.lyncode.jtwig.tree;
+package com.lyncode.jtwig.elements;
 
+import java.util.ArrayList;
+import java.util.Map;
+
+import com.lyncode.jtwig.manager.ResourceManager;
+import com.lyncode.jtwig.render.Renderable;
 
 /**
  * @author "João Melo <jmelo@lyncode.com>"
  *
  */
-public class JtwigBlock extends JtwigContent {
-	private String name;
-
-	public JtwigBlock(String name) {
-		super();
-		this.name = name;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof JtwigBlock) {
-			return ((JtwigBlock) obj).getName().equals(this.getName());
-		}
-		if (obj instanceof String)
-			return ((String) obj).equals(this.getName());
-		
-		return false;
-	}
+public class ObjectList extends ArrayList<Object> implements Renderable {
+	private static final long serialVersionUID = 6581105515775675565L;
 	
+	public String render(Map<String, Object> model, ResourceManager manager) {
+		String result = "";
+		for (Object obj : this) {
+			if (obj instanceof Renderable) {
+				result += ((Renderable) obj).render(model, manager);
+			} else if (obj instanceof String) {
+				result += (String) obj;
+			}
+		}
+		return result;
+	}
 }

@@ -13,17 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.lyncode.jtwig.tree;
-
-import java.util.Map;
-
-import com.lyncode.jtwig.render.JtwigRender;
-
+package com.lyncode.jtwig.elements;
 
 /**
  * @author "João Melo <jmelo@lyncode.com>"
  *
  */
-public abstract class JtwigElement {
-	public abstract JtwigRender<? extends JtwigElement> renderer (Map<String, Object> map);
+public class Include {
+	private String path;
+
+	public Include(String path) {
+		super();
+		this.path = path;
+	}
+
+	public String getPath() {
+		return path;
+	}
+	
+	
 }

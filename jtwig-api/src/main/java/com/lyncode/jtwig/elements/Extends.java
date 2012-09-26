@@ -13,36 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.lyncode.jtwig.tree;
-
-import java.util.Map;
-
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-
-import com.lyncode.jtwig.render.JtwigRender;
-import com.lyncode.jtwig.render.JtwigTextRender;
+package com.lyncode.jtwig.elements;
 
 /**
  * @author "João Melo <jmelo@lyncode.com>"
  *
  */
-public class JtwigText extends JtwigElement {
-	private static Logger log = LogManager.getLogger(JtwigText.class);
-	private String text;
+public class Extends {
+	private String path;
 
-	public JtwigText(String text) {
+	public Extends(String path) {
 		super();
-		this.text = text;
-		log.debug("Text: '"+text+"'");
+		this.path = path;
 	}
 
-	public String getText() {
-		return text;
+	public String getPath() {
+		return path;
 	}
-
-	@Override
-	public JtwigRender<? extends JtwigElement> renderer(Map<String, Object> map) {
-		return new JtwigTextRender(map, this);
-	}
+	
+	
 }

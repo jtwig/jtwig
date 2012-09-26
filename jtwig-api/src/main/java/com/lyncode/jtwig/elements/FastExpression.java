@@ -13,29 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.lyncode.jtwig.tree;
+package com.lyncode.jtwig.elements;
 
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author "João Melo <jmelo@lyncode.com>"
  *
  */
-public class JtwigRoot extends JtwigContent {
-
-	public void replace(JtwigBlock block) {
-		JtwigBlock old = null;
-		
-		JtwigContent content = new JtwigContent();
-		for (JtwigElement e : block.getChilds())
-			content.add(e);
-		
-		for (JtwigElement e : this.getChilds())
-			if (e instanceof JtwigBlock)
-				if (e.equals(block))
-					old = (JtwigBlock) e;
-		
-		super.replace(old, content);
-					
+public class FastExpression {
+	private Object value;
+	private List<Function> functions;
+	
+	public FastExpression (Object value) {
+		this.value = value;
+		this.functions = new ArrayList<Function>();
 	}
 
+	public Object getValue() {
+		return value;
+	}
+	
+	public boolean add (Function f) {
+		this.functions.add(f);
+		return true;
+	}
+
+	public List<Function> getFunctions() {
+		return functions;
+	}
+	
+	
 }

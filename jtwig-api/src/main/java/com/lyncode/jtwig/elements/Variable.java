@@ -13,28 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.lyncode.jtwig.render;
-
-import java.util.Map;
-
-import com.lyncode.jtwig.tree.JtwigText;
+package com.lyncode.jtwig.elements;
 
 /**
  * @author "João Melo <jmelo@lyncode.com>"
  *
  */
-public class JtwigTextRender extends JtwigRender<JtwigText> {
+public class Variable {
+	private String name;
 
-	public JtwigTextRender(Map<String, Object> model, JtwigText e) {
-		super(model, e);
+	public Variable(String name) {
+		super();
+		this.name = name;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.lyncode.jtwig.render.JtwigRender#render()
-	 */
-	@Override
-	public String render() {
-		return this.getElement().getText();
+	public String getName() {
+		return name;
 	}
-
 }

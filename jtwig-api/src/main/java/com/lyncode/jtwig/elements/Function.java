@@ -13,43 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.lyncode.jtwig.tree;
+package com.lyncode.jtwig.elements;
 
-import java.util.Map;
-
-import com.lyncode.jtwig.render.JtwigIfRender;
-import com.lyncode.jtwig.render.JtwigRender;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author "João Melo <jmelo@lyncode.com>"
  *
  */
-public class JtwigIf extends JtwigContent {
-	private JtwigValue name;
-	private JtwigElse elseContent;
+public class Function {
+	private String name;
+	private List<Object> arguments;
 
-	public JtwigIf(JtwigValue name) {
+	public Function(String name) {
 		super();
 		this.name = name;
+		this.arguments = new ArrayList<Object>();
 	}
 
-	public JtwigValue getName() {
+	public String getName() {
 		return name;
 	}
 	
-	public boolean setElse (JtwigElse elsea) {
-		this.elseContent = elsea;
+	public boolean add (Object argument) {
+		this.arguments.add(argument);
 		return true;
 	}
-
-	public JtwigElse getElseContent() {
-		return elseContent;
-	}
-
-	@Override
-	public JtwigRender<? extends JtwigElement> renderer(Map<String, Object> map) {
-		return new JtwigIfRender(map, this);
-		
-	}
-	
 }
