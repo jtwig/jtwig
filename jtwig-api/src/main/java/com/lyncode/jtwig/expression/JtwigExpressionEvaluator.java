@@ -20,16 +20,16 @@ import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.text.WordUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.util.ReflectionUtils;
 
-import com.lyncode.jtwig.elements.Function;
+import com.lyncode.jtwig.elements.FunctionExpr;
 import com.lyncode.jtwig.elements.ObjectList;
 import com.lyncode.jtwig.elements.ObjectMap;
 import com.lyncode.jtwig.elements.Variable;
 import com.lyncode.jtwig.exceptions.JtwigRenderException;
+import com.lyncode.jtwig.render.Calculable;
 
 /**
  * @author "João Melo <jmelo@lyncode.com>"
@@ -59,9 +59,10 @@ public class JtwigExpressionEvaluator {
 			for (String key : m.keySet())
 				newM.add(key, this.evaluate(m.get(key)));
 			return newM;
-		} else if (input instanceof Function) {
-			
-		}
+		} else if (input instanceof Calculable) {
+			return ((FunctionExpr) input).calculate(this.model);
+		} 
+		return input;
 	}
 	
 	public Object evaluate (String variable) throws JtwigRenderException {

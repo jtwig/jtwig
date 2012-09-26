@@ -16,8 +16,10 @@
 package com.lyncode.jtwig.elements;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Map;
 
+import com.lyncode.jtwig.exceptions.JtwigRenderException;
 import com.lyncode.jtwig.manager.ResourceManager;
 import com.lyncode.jtwig.render.Renderable;
 
@@ -28,7 +30,7 @@ import com.lyncode.jtwig.render.Renderable;
 public class ObjectList extends ArrayList<Object> implements Renderable {
 	private static final long serialVersionUID = 6581105515775675565L;
 	
-	public String render(Map<String, Object> model, ResourceManager manager) {
+	public String render(Map<String, Object> model, ResourceManager manager) throws JtwigRenderException {
 		String result = "";
 		for (Object obj : this) {
 			if (obj instanceof Renderable) {
@@ -38,5 +40,29 @@ public class ObjectList extends ArrayList<Object> implements Renderable {
 			}
 		}
 		return result;
+	}
+
+	public void replace(Include icl, ObjectList parent) {
+		boolean replaced = false;
+		for (int i = 0;i<this.size() && !replaced;i++) {
+			if (this.get(i) instanceof Include) {
+				if (((Include) this.get(i)).getPath().equals(icl.getPath())) {
+					this.set(i, parent);
+					replaced = true;
+				}
+			}
+		}
+	}
+
+	public void replace(Block block) {
+		boolean replaced = false;
+		for (int i = 0;i<this.size() && !replaced;i++) {
+			if (this.get(i) instanceof Block) {
+				if (((Block) this.get(i)).getName().equals(block.getName())) {
+					this.set(i, block);
+					replaced = true;
+				}
+			}
+		}
 	}
 }

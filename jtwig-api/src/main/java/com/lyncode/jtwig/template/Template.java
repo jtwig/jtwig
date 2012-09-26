@@ -18,28 +18,24 @@ package com.lyncode.jtwig.template;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
 
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.parboiled.common.FileUtils;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
+import com.lyncode.jtwig.elements.Block;
+import com.lyncode.jtwig.elements.Extends;
+import com.lyncode.jtwig.elements.Include;
+import com.lyncode.jtwig.elements.ObjectList;
 import com.lyncode.jtwig.exceptions.JtwigParsingException;
 import com.lyncode.jtwig.exceptions.JtwigRenderException;
 import com.lyncode.jtwig.exceptions.TemplateBuildException;
 import com.lyncode.jtwig.manager.ResourceManager;
 import com.lyncode.jtwig.manager.ServletContextResourceManager;
-import com.lyncode.jtwig.parser.JtwigParser;
-import com.lyncode.jtwig.tree.JtwigBlock;
-import com.lyncode.jtwig.tree.JtwigContent;
-import com.lyncode.jtwig.tree.JtwigElement;
-import com.lyncode.jtwig.tree.JtwigExtends;
-import com.lyncode.jtwig.tree.JtwigInclude;
-import com.lyncode.jtwig.tree.JtwigRoot;
+import com.lyncode.jtwig.parser.JtwigExtendedParser;
 
 /**
  * @author "João Melo <jmelo@lyncode.com>"
@@ -48,7 +44,7 @@ import com.lyncode.jtwig.tree.JtwigRoot;
 public class Template {
 	private ServletContext servletContext;
 	private ResourceManager resources;
-	private JtwigRoot resolved;
+	private ObjectList resolved;
 	
 	public Template (ServletContext servletContext, String filename) throws TemplateBuildException  {
 		try {
@@ -68,33 +64,33 @@ public class Template {
 		}
 	}
 
-	private void replaceIncludes (JtwigContent content) throws TemplateBuildException {
-		Collection<JtwigElement> includes = Collections2.filter(content.getChilds(), new Predicate<JtwigElement>() {
-			public boolean apply(JtwigElement input) {
-				return (input instanceof JtwigInclude);
+	private void replaceIncludes (ObjectList content) throws TemplateBuildException {
+		Collection<Object> includes = Collections2.filter(content, new Predicate<Object>() {
+			public boolean apply(Object input) {
+				return (input instanceof Include);
 			}
 		});
 		
-		for (JtwigElement inc : includes) {
-			JtwigInclude icl = (JtwigInclude) inc;
-			Template t = this.loadTemplate(icl.getTemplateName());
-			JtwigRoot parent = t.resolve();
+		for (Object inc : includes) {
+			Include icl = (Include) inc;
+			Template t = this.loadTemplate(icl.getPath());
+			ObjectList parent = t.resolve();
 			content.replace(icl, parent);
 		}
 		
-		Collection<JtwigElement> contents = Collections2.filter(content.getChilds(), new Predicate<JtwigElement>() {
-			public boolean apply(JtwigElement input) {
-				return (input instanceof JtwigContent);
+		Collection<Object> contents = Collections2.filter(content, new Predicate<Object>() {
+			public boolean apply(Object input) {
+				return (input instanceof ObjectList);
 			}
 		});
 		
-		for (JtwigElement ct : contents) {
-			JtwigContent icl = (JtwigContent) ct;
+		for (Object ct : contents) {
+			ObjectList icl = (ObjectList) ct;
 			this.replaceIncludes(icl);
 		}
 	}
 	
-	private JtwigRoot resolve () throws TemplateBuildException {
+	private ObjectList resolve () throws TemplateBuildException {
 		byte[] readed;
 		try {
 			readed = FileUtils.readAllBytes(resources.getResource());
@@ -102,43 +98,41 @@ public class Template {
 			throw new TemplateBuildException(e1);
 		}
 		String input = new String(readed);
-		JtwigRoot root;
+		ObjectList root;
 		try {
-			root = JtwigParser.parse(input);
+			root = JtwigExtendedParser.parse(input);
 		} catch (JtwigParsingException e) {
 			throw new TemplateBuildException(e);
 		}
-		if (root.getChilds().isEmpty()) {
-			return root;
-		} else {
+		if (!root.isEmpty()) {
 			// Search the tree for Includes and replace them
 			this.replaceIncludes(root);
 			
 			// Search the root tree for Blocks and replace them
-			List<JtwigElement> elements = root.getChilds();
-			if (elements.get(0) instanceof JtwigExtends) {
+			if (root.get(0) instanceof Extends) {
 				// Extension template
-				JtwigExtends ext = (JtwigExtends) elements.get(0);
-				Template t = this.loadTemplate(ext.getTemplateName());
-				JtwigRoot parent = t.resolve();
+				Extends ext = (Extends) root.get(0);
+				Template t = this.loadTemplate(ext.getPath());
 				
-				Collection<JtwigElement> masterBlocks = Collections2.filter(parent.getChilds(), new Predicate<JtwigElement>() {
-					public boolean apply(JtwigElement input) {
-						return (input instanceof JtwigBlock);
+				ObjectList parent = t.resolve();
+				
+				Collection<Object> masterBlocks = Collections2.filter(parent, new Predicate<Object>() {
+					public boolean apply(Object input) {
+						return (input instanceof Block);
 					}
 				});
 				
-				Collection<JtwigElement> thisBlocks = Collections2.filter(elements, new Predicate<JtwigElement>() {
-					public boolean apply(JtwigElement input) {
-						return (input instanceof JtwigBlock);
+				Collection<Object> thisBlocks = Collections2.filter(root, new Predicate<Object>() {
+					public boolean apply(Object input) {
+						return (input instanceof Block);
 					}
 				});
 				
-				if (thisBlocks.size() > elements.size() + 1)
+				if (thisBlocks.size() > root.size() + 1)
 					throw new TemplateBuildException(this.resources.getPath() + " template with unexpected constructions");
 				
-				for (JtwigElement elem : thisBlocks) {
-					JtwigBlock block = (JtwigBlock) elem;
+				for (Object elem : thisBlocks) {
+					Block block = (Block) elem;
 					if (!masterBlocks.contains(block))
 						throw new TemplateBuildException("Undefined block "+block.getName());
 					
@@ -154,7 +148,7 @@ public class Template {
 	
 	public void process (Map<String, Object> model, OutputStream out) throws JtwigRenderException {
 		try {
-			out.write(this.resolved.renderer(model).render().getBytes());
+			out.write(this.resolved.render(model, resources).getBytes());
 			out.flush();
 			out.close();
 		} catch (IOException e) {

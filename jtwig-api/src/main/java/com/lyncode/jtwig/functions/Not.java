@@ -29,10 +29,18 @@ public class Not extends Function {
 	 * @see com.lyncode.jtwig.functions.Function#apply(java.util.List)
 	 */
 	@Override
-	public String apply(List<String> arguments) throws FunctionException {
+	public Object apply(List<Object> arguments) throws FunctionException {
 		if (arguments.size() != 1)
 			throw new FunctionException("Not function must receive one argument");
-		return new Boolean(!arguments.get(0).equals(new Boolean(true).toString())).toString();
+		Object argument = arguments.get(0);
+		Boolean value = new Boolean(false);
+		if (argument == null) value = new Boolean(false);
+		else if (argument instanceof String)
+			return Boolean.parseBoolean((String) argument);
+		else if (argument instanceof Boolean) value = (Boolean) argument;
+		else value = new Boolean(true); // Non null goes true
+		
+		return new Boolean(!value.booleanValue());
 	}
 
 }

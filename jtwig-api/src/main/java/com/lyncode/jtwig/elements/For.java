@@ -15,11 +15,15 @@
  */
 package com.lyncode.jtwig.elements;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.lyncode.jtwig.exceptions.JtwigRenderException;
 import com.lyncode.jtwig.expression.JtwigExpressionEvaluator;
 import com.lyncode.jtwig.manager.ResourceManager;
+import com.lyncode.jtwig.render.Calculable;
 import com.lyncode.jtwig.render.Renderable;
 
 /**
@@ -44,22 +48,32 @@ public class For extends ObjectList {
 		return value;
 	}
 	
-	public String render(Map<String, Object> model, ResourceManager manager) {
+	@SuppressWarnings("unchecked")
+	public String render(Map<String, Object> model, ResourceManager manager) throws JtwigRenderException {
 		String result = "";
-		JtwigExpressionEvaluator eval = new JtwigExpressionEvaluator(model);
-		if (this.value instanceof ObjectList) {
-			
-		} else if (this.value instanceof Variable) {
-			
-		} else if (this.)
+		Object values = null;
+		if (this.value instanceof Calculable) {
+			values = ((Calculable) this.value).calculate(model);
+		} else values = this.value;
 		
-		for (Object obj : this) {
+		List<Object> forValues = null;
+		
+		if (values == null) forValues = new ObjectList();
+		else if (!(values instanceof List<?>)) {
+			forValues = new ArrayList<Object>();
+			forValues.add(values);
+		} else forValues = (List<Object>) values;
+		
+		for (Object val : forValues) {
 			Map<String, Object> newModel = new TreeMap<String, Object>();
 			newModel.putAll(model);
-			if (obj instanceof Renderable) {
-				result += ((Renderable) obj).render(model, manager);
-			} else if (obj instanceof String) {
-				result += (String) obj;
+			newModel.put(variable, val);
+			for (Object obj : this) {
+				if (obj instanceof Renderable) {
+					result += ((Renderable) obj).render(newModel, manager);
+				} else if (obj instanceof String) {
+					result += (String) obj;
+				} else throw new JtwigRenderException("Unable to render object "+obj.toString());
 			}
 		}
 		return result;

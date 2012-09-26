@@ -24,5 +24,5 @@ import com.lyncode.jtwig.exceptions.FunctionException;
  *
  */
 public abstract class Function {
-	public abstract String apply (List<String> arguments) throws FunctionException;
+	public abstract Object apply (List<Object> arguments) throws FunctionException;
 }

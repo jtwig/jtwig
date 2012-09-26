@@ -15,6 +15,16 @@
  */
 package com.lyncode.jtwig.elements;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
+import com.lyncode.jtwig.exceptions.JtwigRenderException;
+import com.lyncode.jtwig.manager.ResourceManager;
+import com.lyncode.jtwig.render.Calculable;
+import com.lyncode.jtwig.render.Renderable;
+
 /**
  * @author "João Melo <jmelo@lyncode.com>"
  *
@@ -48,5 +58,44 @@ public class If extends ObjectList {
 	public boolean setElse (ObjectList l) {
 		this.elseContent = l;
 		return true;
+	}
+	
+
+	public String render(Map<String, Object> model, ResourceManager manager) throws JtwigRenderException {
+		String result = "";
+		Object values = null;
+		if (this.value instanceof Calculable) {
+			values = ((Calculable) this.value).calculate(model);
+		} else values = this.value;
+		
+		boolean test = false;
+		
+		if (values != null) {
+			if (!(values instanceof List<?>)) {
+				test = (((List<?>)values).size() > 0);
+			} else if (values instanceof Boolean) {
+				test = ((Boolean) values);
+			} else test = true; // Non null object
+		}
+		if (test) {
+			for (Object obj : this) {
+				if (obj instanceof Renderable) {
+					result += ((Renderable) obj).render(model, manager);
+				} else if (obj instanceof String) {
+					result += (String) obj;
+				} else throw new JtwigRenderException("Unable to render object "+obj.toString());
+			}
+		} else {
+			if (this.hasElse()) {
+				for (Object obj : this.getElseContent()) {
+					if (obj instanceof Renderable) {
+						result += ((Renderable) obj).render(model, manager);
+					} else if (obj instanceof String) {
+						result += (String) obj;
+					} else throw new JtwigRenderException("Unable to render object "+obj.toString());
+				}
+			}
+		}
+		return result;
 	}
 }

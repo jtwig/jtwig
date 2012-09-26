@@ -17,31 +17,60 @@ package com.lyncode.jtwig.elements;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
+import com.lyncode.jtwig.exceptions.JtwigRenderException;
+import com.lyncode.jtwig.expression.JtwigExpressionEvaluator;
+import com.lyncode.jtwig.manager.ResourceManager;
+import com.lyncode.jtwig.render.Calculable;
+import com.lyncode.jtwig.render.Renderable;
 
 /**
  * @author "João Melo <jmelo@lyncode.com>"
  *
  */
-public class FastExpression {
+public class FastExpression implements Renderable {
 	private Object value;
-	private List<Function> functions;
+	private List<FunctionExpr> functions;
 	
 	public FastExpression (Object value) {
 		this.value = value;
-		this.functions = new ArrayList<Function>();
+		this.functions = new ArrayList<FunctionExpr>();
 	}
 
 	public Object getValue() {
 		return value;
 	}
 	
-	public boolean add (Function f) {
+	public boolean add (FunctionExpr f) {
 		this.functions.add(f);
 		return true;
 	}
 
-	public List<Function> getFunctions() {
+	public List<FunctionExpr> getFunctions() {
 		return functions;
+	}
+
+	public String render(Map<String, Object> model, ResourceManager manager)
+			throws JtwigRenderException {
+		JtwigExpressionEvaluator evaluator = new JtwigExpressionEvaluator(model);
+		Object result = null;
+		if (this.value instanceof Calculable) {
+			result = ((Calculable) this.value).calculate(model);
+		} else result = this.value;
+		
+		for (FunctionExpr f : functions) {
+			List<Object> args = new ArrayList<Object>();
+			args.add(result);
+			for (Object obj : f.getArguments()) {
+				obj = evaluator.evaluate(obj);
+				args.add(obj);
+			}
+			result = f.calculate(args);
+		}
+		
+		return result.toString();
 	}
 	
 	

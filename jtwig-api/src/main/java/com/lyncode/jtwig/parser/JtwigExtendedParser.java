@@ -29,7 +29,7 @@ import com.lyncode.jtwig.elements.Block;
 import com.lyncode.jtwig.elements.Extends;
 import com.lyncode.jtwig.elements.FastExpression;
 import com.lyncode.jtwig.elements.For;
-import com.lyncode.jtwig.elements.Function;
+import com.lyncode.jtwig.elements.FunctionExpr;
 import com.lyncode.jtwig.elements.If;
 import com.lyncode.jtwig.elements.Include;
 import com.lyncode.jtwig.elements.ObjectList;
@@ -334,7 +334,7 @@ public class JtwigExtendedParser extends BaseParser<Object> {
     			ZeroOrMore(Sequence(
     					OR,
     					Function(),
-    					((FastExpression) peek(1)).add((Function)pop())
+    					((FastExpression) peek(1)).add((FunctionExpr)pop())
     			)),
     			CFAST
     	);
@@ -374,7 +374,7 @@ public class JtwigExtendedParser extends BaseParser<Object> {
     							MapExpression(),
     							Variable()
     					),
-    					ACTION(((Function)peek(1)).add(pop()))
+    					ACTION(((FunctionExpr)peek(1)).add(pop()))
     			)
     	);
     }
@@ -387,7 +387,7 @@ public class JtwigExtendedParser extends BaseParser<Object> {
     Rule Function () {
     	return Sequence(
     			Identifier(),
-    			push(new Function((String) pop())),
+    			push(new FunctionExpr((String) pop())),
     			FunctionArguments()
     	);
     }

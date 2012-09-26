@@ -17,6 +17,7 @@ package com.lyncode.jtwig.render;
 
 import java.util.Map;
 
+import com.lyncode.jtwig.exceptions.JtwigRenderException;
 import com.lyncode.jtwig.manager.ResourceManager;
 
 /**
@@ -24,5 +25,5 @@ import com.lyncode.jtwig.manager.ResourceManager;
  *
  */
 public interface Renderable {
-	String render (Map<String, Object> model, ResourceManager manager);
+	String render (Map<String, Object> model, ResourceManager manager) throws JtwigRenderException;
 }
