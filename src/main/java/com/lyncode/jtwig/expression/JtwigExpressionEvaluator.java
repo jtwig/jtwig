@@ -83,6 +83,7 @@ public class JtwigExpressionEvaluator {
 	}
 
 	private Object evaluate(Object context, String part) throws JtwigRenderException {
+		if (context == null) return null;
 		if (context instanceof Map<?, ?>) {
 			System.out.println("Trying to get "+part+" on Map:");
 			for (Object k : ((Map<?, ?>) context).keySet())
@@ -112,7 +113,7 @@ public class JtwigExpressionEvaluator {
 				}
 			}
 			
-			throw new JtwigRenderException();
+			throw new JtwigRenderException("Unable to find Key '"+part+"' in Object "+context.toString());
 		}
 	}
 	

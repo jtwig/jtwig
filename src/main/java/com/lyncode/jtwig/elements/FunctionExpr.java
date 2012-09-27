@@ -74,7 +74,8 @@ public class FunctionExpr implements Calculable {
 			Object obj = loadedClass.newInstance();
 			if (obj instanceof Function) {
 				return ((Function) obj).apply(args);
-			} else throw new JtwigRenderException("Unknown function "+name);
+			} else 
+				throw new JtwigRenderException("Unknown function "+name);
 		} catch (ClassNotFoundException e) {
 			throw new JtwigRenderException(e);
 		} catch (InstantiationException e) {
