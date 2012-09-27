@@ -85,9 +85,7 @@ public class JtwigExpressionEvaluator {
 	private Object evaluate(Object context, String part) throws JtwigRenderException {
 		if (context == null) return null;
 		if (context instanceof Map<?, ?>) {
-			System.out.println("Trying to get "+part+" on Map:");
-			for (Object k : ((Map<?, ?>) context).keySet())
-				System.out.println(k.toString()+ " = "+((Map<?, ?>) context).get(k));
+			log.debug("Trying to get "+part+" on Map");
 			
 			if (((Map<?, ?>) context).containsKey(part))
 				return ((Map<?, ?>) context).get(part);
