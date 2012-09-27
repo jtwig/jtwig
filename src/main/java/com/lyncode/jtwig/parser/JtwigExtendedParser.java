@@ -17,6 +17,8 @@ package com.lyncode.jtwig.parser;
 
 import java.util.regex.Pattern;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.parboiled.BaseParser;
 import org.parboiled.Parboiled;
 import org.parboiled.Rule;
@@ -44,39 +46,40 @@ import com.lyncode.jtwig.exceptions.JtwigParsingException;
  * @author "João Melo <jmelo@lyncode.com>"
  */
 public class JtwigExtendedParser extends BaseParser<Object> {
+	private static Logger log = LogManager.getLogger(JtwigExtendedParser.class);
 	private static JtwigExtendedParser parser = null;
 	
     @Override
 	public Object pop(int down) {
-    	System.out.println("Before Pop Stack Size: " + this.getContext().getValueStack().size());
+    	log.debug("Before Pop Stack Size: " + this.getContext().getValueStack().size());
     	Object e = super.pop(down);
-    	System.out.println("Poping at "+down+": "+e.toString());
-    	System.out.println("Stack Size: " + this.getContext().getValueStack().size());
+    	log.debug("Poping at "+down+": "+e.toString());
+    	log.debug("Stack Size: " + this.getContext().getValueStack().size());
 		return e;
 	}
 
 	@Override
 	public boolean push(Object value) {
-		System.out.println("Before Push Stack Size: " + this.getContext().getValueStack().size());
+		log.debug("Before Push Stack Size: " + this.getContext().getValueStack().size());
     	boolean e = super.push(value);
-    	System.out.println("Pushing: "+value.toString());
-    	System.out.println("Stack Size: " + this.getContext().getValueStack().size());
+    	log.debug("Pushing: "+value.toString());
+    	log.debug("Stack Size: " + this.getContext().getValueStack().size());
 		return e;
 	}
 
 	@Override
 	public Object pop() {
-		System.out.println("Before Pop Stack Size: " + this.getContext().getValueStack().size());
+		log.debug("Before Pop Stack Size: " + this.getContext().getValueStack().size());
 		Object e = super.pop();
-    	System.out.println("Poping: "+e.toString());
-    	System.out.println("Stack Size: " + this.getContext().getValueStack().size());
+    	log.debug("Poping: "+e.toString());
+    	log.debug("Stack Size: " + this.getContext().getValueStack().size());
 		return e;
 	}
 	
 	public static void main (String... str) throws JtwigParsingException {
 		String input = "     {% block boy %}     <asdasd>\n     {% endblock %}";
-		System.out.println(input);
-		System.out.println(parse(input));
+		log.debug(input);
+		log.debug(parse(input));
 	}
 
 	public static ObjectList parse (String input) throws JtwigParsingException {
@@ -88,16 +91,20 @@ public class JtwigExtendedParser extends BaseParser<Object> {
     	// Tratar do Input
     	input = input.replaceAll("\\n\\s*"+Pattern.quote("{%"), "{%");
     	input = input.replaceAll(Pattern.quote("{%")+"\\s*\\n", "%}");
-    	System.out.println(input);
     	
-        //ParsingResult<JtwigElement> result = new TracingParseRunner<JtwigElement>(parser.JtwigContentRoot()).run(input);
-        ParsingResult<Object> result = new BasicParseRunner<Object>(parser.Start()).run(input);
-        
-        Object e = result.valueStack.pop();
-        if (e instanceof ObjectList)
-        	return (ObjectList) e;
-        else
-        	throw new JtwigParsingException("A parsing error occurs");
+    	try {
+    		log.debug("Start new parse");
+    		//ParsingResult<JtwigElement> result = new TracingParseRunner<JtwigElement>(parser.JtwigContentRoot()).run(input);
+    		ParsingResult<Object> result = new BasicParseRunner<Object>(parser.Start()).run(input);
+
+            Object e = result.valueStack.pop();
+            if (e instanceof ObjectList)
+            	return (ObjectList) e;
+            else
+            	throw new JtwigParsingException("A parsing error occurs");
+    	} catch (IllegalArgumentException e) {
+    		throw new JtwigParsingException("Template not well formed", e);
+    	}
     }
 	
 	final String TRUE = "true";
@@ -165,6 +172,7 @@ public class JtwigExtendedParser extends BaseParser<Object> {
     					BlockExpression(),
     	    			((ObjectList) peek(1)).add(pop())
     			),
+    			Spacing(),
     			EOI
     	);
     }

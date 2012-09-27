@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.text.WordUtils;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 
 import com.lyncode.jtwig.exceptions.FunctionException;
 import com.lyncode.jtwig.exceptions.JtwigRenderException;
@@ -32,14 +34,15 @@ import com.lyncode.jtwig.render.Calculable;
  *
  */
 public class FunctionExpr implements Calculable {
+	private static Logger log = LogManager.getLogger(FunctionExpr.class);
 	private String name;
 	private List<Object> arguments;
 
 	public FunctionExpr(String name) {
 		super();
-		System.out.println("FUNCTION: "+name);
 		this.name = name;
 		this.arguments = new ArrayList<Object>();
+		log.debug(this);
 	}
 
 	public String getName() {
@@ -102,5 +105,9 @@ public class FunctionExpr implements Calculable {
 		} catch (FunctionException e) {
 			throw new JtwigRenderException(e);
 		}
+	}
+
+	public String toString () {
+		return "FUNCTION: "+name;
 	}
 }

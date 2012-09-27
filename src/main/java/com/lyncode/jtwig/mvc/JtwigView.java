@@ -70,10 +70,11 @@ public class JtwigView extends AbstractTemplateView {
 	private static Map<String, Template> templates = new HashMap<String, Template>();
 	
 	private static Template getTemplate (ServletContext servletContext, String url) throws IOException, JtwigParsingException, TemplateBuildException {
-		if (!templates.containsKey(url)) {
+		return new Template(servletContext, url);
+		/*if (!templates.containsKey(url)) {
 			templates.put(url, new Template(servletContext, url));
 		}
-		return templates.get(url);
+		return templates.get(url);*/
 	}
 	
 	

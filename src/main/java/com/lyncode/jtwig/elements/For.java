@@ -20,6 +20,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+
 import com.lyncode.jtwig.exceptions.JtwigRenderException;
 import com.lyncode.jtwig.manager.ResourceManager;
 import com.lyncode.jtwig.render.Calculable;
@@ -30,14 +33,15 @@ import com.lyncode.jtwig.render.Renderable;
  *
  */
 public class For extends ObjectList {
+	private static Logger log = LogManager.getLogger(For.class);
 	private static final long serialVersionUID = 4648580478468941354L;
 	private String variable;
 	private Object value;
 	
 	public For (String variable, Object value) {
-		System.out.println("FOR: "+variable+", VALUE: "+value.toString());
 		this.variable = variable;
 		this.value = value;
+		log.debug(this);
 	}
 
 	public String getVariable() {
@@ -78,5 +82,8 @@ public class For extends ObjectList {
 		}
 		return result;
 	}
-	
+
+	public String toString () {
+		return "FOR: "+variable+", VALUE: "+value.toString();
+	}
 }

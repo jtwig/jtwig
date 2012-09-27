@@ -17,6 +17,9 @@ package com.lyncode.jtwig.elements;
 
 import java.util.Map;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+
 import com.lyncode.jtwig.exceptions.JtwigRenderException;
 import com.lyncode.jtwig.manager.ResourceManager;
 
@@ -26,13 +29,14 @@ import com.lyncode.jtwig.manager.ResourceManager;
  *
  */
 public class Block extends ObjectList {
+	private static Logger log = LogManager.getLogger(Block.class);
 	private static final long serialVersionUID = -3386153290112843228L;
 	private String name;
 
 	public Block(String name) {
 		super();
-		System.out.println("BLOCK: "+name);
 		this.name = name;
+		log.debug(this);
 	}
 
 	public String getName() {
@@ -48,5 +52,9 @@ public class Block extends ObjectList {
 		if (obj instanceof Block)
 			return ((Block) obj).getName().equals(name);
 		return false;
+	}
+	
+	public String toString () {
+		return "BLOCK: "+name;
 	}
 }

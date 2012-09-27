@@ -18,6 +18,9 @@ package com.lyncode.jtwig.elements;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+
 import com.lyncode.jtwig.exceptions.JtwigRenderException;
 import com.lyncode.jtwig.manager.ResourceManager;
 import com.lyncode.jtwig.render.Calculable;
@@ -28,20 +31,22 @@ import com.lyncode.jtwig.render.Renderable;
  *
  */
 public class If extends ObjectList {
+	private static Logger log = LogManager.getLogger(If.class);
 	private static final long serialVersionUID = -8676097057249972628L;
 	private Object value;
 	private ObjectList elseContent;
 	public If(Object value, ObjectList elseContent) {
 		super();
-		System.out.println("IF: "+value+" with ELSE");
 		this.value = value;
 		this.elseContent = elseContent;
+		log.debug(this);
 	}
 	
 	public If(Object value) {
 		super();
-		System.out.println("IF: "+value+" without ELSE");
+		this.elseContent = null;
 		this.value = value;
+		log.debug(this);
 	}
 	
 	public Object getValue() {
@@ -97,5 +102,13 @@ public class If extends ObjectList {
 			}
 		}
 		return result;
+	}
+	
+
+	public String toString () {
+		if (this.hasElse())
+			return "IF: "+value+" with ELSE";
+		else
+			return "IF: "+value+" without ELSE";
 	}
 }

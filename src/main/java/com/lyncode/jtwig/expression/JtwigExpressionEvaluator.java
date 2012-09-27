@@ -17,6 +17,7 @@ package com.lyncode.jtwig.expression;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -74,7 +75,7 @@ public class JtwigExpressionEvaluator {
 				context = this.evaluate(context, part.trim());
 			} catch (JtwigRenderException e) {
 				log.debug(part, e);
-				throw new JtwigRenderException("Unable to evaluate variable "+variable, e);
+				return null;
 			}
 		}
 		
@@ -92,17 +93,23 @@ public class JtwigExpressionEvaluator {
 			else
 				throw new JtwigRenderException("Unable to find Key '"+part+"' in Map "+context.toString());
 		} else {
-			Field f = ReflectionUtils.findField(context.getClass(), part);
-			if (f != null) return ReflectionUtils.getField(f, context);
-			
+			Field[] fields = context.getClass().getFields();
+			for (Field f : fields) {
+				if (Modifier.isPublic(f.getModifiers())) {
+					if (f.getName().toLowerCase().equals(part.toLowerCase()))
+						return ReflectionUtils.getField(f, context);
+				}
+			}
 			Method[] methods = context.getClass().getMethods();
 			for (Method met : methods) {
-				if (met.getName().toLowerCase().equals(part.toLowerCase()))
-					return ReflectionUtils.invokeMethod(met, context);
-				if (met.getName().toLowerCase().equals("get" + part.toLowerCase()))
-					return ReflectionUtils.invokeMethod(met, context);
-				if (met.getName().toLowerCase().equals("is" + part.toLowerCase()))
-					return ReflectionUtils.invokeMethod(met, context);
+				if (Modifier.isPublic(met.getModifiers())) {
+					if (met.getName().toLowerCase().equals(part.toLowerCase()))
+						return ReflectionUtils.invokeMethod(met, context);
+					if (met.getName().toLowerCase().equals("get" + part.toLowerCase()))
+						return ReflectionUtils.invokeMethod(met, context);
+					if (met.getName().toLowerCase().equals("is" + part.toLowerCase()))
+						return ReflectionUtils.invokeMethod(met, context);
+				}
 			}
 			
 			throw new JtwigRenderException();

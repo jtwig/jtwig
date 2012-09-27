@@ -31,7 +31,6 @@ public class ObjectList extends ArrayList<Object> implements Renderable {
 	
 	public ObjectList () {
 		super();
-		System.out.println("Container");
 	}
 
 	private boolean block = false;
@@ -84,5 +83,9 @@ public class ObjectList extends ArrayList<Object> implements Renderable {
 				}
 			}
 		}
+	}
+	
+	public String toString () {
+		return "CONTAINER ("+this.size()+")";
 	}
 }

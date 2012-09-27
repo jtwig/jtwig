@@ -19,6 +19,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+
 import com.lyncode.jtwig.exceptions.JtwigRenderException;
 import com.lyncode.jtwig.expression.JtwigExpressionEvaluator;
 import com.lyncode.jtwig.manager.ResourceManager;
@@ -30,13 +33,14 @@ import com.lyncode.jtwig.render.Renderable;
  *
  */
 public class FastExpression implements Renderable {
+	private static Logger log = LogManager.getLogger(FastExpression.class);
 	private Object value;
 	private List<FunctionExpr> functions;
 	
 	public FastExpression (Object value) {
-		System.out.println("FAST EXPRESSION: "+value.toString());
 		this.value = value;
 		this.functions = new ArrayList<FunctionExpr>();
+		log.debug(this);
 	}
 
 	public Object getValue() {
@@ -73,5 +77,8 @@ public class FastExpression implements Renderable {
 		return result.toString();
 	}
 	
-	
+
+	public String toString () {
+		return "FastExpression: "+value;
+	}
 }

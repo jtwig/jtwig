@@ -17,19 +17,28 @@ package com.lyncode.jtwig.elements;
 
 import java.util.TreeMap;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+
 /**
  * @author "João Melo <jmelo@lyncode.com>"
  *
  */
 public class ObjectMap extends TreeMap<String, Object> {
+	private static Logger log = LogManager.getLogger(ObjectMap.class);
 	private static final long serialVersionUID = -5599558472927362564L;
 
 	public ObjectMap () {
-		System.out.println("MAP");
+		log.debug(this);
 	}
 	
 	public boolean add (String key, Object value) {
 		super.put(key, value);
 		return true;
+	}
+	
+
+	public String toString () {
+		return "MAP ("+this.size()+")";
 	}
 }

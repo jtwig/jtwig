@@ -17,6 +17,9 @@ package com.lyncode.jtwig.elements;
 
 import java.util.Map;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+
 import com.lyncode.jtwig.exceptions.JtwigRenderException;
 import com.lyncode.jtwig.expression.JtwigExpressionEvaluator;
 import com.lyncode.jtwig.render.Calculable;
@@ -26,12 +29,13 @@ import com.lyncode.jtwig.render.Calculable;
  *
  */
 public class Variable implements Calculable {
+	private static Logger log = LogManager.getLogger(Variable.class);
 	private String name;
 
 	public Variable(String name) {
 		super();
-		System.out.println("VARIABLE: "+name);
 		this.name = name;
+		log.debug(this);
 	}
 
 	public String getName() {
@@ -42,5 +46,9 @@ public class Variable implements Calculable {
 			throws JtwigRenderException {
 		JtwigExpressionEvaluator evaluator = new JtwigExpressionEvaluator(values);
 		return evaluator.evaluate(this.getName());
+	}
+
+	public String toString () {
+		return "VARIABLE: "+name;
 	}
 }
