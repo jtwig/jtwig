@@ -4,8 +4,12 @@
 
 ### Why beta?
 
-Currently the version is in beta stage, we are testing it under heavy scenarios, in real world cases. Also it will need some enhancements by adding a good number of functions. There is also some work left to do in order to have a better aproximation to the Twig syntax.
+Currently the version is in beta stage, we are testing it under heavy scenarios, in real world cases. Also it will need some enhancements by adding a good amount of functions.
 
+
+### Architecture
+
+JTwig architecture is really simple. It consists of a [Parboiled Parser](https://github.com/sirthias/parboiled), that process the template. After assembly all Extends and Includes macros, it renders the output.
 
 ### Example
 
@@ -31,7 +35,7 @@ File: hello.twig
 {% endblock %}
 </code></pre>
 
-More at the [wiki](/lyncode/jtwig/wiki).
+More [documentation available](/lyncode/jtwig/wiki).
 
 ----------
 
