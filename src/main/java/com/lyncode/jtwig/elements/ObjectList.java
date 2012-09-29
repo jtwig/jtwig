@@ -18,6 +18,8 @@ package com.lyncode.jtwig.elements;
 import java.util.ArrayList;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import com.lyncode.jtwig.exceptions.JtwigRenderException;
 import com.lyncode.jtwig.manager.ResourceManager;
 import com.lyncode.jtwig.render.Renderable;
@@ -43,7 +45,7 @@ public class ObjectList extends ArrayList<Object> implements Renderable {
 		block = true;
 	}
 	
-	public String render(Map<String, Object> model, ResourceManager manager) throws JtwigRenderException {
+	public String render(HttpServletRequest req, Map<String, Object> model, ResourceManager manager) throws JtwigRenderException {
 		String result = "";
 		for (Object obj : this) {
 			if (this.hasBlock()) {
@@ -53,7 +55,7 @@ public class ObjectList extends ArrayList<Object> implements Renderable {
 					((ObjectList) obj).setBlock();
 			}
 			if (obj instanceof Renderable) {
-				result += ((Renderable) obj).render(model, manager);
+				result += ((Renderable) obj).render(req, model, manager);
 			} else if (obj instanceof String) {
 				result += (String) obj;
 			}

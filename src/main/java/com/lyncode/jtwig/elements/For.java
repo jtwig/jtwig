@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
@@ -53,11 +55,11 @@ public class For extends ObjectList {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public String render(Map<String, Object> model, ResourceManager manager) throws JtwigRenderException {
+	public String render(HttpServletRequest req, Map<String, Object> model, ResourceManager manager) throws JtwigRenderException {
 		String result = "";
 		Object values = null;
 		if (this.value instanceof Calculable) {
-			values = ((Calculable) this.value).calculate(model);
+			values = ((Calculable) this.value).calculate(req, model);
 		} else values = this.value;
 		
 		List<Object> forValues = null;
@@ -74,7 +76,7 @@ public class For extends ObjectList {
 			newModel.put(variable, val);
 			for (Object obj : this) {
 				if (obj instanceof Renderable) {
-					result += ((Renderable) obj).render(newModel, manager);
+					result += ((Renderable) obj).render(req, newModel, manager);
 				} else if (obj instanceof String) {
 					result += (String) obj;
 				} else throw new JtwigRenderException("Unable to render object "+obj.toString());

@@ -13,19 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.lyncode.jtwig.render;
-
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
-import com.lyncode.jtwig.exceptions.JtwigRenderException;
-import com.lyncode.jtwig.manager.ResourceManager;
+package com.lyncode.jtwig.functions;
 
 /**
  * @author "João Melo <jmelo@lyncode.com>"
  *
  */
-public interface Renderable {
-	String render (HttpServletRequest req, Map<String, Object> model, ResourceManager manager) throws JtwigRenderException;
+public class Trans extends Message {
+
 }

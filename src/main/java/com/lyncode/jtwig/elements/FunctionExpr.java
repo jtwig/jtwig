@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang3.text.WordUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -60,7 +62,7 @@ public class FunctionExpr implements Calculable {
 		return true;
 	}
 
-	public Object calculate(Map<String, Object> values) throws JtwigRenderException {
+	public Object calculate(HttpServletRequest req, Map<String, Object> values) throws JtwigRenderException {
 		JtwigExpressionEvaluator evaluator = new JtwigExpressionEvaluator(values);
 		String name = WordUtils.capitalizeFully(this.getName().replace('-', ' ').replace('_', ' ')).replaceAll(" ", "");
 		String className = Function.class.getPackage().getName() + "." + name;
@@ -68,12 +70,12 @@ public class FunctionExpr implements Calculable {
 			List<Object> args = new ArrayList<Object>();
 			
 			for (Object arg : this.arguments)
-				args.add(evaluator.evaluate(arg));
+				args.add(evaluator.evaluate(req, arg));
 			
 			Class<?> loadedClass = this.getClass().getClassLoader().loadClass(className);
 			Object obj = loadedClass.newInstance();
 			if (obj instanceof Function) {
-				return ((Function) obj).apply(args);
+				return ((Function) obj).apply(req, args);
 			} else 
 				throw new JtwigRenderException("Unknown function "+name);
 		} catch (ClassNotFoundException e) {
@@ -88,14 +90,14 @@ public class FunctionExpr implements Calculable {
 	}
 	
 
-	public Object calculate(List<Object> calculatedArguments) throws JtwigRenderException {
+	public Object calculate(HttpServletRequest req, List<Object> calculatedArguments) throws JtwigRenderException {
 		String name = WordUtils.capitalizeFully(this.getName().replace('-', ' ').replace('_', ' ')).replaceAll(" ", "");
 		String className = Function.class.getPackage().getName() + "." + name;
 		try {
 			Class<?> loadedClass = this.getClass().getClassLoader().loadClass(className);
 			Object obj = loadedClass.newInstance();
 			if (obj instanceof Function) {
-				return ((Function) obj).apply(calculatedArguments);
+				return ((Function) obj).apply(req, calculatedArguments);
 			} else throw new JtwigRenderException("Unknown function "+name);
 		} catch (ClassNotFoundException e) {
 			throw new JtwigRenderException(e);

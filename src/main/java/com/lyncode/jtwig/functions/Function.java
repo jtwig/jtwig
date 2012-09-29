@@ -17,6 +17,8 @@ package com.lyncode.jtwig.functions;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import com.lyncode.jtwig.exceptions.FunctionException;
 
 /**
@@ -24,5 +26,5 @@ import com.lyncode.jtwig.exceptions.FunctionException;
  *
  */
 public abstract class Function {
-	public abstract Object apply (List<Object> arguments) throws FunctionException;
+	public abstract Object apply (HttpServletRequest req, List<Object> arguments) throws FunctionException;
 }

@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 
 import org.parboiled.common.FileUtils;
 
@@ -146,9 +147,9 @@ public class Template {
 		return root;
 	}
 	
-	public void process (Map<String, Object> model, OutputStream out) throws JtwigRenderException {
+	public void process (HttpServletRequest request, Map<String, Object> model, OutputStream out) throws JtwigRenderException {
 		try {
-			out.write(this.resolved.render(model, resources).getBytes());
+			out.write(this.resolved.render(request, model, resources).getBytes());
 			out.flush();
 			out.close();
 		} catch (IOException e) {

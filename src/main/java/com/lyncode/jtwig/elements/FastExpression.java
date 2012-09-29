@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
@@ -56,22 +58,22 @@ public class FastExpression implements Renderable {
 		return functions;
 	}
 
-	public String render(Map<String, Object> model, ResourceManager manager)
+	public String render(HttpServletRequest req, Map<String, Object> model, ResourceManager manager)
 			throws JtwigRenderException {
 		JtwigExpressionEvaluator evaluator = new JtwigExpressionEvaluator(model);
 		Object result = null;
 		if (this.value instanceof Calculable) {
-			result = ((Calculable) this.value).calculate(model);
+			result = ((Calculable) this.value).calculate(req, model);
 		} else result = this.value;
 		
 		for (FunctionExpr f : functions) {
 			List<Object> args = new ArrayList<Object>();
 			args.add(result);
 			for (Object obj : f.getArguments()) {
-				obj = evaluator.evaluate(obj);
+				obj = evaluator.evaluate(req, obj);
 				args.add(obj);
 			}
-			result = f.calculate(args);
+			result = f.calculate(req, args);
 		}
 		
 		if (result == null) return "No value for "+this.value;

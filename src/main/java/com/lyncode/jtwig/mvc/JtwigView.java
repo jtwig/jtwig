@@ -3,7 +3,6 @@ package com.lyncode.jtwig.mvc;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.GenericServlet;
@@ -64,10 +63,10 @@ public class JtwigView extends AbstractTemplateView {
 			log.debug("Rendering Jtwig template [" + getUrl() + "] in JtwigView '" + getBeanName() + "'");
 		}
 		
-		processTemplate(getTemplate(request.getServletContext(), getUrl()), model, response);
+		processTemplate(getTemplate(request.getServletContext(), getUrl()), request, model, response);
 	}
 	
-	private static Map<String, Template> templates = new HashMap<String, Template>();
+	// private static Map<String, Template> templates = new HashMap<String, Template>();
 	
 	private static Template getTemplate (ServletContext servletContext, String url) throws IOException, JtwigParsingException, TemplateBuildException {
 		return new Template(servletContext, url);
@@ -78,10 +77,12 @@ public class JtwigView extends AbstractTemplateView {
 	}
 	
 	
-	private void processTemplate(Template template, Map<String, Object> model,
+	private void processTemplate(Template template, HttpServletRequest request, Map<String, Object> model,
 			HttpServletResponse response) throws JtwigRenderException {
 		try {
-			template.process(model, response.getOutputStream());
+			response.setCharacterEncoding("UTF-8");
+			response.setContentType(this.getContentType());
+			template.process(request, model, response.getOutputStream());
 		} catch (IOException e) {
 			throw new JtwigRenderException(e);
 		}
@@ -110,4 +111,6 @@ public class JtwigView extends AbstractTemplateView {
 			return Collections.enumeration(Collections.EMPTY_SET);
 		}
 	}
+	
+	
 }

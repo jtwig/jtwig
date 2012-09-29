@@ -17,6 +17,8 @@ package com.lyncode.jtwig.elements;
 
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
@@ -43,9 +45,9 @@ public class Block extends ObjectList {
 		return name;
 	}
 
-	public String render(Map<String, Object> model, ResourceManager manager) throws JtwigRenderException {
+	public String render(HttpServletRequest req, Map<String, Object> model, ResourceManager manager) throws JtwigRenderException {
 		this.setBlock();
-		return super.render(model, manager);
+		return super.render(req, model, manager);
 	}
 	
 	public boolean equals (Object obj) {

@@ -17,6 +17,8 @@ package com.lyncode.jtwig.elements;
 
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
@@ -42,7 +44,7 @@ public class Variable implements Calculable {
 		return name;
 	}
 
-	public Object calculate(Map<String, Object> values)
+	public Object calculate(HttpServletRequest req, Map<String, Object> values)
 			throws JtwigRenderException {
 		JtwigExpressionEvaluator evaluator = new JtwigExpressionEvaluator(values);
 		return evaluator.evaluate(this.getName());

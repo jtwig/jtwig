@@ -18,6 +18,8 @@ package com.lyncode.jtwig.elements;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
@@ -66,11 +68,11 @@ public class If extends ObjectList {
 	}
 	
 
-	public String render(Map<String, Object> model, ResourceManager manager) throws JtwigRenderException {
+	public String render(HttpServletRequest req, Map<String, Object> model, ResourceManager manager) throws JtwigRenderException {
 		String result = "";
 		Object values = null;
 		if (this.value instanceof Calculable) {
-			values = ((Calculable) this.value).calculate(model);
+			values = ((Calculable) this.value).calculate(req, model);
 		} else values = this.value;
 		
 		boolean test = false;
@@ -85,7 +87,7 @@ public class If extends ObjectList {
 		if (test) {
 			for (Object obj : this) {
 				if (obj instanceof Renderable) {
-					result += ((Renderable) obj).render(model, manager);
+					result += ((Renderable) obj).render(req, model, manager);
 				} else if (obj instanceof String) {
 					result += (String) obj;
 				} else throw new JtwigRenderException("Unable to render object "+obj.toString());
@@ -94,7 +96,7 @@ public class If extends ObjectList {
 			if (this.hasElse()) {
 				for (Object obj : this.getElseContent()) {
 					if (obj instanceof Renderable) {
-						result += ((Renderable) obj).render(model, manager);
+						result += ((Renderable) obj).render(req, model, manager);
 					} else if (obj instanceof String) {
 						result += (String) obj;
 					} else throw new JtwigRenderException("Unable to render object "+obj.toString());

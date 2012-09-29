@@ -21,6 +21,8 @@ import java.lang.reflect.Modifier;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.util.ReflectionUtils;
@@ -45,23 +47,23 @@ public class JtwigExpressionEvaluator {
 		this.model = model;
 	}
 	
-	public Object evaluate (Object input) throws JtwigRenderException {
+	public Object evaluate (HttpServletRequest req, Object input) throws JtwigRenderException {
 		if (input instanceof Variable) {
 			return this.evaluate(((Variable) input).getName());
 		} else if (input instanceof ObjectList) {
 			ObjectList l = (ObjectList) input;
 			ObjectList newL = new ObjectList();
 			for (Object obj : l)
-				newL.add(this.evaluate(obj));
+				newL.add(this.evaluate(req, obj));
 			return newL;
 		} else if (input instanceof ObjectMap) {
 			ObjectMap m = (ObjectMap) input;
 			ObjectMap newM = new ObjectMap();
 			for (String key : m.keySet())
-				newM.add(key, this.evaluate(m.get(key)));
+				newM.add(key, this.evaluate(req, m.get(key)));
 			return newM;
 		} else if (input instanceof Calculable) {
-			return ((FunctionExpr) input).calculate(this.model);
+			return ((FunctionExpr) input).calculate(req, this.model);
 		} 
 		return input;
 	}

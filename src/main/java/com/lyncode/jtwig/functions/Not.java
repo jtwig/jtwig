@@ -17,6 +17,8 @@ package com.lyncode.jtwig.functions;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import com.lyncode.jtwig.exceptions.FunctionException;
 
 /**
@@ -29,7 +31,7 @@ public class Not extends Function {
 	 * @see com.lyncode.jtwig.functions.Function#apply(java.util.List)
 	 */
 	@Override
-	public Object apply(List<Object> arguments) throws FunctionException {
+	public Object apply(HttpServletRequest req, List<Object> arguments) throws FunctionException {
 		if (arguments.size() != 1)
 			throw new FunctionException("Not function must receive one argument");
 		Object argument = arguments.get(0);
