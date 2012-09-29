@@ -15,33 +15,21 @@
  */
 package com.lyncode.jtwig.mvc;
 
-import java.io.File;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.servlet.view.AbstractTemplateViewResolver;
+import org.springframework.stereotype.Component;
 
 /**
  * @author "João Melo <jmelo@lyncode.com>"
  *
  */
-public class JtwigViewResolver extends AbstractTemplateViewResolver  {
-	@Autowired Theme theme;
-	
-	
-	public JtwigViewResolver () {
-		setViewClass(requiredViewClass());
+@Component
+public class Theme {
+	private String theme;
+
+	public String getTheme() {
+		return theme;
 	}
 
-	@Override
-	protected Class<?> requiredViewClass() {
-		return JtwigView.class;
-	}
-	
-	@Override
-	protected String getPrefix() {
-		if (theme == null)
-			return super.getPrefix();
-		else
-			return super.getPrefix() + theme.getTheme() + File.separator;
+	public void setTheme(String theme) {
+		this.theme = theme;
 	}
 }

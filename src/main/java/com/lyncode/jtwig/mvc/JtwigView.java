@@ -58,6 +58,11 @@ public class JtwigView extends AbstractTemplateView {
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		exposeModelAsRequestAttributes(model, request);
+		
+
+		Theme theme = this.getWebApplicationContext().getBean(Theme.class);
+		if (theme == null) model.put("theme", "");
+		else model.put("theme", theme.getTheme());
 
 		if (log.isDebugEnabled()) {
 			log.debug("Rendering Jtwig template [" + getUrl() + "] in JtwigView '" + getBeanName() + "'");
@@ -80,8 +85,10 @@ public class JtwigView extends AbstractTemplateView {
 	private void processTemplate(Template template, HttpServletRequest request, Map<String, Object> model,
 			HttpServletResponse response) throws JtwigRenderException {
 		try {
-			response.setCharacterEncoding("UTF-8");
+			
 			response.setContentType(this.getContentType());
+			response.setCharacterEncoding("UTF-8");
+			
 			template.process(request, model, response.getOutputStream());
 		} catch (IOException e) {
 			throw new JtwigRenderException(e);
