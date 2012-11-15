@@ -21,6 +21,8 @@ import java.io.InputStream;
 
 import javax.servlet.ServletContext;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.springframework.core.io.Resource;
 import org.springframework.web.context.support.ServletContextResourceLoader;
 
@@ -31,6 +33,7 @@ import com.lyncode.jtwig.exceptions.TemplateBuildException;
  *
  */
 public class ServletContextResourceManager extends ResourceManager {
+	private static Logger log = LogManager.getLogger(ServletContextResourceManager.class);
 	private Resource resource;
 	private ServletContextResourceLoader loader;
 	private File parent;
@@ -39,7 +42,7 @@ public class ServletContextResourceManager extends ResourceManager {
 	public ServletContextResourceManager (ServletContext context, String filename) throws TemplateBuildException {
 		File thisFile = new File(filename);
 		filename = thisFile.getPath();
-		System.out.println("Filename: "+ thisFile.getPath());
+		log.debug("Filename: "+thisFile.getPath());
 		this.loader = new ServletContextResourceLoader(context);
 		this.resource = this.loader.getResource(filename);
 		this.filename = filename;
