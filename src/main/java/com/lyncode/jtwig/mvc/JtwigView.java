@@ -1,8 +1,6 @@
 package com.lyncode.jtwig.mvc;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
-import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -19,11 +17,10 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.web.servlet.view.AbstractTemplateView;
 
@@ -65,9 +62,13 @@ public class JtwigView extends AbstractTemplateView {
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		exposeModelAsRequestAttributes(model, request);
-		Theme theme = this.getWebApplicationContext().getBean(Theme.class);
-		if (theme == null) model.put("theme", "");
-		else model.put("theme", theme.getTheme());
+		try {
+			Theme theme = this.getWebApplicationContext().getBean(Theme.class);
+			if (theme == null) model.put("theme", "");
+			else model.put("theme", theme.getTheme());
+		} catch (BeanCreationException e) {
+			log.debug(e.getMessage(), e);
+		}
 		
 		addRequestAttributes(request, model);
 
@@ -76,7 +77,13 @@ public class JtwigView extends AbstractTemplateView {
 			log.debug("Model: "+showModel(model));
 		}
 		
-		processTemplate(getTemplate(request.getServletContext(), getUrl()), request, model, response);
+		JtwigViewResolver viewResolver = this.getApplicationContext().getBean(JtwigViewResolver.class);
+		if (!viewResolver.isCached()) {
+			processTemplate(getTemplate(request.getServletContext(), getUrl()), request, model, response);
+		} else {
+			processTemplate(getCachedTemplate(request.getServletContext(), getUrl()), request, model, response);
+		}
+		
 	}
 	
 	private static String showModel (Map<?, ?> model) {
@@ -94,7 +101,7 @@ public class JtwigView extends AbstractTemplateView {
 			Object obj = model.get(n);
 			if (obj instanceof Map) {
 				b.append("\n");
-				b.append(showModel((Map)obj, spaces+1));
+				b.append(showModel((Map<?, ?>)obj, spaces+1));
 			} else {
 				if (obj == null)
 					b.append("null");
@@ -150,12 +157,14 @@ public class JtwigView extends AbstractTemplateView {
 
 	private static Template getTemplate (ServletContext servletContext, String url) throws IOException, JtwigParsingException, TemplateBuildException {
 		return new Template(servletContext, url);
-		/*if (!templates.containsKey(url)) {
+	}
+
+	private static Template getCachedTemplate (ServletContext servletContext, String url) throws IOException, JtwigParsingException, TemplateBuildException {
+		if (!templates.containsKey(url)) {
 			templates.put(url, new Template(servletContext, url));
 		}
-		return templates.get(url);*/
+		return templates.get(url);
 	}
-	
 	
 	private void processTemplate(Template template, HttpServletRequest request, Map<String, Object> model,
 			HttpServletResponse response) throws JtwigRenderException {

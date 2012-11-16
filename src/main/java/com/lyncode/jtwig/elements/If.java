@@ -85,6 +85,7 @@ public class If extends ObjectList {
 			} else test = true; // Non null object
 		}
 		if (test) {
+			log.debug("Rendering if content");
 			for (Object obj : this) {
 				if (obj instanceof Renderable) {
 					result += ((Renderable) obj).render(req, model, manager);
@@ -93,6 +94,7 @@ public class If extends ObjectList {
 				} else throw new JtwigRenderException("Unable to render object "+obj.toString());
 			}
 		} else {
+			log.debug("Rendering else content (if exists)");
 			if (this.hasElse()) {
 				for (Object obj : this.getElseContent()) {
 					if (obj instanceof Renderable) {
@@ -103,6 +105,7 @@ public class If extends ObjectList {
 				}
 			}
 		}
+		log.debug("Render: "+result);
 		return result;
 	}
 	

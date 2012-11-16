@@ -89,9 +89,12 @@ public class JtwigExpressionEvaluator {
 		if (context instanceof Map<?, ?>) {
 			log.debug("Trying to get "+part+" on Map");
 			
-			if (((Map<?, ?>) context).containsKey(part))
-				return ((Map<?, ?>) context).get(part);
-			else
+			if (((Map<?, ?>) context).containsKey(part)) {
+				Object obja = ((Map<?, ?>) context).get(part);
+				if (obja != null) log.debug("Value: "+obja.toString());
+				else log.debug("Value: NULL");
+				return obja;
+			} else
 				throw new JtwigRenderException("Unable to find Key '"+part+"' in Map "+context.toString());
 		} else {
 			Field[] fields = context.getClass().getFields();

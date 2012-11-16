@@ -27,6 +27,15 @@ import org.springframework.web.servlet.view.AbstractTemplateViewResolver;
 public class JtwigViewResolver extends AbstractTemplateViewResolver  {
 	@Autowired Theme theme;
 	
+	private boolean cached;
+	
+	public boolean isCached () {
+		return cached;
+	}
+	
+	public void setCached (boolean b) {
+		cached = b;
+	}
 	
 	public JtwigViewResolver () {
 		setViewClass(requiredViewClass());
