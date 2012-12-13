@@ -20,10 +20,9 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
-import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.LocaleResolver;
-import org.springframework.web.servlet.support.RequestContextUtils;
 
 import com.lyncode.jtwig.exceptions.FunctionException;
 
@@ -33,12 +32,12 @@ import com.lyncode.jtwig.exceptions.FunctionException;
  */
 public class Message extends Function {
 	
+	@Autowired LocaleResolver localeResolver;
+	@Autowired MessageSource messageSource;
+	@Autowired HttpServletRequest request;
+	
 	@Override
-	public Object apply(HttpServletRequest request, List<Object> arguments) throws FunctionException {
-		WebApplicationContext webContext = RequestContextUtils.getWebApplicationContext(request);
-		
-		LocaleResolver localeResolver = webContext.getBean(LocaleResolver.class);
-		MessageSource messageSource = webContext.getBean(MessageSource.class);
+	public Object apply(List<Object> arguments) throws FunctionException {
 		
 		if (localeResolver == null)
 			throw new FunctionException("Locale Resolver not well configured (localeResolver spring bean)");

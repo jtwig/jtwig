@@ -40,6 +40,9 @@ public class For extends ObjectList {
 	private String variable;
 	private Object value;
 	
+	private ObjectList first;
+	private ObjectList last;
+	
 	public For (String variable, Object value) {
 		this.variable = variable;
 		this.value = value;
@@ -54,6 +57,24 @@ public class For extends ObjectList {
 		return value;
 	}
 	
+	public ObjectList getFirst() {
+		return first;
+	}
+
+	public boolean setFirst(ObjectList first) {
+		this.first = first;
+		return true;
+	}
+
+	public ObjectList getLast() {
+		return last;
+	}
+
+	public boolean setLast(ObjectList last) {
+		this.last = last;
+		return true;
+	}
+
 	@SuppressWarnings("unchecked")
 	public String render(HttpServletRequest req, Map<String, Object> model, ResourceManager manager) throws JtwigRenderException {
 		String result = "";
@@ -70,17 +91,51 @@ public class For extends ObjectList {
 			forValues.add(values);
 		} else forValues = (List<Object>) values;
 		
-		for (Object val : forValues) {
+		
+		for (int i = 0;i<forValues.size();i++) {
+			Object val = forValues.get(i);
 			Map<String, Object> newModel = new TreeMap<String, Object>();
 			newModel.putAll(model);
 			newModel.put(variable, val);
-			for (Object obj : this) {
-				if (obj instanceof Renderable) {
-					result += ((Renderable) obj).render(req, newModel, manager);
-				} else if (obj instanceof String) {
-					result += (String) obj;
-				} else throw new JtwigRenderException("Unable to render object "+obj.toString());
+			
+			if (i == 0 && this.first != null) {
+				for (Object obj : this.first) {
+					if (obj instanceof Invoke) {
+						((Invoke) obj).invoke(req, newModel);
+					} else {
+						if (obj instanceof Renderable) {
+							result += ((Renderable) obj).render(req, newModel, manager);
+						} else if (obj instanceof String) {
+							result += (String) obj;
+						} else throw new JtwigRenderException("Unable to render object "+obj.toString());
+					}
+				}
+			} else if (i == (forValues.size() - 1) && this.last != null) {
+				for (Object obj : this.last) {
+					if (obj instanceof Invoke) {
+						((Invoke) obj).invoke(req, newModel);
+					} else {
+						if (obj instanceof Renderable) {
+							result += ((Renderable) obj).render(req, newModel, manager);
+						} else if (obj instanceof String) {
+							result += (String) obj;
+						} else throw new JtwigRenderException("Unable to render object "+obj.toString());
+					}
+				}
+			} else {
+				for (Object obj : this) {
+					if (obj instanceof Invoke) {
+						((Invoke) obj).invoke(req, newModel);
+					} else {
+						if (obj instanceof Renderable) {
+							result += ((Renderable) obj).render(req, newModel, manager);
+						} else if (obj instanceof String) {
+							result += (String) obj;
+						} else throw new JtwigRenderException("Unable to render object "+obj.toString());
+					}
+				}
 			}
+			
 		}
 		return result;
 	}

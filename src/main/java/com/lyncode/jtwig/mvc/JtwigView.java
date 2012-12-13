@@ -170,6 +170,8 @@ public class JtwigView extends AbstractTemplateView {
 			HttpServletResponse response) throws JtwigRenderException {
 		try {
 			
+			request.setCharacterEncoding("UTF-8");
+			
 			response.setContentType(this.getContentType());
 			response.setCharacterEncoding("UTF-8");
 			

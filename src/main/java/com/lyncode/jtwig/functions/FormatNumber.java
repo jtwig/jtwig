@@ -15,6 +15,8 @@
  */
 package com.lyncode.jtwig.functions;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.List;
 
 import com.lyncode.jtwig.exceptions.FunctionException;
@@ -23,7 +25,7 @@ import com.lyncode.jtwig.exceptions.FunctionException;
  * @author "João Melo <jmelo@lyncode.com>"
  *
  */
-public class Not extends Function {
+public class FormatNumber extends Function {
 
 	/* (non-Javadoc)
 	 * @see com.lyncode.jtwig.functions.Function#apply(java.util.List)
@@ -31,18 +33,14 @@ public class Not extends Function {
 	@Override
 	public Object apply(List<Object> arguments) throws FunctionException {
 		if (arguments.size() != 1)
-			throw new FunctionException("Not function must receive one argument");
+			throw new FunctionException("FormatNumber function must receive one argument");
 		Object argument = arguments.get(0);
-		Boolean value = new Boolean(false);
-		if (argument == null) value = new Boolean(false);
-		else if (argument instanceof String)
-			return Boolean.parseBoolean((String) argument);
-		else if (argument instanceof Boolean) value = (Boolean) argument;
-		else if (argument instanceof List) // Not (list) = is List Empty?
-			return new Boolean(((List<?>)argument).size()==0);
-		else value = new Boolean(true); // Non null goes true
+		DecimalFormatSymbols symbols = new DecimalFormatSymbols();
+		symbols.setGroupingSeparator('.');
+		DecimalFormat formatter = new DecimalFormat("#,###", symbols);
+		formatter.setGroupingUsed(true);
 		
-		return new Boolean(!value.booleanValue());
+		return formatter.format(argument);
 	}
 
 }

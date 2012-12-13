@@ -78,7 +78,7 @@ public class If extends ObjectList {
 		boolean test = false;
 		
 		if (values != null) {
-			if (values instanceof List<?>) {
+			if (values instanceof List) {
 				test = (((List<?>)values).size() > 0);
 			} else if (values instanceof Boolean) {
 				test = ((Boolean) values);
@@ -87,21 +87,29 @@ public class If extends ObjectList {
 		if (test) {
 			log.debug("Rendering if content");
 			for (Object obj : this) {
-				if (obj instanceof Renderable) {
-					result += ((Renderable) obj).render(req, model, manager);
-				} else if (obj instanceof String) {
-					result += (String) obj;
-				} else throw new JtwigRenderException("Unable to render object "+obj.toString());
-			}
-		} else {
-			log.debug("Rendering else content (if exists)");
-			if (this.hasElse()) {
-				for (Object obj : this.getElseContent()) {
+				if (obj instanceof Invoke) {
+					((Invoke) obj).invoke(req, model);
+				} else {
 					if (obj instanceof Renderable) {
 						result += ((Renderable) obj).render(req, model, manager);
 					} else if (obj instanceof String) {
 						result += (String) obj;
 					} else throw new JtwigRenderException("Unable to render object "+obj.toString());
+				}
+			}
+		} else {
+			log.debug("Rendering else content (if exists)");
+			if (this.hasElse()) {
+				for (Object obj : this.getElseContent()) {
+					if (obj instanceof Invoke) {
+						((Invoke) obj).invoke(req, model);
+					} else {
+						if (obj instanceof Renderable) {
+							result += ((Renderable) obj).render(req, model, manager);
+						} else if (obj instanceof String) {
+							result += (String) obj;
+						} else throw new JtwigRenderException("Unable to render object "+obj.toString());
+					}
 				}
 			}
 		}

@@ -76,8 +76,14 @@ public class FastExpression implements Renderable {
 			result = f.calculate(req, args);
 		}
 		
-		if (result == null) return "No value for "+this.value;
-		else return result.toString();
+		if (result == null) {
+			log.debug("No value for "+this.value);
+			return "";
+		}
+		else {
+			log.debug("Value for "+this.value+" = "+result);
+			return result.toString();
+		}
 	}
 	
 

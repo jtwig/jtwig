@@ -24,6 +24,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.text.WordUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
+import org.springframework.web.servlet.support.RequestContextUtils;
 
 import com.lyncode.jtwig.exceptions.FunctionException;
 import com.lyncode.jtwig.exceptions.JtwigRenderException;
@@ -64,6 +66,7 @@ public class FunctionExpr implements Calculable {
 
 	public Object calculate(HttpServletRequest req, Map<String, Object> values) throws JtwigRenderException {
 		JtwigExpressionEvaluator evaluator = new JtwigExpressionEvaluator(values);
+		AutowireCapableBeanFactory factory = RequestContextUtils.getWebApplicationContext(req).getAutowireCapableBeanFactory();
 		String name = WordUtils.capitalizeFully(this.getName().replace('-', ' ').replace('_', ' ')).replaceAll(" ", "");
 		String className = Function.class.getPackage().getName() + "." + name;
 		try {
@@ -75,7 +78,8 @@ public class FunctionExpr implements Calculable {
 			Class<?> loadedClass = this.getClass().getClassLoader().loadClass(className);
 			Object obj = loadedClass.newInstance();
 			if (obj instanceof Function) {
-				return ((Function) obj).apply(req, args);
+				factory.autowireBean(obj);
+				return ((Function) obj).apply(args);
 			} else 
 				throw new JtwigRenderException("Unknown function "+name);
 		} catch (ClassNotFoundException e) {
@@ -91,13 +95,15 @@ public class FunctionExpr implements Calculable {
 	
 
 	public Object calculate(HttpServletRequest req, List<Object> calculatedArguments) throws JtwigRenderException {
+		AutowireCapableBeanFactory factory = RequestContextUtils.getWebApplicationContext(req).getAutowireCapableBeanFactory();
 		String name = WordUtils.capitalizeFully(this.getName().replace('-', ' ').replace('_', ' ')).replaceAll(" ", "");
 		String className = Function.class.getPackage().getName() + "." + name;
 		try {
 			Class<?> loadedClass = this.getClass().getClassLoader().loadClass(className);
 			Object obj = loadedClass.newInstance();
 			if (obj instanceof Function) {
-				return ((Function) obj).apply(req, calculatedArguments);
+				factory.autowireBean(obj);
+				return ((Function) obj).apply(calculatedArguments);
 			} else throw new JtwigRenderException("Unknown function "+name);
 		} catch (ClassNotFoundException e) {
 			throw new JtwigRenderException(e);

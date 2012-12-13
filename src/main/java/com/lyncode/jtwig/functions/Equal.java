@@ -2,8 +2,6 @@ package com.lyncode.jtwig.functions;
 
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
@@ -14,7 +12,7 @@ public class Equal extends Function {
 	private static Logger log = LogManager.getLogger(Equal.class);
 	
 	@Override
-	public Object apply(HttpServletRequest req, List<Object> arguments)
+	public Object apply(List<Object> arguments)
 			throws FunctionException {
 		if (arguments.size() != 2)
 			throw new FunctionException("Equal function must receive two arguments");

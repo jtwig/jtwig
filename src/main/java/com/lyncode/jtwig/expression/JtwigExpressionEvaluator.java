@@ -107,12 +107,22 @@ public class JtwigExpressionEvaluator {
 			Method[] methods = context.getClass().getMethods();
 			for (Method met : methods) {
 				if (Modifier.isPublic(met.getModifiers())) {
+					boolean call = false;
 					if (met.getName().toLowerCase().equals(part.toLowerCase()))
-						return ReflectionUtils.invokeMethod(met, context);
-					if (met.getName().toLowerCase().equals("get" + part.toLowerCase()))
-						return ReflectionUtils.invokeMethod(met, context);
-					if (met.getName().toLowerCase().equals("is" + part.toLowerCase()))
-						return ReflectionUtils.invokeMethod(met, context);
+						call = true;
+					else if (met.getName().toLowerCase().equals("get" + part.toLowerCase()))
+						call = true;
+					else if (met.getName().toLowerCase().equals("is" + part.toLowerCase()))
+						call = true;
+					
+					if (call && met.getParameterTypes().length == 0) {
+						try {
+							return met.invoke(context, (Object[]) null);
+						} catch (Exception e) {
+							log.debug(e.getMessage(), e);
+						} 
+						break;
+					}
 				}
 			}
 			

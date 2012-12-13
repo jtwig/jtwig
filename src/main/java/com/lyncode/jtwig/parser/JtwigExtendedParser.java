@@ -17,6 +17,7 @@ package com.lyncode.jtwig.parser;
 
 import java.util.regex.Pattern;
 
+import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.parboiled.BaseParser;
@@ -36,6 +37,7 @@ import com.lyncode.jtwig.elements.For;
 import com.lyncode.jtwig.elements.FunctionExpr;
 import com.lyncode.jtwig.elements.If;
 import com.lyncode.jtwig.elements.Include;
+import com.lyncode.jtwig.elements.Invoke;
 import com.lyncode.jtwig.elements.ObjectList;
 import com.lyncode.jtwig.elements.ObjectMap;
 import com.lyncode.jtwig.elements.Variable;
@@ -48,36 +50,36 @@ import com.lyncode.jtwig.exceptions.JtwigParsingException;
 public class JtwigExtendedParser extends BaseParser<Object> {
 	private static Logger log = LogManager.getLogger(JtwigExtendedParser.class);
 	private static JtwigExtendedParser parser = null;
+
+	public boolean WriteIt (Object obj) {
+		log.debug(obj);
+		return true;
+	}
 	
     @Override
 	public Object pop(int down) {
-    	log.debug("Before Pop Stack Size: " + this.getContext().getValueStack().size());
     	Object e = super.pop(down);
     	log.debug("Poping at "+down+": "+e.toString());
-    	log.debug("Stack Size: " + this.getContext().getValueStack().size());
 		return e;
 	}
 
 	@Override
 	public boolean push(Object value) {
-		log.debug("Before Push Stack Size: " + this.getContext().getValueStack().size());
     	boolean e = super.push(value);
     	log.debug("Pushing: "+value.toString());
-    	log.debug("Stack Size: " + this.getContext().getValueStack().size());
 		return e;
 	}
 
 	@Override
 	public Object pop() {
-		log.debug("Before Pop Stack Size: " + this.getContext().getValueStack().size());
 		Object e = super.pop();
     	log.debug("Poping: "+e.toString());
-    	log.debug("Stack Size: " + this.getContext().getValueStack().size());
 		return e;
 	}
 	
 	public static void main (String... str) throws JtwigParsingException {
-		String input = "     {% block boy %}     <asdasd>\n     {% endblock %}";
+		BasicConfigurator.configure();
+		String input = "     {% if test 1123 %}     <asdasd>\n     {% endif %}";
 		log.debug(input);
 		log.debug(parse(input));
 	}
@@ -119,6 +121,12 @@ public class JtwigExtendedParser extends BaseParser<Object> {
     final String IN = "in";
     final String INCLUDE = "include";
     final String EXTENDS = "extends";
+    final String INVOKE = "invoke";
+    final String WITH = "with";
+    final String START_FIRST = "first";
+    final String START_LAST = "last";
+    final String END_FIRST = "endfirst";
+    final String END_LAST = "endlast";
 
     final Rule LPARENT = Terminal("(");
     final Rule RPARENT = Terminal(")");
@@ -149,6 +157,7 @@ public class JtwigExtendedParser extends BaseParser<Object> {
      */
     Rule NormalTemplate () {
     	return Sequence(
+    			WriteIt("Entering NormalTemplate Rule"),
     			Spacing(),
     			push(new ObjectList()),
     			Content(),
@@ -163,6 +172,7 @@ public class JtwigExtendedParser extends BaseParser<Object> {
      */
     Rule ExtendingTemplate () {
     	return Sequence (
+    			WriteIt("Entering ExtendingTemplate Rule"),
     			Spacing(),
     			ExtendsExpression(),
     			push(new ObjectList()),
@@ -177,6 +187,36 @@ public class JtwigExtendedParser extends BaseParser<Object> {
     	);
     }
     
+    Rule InvokeExpression () {
+    	return Sequence (
+    		WriteIt("Entering InvokeExpression Rule"),
+    		CODEOPEN,
+    		Keyword(INVOKE),
+    		QualifiedIdentifier(),
+    		Identifier(),
+    		push(new Invoke((String)pop(1), (String)pop())),
+    		Optional(
+    				Keyword(WITH),
+    				MAPOPEN,
+        			Optional(
+        					Identifier(),
+        					DIV,
+        					Value(),
+        					((Invoke)peek(2)).add((String)pop(1), pop()),
+        					ZeroOrMore(
+        							COMMA,
+        	    					Identifier(),
+        	    					DIV,
+        	    					Value(),
+        	    					((ObjectMap)peek(2)).add((String)pop(1), pop())
+        					)
+        			),
+        			MAPCLOSE
+    		),
+    		CODECLOSE
+    	);
+    }
+    
     /**
      * Pushes a Block
      * 
@@ -184,6 +224,7 @@ public class JtwigExtendedParser extends BaseParser<Object> {
      */
     Rule BlockExpression () {
     	return Sequence(
+        	WriteIt("Entering BlockExpression Rule"),
     		CODEOPEN,
     		Keyword(BLOCK),
     		Identifier(),
@@ -203,6 +244,7 @@ public class JtwigExtendedParser extends BaseParser<Object> {
      */
     Rule ExtendsExpression () {
     	return Sequence(
+            	WriteIt("Entering ExtendsExpression Rule"),
     			CODEOPEN,
     			Keyword(EXTENDS),
     			StringLiteral(),
@@ -218,6 +260,7 @@ public class JtwigExtendedParser extends BaseParser<Object> {
      */
     Rule IncludeExpression () {
     	return Sequence(
+            	WriteIt("Entering IncludeExpression Rule"),
     			CODEOPEN,
     			Keyword(INCLUDE),
     			StringLiteral(),
@@ -235,6 +278,7 @@ public class JtwigExtendedParser extends BaseParser<Object> {
     	return ZeroOrMore(
     			FirstOf(
     					FastExpression(),
+    					InvokeExpression(),
     					ForExpression(),
     					IfExpression(),
     					BlockExpression(),
@@ -282,11 +326,13 @@ public class JtwigExtendedParser extends BaseParser<Object> {
 	 */
 	Rule IfExpression () {
 		return Sequence(
+            	WriteIt("Entering IfExpression Rule"),
 				CODEOPEN,
 				Keyword(IF),
 				BooleanExpression(),
 				push(new If(pop())),
 				CODECLOSE,
+				WriteIt("Code closed in IfExpression"),
 				Content(),
 				Optional(
 						Sequence(
@@ -322,10 +368,40 @@ public class JtwigExtendedParser extends BaseParser<Object> {
     		),
     		CODECLOSE,
     		push(new For((String)pop(1), pop())),
+    		Optional(FirstExpression(), ((For)peek(1)).setFirst(((ObjectList)pop()))),
     		Content(),
+    		Optional(LastExpression(), ((For)peek(1)).setLast(((ObjectList)pop()))),
     		CODEOPEN,
     		Keyword(ENDFOR),
     		CODECLOSE
+    	);
+    }
+    
+    Rule FirstExpression () {
+    	return Sequence (
+    			Spacing(),
+    			CODEOPEN,
+    			Keyword(START_FIRST),
+    			CODECLOSE,
+    			push(new ObjectList()),
+    			Content(),
+    			CODEOPEN,
+    			Keyword(END_FIRST),
+    			CODECLOSE
+    	);
+    }
+    
+    Rule LastExpression () {
+    	return Sequence (
+    			Spacing(),
+    			CODEOPEN,
+    			Keyword(START_LAST),
+    			CODECLOSE,
+    			push(new ObjectList()),
+    			Content(),
+    			CODEOPEN,
+    			Keyword(END_LAST),
+    			CODECLOSE
     	);
     }
     
@@ -354,7 +430,7 @@ public class JtwigExtendedParser extends BaseParser<Object> {
      * @return
      */
     Rule Value () {
-    	return FirstOf(
+    	return Sequence(FirstOf(
     			Integer(),
     			Boolean(),
     			StringLiteral(),
@@ -362,7 +438,7 @@ public class JtwigExtendedParser extends BaseParser<Object> {
     			Variable(),
     			ListExpression(),
     			MapExpression()
-    	);
+    	), Spacing());
     }
     
     /**
@@ -394,6 +470,7 @@ public class JtwigExtendedParser extends BaseParser<Object> {
     Rule FunctionOneArguments () {
     	return OneOrMore(
     			Sequence(
+    	            	WriteIt("Entering FunctionOneArguments:OneOrMore Rule"),
     					FirstOf(
     							Integer(),
     							Boolean(),
@@ -403,6 +480,7 @@ public class JtwigExtendedParser extends BaseParser<Object> {
     							MapExpression(),
     							Variable()
     					),
+    	            	WriteIt("Adding "+peek()+" as argument to "+peek(1)),
     					ACTION(((FunctionExpr)peek(1)).add(pop()))
     			)
     	);
@@ -415,6 +493,7 @@ public class JtwigExtendedParser extends BaseParser<Object> {
      */
     Rule FunctionOneArgument () {
     	return Sequence(
+            	WriteIt("Entering FunctionOneArgument Rule"),
     			Identifier(),
     			push(new FunctionExpr((String) pop())),
     			FunctionOneArguments()
@@ -502,7 +581,8 @@ public class JtwigExtendedParser extends BaseParser<Object> {
     Rule Integer () {
     	return Sequence(
     			OneOrMore(Digit()),
-    			push(Integer.parseInt(match()))
+    			push(Integer.parseInt(match())),
+    			WriteIt(peek())
     	);
     }
     
@@ -645,7 +725,7 @@ public class JtwigExtendedParser extends BaseParser<Object> {
 		if (spacing)
 			return Sequence(string, Spacing()).label('\'' + string + '\'');
 		else
-			return String(string).label('\'' + string + '\'');
+			return Sequence(Spacing(), String(string)).label('\'' + string + '\'');
     }
 	
     @SuppressNode

@@ -48,16 +48,20 @@ public class ObjectList extends ArrayList<Object> implements Renderable {
 	public String render(HttpServletRequest req, Map<String, Object> model, ResourceManager manager) throws JtwigRenderException {
 		String result = "";
 		for (Object obj : this) {
-			if (this.hasBlock()) {
-				if (obj instanceof Block)
-					throw new JtwigRenderException("Cannot have nested blocks");
-				else if (obj instanceof ObjectList)
-					((ObjectList) obj).setBlock();
-			}
-			if (obj instanceof Renderable) {
-				result += ((Renderable) obj).render(req, model, manager);
-			} else if (obj instanceof String) {
-				result += (String) obj;
+			if (obj instanceof Invoke) {
+				((Invoke) obj).invoke(req, model);
+			} else {
+				if (this.hasBlock()) {
+					if (obj instanceof Block)
+						throw new JtwigRenderException("Cannot have nested blocks");
+					else if (obj instanceof ObjectList)
+						((ObjectList) obj).setBlock();
+				}
+				if (obj instanceof Renderable) {
+					result += ((Renderable) obj).render(req, model, manager);
+				} else if (obj instanceof String) {
+					result += (String) obj;
+				}
 			}
 		}
 		return result;
@@ -86,6 +90,7 @@ public class ObjectList extends ArrayList<Object> implements Renderable {
 			}
 		}
 	}
+	
 	
 	public String toString () {
 		return "CONTAINER ("+this.size()+")";
