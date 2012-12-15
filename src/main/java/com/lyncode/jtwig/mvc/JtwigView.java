@@ -63,7 +63,7 @@ public class JtwigView extends AbstractTemplateView {
 			throws Exception {
 		exposeModelAsRequestAttributes(model, request);
 		try {
-			Theme theme = this.getWebApplicationContext().getBean(Theme.class);
+			DefaultThemeResolver theme = this.getWebApplicationContext().getBean(DefaultThemeResolver.class);
 			if (theme == null) model.put("theme", "");
 			else model.put("theme", theme.getTheme());
 		} catch (BeanCreationException e) {

@@ -15,7 +15,6 @@
  */
 package com.lyncode.jtwig.elements;
 
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,7 +25,6 @@ import org.apache.log4j.Logger;
 import com.lyncode.jtwig.exceptions.JtwigRenderException;
 import com.lyncode.jtwig.manager.ResourceManager;
 import com.lyncode.jtwig.render.Calculable;
-import com.lyncode.jtwig.render.Renderable;
 
 /**
  * @author "João Melo <jmelo@lyncode.com>"
@@ -75,45 +73,14 @@ public class If extends ObjectList {
 			values = ((Calculable) this.value).calculate(req, model);
 		} else values = this.value;
 		
-		boolean test = false;
-		
-		if (values != null) {
-			if (values instanceof List) {
-				test = (((List<?>)values).size() > 0);
-			} else if (values instanceof Boolean) {
-				test = ((Boolean) values);
-			} else test = true; // Non null object
-		}
-		if (test) {
+		if (JtwigExpression.isTrue(values)) {
 			log.debug("Rendering if content");
-			for (Object obj : this) {
-				if (obj instanceof Invoke) {
-					((Invoke) obj).invoke(req, model);
-				} else {
-					if (obj instanceof Renderable) {
-						result += ((Renderable) obj).render(req, model, manager);
-					} else if (obj instanceof String) {
-						result += (String) obj;
-					} else throw new JtwigRenderException("Unable to render object "+obj.toString());
-				}
-			}
+			result += super.render(req, model, manager);
 		} else {
 			log.debug("Rendering else content (if exists)");
-			if (this.hasElse()) {
-				for (Object obj : this.getElseContent()) {
-					if (obj instanceof Invoke) {
-						((Invoke) obj).invoke(req, model);
-					} else {
-						if (obj instanceof Renderable) {
-							result += ((Renderable) obj).render(req, model, manager);
-						} else if (obj instanceof String) {
-							result += (String) obj;
-						} else throw new JtwigRenderException("Unable to render object "+obj.toString());
-					}
-				}
-			}
+			if (this.hasElse())
+				result += this.getElseContent().render(req, model, manager);
 		}
-		log.debug("Render: "+result);
 		return result;
 	}
 	

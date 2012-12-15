@@ -17,12 +17,14 @@ package com.lyncode.jtwig.mvc;
 
 import org.springframework.stereotype.Component;
 
+import com.lyncode.jtwig.api.ThemeResolver;
+
 /**
  * @author "João Melo <jmelo@lyncode.com>"
  *
  */
 @Component
-public class Theme {
+public class DefaultThemeResolver implements ThemeResolver {
 	private String theme;
 
 	public String getTheme() {

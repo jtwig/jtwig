@@ -63,7 +63,7 @@ public class JtwigExpressionEvaluator {
 				newM.add(key, this.evaluate(req, m.get(key)));
 			return newM;
 		} else if (input instanceof Calculable) {
-			return ((FunctionExpr) input).calculate(req, this.model);
+			return ((Calculable) input).calculate(req, this.model);
 		} 
 		return input;
 	}

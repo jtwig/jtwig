@@ -2,8 +2,6 @@ package com.lyncode.jtwig.functions;
 
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.lyncode.jtwig.api.PropertyReader;
@@ -13,7 +11,7 @@ public class Property extends Function {
 	@Autowired PropertyReader config;
 	
 	@Override
-	public Object apply(HttpServletRequest req, List<Object> arguments)
+	public Object apply(List<Object> arguments)
 			throws FunctionException {
 		if (arguments.size() == 1) {
 			// get by key

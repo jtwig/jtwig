@@ -25,7 +25,7 @@ import org.springframework.web.servlet.view.AbstractTemplateViewResolver;
  *
  */
 public class JtwigViewResolver extends AbstractTemplateViewResolver  {
-	@Autowired Theme theme;
+	@Autowired DefaultThemeResolver theme;
 	
 	private boolean cached;
 	

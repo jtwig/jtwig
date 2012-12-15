@@ -28,7 +28,6 @@ import org.apache.log4j.Logger;
 import com.lyncode.jtwig.exceptions.JtwigRenderException;
 import com.lyncode.jtwig.manager.ResourceManager;
 import com.lyncode.jtwig.render.Calculable;
-import com.lyncode.jtwig.render.Renderable;
 
 /**
  * @author "João Melo <jmelo@lyncode.com>"
@@ -39,9 +38,6 @@ public class For extends ObjectList {
 	private static final long serialVersionUID = 4648580478468941354L;
 	private String variable;
 	private Object value;
-	
-	private ObjectList first;
-	private ObjectList last;
 	
 	public For (String variable, Object value) {
 		this.variable = variable;
@@ -56,24 +52,6 @@ public class For extends ObjectList {
 	public Object getValue() {
 		return value;
 	}
-	
-	public ObjectList getFirst() {
-		return first;
-	}
-
-	public boolean setFirst(ObjectList first) {
-		this.first = first;
-		return true;
-	}
-
-	public ObjectList getLast() {
-		return last;
-	}
-
-	public boolean setLast(ObjectList last) {
-		this.last = last;
-		return true;
-	}
 
 	@SuppressWarnings("unchecked")
 	public String render(HttpServletRequest req, Map<String, Object> model, ResourceManager manager) throws JtwigRenderException {
@@ -86,10 +64,17 @@ public class For extends ObjectList {
 		List<Object> forValues = null;
 		
 		if (values == null) forValues = new ObjectList();
-		else if (!(values instanceof List<?>)) {
+		else if (values instanceof List<?>) {
+			forValues = (List<Object>) values;
+		} else if (values.getClass().isArray()) {
+			Object[] list = (Object[]) values;
+			forValues = new ArrayList<Object>();
+			for (int i=0;i<list.length;i++)
+				forValues.add(list[i]);
+		} else {
 			forValues = new ArrayList<Object>();
 			forValues.add(values);
-		} else forValues = (List<Object>) values;
+		}
 		
 		
 		for (int i = 0;i<forValues.size();i++) {
@@ -97,45 +82,10 @@ public class For extends ObjectList {
 			Map<String, Object> newModel = new TreeMap<String, Object>();
 			newModel.putAll(model);
 			newModel.put(variable, val);
-			
-			if (i == 0 && this.first != null) {
-				for (Object obj : this.first) {
-					if (obj instanceof Invoke) {
-						((Invoke) obj).invoke(req, newModel);
-					} else {
-						if (obj instanceof Renderable) {
-							result += ((Renderable) obj).render(req, newModel, manager);
-						} else if (obj instanceof String) {
-							result += (String) obj;
-						} else throw new JtwigRenderException("Unable to render object "+obj.toString());
-					}
-				}
-			} else if (i == (forValues.size() - 1) && this.last != null) {
-				for (Object obj : this.last) {
-					if (obj instanceof Invoke) {
-						((Invoke) obj).invoke(req, newModel);
-					} else {
-						if (obj instanceof Renderable) {
-							result += ((Renderable) obj).render(req, newModel, manager);
-						} else if (obj instanceof String) {
-							result += (String) obj;
-						} else throw new JtwigRenderException("Unable to render object "+obj.toString());
-					}
-				}
-			} else {
-				for (Object obj : this) {
-					if (obj instanceof Invoke) {
-						((Invoke) obj).invoke(req, newModel);
-					} else {
-						if (obj instanceof Renderable) {
-							result += ((Renderable) obj).render(req, newModel, manager);
-						} else if (obj instanceof String) {
-							result += (String) obj;
-						} else throw new JtwigRenderException("Unable to render object "+obj.toString());
-					}
-				}
-			}
-			
+			newModel.put("position", i);
+			newModel.put("first", i == 0);
+			newModel.put("last", (i + 1) == forValues.size());
+			result += super.render(req, newModel, manager);
 		}
 		return result;
 	}

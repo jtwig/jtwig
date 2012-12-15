@@ -31,13 +31,14 @@ import com.lyncode.jtwig.exceptions.FunctionException;
 import com.lyncode.jtwig.exceptions.JtwigRenderException;
 import com.lyncode.jtwig.expression.JtwigExpressionEvaluator;
 import com.lyncode.jtwig.functions.Function;
+import com.lyncode.jtwig.render.Argumentable;
 import com.lyncode.jtwig.render.Calculable;
 
 /**
  * @author "João Melo <jmelo@lyncode.com>"
  *
  */
-public class FunctionExpr implements Calculable {
+public class FunctionExpr implements Calculable, Argumentable {
 	private static Logger log = LogManager.getLogger(FunctionExpr.class);
 	private String name;
 	private List<Object> arguments;

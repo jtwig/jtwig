@@ -2,6 +2,8 @@ package com.lyncode.jtwig.mvc;
 
 import java.util.regex.Pattern;
 
+import com.lyncode.jtwig.api.InvokeResolver;
+
 public class DefaultInvokeResolver implements InvokeResolver {
 	private String path;
 	

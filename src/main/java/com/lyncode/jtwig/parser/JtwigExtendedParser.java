@@ -28,9 +28,12 @@ import org.parboiled.annotations.MemoMismatches;
 import org.parboiled.annotations.SuppressNode;
 import org.parboiled.annotations.SuppressSubnodes;
 import org.parboiled.parserunners.BasicParseRunner;
+import org.parboiled.parserunners.RecoveringParseRunner;
 import org.parboiled.support.ParsingResult;
 
 import com.lyncode.jtwig.elements.Block;
+import com.lyncode.jtwig.elements.Call;
+import com.lyncode.jtwig.elements.ExpressionOperator;
 import com.lyncode.jtwig.elements.Extends;
 import com.lyncode.jtwig.elements.FastExpression;
 import com.lyncode.jtwig.elements.For;
@@ -38,10 +41,13 @@ import com.lyncode.jtwig.elements.FunctionExpr;
 import com.lyncode.jtwig.elements.If;
 import com.lyncode.jtwig.elements.Include;
 import com.lyncode.jtwig.elements.Invoke;
+import com.lyncode.jtwig.elements.JtwigExpression;
 import com.lyncode.jtwig.elements.ObjectList;
 import com.lyncode.jtwig.elements.ObjectMap;
+import com.lyncode.jtwig.elements.Set;
 import com.lyncode.jtwig.elements.Variable;
 import com.lyncode.jtwig.exceptions.JtwigParsingException;
+import com.lyncode.jtwig.render.Argumentable;
 
 /**
  * 
@@ -79,7 +85,7 @@ public class JtwigExtendedParser extends BaseParser<Object> {
 	
 	public static void main (String... str) throws JtwigParsingException {
 		BasicConfigurator.configure();
-		String input = "     {% if test 1123 %}     <asdasd>\n     {% endif %}";
+		String input = "asdsad sad asd {% if asd %}{% endif %}";
 		log.debug(input);
 		log.debug(parse(input));
 	}
@@ -87,7 +93,7 @@ public class JtwigExtendedParser extends BaseParser<Object> {
 	public static ObjectList parse (String input) throws JtwigParsingException {
     	if (parser == null)
     		parser = Parboiled.createParser(JtwigExtendedParser.class);
-        // String input = "{{ 'aaaa' | trans 'asdasd' | make | aaa }}            ";
+        // String input = "{{ path('aaaa') }}            ";
         // 
 
     	// Tratar do Input
@@ -97,8 +103,9 @@ public class JtwigExtendedParser extends BaseParser<Object> {
     	try {
     		log.debug("Start new parse");
     		//ParsingResult<JtwigElement> result = new TracingParseRunner<JtwigElement>(parser.JtwigContentRoot()).run(input);
-    		ParsingResult<Object> result = new BasicParseRunner<Object>(parser.Start()).run(input);
-
+    		//ParsingResult<Object> result = new BasicParseRunner<Object>(parser.Start()).run(input);
+    		ParsingResult<Object> result = new RecoveringParseRunner<Object>(parser.Start()).run(input);
+    		
             Object e = result.valueStack.pop();
             if (e instanceof ObjectList)
             	return (ObjectList) e;
@@ -122,11 +129,13 @@ public class JtwigExtendedParser extends BaseParser<Object> {
     final String INCLUDE = "include";
     final String EXTENDS = "extends";
     final String INVOKE = "invoke";
+    final String CALL = "call";
     final String WITH = "with";
     final String START_FIRST = "first";
     final String START_LAST = "last";
     final String END_FIRST = "endfirst";
     final String END_LAST = "endlast";
+    final String SET = "set";
 
     final Rule LPARENT = Terminal("(");
     final Rule RPARENT = Terminal(")");
@@ -142,6 +151,21 @@ public class JtwigExtendedParser extends BaseParser<Object> {
     final Rule MAPCLOSE = Terminal("}");
     final Rule CODEOPEN = Terminal("{%");
     final Rule CODECLOSE = Terminal("%}", false);
+    final Rule ATTR = Terminal("=");
+
+    final Rule STAR = Terminal("*");
+    final Rule MOD = Terminal("%");
+    final Rule PLUS = Terminal("+");
+    final Rule MINUS = Terminal("-");
+    final Rule LE = Terminal("<=");
+    final Rule GE = Terminal(">=");
+    final Rule GT = Terminal(">");
+    final Rule LT = Terminal("<");
+    final Rule EQUAL = Terminal("==");
+    final Rule NOTEQUAL = Terminal("!=");
+    final Rule ANDAND = Terminal("&&");
+    final Rule OROR = Terminal("||");
+    
     
     Rule Start () {
     	return FirstOf(
@@ -157,11 +181,12 @@ public class JtwigExtendedParser extends BaseParser<Object> {
      */
     Rule NormalTemplate () {
     	return Sequence(
-    			WriteIt("Entering NormalTemplate Rule"),
+    			WriteIt("Entering Rule (NormalTemplate)"),
     			Spacing(),
     			push(new ObjectList()),
     			Content(),
-    			EOI
+    			EOI,
+    			WriteIt("Exiting Rule (NormalTemplate)")
     	);
     }
     
@@ -172,7 +197,7 @@ public class JtwigExtendedParser extends BaseParser<Object> {
      */
     Rule ExtendingTemplate () {
     	return Sequence (
-    			WriteIt("Entering ExtendingTemplate Rule"),
+    			WriteIt("Entering Rule (ExtendingTemplate)"),
     			Spacing(),
     			ExtendsExpression(),
     			push(new ObjectList()),
@@ -183,15 +208,19 @@ public class JtwigExtendedParser extends BaseParser<Object> {
     	    			((ObjectList) peek(1)).add(pop())
     			),
     			Spacing(),
-    			EOI
+    			EOI,
+    			WriteIt("Exiting Rule (ExtendingTemplate)")
     	);
     }
     
     Rule InvokeExpression () {
     	return Sequence (
-    		WriteIt("Entering InvokeExpression Rule"),
+    		WriteIt("Entering Rule (InvokeExpression)"),
     		CODEOPEN,
-    		Keyword(INVOKE),
+    		FirstOf(
+    				Keyword(INVOKE),
+    				Keyword(CALL)
+    		),
     		QualifiedIdentifier(),
     		Identifier(),
     		push(new Invoke((String)pop(1), (String)pop())),
@@ -201,19 +230,20 @@ public class JtwigExtendedParser extends BaseParser<Object> {
         			Optional(
         					Identifier(),
         					DIV,
-        					Value(),
+        					Expression(),
         					((Invoke)peek(2)).add((String)pop(1), pop()),
         					ZeroOrMore(
         							COMMA,
         	    					Identifier(),
         	    					DIV,
-        	    					Value(),
+        	    					Expression(),
         	    					((ObjectMap)peek(2)).add((String)pop(1), pop())
         					)
         			),
         			MAPCLOSE
     		),
-    		CODECLOSE
+    		CODECLOSE,
+    		WriteIt("Exiting Rule (InvokeExpression)")
     	);
     }
     
@@ -224,7 +254,7 @@ public class JtwigExtendedParser extends BaseParser<Object> {
      */
     Rule BlockExpression () {
     	return Sequence(
-        	WriteIt("Entering BlockExpression Rule"),
+        	WriteIt("Entering Rule (BlockExpression)"),
     		CODEOPEN,
     		Keyword(BLOCK),
     		Identifier(),
@@ -233,7 +263,8 @@ public class JtwigExtendedParser extends BaseParser<Object> {
     		Content(),
     		CODEOPEN,
     		Keyword(ENDBLOCK),
-    		CODECLOSE
+    		CODECLOSE,
+    		WriteIt("Exiting Rule (BlockExpression)")
     	);
     }
     
@@ -244,12 +275,13 @@ public class JtwigExtendedParser extends BaseParser<Object> {
      */
     Rule ExtendsExpression () {
     	return Sequence(
-            	WriteIt("Entering ExtendsExpression Rule"),
+            	WriteIt("Entering Rule (ExtendsExpression)"),
     			CODEOPEN,
     			Keyword(EXTENDS),
     			StringLiteral(),
     			push(new Extends((String) pop())),
-    			CODECLOSE
+    			CODECLOSE,
+        		WriteIt("Exiting Rule (ExtendsExpression)")
     	);
     }
     
@@ -260,12 +292,13 @@ public class JtwigExtendedParser extends BaseParser<Object> {
      */
     Rule IncludeExpression () {
     	return Sequence(
-            	WriteIt("Entering IncludeExpression Rule"),
+            	WriteIt("Entering Rule (IncludeExpression)"),
     			CODEOPEN,
     			Keyword(INCLUDE),
     			StringLiteral(),
     			push(new Include((String)pop())),
-    			CODECLOSE
+    			CODECLOSE,
+        		WriteIt("Exiting Rule (IncludeExpression)")
     	);
     }
     
@@ -275,17 +308,23 @@ public class JtwigExtendedParser extends BaseParser<Object> {
      * @return
      */
     Rule Content () {
-    	return ZeroOrMore(
-    			FirstOf(
-    					FastExpression(),
-    					InvokeExpression(),
-    					ForExpression(),
-    					IfExpression(),
-    					BlockExpression(),
-    					IncludeExpression(),
-    					TextRule()
-    			),
-    			((ObjectList)peek(1)).add(pop())
+    	return Sequence(
+    			WriteIt("Entering Rule (Content)"),
+	    			ZeroOrMore(
+		    			FirstOf(
+		    					SetExpression(),
+		    					FastExpression(),
+		    					InvokeExpression(),
+		    					ForExpression(),
+		    					IfExpression(),
+		    					BlockExpression(),
+		    					IncludeExpression(),
+		    					TextRule()
+		    			),
+		    			((ObjectList)peek(1)).add(pop())
+	    			),
+	    		WriteIt("Leaving Rule (Content)")
+    	
     	);
     }
 
@@ -296,28 +335,18 @@ public class JtwigExtendedParser extends BaseParser<Object> {
      */
 	Rule TextRule () {
 		return Sequence(
+				WriteIt("Entering Rule (TextRule)"),
 				OneOrMore(
                         FirstOf(
                                 Escape(),
                                 Sequence(TestNot(FirstOf(OFAST, CODEOPEN)), ANY)
                         )
 				).suppressSubnodes(),
-				push(match())
+				push(match()),
+		    	WriteIt("Leaving Rule (TextRule)")
 		);
 	}
 	
-	/**
-	 * Pushes on value
-	 * 
-	 * @return
-	 */
-	Rule BooleanExpression () {
-		return FirstOf(
-			FunctionOneArgument(),
-			Variable(),
-			Boolean()
-		);
-	}
 	
 	/**
 	 * Pushes one IF
@@ -326,27 +355,29 @@ public class JtwigExtendedParser extends BaseParser<Object> {
 	 */
 	Rule IfExpression () {
 		return Sequence(
-            	WriteIt("Entering IfExpression Rule"),
+            	WriteIt("Entering Rule (IfExpression)"),
 				CODEOPEN,
 				Keyword(IF),
-				BooleanExpression(),
+				Expression(),
 				push(new If(pop())),
 				CODECLOSE,
-				WriteIt("Code closed in IfExpression"),
 				Content(),
 				Optional(
 						Sequence(
+							WriteIt("Entering Else (IfExpression)"),
 							CODEOPEN,
 							Keyword(ELSE),
 							CODECLOSE,
 							push(new ObjectList()),
 							Content(),
-							((If)peek(1)).setElse((ObjectList)pop())
+							((If)peek(1)).setElse((ObjectList)pop()),
+							WriteIt("Leaving Else (IfExpression)")
 						)
 				),
 				CODEOPEN,
 				Keyword(ENDIF),
-				CODECLOSE
+				CODECLOSE,
+				WriteIt("Leaving Rule (IfExpression)")
 		);
 	}
 	
@@ -357,54 +388,43 @@ public class JtwigExtendedParser extends BaseParser<Object> {
      */
     Rule ForExpression () {
     	return Sequence(
+            WriteIt("Entering Rule (ForExpression)"),
     		CODEOPEN,
     		Keyword(FOR),
     		Identifier(),
     		Keyword(IN),
-    		FirstOf(
-    				ListExpression(),
-    				FunctionOneArgument(),
-    				Variable()
-    		),
+    		Expression(),
     		CODECLOSE,
     		push(new For((String)pop(1), pop())),
-    		Optional(FirstExpression(), ((For)peek(1)).setFirst(((ObjectList)pop()))),
+    		// There is no first/last expressions
+    		// Optional(FirstExpression(), ((For)peek(1)).setFirst(((ObjectList)pop()))),
     		Content(),
-    		Optional(LastExpression(), ((For)peek(1)).setLast(((ObjectList)pop()))),
+    		// Optional(LastExpression(), ((For)peek(1)).setLast(((ObjectList)pop()))),
     		CODEOPEN,
     		Keyword(ENDFOR),
-    		CODECLOSE
+    		CODECLOSE,
+			WriteIt("Leaving Rule (ForExpression)")
     	);
     }
     
-    Rule FirstExpression () {
-    	return Sequence (
-    			Spacing(),
+    /**
+     * Pushes one Set
+     * 
+     * @return
+     */
+    Rule SetExpression () {
+    	return Sequence(
+                WriteIt("Entering Rule (SetExpression)"),
     			CODEOPEN,
-    			Keyword(START_FIRST),
+    			Keyword(SET),
+    			Identifier(),
+    			ATTR,
+    			Expression(),
     			CODECLOSE,
-    			push(new ObjectList()),
-    			Content(),
-    			CODEOPEN,
-    			Keyword(END_FIRST),
-    			CODECLOSE
+    			push(new Set((String)pop(1), pop())),
+    			WriteIt("Leaving Rule (SetExpression)")
     	);
     }
-    
-    Rule LastExpression () {
-    	return Sequence (
-    			Spacing(),
-    			CODEOPEN,
-    			Keyword(START_LAST),
-    			CODECLOSE,
-    			push(new ObjectList()),
-    			Content(),
-    			CODEOPEN,
-    			Keyword(END_LAST),
-    			CODECLOSE
-    	);
-    }
-    
     /**
      * Pushes one fast expression
      * 
@@ -412,94 +432,224 @@ public class JtwigExtendedParser extends BaseParser<Object> {
      */
     Rule FastExpression () {
     	return Sequence(
+                WriteIt("Entering Rule (FastExpression)"),
     			OFAST,
-    			Value(),
+    			Expression(),
     			push(new FastExpression(pop())),
     			ZeroOrMore(Sequence(
     					OR,
     					Function(),
     					((FastExpression) peek(1)).add((FunctionExpr)pop())
     			)),
-    			CFAST
+    			CFAST,
+    			WriteIt("Leaving Rule (FastExpression)")
     	);
     }
     
     /**
-     * Pushes one value (function or variable or constant)
+     * Pushes one expression
      * 
      * @return
      */
-    Rule Value () {
-    	return Sequence(FirstOf(
-    			Integer(),
-    			Boolean(),
-    			StringLiteral(),
-    			FunctionOneArgument(),
-    			Variable(),
-    			ListExpression(),
-    			MapExpression()
-    	), Spacing());
+    Rule Expression() {
+        return ConditionalOrExpression();
+    }
+    
+    Rule ConditionalOrExpression() {
+        return Sequence(
+        		ConditionalAndExpression(),
+        		push(new JtwigExpression(ExpressionOperator.OR)),
+        		((Argumentable)peek()).add(pop(1)),
+                ZeroOrMore(
+                		OROR, 
+                		ConditionalAndExpression(),
+                		((Argumentable)peek(1)).add(pop())
+                )
+        );
+    }
+    
+    Rule ConditionalAndExpression() {
+        return Sequence(
+        		EqualityExpression(),
+        		push(new JtwigExpression(ExpressionOperator.AND)),
+        		((Argumentable)peek()).add(pop(1)),
+                ZeroOrMore(
+                		ANDAND, 
+                		EqualityExpression(),
+                		((Argumentable)peek(1)).add(pop())
+                )
+        );
+    }
+    
+
+
+    Rule EqualityExpression() {
+        return Sequence(
+        		NotEqualityExpression(),
+        		push(new JtwigExpression(ExpressionOperator.EQUAL)),
+        		((Argumentable)peek()).add(pop(1)),
+        		ZeroOrMore(
+                		EQUAL, 
+                		NotEqualityExpression(),
+                		((Argumentable)peek(1)).add(pop())
+                )
+        );
+    }
+    
+    Rule NotEqualityExpression() {
+        return Sequence(
+        		RelationalExpression(),
+        		push(new JtwigExpression(ExpressionOperator.NOTEQUAL)),
+                ((Argumentable)peek()).add(pop(1)),
+                ZeroOrMore(
+                		NOTEQUAL, 
+                		RelationalExpression(),
+                		((Argumentable)peek(1)).add(pop())
+                )
+        );
+    }
+
+    Rule RelationalExpression() {
+        return Sequence(
+        		AdditiveExpression(),
+        		push(new JtwigExpression()),
+        		((Argumentable)peek()).add(pop(1)),
+                ZeroOrMore(
+                        Sequence(
+                        		FirstOf(
+                        				Sequence(LE, ((JtwigExpression) peek()).setOperator(ExpressionOperator.LE)), 
+                        				Sequence(GE, ((JtwigExpression) peek()).setOperator(ExpressionOperator.GE)),
+                        				Sequence(LT, ((JtwigExpression) peek()).setOperator(ExpressionOperator.LT)),
+                        				Sequence(GT, ((JtwigExpression) peek()).setOperator(ExpressionOperator.GT))
+                        		), 
+                        		AdditiveExpression(),
+                        		((Argumentable)peek(1)).add(pop())
+                        )
+                )
+        );
+    }
+    
+
+    Rule AdditiveExpression() {
+        return Sequence(
+        		MultiplicativeExpression(),
+        		push(new JtwigExpression()),
+        		((Argumentable)peek()).add(pop(1)),
+                ZeroOrMore(
+                		FirstOf(
+                				Sequence(PLUS, ((JtwigExpression) peek()).setOperator(ExpressionOperator.PLUS)),
+                				Sequence(MINUS, ((JtwigExpression) peek()).setOperator(ExpressionOperator.MINUS))
+                		), 
+                		MultiplicativeExpression(),
+                		((Argumentable)peek(1)).add(pop())
+                )
+        );
+    }
+
+    Rule MultiplicativeExpression() {
+        return Sequence(
+        		UnaryExpression(),
+        		push(new JtwigExpression()),
+        		((Argumentable)peek()).add(pop(1)),
+                ZeroOrMore(
+                	FirstOf(
+                			Sequence(STAR, ((JtwigExpression) peek()).setOperator(ExpressionOperator.STAR)),
+                			Sequence(DIV, ((JtwigExpression) peek()).setOperator(ExpressionOperator.DIV)),
+                			Sequence(MOD, ((JtwigExpression) peek()).setOperator(ExpressionOperator.MOD))
+                	),
+                	UnaryExpression(),
+                	((Argumentable)peek(1)).add(pop())
+                )
+        );
+    }
+    
+    Rule UnaryExpression() {
+        return Primary();
+    }
+    
+    Rule Primary() {
+        return FirstOf(
+                ParExpression(),
+        		FunctionExpression(),
+        		FunctionOneArgumentExpression(),
+        		CallExpression(),
+                StringLiteral(),
+                Variable(),
+                Integer(),
+                Boolean(),
+                MapExpression(),
+                ListExpression()
+        );
+    }
+    
+    Rule ParExpression() {
+        return Sequence(LPARENT, Expression(), RPARENT);
+    }
+
+    Rule Arguments () {
+    	return Sequence(
+    			WriteIt("Entering Rule (Arguments)"),
+    			Expression(),
+    			((Argumentable) peek(1)).add(pop()),
+    			ZeroOrMore(
+    				COMMA,
+    				Expression(),
+        			((Argumentable) peek(1)).add(pop())
+    			),
+    			WriteIt("Leaving Rule (Arguments)")
+    	);
     }
     
     /**
-     * No pushes!
+     * Pushes one call
      * 
      * @return
      */
-    Rule FunctionArguments () {
-    	return ZeroOrMore(
-    			Sequence(
-    					FirstOf(
-    							Integer(),
-    							Boolean(),
-    							StringLiteral(),
-    							Sequence(LPARENT, FunctionOneArgument(), RPARENT),
-    							ListExpression(),
-    							MapExpression(),
-    							Variable()
-    					),
-    					ACTION(((FunctionExpr)peek(1)).add(pop()))
-    			)
-    	);
-    }
-    /**
-     * No pushes!
-     * 
-     * @return
-     */
-    Rule FunctionOneArguments () {
-    	return OneOrMore(
-    			Sequence(
-    	            	WriteIt("Entering FunctionOneArguments:OneOrMore Rule"),
-    					FirstOf(
-    							Integer(),
-    							Boolean(),
-    							StringLiteral(),
-    							Sequence(LPARENT, FunctionOneArgument(), RPARENT),
-    							ListExpression(),
-    							MapExpression(),
-    							Variable()
-    					),
-    	            	WriteIt("Adding "+peek()+" as argument to "+peek(1)),
-    					ACTION(((FunctionExpr)peek(1)).add(pop()))
-    			)
+    Rule FunctionExpression () {
+    	return Sequence(
+    			WriteIt("Entering Rule (FunctionExpression)"),
+    			Identifier(),
+    			push(new FunctionExpr((String)pop())),
+    			LPARENT,
+    			Arguments(),
+    			RPARENT,
+    			WriteIt("Leaving Rule (FunctionExpression)")
     	);
     }
 
     /**
-     * Pushes a Function
+     * Pushes one call
      * 
      * @return
      */
-    Rule FunctionOneArgument () {
+    Rule FunctionOneArgumentExpression () {
     	return Sequence(
-            	WriteIt("Entering FunctionOneArgument Rule"),
+    			WriteIt("Entering Rule (FunctionExpression)"),
     			Identifier(),
-    			push(new FunctionExpr((String) pop())),
-    			FunctionOneArguments()
+    			push(new FunctionExpr((String)pop())),
+    			Expression(),
+    			((Argumentable) peek(1)).add(pop()),
+    			WriteIt("Leaving Rule (FunctionExpression)")
     	);
     }
     
+    /**
+     * Pushes one call
+     * 
+     * @return
+     */
+    Rule CallExpression () {
+    	return Sequence(
+    			WriteIt("Entering Rule (CallExpression)"),
+    			QualifiedMethodIdentifier(),
+    			push(new Call((String)pop())),
+    			LPARENT,
+    			Arguments(),
+    			RPARENT,
+    			WriteIt("Leaving Rule (CallExpression)")
+    	);
+    }
+        
     /**
      * Pushes a Function
      * 
@@ -507,9 +657,11 @@ public class JtwigExtendedParser extends BaseParser<Object> {
      */
     Rule Function () {
     	return Sequence(
+    			WriteIt("Entering Rule (Function)"),
     			Identifier(),
     			push(new FunctionExpr((String) pop())),
-    			FunctionArguments()
+    			Optional(LPARENT, Arguments(), RPARENT),
+    			WriteIt("Leaving Rule (Function)")
     	);
     }
     
@@ -520,22 +672,24 @@ public class JtwigExtendedParser extends BaseParser<Object> {
      */
     Rule MapExpression () {
     	return Sequence(
+    			WriteIt("Entering Rule (MapExpression)"),
     			MAPOPEN,
     			push(new ObjectMap()),
     			Optional(
     					Identifier(),
     					DIV,
-    					Value(),
+    					Expression(),
     					((ObjectMap)peek(2)).add((String)pop(1), pop()),
     					ZeroOrMore(
     							COMMA,
     	    					Identifier(),
     	    					DIV,
-    	    					Value(),
+    	    					Expression(),
     	    					((ObjectMap)peek(2)).add((String)pop(1), pop())
     					)
     			),
-    			MAPCLOSE
+    			MAPCLOSE,
+    			WriteIt("Leaving Rule (MapExpression)")
     	);
     }
     
@@ -546,18 +700,20 @@ public class JtwigExtendedParser extends BaseParser<Object> {
      */
 	Rule ListExpression () {
     	return Sequence(
+    			WriteIt("Entering Rule (ListExpression)"),
     			LISTOPEN,
     			push(new ObjectList()),
     			Optional(
-    					Value(),
+    					Expression(),
     					((ObjectList)peek(1)).add(pop()),
     					ZeroOrMore(
     							COMMA,
-    	    					Value(),
+    	    					Expression(),
     	    					((ObjectList)peek(1)).add(pop())
     					)
     			),
-    			LISTCLOSE
+    			LISTCLOSE,
+    			WriteIt("Leaving Rule (ListExpression)")
     	);
     }
     
@@ -567,9 +723,13 @@ public class JtwigExtendedParser extends BaseParser<Object> {
      * @return
      */
     Rule Boolean () {
-    	return FirstOf(
+    	return Sequence(
+    		WriteIt("Entering Rule (Boolean)"),
+    		FirstOf(
     			Sequence(TRUE, push(new Boolean(true))),
     			Sequence(FALSE, push(new Boolean(false)))
+    		),
+    		WriteIt("Leaving Rule (Boolean)")
     	);
     }
     
@@ -580,9 +740,11 @@ public class JtwigExtendedParser extends BaseParser<Object> {
      */
     Rule Integer () {
     	return Sequence(
+    			WriteIt("Entering Rule (Integer)"),
     			OneOrMore(Digit()),
     			push(Integer.parseInt(match())),
-    			WriteIt(peek())
+    			WriteIt(peek()),
+    			WriteIt("Entering Rule (Integer)")
     	);
     }
     
@@ -593,8 +755,10 @@ public class JtwigExtendedParser extends BaseParser<Object> {
      */
     Rule Variable () {
     	return Sequence(
+    			WriteIt("Entering Rule (Variable)"),
     			QualifiedIdentifier(),
-    			push(new Variable((String) pop()))
+    			push(new Variable((String) pop())),
+    			WriteIt("Leaving Rule (Variable)")
     	);
     }
     
@@ -604,7 +768,9 @@ public class JtwigExtendedParser extends BaseParser<Object> {
      * @return
      */
     Rule StringLiteral() {
-        return FirstOf(
+        return Sequence(
+        		WriteIt("Entering Rule (StringLiteral)"),
+        		FirstOf(
 	        		Sequence(
 			                '"',
 			                ZeroOrMore(
@@ -629,6 +795,8 @@ public class JtwigExtendedParser extends BaseParser<Object> {
 	     	               "'", 
 	     	               Spacing()
 	               )
+	         ),
+	         WriteIt("Leaving Rule (StringLiteral)")
         );
     }
 
@@ -663,6 +831,7 @@ public class JtwigExtendedParser extends BaseParser<Object> {
      */
 	Rule QualifiedIdentifier() {
         return Sequence(
+        		WriteIt("Entering Rule (QualifiedIdentifier)"),
         		Identifier(), 
         		ZeroOrMore(
         				Sequence(
@@ -670,7 +839,28 @@ public class JtwigExtendedParser extends BaseParser<Object> {
         						Identifier(),
         						push(pop(1) + "." + pop())
         				)
-        		)
+        		),
+        		WriteIt("Leaving Rule (QualifiedIdentifier)")
+        );
+    }
+	
+	/**
+     * Pushes the qualified identifier as String
+     * 
+     * @return
+     */
+	Rule QualifiedMethodIdentifier() {
+        return Sequence(
+        		WriteIt("Entering Rule (QualifiedMethodIdentifier)"),
+        		Identifier(), 
+        		OneOrMore(
+        				Sequence(
+        						DOT, 
+        						Identifier(),
+        						push(pop(1) + "." + pop())
+        				)
+        		),
+        		WriteIt("Leaving Rule (QualifiedMethodIdentifier)")
         );
     }
 	
@@ -683,9 +873,11 @@ public class JtwigExtendedParser extends BaseParser<Object> {
     @MemoMismatches
     Rule Identifier() {
         return Sequence(
+        		WriteIt("Entering Rule (Identifier)"),
         		Sequence(TestNot(Keyword()), Letter(), ZeroOrMore(LetterOrDigit())),
         		push(match()),
-        		Spacing()
+        		Spacing(),
+        		WriteIt("Leaving Rule (Identifier)")
         	);
     }
 	

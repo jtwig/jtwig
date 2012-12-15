@@ -13,9 +13,12 @@ import org.apache.log4j.Logger;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.support.RequestContextUtils;
 
-import com.lyncode.jtwig.mvc.InvokeResolver;
+import com.lyncode.jtwig.api.InvokeResolver;
+import com.lyncode.jtwig.exceptions.JtwigRenderException;
+import com.lyncode.jtwig.manager.ResourceManager;
+import com.lyncode.jtwig.render.Renderable;
 
-public class Invoke {
+public class Invoke implements Renderable {
 	private static Logger log = LogManager.getLogger(Invoke.class);
 	
 	private String className;
@@ -74,6 +77,13 @@ public class Invoke {
 			log.error(e.getMessage(), e);
 		}
 		
+	}
+	
+	@Override
+	public String render(HttpServletRequest req, Map<String, Object> model,
+			ResourceManager manager) throws JtwigRenderException {
+		this.invoke(req, model);
+		return "";
 	}
 	
 	
