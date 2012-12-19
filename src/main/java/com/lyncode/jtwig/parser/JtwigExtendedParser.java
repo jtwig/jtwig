@@ -15,6 +15,8 @@
  */
 package com.lyncode.jtwig.parser;
 
+import java.lang.reflect.Array;
+import java.lang.reflect.Field;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.BasicConfigurator;
@@ -85,9 +87,9 @@ public class JtwigExtendedParser extends BaseParser<Object> {
 	
 	public static void main (String... str) throws JtwigParsingException {
 		BasicConfigurator.configure();
-		String input = "asdsad sad asd {% if asd %}{% endif %}";
+		String input = "asdsad {# hello #}sad asd {% if {# hello #} asd %}{% endif %}";
 		log.debug(input);
-		log.debug(parse(input));
+		log.debug("'"+parse(input)+"'");
 	}
 
 	public static ObjectList parse (String input) throws JtwigParsingException {
@@ -144,6 +146,8 @@ public class JtwigExtendedParser extends BaseParser<Object> {
     final Rule COMMA = Terminal(",");
     final Rule DIV = Terminal(":");
     final Rule OFAST = Terminal("{{");
+    final Rule COMMENTSTART = Terminal("{#");
+    final Rule COMMENTEND = Terminal("#}", false);
     final Rule CFAST = Terminal("}}", false);
     final Rule LISTOPEN = Terminal("[");
     final Rule LISTCLOSE = Terminal("]");
@@ -336,13 +340,21 @@ public class JtwigExtendedParser extends BaseParser<Object> {
 	Rule TextRule () {
 		return Sequence(
 				WriteIt("Entering Rule (TextRule)"),
+				push(""),
 				OneOrMore(
-                        FirstOf(
-                                Escape(),
-                                Sequence(TestNot(FirstOf(OFAST, CODEOPEN)), ANY)
+						FirstOf(
+								Sequence("{#", ZeroOrMore(TestNot("#}"), ANY), "#}"),
+                                Sequence(
+                                		Escape(),
+                                		push(pop()+match())
+                                ),
+                                Sequence(
+                                		TestNot(FirstOf(OFAST, CODEOPEN)), 
+                                		ANY,
+                                		push(pop()+match())
+                                )
                         )
 				).suppressSubnodes(),
-				push(match()),
 		    	WriteIt("Leaving Rule (TextRule)")
 		);
 	}
@@ -934,14 +946,14 @@ public class JtwigExtendedParser extends BaseParser<Object> {
                 OneOrMore(AnyOf(" \t\r\n\f").label("Whitespace")),
 
                 // traditional comment
-                Sequence("/*", ZeroOrMore(TestNot("*/"), ANY), "*/"),
+                Sequence("{#", ZeroOrMore(TestNot("#}"), ANY), "#}")
 
                 // end of line comment
-                Sequence(
+                /*Sequence(
                         "//",
                         ZeroOrMore(TestNot(AnyOf("\r\n")), ANY),
                         FirstOf("\r\n", '\r', '\n', EOI)
-                )
+                )*/
         ));
     }
 }
