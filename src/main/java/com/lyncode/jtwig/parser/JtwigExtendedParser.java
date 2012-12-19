@@ -64,10 +64,10 @@ public class JtwigExtendedParser extends BaseParser<Object> {
 		return true;
 	}
 	
-    @Override
+	@Override
 	public Object pop(int down) {
     	Object e = super.pop(down);
-    	log.debug("Poping at "+down+": "+e.toString());
+    	log.debug("Popping at "+down+": "+e.toString());
 		return e;
 	}
 
@@ -98,7 +98,7 @@ public class JtwigExtendedParser extends BaseParser<Object> {
         // String input = "{{ path('aaaa') }}            ";
         // 
 
-    	// Tratar do Input
+    	// treat the input
     	input = input.replaceAll("\\n\\s*"+Pattern.quote("{%"), "{%");
     	input = input.replaceAll(Pattern.quote("{%")+"\\s*\\n", "%}");
     	
@@ -112,9 +112,9 @@ public class JtwigExtendedParser extends BaseParser<Object> {
             if (e instanceof ObjectList)
             	return (ObjectList) e;
             else
-            	throw new JtwigParsingException("A parsing error occurs");
+            	throw new JtwigParsingException("A parsing error occurred");
     	} catch (IllegalArgumentException e) {
-    		throw new JtwigParsingException("Template not well formed", e);
+    		throw new JtwigParsingException("Template is not well-formed", e);
     	}
     }
 	
@@ -332,11 +332,11 @@ public class JtwigExtendedParser extends BaseParser<Object> {
     	);
     }
 
-    /**
-     * Pushes the text
-     * 
-     * @return
-     */
+	/**
+	* Pushes the text
+	* 
+	* @return
+	*/
 	Rule TextRule () {
 		return Sequence(
 				WriteIt("Entering Rule (TextRule)"),
