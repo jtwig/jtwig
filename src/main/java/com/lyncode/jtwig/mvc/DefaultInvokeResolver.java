@@ -13,7 +13,7 @@ public class DefaultInvokeResolver implements InvokeResolver {
 	}
 
 
-	public void setPath(String path) {
+	public void setPackage(String path) {
 		this.path = path;
 	}
 

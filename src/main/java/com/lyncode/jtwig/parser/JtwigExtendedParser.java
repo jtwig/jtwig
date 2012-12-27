@@ -15,8 +15,6 @@
  */
 package com.lyncode.jtwig.parser;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.Field;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.BasicConfigurator;
@@ -29,7 +27,6 @@ import org.parboiled.annotations.DontLabel;
 import org.parboiled.annotations.MemoMismatches;
 import org.parboiled.annotations.SuppressNode;
 import org.parboiled.annotations.SuppressSubnodes;
-import org.parboiled.parserunners.BasicParseRunner;
 import org.parboiled.parserunners.RecoveringParseRunner;
 import org.parboiled.support.ParsingResult;
 
