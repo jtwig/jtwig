@@ -24,6 +24,8 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 import org.parboiled.common.FileUtils;
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.servlet.support.RequestContextUtils;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
@@ -36,6 +38,7 @@ import com.lyncode.jtwig.exceptions.JtwigRenderException;
 import com.lyncode.jtwig.exceptions.TemplateBuildException;
 import com.lyncode.jtwig.manager.ResourceManager;
 import com.lyncode.jtwig.manager.ServletContextResourceManager;
+import com.lyncode.jtwig.mvc.AfterRenderRunnableBeans;
 import com.lyncode.jtwig.parser.JtwigExtendedParser;
 
 /**
@@ -152,8 +155,21 @@ public class Template {
 			out.write(this.resolved.render(request, model, resources).getBytes());
 			out.flush();
 			out.close();
+			this.runEndingTasks(request);
 		} catch (IOException e) {
 			throw new JtwigRenderException(e);
+		}
+	}
+
+	private void runEndingTasks(HttpServletRequest request) {
+		ApplicationContext a = RequestContextUtils.getWebApplicationContext(request);
+		AfterRenderRunnableBeans beans = a.getBean(AfterRenderRunnableBeans.class);
+		if (beans != null) {
+			for (String id : beans.getIds()) {
+				Object o = a.getBean(id);
+				if (o instanceof Runnable)
+					((Runnable) o).run();
+			}
 		}
 	}
 }
