@@ -1,7 +1,5 @@
 package com.lyncode.jtwig.mvc;
 
-import java.io.File;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,15 +33,15 @@ public class DefaultAssetResolver implements AssetResolver {
 		if (path == null) path = "";
 		if (themeResolver != null) {
 			if (themeResolver.getTheme() != null && !themeResolver.getTheme().equals("")) {
-				if (!path.endsWith(File.separator))
-					path += File.separator;
+				if (!path.endsWith("/"))
+					path += "/";
 				path += themeResolver.getTheme();
 			}
 		}
-		if (!path.endsWith(File.separator))
-			path += File.separator;
+		if (!path.endsWith("/"))
+			path += "/";
 		
-		if (resource.startsWith(File.separator))
+		if (resource.startsWith("/"))
 			resource = resource.substring(1);
 		
 		path = path + resource;
