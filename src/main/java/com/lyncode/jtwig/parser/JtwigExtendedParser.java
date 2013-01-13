@@ -84,9 +84,17 @@ public class JtwigExtendedParser extends BaseParser<Object> {
 	
 	public static void main (String... str) throws JtwigParsingException {
 		BasicConfigurator.configure();
-		String input = "{{ teste.main('ola', 'ole').dois.um('como é') }}";
+		String input = "{{ teste.main('ola', 'ole').texte }}";
 		log.debug(input);
-		log.debug("'"+parse(input)+"'");
+		ObjectList l = parse(input);
+		log.debug("'"+l+"'");
+		Object exp = (JtwigExpression) (((FastExpression) l.get(0)).getValue());
+		while (exp instanceof JtwigExpression) {
+			exp = ((JtwigExpression) exp).getArguments().get(0);
+		}
+		log.debug(exp);
+		log.debug(((EncapsuledIdentifier) exp).getNext().getNext().getIdentifier());
+		
 	}
 
 	public static ObjectList parse (String input) throws JtwigParsingException {
@@ -652,22 +660,37 @@ public class JtwigExtendedParser extends BaseParser<Object> {
     			WriteIt("Entering Rule (CallExpression)"),
     			Identifier(),
     			push(new EncapsuledIdentifier((String) pop())),
-    			OneOrMore(
+    			Sequence(
+						DOT,
+    					FirstOf(
+    							Sequence(
+    									Identifier(),
+    									push(new EncapsuledIdentifier((String) pop())),
+    									LPARENT,
+    					    			Arguments(),
+    					    			RPARENT
+    							),
+    							Sequence(Identifier(), push(new EncapsuledIdentifier((String)pop())))
+    					)
+				),
+    			((EncapsuledIdentifier)peek(1)).setNext((EncapsuledIdentifier)peek()),
+    			ZeroOrMore(
     					Sequence(
     						DOT,
 	    					FirstOf(
-	    							Sequence(Identifier(), push(new EncapsuledIdentifier((String)pop()))),
 	    							Sequence(
 	    									Identifier(),
 	    									push(new EncapsuledIdentifier((String) pop())),
 	    									LPARENT,
 	    					    			Arguments(),
 	    					    			RPARENT
-	    							)
+	    							),
+	    							Sequence(Identifier(), push(new EncapsuledIdentifier((String)pop())))
 	    					),
-	    					((EncapsuledIdentifier)peek(1)).setNext((EncapsuledIdentifier)pop())
+	    					((EncapsuledIdentifier)pop(1)).setNext((EncapsuledIdentifier)peek())
     					)
     			),
+    			ACTION(pop() != null),
     			WriteIt("Leaving Rule (CallExpression)")
     	);
     }

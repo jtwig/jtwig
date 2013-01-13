@@ -31,6 +31,10 @@ public class EncapsuledIdentifier implements Argumentable, Calculable {
 		return true;
 	}
 	
+	public EncapsuledIdentifier getNext () {
+		return next;
+	}
+	
 	public boolean setNext (EncapsuledIdentifier id) {
 		next = id;
 		return true;
@@ -49,7 +53,7 @@ public class EncapsuledIdentifier implements Argumentable, Calculable {
 			EncapsuledIdentifier tmp = next;
 			while (tmp != null) {
 				List<Object> args = new ArrayList<Object>();
-				for (Object ob : this.arguments)
+				for (Object ob : tmp.arguments)
 					args.add(evaluator.evaluate(req, ob));
 					
 				obj = JtwigExpressionEvaluator.evaluate(obj, tmp.getIdentifier(), args);
