@@ -137,10 +137,10 @@ public class JtwigExpressionEvaluator {
 		String last = name.toLowerCase();
 		log.debug("Trying to execute method: "+last);
 		for (Method m : obj.getClass().getMethods()) {
-			if (last.equals(m.getName().toLowerCase()) ||
-				last.equals("get"+m.getName().toLowerCase()) || 
-				last.equals("is"+m.getName().toLowerCase()) ||
-				last.equals("has"+m.getName().toLowerCase())) {
+			if (m.getName().toLowerCase().equals(last) ||
+					m.getName().toLowerCase().equals("get"+last) || 
+					m.getName().toLowerCase().equals("is"+last) ||
+					m.getName().toLowerCase().equals("has"+last)) {
 				if (m.getParameterTypes().length == arguments.size()) {
 					try {
 						return m.invoke(obj, arguments.toArray());
