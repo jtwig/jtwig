@@ -16,8 +16,10 @@
 package com.lyncode.jtwig.expression;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -27,11 +29,11 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.util.ReflectionUtils;
 
-import com.lyncode.jtwig.elements.FunctionExpr;
 import com.lyncode.jtwig.elements.ObjectList;
 import com.lyncode.jtwig.elements.ObjectMap;
 import com.lyncode.jtwig.elements.Variable;
 import com.lyncode.jtwig.exceptions.JtwigRenderException;
+import com.lyncode.jtwig.render.Argumentable;
 import com.lyncode.jtwig.render.Calculable;
 
 /**
@@ -74,7 +76,7 @@ public class JtwigExpressionEvaluator {
 		
 		for (String part : parts) {
 			try {
-				context = this.evaluate(context, part.trim());
+				context = evaluate(context, part.trim());
 			} catch (JtwigRenderException e) {
 				log.debug(part, e);
 				return null;
@@ -84,7 +86,7 @@ public class JtwigExpressionEvaluator {
 		return context;
 	}
 
-	private Object evaluate(Object context, String part) throws JtwigRenderException {
+	public static Object evaluate(Object context, String part) throws JtwigRenderException {
 		if (context == null) return null;
 		if (context instanceof Map<?, ?>) {
 			log.debug("Trying to get "+part+" on Map");
@@ -130,5 +132,28 @@ public class JtwigExpressionEvaluator {
 		}
 	}
 	
-	
+	public static Object evaluate (Object obj, String name, List<Object> arguments) {
+		log.debug("Object to call: "+obj);
+		String last = name.toLowerCase();
+		log.debug("Trying to execute method: "+last);
+		for (Method m : obj.getClass().getMethods()) {
+			if (last.equals(m.getName().toLowerCase()) ||
+				last.equals("get"+m.getName().toLowerCase()) || 
+				last.equals("is"+m.getName().toLowerCase()) ||
+				last.equals("has"+m.getName().toLowerCase())) {
+				if (m.getParameterTypes().length == arguments.size()) {
+					try {
+						return m.invoke(obj, arguments.toArray());
+					} catch (IllegalArgumentException e) {
+						log.error(e.getMessage(), e);
+					} catch (IllegalAccessException e) {
+						log.error(e.getMessage(), e);
+					} catch (InvocationTargetException e) {
+						log.error(e.getMessage(), e);
+					}
+				}
+			}
+		}
+		return null;
+	}
 }

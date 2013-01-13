@@ -31,7 +31,7 @@ import org.parboiled.parserunners.RecoveringParseRunner;
 import org.parboiled.support.ParsingResult;
 
 import com.lyncode.jtwig.elements.Block;
-import com.lyncode.jtwig.elements.Call;
+import com.lyncode.jtwig.elements.EncapsuledIdentifier;
 import com.lyncode.jtwig.elements.ExpressionOperator;
 import com.lyncode.jtwig.elements.Extends;
 import com.lyncode.jtwig.elements.FastExpression;
@@ -84,7 +84,7 @@ public class JtwigExtendedParser extends BaseParser<Object> {
 	
 	public static void main (String... str) throws JtwigParsingException {
 		BasicConfigurator.configure();
-		String input = "asdsad {# hello #}sad asd {% if {# hello #} asd %}{% endif %}";
+		String input = "{{ teste.main('ola', 'ole').dois.um('como é') }}";
 		log.debug(input);
 		log.debug("'"+parse(input)+"'");
 	}
@@ -650,14 +650,31 @@ public class JtwigExtendedParser extends BaseParser<Object> {
     Rule CallExpression () {
     	return Sequence(
     			WriteIt("Entering Rule (CallExpression)"),
-    			QualifiedMethodIdentifier(),
-    			push(new Call((String)pop())),
-    			LPARENT,
-    			Arguments(),
-    			RPARENT,
+    			Identifier(),
+    			push(new EncapsuledIdentifier((String) pop())),
+    			OneOrMore(
+    					Sequence(
+    						DOT,
+	    					FirstOf(
+	    							Sequence(Identifier(), push(new EncapsuledIdentifier((String)pop()))),
+	    							Sequence(
+	    									Identifier(),
+	    									push(new EncapsuledIdentifier((String) pop())),
+	    									LPARENT,
+	    					    			Arguments(),
+	    					    			RPARENT
+	    							)
+	    					),
+	    					((EncapsuledIdentifier)peek(1)).setNext((EncapsuledIdentifier)pop())
+    					)
+    			),
     			WriteIt("Leaving Rule (CallExpression)")
     	);
     }
+    
+    
+    
+    
         
     /**
      * Pushes a Function
