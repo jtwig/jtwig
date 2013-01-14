@@ -36,12 +36,14 @@ import com.lyncode.jtwig.render.Calculable;
 public class For extends ObjectList {
 	private static Logger log = LogManager.getLogger(For.class);
 	private static final long serialVersionUID = 4648580478468941354L;
+	private List<JtwigExpression> exp;
 	private String variable;
 	private Object value;
 	
 	public For (String variable, Object value) {
 		this.variable = variable;
 		this.value = value;
+		this.exp = new ArrayList<JtwigExpression>();
 		log.debug(this);
 	}
 
@@ -76,6 +78,7 @@ public class For extends ObjectList {
 			forValues.add(values);
 		}
 		
+		forValues = this.applyFilters(forValues, variable, req, model);
 		
 		for (int i = 0;i<forValues.size();i++) {
 			Object val = forValues.get(i);
@@ -85,12 +88,36 @@ public class For extends ObjectList {
 			newModel.put("position", i);
 			newModel.put("first", i == 0);
 			newModel.put("last", (i + 1) == forValues.size());
+			
 			result += super.render(req, newModel, manager);
 		}
 		return result;
 	}
 
+	private List<Object> applyFilters(List<Object> forValues, String variable2,
+			HttpServletRequest req, Map<String, Object> model) throws JtwigRenderException {
+		List<Object> filtered = new ArrayList<Object>(forValues);
+		for (JtwigExpression e : exp) {
+			List<Object> newList = new ArrayList<Object>();
+			for (Object val : filtered) {
+				Map<String, Object> newModel = new TreeMap<String, Object>();
+				newModel.putAll(model);
+				newModel.put(variable, val);
+				
+				if (JtwigExpression.isTrue(e.calculate(req, newModel)))
+					newList.add(val);
+			}
+			filtered = newList;
+		}
+		return filtered;
+	}
+
 	public String toString () {
 		return "FOR: "+variable+", VALUE: "+value.toString();
+	}
+
+	public boolean addFilter(JtwigExpression jtwigExpression) {
+		this.exp.add(jtwigExpression);
+		return true;
 	}
 }

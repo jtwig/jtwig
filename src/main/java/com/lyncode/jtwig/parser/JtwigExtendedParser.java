@@ -127,6 +127,7 @@ public class JtwigExtendedParser extends BaseParser<Object> {
     final String FALSE = "false";
     final String IF = "if";
     final String ELSE = "else";
+    final String ELSEIF = "elseif";
     final String ENDIF = "endif";
     final String BLOCK = "block";
     final String ENDBLOCK = "endblock";
@@ -143,6 +144,7 @@ public class JtwigExtendedParser extends BaseParser<Object> {
     final String END_FIRST = "endfirst";
     final String END_LAST = "endlast";
     final String SET = "set";
+    final String FILTER = "filter";
 
     final Rule LPARENT = Terminal("(");
     final Rule RPARENT = Terminal(")");
@@ -379,6 +381,19 @@ public class JtwigExtendedParser extends BaseParser<Object> {
 				push(new If(pop())),
 				CODECLOSE,
 				Content(),
+				ZeroOrMore(
+						Sequence(
+								WriteIt("Entering Elseif"),
+								CODEOPEN,
+								Keyword(ELSEIF),
+								Expression(),
+								push(new If(pop())),
+								CODECLOSE,
+								Content(),
+								((If)peek(1)).addElseIf((If)pop()),
+								WriteIt("Leaving Elseif")
+						)
+				),
 				Optional(
 						Sequence(
 							WriteIt("Entering Else (IfExpression)"),
@@ -411,8 +426,11 @@ public class JtwigExtendedParser extends BaseParser<Object> {
     		Identifier(),
     		Keyword(IN),
     		Expression(),
-    		CODECLOSE,
     		push(new For((String)pop(1), pop())),
+    		Optional(
+    				ForFilters()
+    		),
+    		CODECLOSE,
     		// There is no first/last expressions
     		// Optional(FirstExpression(), ((For)peek(1)).setFirst(((ObjectList)pop()))),
     		Content(),
@@ -421,6 +439,17 @@ public class JtwigExtendedParser extends BaseParser<Object> {
     		Keyword(ENDFOR),
     		CODECLOSE,
 			WriteIt("Leaving Rule (ForExpression)")
+    	);
+    }
+    
+    Rule ForFilters () {
+    	return ZeroOrMore(
+    			Sequence(
+    					OR,
+    					Keyword(FILTER),
+    					Expression(),
+    					((For) peek(1)).addFilter(((JtwigExpression) pop()))
+    			)
     	);
     }
     

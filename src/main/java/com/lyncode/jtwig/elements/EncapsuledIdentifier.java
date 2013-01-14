@@ -52,7 +52,7 @@ public class EncapsuledIdentifier implements Argumentable, Calculable {
 		//System.out.println("Evaluating "+this.getIdentifier());
 		if (next != null) {
 			EncapsuledIdentifier tmp = next;
-			while (tmp != null) {
+			while (tmp != null && obj != null) {
 				//System.out.println("Evaluating "+tmp.getIdentifier());
 				//System.out.println("Current Value: "+obj.toString());
 				List<Object> args = new ArrayList<Object>();
