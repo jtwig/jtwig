@@ -12,7 +12,8 @@ public class Concat extends Function {
 		if (arguments.size() == 0)
 			throw new FunctionException("Not function must receive at least one argument");
 		for (Object arg : arguments) {
-			result += arg.toString();
+			if (arg != null)
+				result += arg.toString();
 		}
 		return result;
 	}
