@@ -178,6 +178,20 @@ public class JtwigExpression implements Argumentable, Calculable {
 	@SuppressWarnings("unchecked")
 	public static boolean greater (Object obj1, Object obj2) {
 		if (obj1 == null || obj2 == null) return false;
+		if (obj1 instanceof Number && obj2 instanceof Number) {
+			Number n1 = (Number) obj1;
+			Number n2 = (Number) obj2;
+			if (obj1 instanceof Long)
+				return n1.longValue() > n2.longValue();
+			else if (obj1 instanceof Integer)
+				return n1.intValue() > n2.intValue();
+			else if (obj1 instanceof Float)
+				return n1.floatValue() > n2.floatValue();
+			else if (obj1 instanceof Double)
+				return n1.doubleValue() > n2.doubleValue();
+			else if (obj1 instanceof Byte)
+				return n1.byteValue() > n2.byteValue();
+		}
 		if (obj1 instanceof Comparable<?> && obj1 instanceof Comparable<?>) {
 			return (((Comparable<Object>) obj1).compareTo(obj2) > 0);
 		}
@@ -187,6 +201,20 @@ public class JtwigExpression implements Argumentable, Calculable {
 	@SuppressWarnings("unchecked")
 	public static boolean lower (Object obj1, Object obj2) {
 		if (obj1 == null || obj2 == null) return false;
+		if (obj1 instanceof Number && obj2 instanceof Number) {
+			Number n1 = (Number) obj1;
+			Number n2 = (Number) obj2;
+			if (obj1 instanceof Long)
+				return n1.longValue() < n2.longValue();
+			else if (obj1 instanceof Integer)
+				return n1.intValue() < n2.intValue();
+			else if (obj1 instanceof Float)
+				return n1.floatValue() < n2.floatValue();
+			else if (obj1 instanceof Double)
+				return n1.doubleValue() < n2.doubleValue();
+			else if (obj1 instanceof Byte)
+				return n1.byteValue() < n2.byteValue();
+		}
 		if (obj1 instanceof Comparable<?> && obj1 instanceof Comparable<?>) {
 			return (((Comparable<Object>) obj1).compareTo(obj2) < 0);
 		}

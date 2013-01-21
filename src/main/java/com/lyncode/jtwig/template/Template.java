@@ -24,6 +24,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 import org.parboiled.common.FileUtils;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.servlet.support.RequestContextUtils;
 
@@ -163,13 +164,17 @@ public class Template {
 
 	private void runEndingTasks(HttpServletRequest request) {
 		ApplicationContext a = RequestContextUtils.getWebApplicationContext(request);
-		AfterRenderRunnableBeans beans = a.getBean(AfterRenderRunnableBeans.class);
-		if (beans != null) {
-			for (String id : beans.getIds()) {
-				Object o = a.getBean(id);
-				if (o instanceof Runnable)
-					((Runnable) o).run();
+		try {
+			AfterRenderRunnableBeans beans = a.getBean(AfterRenderRunnableBeans.class);
+			if (beans != null) {
+				for (String id : beans.getIds()) {
+					Object o = a.getBean(id);
+					if (o instanceof Runnable)
+						((Runnable) o).run();
+				}
 			}
+		} catch (NoSuchBeanDefinitionException e) {
+			// nothing to do
 		}
 	}
 }

@@ -15,6 +15,8 @@
  */
 package com.lyncode.jtwig.elements;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -35,10 +37,12 @@ public class If extends ObjectList {
 	private static final long serialVersionUID = -8676097057249972628L;
 	private Object value;
 	private ObjectList elseContent;
+	private List<If> elseifs;
 	public If(Object value, ObjectList elseContent) {
 		super();
 		this.value = value;
 		this.elseContent = elseContent;
+		this.elseifs = new ArrayList<If>();
 		log.debug(this);
 	}
 	
@@ -46,7 +50,13 @@ public class If extends ObjectList {
 		super();
 		this.elseContent = null;
 		this.value = value;
+		this.elseifs = new ArrayList<If>();
 		log.debug(this);
+	}
+	
+	public boolean addElseIf (If i) {
+		this.elseifs.add(i);
+		return true;
 	}
 	
 	public Object getValue() {
@@ -65,21 +75,36 @@ public class If extends ObjectList {
 		return true;
 	}
 	
-
-	public String render(HttpServletRequest req, Map<String, Object> model, ResourceManager manager) throws JtwigRenderException {
-		String result = "";
+	private boolean isTrue (HttpServletRequest req, Map<String, Object> model) throws JtwigRenderException {
 		Object values = null;
 		if (this.value instanceof Calculable) {
 			values = ((Calculable) this.value).calculate(req, model);
 		} else values = this.value;
-		
-		if (JtwigExpression.isTrue(values)) {
+		return JtwigExpression.isTrue(values);
+	}
+	
+	private String renderSuper (HttpServletRequest req, Map<String, Object> model, ResourceManager manager) throws JtwigRenderException {
+		return super.render(req, model, manager);
+	}
+
+	public String render(HttpServletRequest req, Map<String, Object> model, ResourceManager manager) throws JtwigRenderException {
+		String result = "";
+		if (this.isTrue(req, model)) {
 			log.debug("Rendering if content");
 			result += super.render(req, model, manager);
 		} else {
-			log.debug("Rendering else content (if exists)");
-			if (this.hasElse())
-				result += this.getElseContent().render(req, model, manager);
+			boolean alreadyRunned = false;
+			for (If i : this.elseifs) {
+				if (i.isTrue(req, model)) {
+					result += i.renderSuper(req, model, manager);
+					alreadyRunned = true;
+					break;
+				}
+			}
+			if (!alreadyRunned) {
+				if (this.hasElse())
+					result += this.getElseContent().render(req, model, manager);
+			}
 		}
 		return result;
 	}

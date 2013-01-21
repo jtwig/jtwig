@@ -116,41 +116,7 @@ public class JtwigView extends AbstractTemplateView {
 	
 	private void addRequestAttributes(HttpServletRequest request,
 			Map<String, Object> model) {
-		Map<String, Object> parameters = new TreeMap<String, Object>();
-		Map<String, String[]> m = request.getParameterMap();
-		
-		for (String k : m.keySet()) {
-			if (m.get(k).length > 1)
-				parameters.put(k, Arrays.asList(m.get(k)));
-			else if (m.get(k).length == 1)
-				parameters.put(k, m.get(k)[0]);
-		}
-
-		
-		
-		Map<String, Object> remote = new TreeMap<String, Object>();
-		remote.put("address", request.getRemoteAddr());
-		remote.put("host", request.getRemoteHost());
-		remote.put("port", request.getRemotePort());
-		remote.put("user", request.getRemoteUser());
-
-		Map<String, Object> context = new TreeMap<String, Object>();
-		context.put("path", request.getServletContext().getContextPath());
-		// remote.put("parameter", request.getServletContext().getInitParameterNames());
-
-		
-		Map<String, Object> mm = new TreeMap<String, Object>();
-		mm.put("parameter", parameters);
-		mm.put("remote", remote);
-		mm.put("context", context);
-		
-		mm.put("method", request.getMethod());
-		mm.put("locale", request.getLocale().getLanguage());
-		mm.put("uri", request.getRequestURI());
-		mm.put("path", request.getPathInfo());
-		mm.put("protocol", request.getProtocol());
-		
-		model.put("request", mm);
+		model.put("request", request);
 	}
 
 	private static Map<String, Template> templates = new HashMap<String, Template>();

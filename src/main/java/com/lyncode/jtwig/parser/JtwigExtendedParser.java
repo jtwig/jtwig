@@ -31,7 +31,7 @@ import org.parboiled.parserunners.RecoveringParseRunner;
 import org.parboiled.support.ParsingResult;
 
 import com.lyncode.jtwig.elements.Block;
-import com.lyncode.jtwig.elements.Call;
+import com.lyncode.jtwig.elements.EncapsuledIdentifier;
 import com.lyncode.jtwig.elements.ExpressionOperator;
 import com.lyncode.jtwig.elements.Extends;
 import com.lyncode.jtwig.elements.FastExpression;
@@ -84,9 +84,17 @@ public class JtwigExtendedParser extends BaseParser<Object> {
 	
 	public static void main (String... str) throws JtwigParsingException {
 		BasicConfigurator.configure();
-		String input = "asdsad {# hello #}sad asd {% if {# hello #} asd %}{% endif %}";
+		String input = "{{ teste.main('ola', 'ole').texte }}";
 		log.debug(input);
-		log.debug("'"+parse(input)+"'");
+		ObjectList l = parse(input);
+		log.debug("'"+l+"'");
+		Object exp = (JtwigExpression) (((FastExpression) l.get(0)).getValue());
+		while (exp instanceof JtwigExpression) {
+			exp = ((JtwigExpression) exp).getArguments().get(0);
+		}
+		log.debug(exp);
+		log.debug(((EncapsuledIdentifier) exp).getNext().getNext().getIdentifier());
+		
 	}
 
 	public static ObjectList parse (String input) throws JtwigParsingException {
@@ -119,6 +127,7 @@ public class JtwigExtendedParser extends BaseParser<Object> {
     final String FALSE = "false";
     final String IF = "if";
     final String ELSE = "else";
+    final String ELSEIF = "elseif";
     final String ENDIF = "endif";
     final String BLOCK = "block";
     final String ENDBLOCK = "endblock";
@@ -135,6 +144,7 @@ public class JtwigExtendedParser extends BaseParser<Object> {
     final String END_FIRST = "endfirst";
     final String END_LAST = "endlast";
     final String SET = "set";
+    final String FILTER = "filter";
 
     final Rule LPARENT = Terminal("(");
     final Rule RPARENT = Terminal(")");
@@ -371,6 +381,19 @@ public class JtwigExtendedParser extends BaseParser<Object> {
 				push(new If(pop())),
 				CODECLOSE,
 				Content(),
+				ZeroOrMore(
+						Sequence(
+								WriteIt("Entering Elseif"),
+								CODEOPEN,
+								Keyword(ELSEIF),
+								Expression(),
+								push(new If(pop())),
+								CODECLOSE,
+								Content(),
+								((If)peek(1)).addElseIf((If)pop()),
+								WriteIt("Leaving Elseif")
+						)
+				),
 				Optional(
 						Sequence(
 							WriteIt("Entering Else (IfExpression)"),
@@ -403,8 +426,11 @@ public class JtwigExtendedParser extends BaseParser<Object> {
     		Identifier(),
     		Keyword(IN),
     		Expression(),
-    		CODECLOSE,
     		push(new For((String)pop(1), pop())),
+    		Optional(
+    				ForFilters()
+    		),
+    		CODECLOSE,
     		// There is no first/last expressions
     		// Optional(FirstExpression(), ((For)peek(1)).setFirst(((ObjectList)pop()))),
     		Content(),
@@ -413,6 +439,17 @@ public class JtwigExtendedParser extends BaseParser<Object> {
     		Keyword(ENDFOR),
     		CODECLOSE,
 			WriteIt("Leaving Rule (ForExpression)")
+    	);
+    }
+    
+    Rule ForFilters () {
+    	return ZeroOrMore(
+    			Sequence(
+    					OR,
+    					Keyword(FILTER),
+    					Expression(),
+    					((For) peek(1)).addFilter(((JtwigExpression) pop()))
+    			)
     	);
     }
     
@@ -581,8 +618,8 @@ public class JtwigExtendedParser extends BaseParser<Object> {
                 ParExpression(),
         		FunctionExpression(),
         		FunctionOneArgumentExpression(),
-        		CallExpression(),
-                StringLiteral(),
+        		StringLiteral(),
+                CallExpression(),
                 Variable(),
                 Integer(),
                 Boolean(),
@@ -650,14 +687,46 @@ public class JtwigExtendedParser extends BaseParser<Object> {
     Rule CallExpression () {
     	return Sequence(
     			WriteIt("Entering Rule (CallExpression)"),
-    			QualifiedMethodIdentifier(),
-    			push(new Call((String)pop())),
-    			LPARENT,
-    			Arguments(),
-    			RPARENT,
+    			Identifier(),
+    			push(new EncapsuledIdentifier((String) pop())),
+    			Sequence(
+						DOT,
+    					FirstOf(
+    							Sequence(
+    									Identifier(),
+    									push(new EncapsuledIdentifier((String) pop())),
+    									LPARENT,
+    					    			Arguments(),
+    					    			RPARENT
+    							),
+    							Sequence(Identifier(), push(new EncapsuledIdentifier((String)pop())))
+    					)
+				),
+    			((EncapsuledIdentifier)peek(1)).setNext((EncapsuledIdentifier)peek()),
+    			ZeroOrMore(
+    					Sequence(
+    						DOT,
+	    					FirstOf(
+	    							Sequence(
+	    									Identifier(),
+	    									push(new EncapsuledIdentifier((String) pop())),
+	    									LPARENT,
+	    					    			Arguments(),
+	    					    			RPARENT
+	    							),
+	    							Sequence(Identifier(), push(new EncapsuledIdentifier((String)pop())))
+	    					),
+	    					((EncapsuledIdentifier)pop(1)).setNext((EncapsuledIdentifier)peek())
+    					)
+    			),
+    			ACTION(pop() != null),
     			WriteIt("Leaving Rule (CallExpression)")
     	);
     }
+    
+    
+    
+    
         
     /**
      * Pushes a Function
