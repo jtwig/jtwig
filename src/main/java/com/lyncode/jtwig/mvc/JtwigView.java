@@ -1,12 +1,10 @@
 package com.lyncode.jtwig.mvc;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 import javax.servlet.GenericServlet;
 import javax.servlet.ServletConfig;
@@ -136,10 +134,10 @@ public class JtwigView extends AbstractTemplateView {
 			HttpServletResponse response) throws JtwigRenderException {
 		try {
 			
-			request.setCharacterEncoding("UTF-8");
+			//request.setCharacterEncoding("UTF-8");
 			
 			response.setContentType(this.getContentType());
-			response.setCharacterEncoding("UTF-8");
+			//response.setCharacterEncoding("UTF-8");
 			
 			template.process(request, model, response.getOutputStream());
 		} catch (IOException e) {
