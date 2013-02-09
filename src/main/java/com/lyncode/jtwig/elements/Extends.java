@@ -15,8 +15,14 @@
  */
 package com.lyncode.jtwig.elements;
 
+import java.io.IOException;
+
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+
+import com.lyncode.jtwig.exceptions.JtwigParsingException;
+import com.lyncode.jtwig.manager.JtwigResource;
+import com.lyncode.jtwig.parser.JtwigExtendedParser;
 
 /**
  * @author "João Melo <jmelo@lyncode.com>"
@@ -39,5 +45,21 @@ public class Extends {
 
 	public String toString () {
 		return "Extends: "+path;
+	}
+
+	public ObjectList resolve(JtwigResource parent, ObjectList blocks) throws IOException, JtwigParsingException {
+		JtwigResource resource = parent.getRelativeResource(this.getPath());
+		ObjectList list = JtwigExtendedParser.parse(resource.retrieve());
+		// Now replace the blocks
+		for (int i=1;i<blocks.size();i++)
+			((Block)blocks.get(i)).resolve(resource);
+		
+		for (int i=1;i<blocks.size();i++) {
+			if (list.replace((Block)blocks.get(i)))
+				log.debug("Block "+((Block)blocks.get(i)).getName()+" replaced");
+		}
+		
+		list.resolve(resource);
+		return list;
 	}
 }

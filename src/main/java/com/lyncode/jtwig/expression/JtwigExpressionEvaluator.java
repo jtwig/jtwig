@@ -33,7 +33,6 @@ import com.lyncode.jtwig.elements.ObjectList;
 import com.lyncode.jtwig.elements.ObjectMap;
 import com.lyncode.jtwig.elements.Variable;
 import com.lyncode.jtwig.exceptions.JtwigRenderException;
-import com.lyncode.jtwig.render.Argumentable;
 import com.lyncode.jtwig.render.Calculable;
 
 /**

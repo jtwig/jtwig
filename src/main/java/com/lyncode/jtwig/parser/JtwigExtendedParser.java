@@ -102,10 +102,12 @@ public class JtwigExtendedParser extends BaseParser<Object> {
     		parser = Parboiled.createParser(JtwigExtendedParser.class);
         // String input = "{{ path('aaaa') }}            ";
         // 
-
+    	if (input == null) throw new JtwigParsingException();
     	// treat the input
     	input = input.replaceAll("\\n\\s*"+Pattern.quote("{%"), "{%");
     	input = input.replaceAll(Pattern.quote("{%")+"\\s*\\n", "%}");
+    	
+    	
     	
     	try {
     		log.debug("Start new parse");

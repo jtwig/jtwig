@@ -23,7 +23,6 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import com.lyncode.jtwig.exceptions.JtwigRenderException;
-import com.lyncode.jtwig.manager.ResourceManager;
 
 
 /**
@@ -45,9 +44,8 @@ public class Block extends ObjectList {
 		return name;
 	}
 
-	public String render(HttpServletRequest req, Map<String, Object> model, ResourceManager manager) throws JtwigRenderException {
-		this.setBlock();
-		return super.render(req, model, manager);
+	public String render(HttpServletRequest req, Map<String, Object> model) throws JtwigRenderException {
+		return super.render(req, model);
 	}
 	
 	public boolean equals (Object obj) {

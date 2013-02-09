@@ -26,7 +26,6 @@ import org.apache.log4j.Logger;
 
 import com.lyncode.jtwig.exceptions.JtwigRenderException;
 import com.lyncode.jtwig.expression.JtwigExpressionEvaluator;
-import com.lyncode.jtwig.manager.ResourceManager;
 import com.lyncode.jtwig.render.Calculable;
 import com.lyncode.jtwig.render.Renderable;
 
@@ -58,7 +57,7 @@ public class FastExpression implements Renderable {
 		return functions;
 	}
 
-	public String render(HttpServletRequest req, Map<String, Object> model, ResourceManager manager)
+	public String render(HttpServletRequest req, Map<String, Object> model)
 			throws JtwigRenderException {
 		JtwigExpressionEvaluator evaluator = new JtwigExpressionEvaluator(model);
 		Object result = null;

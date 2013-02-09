@@ -26,7 +26,6 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import com.lyncode.jtwig.exceptions.JtwigRenderException;
-import com.lyncode.jtwig.manager.ResourceManager;
 import com.lyncode.jtwig.render.Calculable;
 
 /**
@@ -56,7 +55,7 @@ public class For extends ObjectList {
 	}
 
 	@SuppressWarnings("unchecked")
-	public String render(HttpServletRequest req, Map<String, Object> model, ResourceManager manager) throws JtwigRenderException {
+	public String render(HttpServletRequest req, Map<String, Object> model) throws JtwigRenderException {
 		String result = "";
 		Object values = null;
 		if (this.value instanceof Calculable) {
@@ -89,7 +88,7 @@ public class For extends ObjectList {
 			newModel.put("first", i == 0);
 			newModel.put("last", (i + 1) == forValues.size());
 			
-			result += super.render(req, newModel, manager);
+			result += super.render(req, newModel);
 		}
 		return result;
 	}

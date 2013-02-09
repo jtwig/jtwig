@@ -5,7 +5,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import com.lyncode.jtwig.exceptions.JtwigRenderException;
-import com.lyncode.jtwig.manager.ResourceManager;
 import com.lyncode.jtwig.render.Calculable;
 import com.lyncode.jtwig.render.Renderable;
 
@@ -28,8 +27,7 @@ public class Set implements Renderable {
 	}
 
 	@Override
-	public String render(HttpServletRequest req, Map<String, Object> model,
-			ResourceManager manager) throws JtwigRenderException {
+	public String render(HttpServletRequest req, Map<String, Object> model) throws JtwigRenderException {
 		Object values = null;
 		if (this.value instanceof Calculable) {
 			values = ((Calculable) this.value).calculate(req, model);

@@ -15,7 +15,6 @@ import org.springframework.web.servlet.support.RequestContextUtils;
 
 import com.lyncode.jtwig.api.InvokeResolver;
 import com.lyncode.jtwig.exceptions.JtwigRenderException;
-import com.lyncode.jtwig.manager.ResourceManager;
 import com.lyncode.jtwig.render.Renderable;
 
 public class Invoke implements Renderable {
@@ -80,8 +79,7 @@ public class Invoke implements Renderable {
 	}
 	
 	@Override
-	public String render(HttpServletRequest req, Map<String, Object> model,
-			ResourceManager manager) throws JtwigRenderException {
+	public String render(HttpServletRequest req, Map<String, Object> model) throws JtwigRenderException {
 		this.invoke(req, model);
 		return "";
 	}

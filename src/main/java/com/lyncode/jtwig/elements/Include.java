@@ -15,8 +15,14 @@
  */
 package com.lyncode.jtwig.elements;
 
+import java.io.IOException;
+
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+
+import com.lyncode.jtwig.exceptions.JtwigParsingException;
+import com.lyncode.jtwig.manager.JtwigResource;
+import com.lyncode.jtwig.parser.JtwigExtendedParser;
 
 /**
  * @author "João Melo <jmelo@lyncode.com>"
@@ -38,6 +44,13 @@ public class Include {
 
 	public String toString () {
 		return "INCLUDE: "+path;
+	}
+
+	public ObjectList resolve(JtwigResource parent) throws IOException, JtwigParsingException {
+		JtwigResource resource = parent.getRelativeResource(this.getPath());
+		ObjectList list = JtwigExtendedParser.parse(resource.retrieve());
+		list.resolve(resource);
+		return list;
 	}
 	
 }

@@ -20,12 +20,11 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import com.lyncode.jtwig.exceptions.JtwigRenderException;
-import com.lyncode.jtwig.manager.ResourceManager;
 
 /**
  * @author "João Melo <jmelo@lyncode.com>"
  *
  */
 public interface Renderable {
-	String render (HttpServletRequest req, Map<String, Object> model, ResourceManager manager) throws JtwigRenderException;
+	String render (HttpServletRequest req, Map<String, Object> model) throws JtwigRenderException;
 }

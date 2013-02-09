@@ -15,6 +15,7 @@
  */
 package com.lyncode.jtwig.elements;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -24,8 +25,9 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
+import com.lyncode.jtwig.exceptions.JtwigParsingException;
 import com.lyncode.jtwig.exceptions.JtwigRenderException;
-import com.lyncode.jtwig.manager.ResourceManager;
+import com.lyncode.jtwig.manager.JtwigResource;
 import com.lyncode.jtwig.render.Calculable;
 
 /**
@@ -83,32 +85,48 @@ public class If extends ObjectList {
 		return JtwigExpression.isTrue(values);
 	}
 	
-	private String renderSuper (HttpServletRequest req, Map<String, Object> model, ResourceManager manager) throws JtwigRenderException {
-		return super.render(req, model, manager);
+	private String renderSuper (HttpServletRequest req, Map<String, Object> model) throws JtwigRenderException {
+		return super.render(req, model);
 	}
 
-	public String render(HttpServletRequest req, Map<String, Object> model, ResourceManager manager) throws JtwigRenderException {
+	public String render(HttpServletRequest req, Map<String, Object> model) throws JtwigRenderException {
 		String result = "";
 		if (this.isTrue(req, model)) {
 			log.debug("Rendering if content");
-			result += super.render(req, model, manager);
+			result += super.render(req, model);
 		} else {
 			boolean alreadyRunned = false;
 			for (If i : this.elseifs) {
 				if (i.isTrue(req, model)) {
-					result += i.renderSuper(req, model, manager);
+					result += i.renderSuper(req, model);
 					alreadyRunned = true;
 					break;
 				}
 			}
 			if (!alreadyRunned) {
 				if (this.hasElse())
-					result += this.getElseContent().render(req, model, manager);
+					result += this.getElseContent().render(req, model);
 			}
 		}
 		return result;
 	}
 	
+
+	@Override
+	public void resolve(JtwigResource parent) throws IOException, JtwigParsingException {
+		super.resolve(parent);
+		this.elseContent.resolve(parent);
+		for (If i : this.elseifs)
+			i.resolve(parent);
+	}
+	
+	public boolean replace(Block block) {
+		boolean replaced = super.replace(block);
+		replaced = replaced && this.elseContent.replace(block);
+		for (If i : this.elseifs)
+			replaced = replaced && i.replace(block);
+		return replaced;
+	}
 
 	public String toString () {
 		if (this.hasElse())

@@ -16,14 +16,12 @@
 package com.lyncode.jtwig.manager;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 /**
  * @author "João Melo <jmelo@lyncode.com>"
  *
  */
-public abstract class ResourceManager {
-	public abstract InputStream getResource () throws IOException;
-	public abstract String getFile (String relative) throws IOException;
-	public abstract String getPath();
+public interface JtwigResource {
+	String retrieve () throws IOException;
+	JtwigResource getRelativeResource (String relativeToCurrent) throws IOException;
 }

@@ -135,9 +135,9 @@ public class JtwigView extends AbstractTemplateView {
 		try {
 			
 			//request.setCharacterEncoding("UTF-8");
-			request.setCharacterEncoding(this.getEncoding());
+			if (request != null && this.getEncoding() != null) request.setCharacterEncoding(this.getEncoding());
 			response.setContentType(this.getContentType());
-			response.setCharacterEncoding(this.getEncoding());
+			if (this.getEncoding() != null) response.setCharacterEncoding(this.getEncoding());
 			//response.setCharacterEncoding("UTF-8");
 			
 			template.process(request, model, response.getOutputStream());
