@@ -115,9 +115,10 @@ public class If extends ObjectList {
 	@Override
 	public void resolve(JtwigResource parent) throws IOException, JtwigParsingException {
 		super.resolve(parent);
-		this.elseContent.resolve(parent);
-		for (If i : this.elseifs)
-			i.resolve(parent);
+		if (this.elseContent != null) this.elseContent.resolve(parent);
+		if (this.elseifs != null)
+			for (If i : this.elseifs)
+				i.resolve(parent);
 	}
 	
 	public boolean replace(Block block) {
