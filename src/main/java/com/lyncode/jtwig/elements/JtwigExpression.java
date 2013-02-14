@@ -45,6 +45,120 @@ public class JtwigExpression implements Argumentable, Calculable {
 	}
 	
 	@Override
+	public Object calculate(Map<String, Object> values)
+			throws JtwigRenderException {
+		JtwigExpressionEvaluator eval = new JtwigExpressionEvaluator(values);
+		List<Object> calculatedPieces = new ArrayList<Object>();
+		for (Object obj : this.arguments)
+			calculatedPieces.add(eval.evaluate(obj));
+		
+		if (this.arguments.size() > 1) {
+			switch (this.operator) {
+				case AND:
+					boolean result = true;
+					for (Object obj : calculatedPieces)
+						result = result && isTrue(obj);
+					return result;
+				case OR:
+					result = false;
+					for (Object obj : calculatedPieces) {
+						result = result || isTrue(obj);
+						if (result) break;
+					}
+					return result;
+				case EQUAL:
+					result = true;
+					Object obj = calculatedPieces.get(0);
+					for (int i=1;i<calculatedPieces.size();i++) {
+						result = result && equal(obj, calculatedPieces.get(i));
+						if (!result) break;
+					}
+					return result;
+				case NOTEQUAL:
+					result = true;
+					obj = calculatedPieces.get(0);
+					for (int i=1;i<calculatedPieces.size();i++) {
+						result = result && !equal(obj, calculatedPieces.get(i));
+						if (!result) break;
+					}
+					return result;
+				case LE:
+					result = true;
+					obj = calculatedPieces.get(0);
+					for (int i=1;i<calculatedPieces.size();i++) {
+						result = result && (lower(obj, calculatedPieces.get(i)) || equal(obj, calculatedPieces.get(i)));
+						if (!result) break;
+						obj = calculatedPieces.get(i);
+					}
+					return result;
+				case GE:
+					result = true;
+					obj = calculatedPieces.get(0);
+					for (int i=1;i<calculatedPieces.size();i++) {
+						result = result && (greater(obj, calculatedPieces.get(i)) || equal(obj, calculatedPieces.get(i)));
+						if (!result) break;
+						obj = calculatedPieces.get(i);
+					}
+					return result;
+				case GT:
+					result = true;
+					obj = calculatedPieces.get(0);
+					for (int i=1;i<calculatedPieces.size();i++) {
+						result = result && (greater(obj, calculatedPieces.get(i)));
+						if (!result) break;
+						obj = calculatedPieces.get(i);
+					}
+					return result;
+				case LT:
+					result = true;
+					obj = calculatedPieces.get(0);
+					for (int i=1;i<calculatedPieces.size();i++) {
+						result = result && (lower(obj, calculatedPieces.get(i)));
+						if (!result) break;
+						obj = calculatedPieces.get(i);
+					}
+					return result;
+				case PLUS:
+					obj = calculatedPieces.get(0);
+					for (int i=1;i<calculatedPieces.size();i++) {
+						obj = plus(obj, calculatedPieces.get(i));
+					}
+					return obj;
+				case DIV:
+					obj = calculatedPieces.get(0);
+					for (int i=1;i<calculatedPieces.size();i++) {
+						obj = div(obj, calculatedPieces.get(i));
+					}
+					return obj;
+				case MINUS:
+					obj = calculatedPieces.get(0);
+					for (int i=1;i<calculatedPieces.size();i++) {
+						obj = minus(obj, calculatedPieces.get(i));
+					}
+					return obj;
+				case MOD:
+					obj = calculatedPieces.get(0);
+					for (int i=1;i<calculatedPieces.size();i++) {
+						obj = mod(obj, calculatedPieces.get(i));
+					}
+					return obj;
+				case STAR:
+					obj = calculatedPieces.get(0);
+					for (int i=1;i<calculatedPieces.size();i++) {
+						obj = star(obj, calculatedPieces.get(i));
+					}
+					return obj;
+				default:
+					throw new JtwigRenderException("Unimplemented operation");
+			}
+		} else {
+			if (this.arguments.isEmpty()) throw new JtwigRenderException("Unable to solve empty argumented expression");
+			return calculatedPieces.get(0);
+		}
+	}
+
+	
+	@Override
 	public Object calculate(HttpServletRequest req, Map<String, Object> values)
 			throws JtwigRenderException {
 		JtwigExpressionEvaluator eval = new JtwigExpressionEvaluator(values);

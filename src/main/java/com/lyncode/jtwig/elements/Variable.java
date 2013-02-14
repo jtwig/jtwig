@@ -50,6 +50,12 @@ public class Variable implements Calculable {
 		return evaluator.evaluate(this.getName());
 	}
 
+	public Object calculate(Map<String, Object> values)
+			throws JtwigRenderException {
+		JtwigExpressionEvaluator evaluator = new JtwigExpressionEvaluator(values);
+		return evaluator.evaluate(this.getName());
+	}
+
 	public String toString () {
 		return "VARIABLE: "+name;
 	}

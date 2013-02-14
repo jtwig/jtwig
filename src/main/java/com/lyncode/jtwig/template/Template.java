@@ -26,6 +26,7 @@ import com.lyncode.jtwig.elements.ObjectList;
 import com.lyncode.jtwig.exceptions.JtwigParsingException;
 import com.lyncode.jtwig.exceptions.JtwigRenderException;
 import com.lyncode.jtwig.exceptions.TemplateBuildException;
+import com.lyncode.jtwig.manager.FileSystemResource;
 import com.lyncode.jtwig.manager.JtwigResource;
 import com.lyncode.jtwig.manager.ServletContextResource;
 import com.lyncode.jtwig.parser.JtwigExtendedParser;
@@ -35,6 +36,13 @@ import com.lyncode.jtwig.parser.JtwigExtendedParser;
  *
  */
 public class Template {
+	public static String read (String file, Map<String, Object> model) throws JtwigParsingException, IOException, JtwigRenderException {
+		JtwigResource resource = new FileSystemResource(file);
+		ObjectList list = JtwigExtendedParser.parse(resource.retrieve());
+		list.resolve(resource);
+		return list.render(model);
+	}
+	
 	private ObjectList resolved;
 	
 	public Template (ServletContext servletContext, String filename) throws TemplateBuildException  {

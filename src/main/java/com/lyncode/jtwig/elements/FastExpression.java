@@ -84,6 +84,34 @@ public class FastExpression implements Renderable {
 			return result.toString();
 		}
 	}
+
+	public String render(Map<String, Object> model)
+			throws JtwigRenderException {
+		JtwigExpressionEvaluator evaluator = new JtwigExpressionEvaluator(model);
+		Object result = null;
+		if (this.value instanceof Calculable) {
+			result = ((Calculable) this.value).calculate(model);
+		} else result = this.value;
+		
+		for (FunctionExpr f : functions) {
+			List<Object> args = new ArrayList<Object>();
+			args.add(result);
+			for (Object obj : f.getArguments()) {
+				obj = evaluator.evaluate(obj);
+				args.add(obj);
+			}
+			result = f.calculate(args);
+		}
+		
+		if (result == null) {
+			log.debug("No value for "+this.value);
+			return "";
+		}
+		else {
+			log.debug("Value for "+this.value+" = "+result);
+			return result.toString();
+		}
+	}
 	
 
 	public String toString () {

@@ -92,7 +92,65 @@ public class For extends ObjectList {
 		}
 		return result;
 	}
+	
 
+	@SuppressWarnings("unchecked")
+	public String render(Map<String, Object> model) throws JtwigRenderException {
+		String result = "";
+		Object values = null;
+		if (this.value instanceof Calculable) {
+			values = ((Calculable) this.value).calculate(model);
+		} else values = this.value;
+		
+		List<Object> forValues = null;
+		
+		if (values == null) forValues = new ObjectList();
+		else if (values instanceof List<?>) {
+			forValues = (List<Object>) values;
+		} else if (values.getClass().isArray()) {
+			Object[] list = (Object[]) values;
+			forValues = new ArrayList<Object>();
+			for (int i=0;i<list.length;i++)
+				forValues.add(list[i]);
+		} else {
+			forValues = new ArrayList<Object>();
+			forValues.add(values);
+		}
+		
+		forValues = this.applyFilters(forValues, variable, model);
+		
+		for (int i = 0;i<forValues.size();i++) {
+			Object val = forValues.get(i);
+			Map<String, Object> newModel = new TreeMap<String, Object>();
+			newModel.putAll(model);
+			newModel.put(variable, val);
+			newModel.put("position", i);
+			newModel.put("first", i == 0);
+			newModel.put("last", (i + 1) == forValues.size());
+			
+			result += super.render(newModel);
+		}
+		return result;
+	}
+
+	private List<Object> applyFilters(List<Object> forValues, String variable2,
+			Map<String, Object> model) throws JtwigRenderException {
+		List<Object> filtered = new ArrayList<Object>(forValues);
+		for (JtwigExpression e : exp) {
+			List<Object> newList = new ArrayList<Object>();
+			for (Object val : filtered) {
+				Map<String, Object> newModel = new TreeMap<String, Object>();
+				newModel.putAll(model);
+				newModel.put(variable, val);
+				
+				if (JtwigExpression.isTrue(e.calculate(newModel)))
+					newList.add(val);
+			}
+			filtered = newList;
+		}
+		return filtered;
+	}
+	
 	private List<Object> applyFilters(List<Object> forValues, String variable2,
 			HttpServletRequest req, Map<String, Object> model) throws JtwigRenderException {
 		List<Object> filtered = new ArrayList<Object>(forValues);

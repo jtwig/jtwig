@@ -84,6 +84,11 @@ public class Invoke implements Renderable {
 		return "";
 	}
 	
+	@Override
+	public String render(Map<String, Object> model) throws JtwigRenderException {
+		return "";
+	}
+	
 	
 	
 	

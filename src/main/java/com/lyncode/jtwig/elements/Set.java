@@ -36,4 +36,15 @@ public class Set implements Renderable {
 		model.put(this.getName(), values);
 		return "";
 	}
+
+	@Override
+	public String render(Map<String, Object> model) throws JtwigRenderException {
+		Object values = null;
+		if (this.value instanceof Calculable) {
+			values = ((Calculable) this.value).calculate(model);
+		} else values = this.value;
+		
+		model.put(this.getName(), values);
+		return "";
+	}
 }

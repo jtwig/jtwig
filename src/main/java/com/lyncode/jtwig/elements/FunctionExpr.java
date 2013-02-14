@@ -94,6 +94,54 @@ public class FunctionExpr implements Calculable, Argumentable {
 		}
 	}
 	
+	public Object calculate(Map<String, Object> values) throws JtwigRenderException {
+		JtwigExpressionEvaluator evaluator = new JtwigExpressionEvaluator(values);
+		String name = WordUtils.capitalizeFully(this.getName().replace('-', ' ').replace('_', ' ')).replaceAll(" ", "");
+		String className = Function.class.getPackage().getName() + "." + name;
+		try {
+			List<Object> args = new ArrayList<Object>();
+			
+			for (Object arg : this.arguments)
+				args.add(evaluator.evaluate(arg));
+			
+			Class<?> loadedClass = this.getClass().getClassLoader().loadClass(className);
+			Object obj = loadedClass.newInstance();
+			if (obj instanceof Function) {
+				return ((Function) obj).apply(args);
+			} else 
+				throw new JtwigRenderException("Unknown function "+name);
+		} catch (ClassNotFoundException e) {
+			throw new JtwigRenderException(e);
+		} catch (InstantiationException e) {
+			throw new JtwigRenderException(e);
+		} catch (IllegalAccessException e) {
+			throw new JtwigRenderException(e);
+		} catch (FunctionException e) {
+			throw new JtwigRenderException(e);
+		}
+	}
+
+
+	public Object calculate(List<Object> calculatedArguments) throws JtwigRenderException {
+		String name = WordUtils.capitalizeFully(this.getName().replace('-', ' ').replace('_', ' ')).replaceAll(" ", "");
+		String className = Function.class.getPackage().getName() + "." + name;
+		try {
+			Class<?> loadedClass = this.getClass().getClassLoader().loadClass(className);
+			Object obj = loadedClass.newInstance();
+			if (obj instanceof Function) {
+				return ((Function) obj).apply(calculatedArguments);
+			} else throw new JtwigRenderException("Unknown function "+name);
+		} catch (ClassNotFoundException e) {
+			throw new JtwigRenderException(e);
+		} catch (InstantiationException e) {
+			throw new JtwigRenderException(e);
+		} catch (IllegalAccessException e) {
+			throw new JtwigRenderException(e);
+		} catch (FunctionException e) {
+			throw new JtwigRenderException(e);
+		}
+	}
+	
 
 	public Object calculate(HttpServletRequest req, List<Object> calculatedArguments) throws JtwigRenderException {
 		AutowireCapableBeanFactory factory = RequestContextUtils.getWebApplicationContext(req).getAutowireCapableBeanFactory();

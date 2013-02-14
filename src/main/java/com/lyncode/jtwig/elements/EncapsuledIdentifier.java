@@ -43,6 +43,28 @@ public class EncapsuledIdentifier implements Argumentable, Calculable {
 	public boolean hasArguments () {
 		return !(this.arguments.isEmpty());
 	}
+	
+	@Override
+	public Object calculate(Map<String, Object> values)
+			throws JtwigRenderException {
+		JtwigExpressionEvaluator evaluator = new JtwigExpressionEvaluator(values);
+		Object obj = evaluator.evaluate(this.getIdentifier());
+		//System.out.println("Evaluating "+this.getIdentifier());
+		if (next != null) {
+			EncapsuledIdentifier tmp = next;
+			while (tmp != null && obj != null) {
+				//System.out.println("Evaluating "+tmp.getIdentifier());
+				//System.out.println("Current Value: "+obj.toString());
+				List<Object> args = new ArrayList<Object>();
+				for (Object ob : tmp.arguments)
+					args.add(evaluator.evaluate(ob));
+					
+				obj = JtwigExpressionEvaluator.evaluate(obj, tmp.getIdentifier(), args);
+				tmp = tmp.next;
+			}
+		}
+		return obj;
+	}
 
 	@Override
 	public Object calculate(HttpServletRequest req, Map<String, Object> values)

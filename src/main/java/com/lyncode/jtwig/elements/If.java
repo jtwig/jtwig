@@ -84,9 +84,21 @@ public class If extends ObjectList {
 		} else values = this.value;
 		return JtwigExpression.isTrue(values);
 	}
+	private boolean isTrue (Map<String, Object> model) throws JtwigRenderException {
+		Object values = null;
+		if (this.value instanceof Calculable) {
+			values = ((Calculable) this.value).calculate(model);
+		} else values = this.value;
+		return JtwigExpression.isTrue(values);
+	}
+	
 	
 	private String renderSuper (HttpServletRequest req, Map<String, Object> model) throws JtwigRenderException {
 		return super.render(req, model);
+	}
+	
+	private String renderSuper (Map<String, Object> model) throws JtwigRenderException {
+		return super.render(model);
 	}
 
 	public String render(HttpServletRequest req, Map<String, Object> model) throws JtwigRenderException {
@@ -106,6 +118,28 @@ public class If extends ObjectList {
 			if (!alreadyRunned) {
 				if (this.hasElse())
 					result += this.getElseContent().render(req, model);
+			}
+		}
+		return result;
+	}
+
+	public String render(Map<String, Object> model) throws JtwigRenderException {
+		String result = "";
+		if (this.isTrue(model)) {
+			log.debug("Rendering if content");
+			result += super.render(model);
+		} else {
+			boolean alreadyRunned = false;
+			for (If i : this.elseifs) {
+				if (i.isTrue(model)) {
+					result += i.renderSuper(model);
+					alreadyRunned = true;
+					break;
+				}
+			}
+			if (!alreadyRunned) {
+				if (this.hasElse())
+					result += this.getElseContent().render(model);
 			}
 		}
 		return result;

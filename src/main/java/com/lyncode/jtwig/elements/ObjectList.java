@@ -108,4 +108,17 @@ public class ObjectList extends ArrayList<Object> implements Renderable, Resolva
 			}
 		}
 	}
+
+	@Override
+	public String render(Map<String, Object> model) throws JtwigRenderException {
+		String result = "";
+		for (Object obj : this) {
+			if (obj instanceof Renderable) {
+				result += ((Renderable) obj).render(model);
+			} else if (obj instanceof String) {
+				result += (String) obj;
+			}
+		}
+		return result;
+	}
 }

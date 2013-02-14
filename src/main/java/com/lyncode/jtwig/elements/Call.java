@@ -75,4 +75,44 @@ public class Call implements Calculable, Argumentable {
 		}
 		return null;
 	}
+
+
+	@Override
+	public Object calculate(Map<String, Object> values)
+			throws JtwigRenderException {
+		JtwigExpressionEvaluator evaluator = new JtwigExpressionEvaluator(values);
+		
+		List<Object> args = new ArrayList<Object>();
+		for (Object obj : this.arguments)
+			args.add(evaluator.evaluate(obj));
+		
+		String part = this.getName().substring(0, this.getName().lastIndexOf('.'));
+		Object obj = evaluator.evaluate(part);
+		if (obj != null) {
+			log.debug("Object to call: "+obj);
+			String last = this.getName().substring(this.getName().lastIndexOf('.') + 1).toLowerCase();
+			log.debug("Trying to execute method: "+last);
+			for (Method m : obj.getClass().getMethods()) {
+				if (last.equals(m.getName().toLowerCase()) ||
+					last.equals("get"+m.getName().toLowerCase()) || 
+					last.equals("is"+m.getName().toLowerCase()) ||
+					last.equals("has"+m.getName().toLowerCase())) {
+					if (m.getParameterTypes().length == args.size()) {
+						try {
+							return m.invoke(obj, args.toArray());
+						} catch (IllegalArgumentException e) {
+							log.error(e.getMessage(), e);
+						} catch (IllegalAccessException e) {
+							log.error(e.getMessage(), e);
+						} catch (InvocationTargetException e) {
+							log.error(e.getMessage(), e);
+						}
+					}
+				}
+			}
+			log.error("Unable to execute method "+last);
+		}
+		return null;
+	}
+
 }

@@ -27,4 +27,5 @@ import com.lyncode.jtwig.exceptions.JtwigRenderException;
  */
 public interface Renderable {
 	String render (HttpServletRequest req, Map<String, Object> model) throws JtwigRenderException;
+	String render (Map<String, Object> model) throws JtwigRenderException;
 }

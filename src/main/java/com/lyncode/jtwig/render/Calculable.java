@@ -8,4 +8,5 @@ import com.lyncode.jtwig.exceptions.JtwigRenderException;
 
 public interface Calculable {
 	public Object calculate (HttpServletRequest req, Map<String, Object> values) throws JtwigRenderException;
+	public Object calculate (Map<String, Object> values) throws JtwigRenderException;
 }
