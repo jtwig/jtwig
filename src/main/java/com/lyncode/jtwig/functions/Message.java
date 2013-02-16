@@ -32,21 +32,21 @@ import com.lyncode.jtwig.exceptions.FunctionException;
  */
 public class Message extends Function {
 	
-	@Autowired LocaleResolver localeResolver;
-	@Autowired MessageSource messageSource;
-	@Autowired HttpServletRequest request;
+	@Autowired(required=false) LocaleResolver localeResolver;
+	@Autowired(required=false) MessageSource messageSource;
+	@Autowired(required=false) HttpServletRequest request;
 	
 	@Override
 	public Object apply(List<Object> arguments) throws FunctionException {
 		
 		if (localeResolver == null)
-			throw new FunctionException("Locale Resolver not well configured (localeResolver spring bean)");
+			return arguments.get(0);
 		
 		if (messageSource == null)
-			throw new FunctionException("Message Source not well configured (messageSource spring bean)");
+			return arguments.get(0);
 				
 		if (request == null)
-			throw new FunctionException("Request not wired into Message function (Spring configuration)");
+			return arguments.get(0);
 				
 		if (arguments.isEmpty()) throw new FunctionException("Invalid number of arguments");
 		List<Object> args = new ArrayList<Object>();

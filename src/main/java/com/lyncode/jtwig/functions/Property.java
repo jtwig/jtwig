@@ -8,11 +8,13 @@ import com.lyncode.jtwig.api.PropertyReader;
 import com.lyncode.jtwig.exceptions.FunctionException;
 
 public class Property extends Function {
-	@Autowired PropertyReader config;
+	@Autowired(required=false) PropertyReader config;
 	
 	@Override
 	public Object apply(List<Object> arguments)
 			throws FunctionException {
+		if (config == null)
+			throw new FunctionException("Function property must be active");
 		if (arguments.size() == 1) {
 			// get by key
 			return config.getString((String)arguments.get(0), (String) null);
