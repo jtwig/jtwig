@@ -35,14 +35,8 @@ public class JtwigView extends AbstractTemplateView {
     public static final String KEY_REQUEST_PARAMETERS = "RequestParameters";
     public static final String KEY_SESSION = "Session";
     
-	private String encoding;
-
-	public void setEncoding(String encoding) {
-		this.encoding = encoding;
-	}
-
 	protected String getEncoding() {
-		return this.encoding;
+		return this.getApplicationContext().getBean(JtwigViewResolver.class).getEncoding();
 	}
 	
 	protected void initApplicationContext() throws BeansException {

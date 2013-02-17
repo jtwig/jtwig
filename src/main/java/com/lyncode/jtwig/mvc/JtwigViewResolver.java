@@ -53,4 +53,14 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver  {
 		else
 			return super.getPrefix() + theme.getTheme() + File.separator;
 	}
+
+	private String encoding;
+
+	public void setEncoding(String encoding) {
+		this.encoding = encoding;
+	}
+
+	public String getEncoding() {
+		return encoding;
+	}
 }
