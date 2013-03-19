@@ -38,6 +38,12 @@ public class ObjectList extends ArrayList<Object> implements Renderable, Resolva
 		super();
 	}
 	
+	public ObjectList(Integer pop, Integer pop2) {
+		for (int i=pop;i<=pop2;i++) {
+			this.add(i);
+		}
+	}
+
 	public String render(HttpServletRequest req, Map<String, Object> model) throws JtwigRenderException {
 		String result = "";
 		for (Object obj : this) {

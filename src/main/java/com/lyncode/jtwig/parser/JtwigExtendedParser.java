@@ -15,6 +15,10 @@
  */
 package com.lyncode.jtwig.parser;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.BasicConfigurator;
@@ -46,6 +50,7 @@ import com.lyncode.jtwig.elements.ObjectMap;
 import com.lyncode.jtwig.elements.Set;
 import com.lyncode.jtwig.elements.Variable;
 import com.lyncode.jtwig.exceptions.JtwigParsingException;
+import com.lyncode.jtwig.exceptions.JtwigRenderException;
 import com.lyncode.jtwig.render.Argumentable;
 
 /**
@@ -82,18 +87,23 @@ public class JtwigExtendedParser extends BaseParser<Object> {
 		return e;
 	}
 	
-	public static void main (String... str) throws JtwigParsingException {
+	public static void main (String... str) throws JtwigParsingException, JtwigRenderException {
 		BasicConfigurator.configure();
-		String input = "{{ teste.main('ola', 'ole').texte }}";
+		String input = "{% for a in [1..16] %}{{ a }}{{ test }}{% set test = test + 1 %}{% endfor %}";
 		log.debug(input);
 		ObjectList l = parse(input);
+		Map<String, Object> model = new TreeMap<String, Object>();
+		List<String> t = new ArrayList<String>();
+		t.add("joao");
+		t.add("melo");
+		t.add("test");
+		model.put("test", 1);
+		model.put("list", t);
+		
+		System.out.println(l.render(model));
 		log.debug("'"+l+"'");
-		Object exp = (JtwigExpression) (((FastExpression) l.get(0)).getValue());
-		while (exp instanceof JtwigExpression) {
-			exp = ((JtwigExpression) exp).getArguments().get(0);
-		}
-		log.debug(exp);
-		log.debug(((EncapsuledIdentifier) exp).getNext().getNext().getIdentifier());
+		log.debug(model.get("test"));
+		
 		
 	}
 
@@ -163,6 +173,7 @@ public class JtwigExtendedParser extends BaseParser<Object> {
     final Rule MAPOPEN = Terminal("{");
     final Rule MAPCLOSE = Terminal("}");
     final Rule CODEOPEN = Terminal("{%");
+    final Rule TWODOTS = Terminal("..");
     final Rule CODECLOSE = Terminal("%}", false);
     final Rule ATTR = Terminal("=");
 
@@ -782,16 +793,26 @@ public class JtwigExtendedParser extends BaseParser<Object> {
     	return Sequence(
     			WriteIt("Entering Rule (ListExpression)"),
     			LISTOPEN,
-    			push(new ObjectList()),
-    			Optional(
-    					Expression(),
-    					((ObjectList)peek(1)).add(pop()),
-    					ZeroOrMore(
-    							COMMA,
-    	    					Expression(),
-    	    					((ObjectList)peek(1)).add(pop())
-    					)
-    			),
+    			FirstOf(
+			    		Sequence(
+			    			Integer(),
+			    			TWODOTS,
+			    			Integer(),
+			    			push(new ObjectList((Integer)pop(1), (Integer)pop()))
+			    		),
+    					Sequence(push(new ObjectList()),
+			    			Optional(
+			    					Expression(),
+			    					((ObjectList)peek(1)).add(pop()),
+			    					ZeroOrMore(
+			    							COMMA,
+			    	    					Expression(),
+			    	    					((ObjectList)peek(1)).add(pop())
+			    					)
+			    			)
+			    		)
+			    ),
+    			
     			LISTCLOSE,
     			WriteIt("Leaving Rule (ListExpression)")
     	);

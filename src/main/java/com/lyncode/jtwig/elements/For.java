@@ -81,14 +81,12 @@ public class For extends ObjectList {
 		
 		for (int i = 0;i<forValues.size();i++) {
 			Object val = forValues.get(i);
-			Map<String, Object> newModel = new TreeMap<String, Object>();
-			newModel.putAll(model);
-			newModel.put(variable, val);
-			newModel.put("position", i);
-			newModel.put("first", i == 0);
-			newModel.put("last", (i + 1) == forValues.size());
+			model.put(variable, val);
+			model.put("position", i);
+			model.put("first", i == 0);
+			model.put("last", (i + 1) == forValues.size());
 			
-			result += super.render(req, newModel);
+			result += super.render(req, model);
 		}
 		return result;
 	}
@@ -121,14 +119,13 @@ public class For extends ObjectList {
 		
 		for (int i = 0;i<forValues.size();i++) {
 			Object val = forValues.get(i);
-			Map<String, Object> newModel = new TreeMap<String, Object>();
-			newModel.putAll(model);
-			newModel.put(variable, val);
-			newModel.put("position", i);
-			newModel.put("first", i == 0);
-			newModel.put("last", (i + 1) == forValues.size());
+			model.putAll(model);
+			model.put(variable, val);
+			model.put("position", i);
+			model.put("first", i == 0);
+			model.put("last", (i + 1) == forValues.size());
 			
-			result += super.render(newModel);
+			result += super.render(model);
 		}
 		return result;
 	}
