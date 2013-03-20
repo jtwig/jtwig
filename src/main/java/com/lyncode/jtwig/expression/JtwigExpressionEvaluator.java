@@ -153,8 +153,9 @@ public class JtwigExpressionEvaluator {
 		}
 	}
 	
-	public static Object evaluate (Object obj, String name, List<Object> arguments) {
+	public static Object evaluate (Object obj, String name, List<Object> arguments) throws JtwigRenderException {
 		log.debug("Object to call: "+obj);
+		if (arguments.isEmpty()) return JtwigExpressionEvaluator.evaluate(obj, name);
 		String last = name.toLowerCase();
 		log.debug("Trying to execute method: "+last);
 		for (Method m : obj.getClass().getMethods()) {
