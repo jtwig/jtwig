@@ -21,7 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.view.AbstractTemplateViewResolver;
 
 /**
- * @author "João Melo <jmelo@lyncode.com>"
+ * @author "Joao Melo <jmelo@lyncode.com>"
  *
  */
 public class JtwigViewResolver extends AbstractTemplateViewResolver  {

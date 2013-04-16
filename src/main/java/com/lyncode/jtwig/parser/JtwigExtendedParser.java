@@ -55,7 +55,7 @@ import com.lyncode.jtwig.render.Argumentable;
 
 /**
  * 
- * @author "João Melo <jmelo@lyncode.com>"
+ * @author "Joao Melo <jmelo@lyncode.com>"
  */
 public class JtwigExtendedParser extends BaseParser<Object> {
 	private static Logger log = LogManager.getLogger(JtwigExtendedParser.class);

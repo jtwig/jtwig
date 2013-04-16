@@ -22,7 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import com.lyncode.jtwig.exceptions.JtwigRenderException;
 
 /**
- * @author "João Melo <jmelo@lyncode.com>"
+ * @author "Joao Melo <jmelo@lyncode.com>"
  *
  */
 public interface Renderable {

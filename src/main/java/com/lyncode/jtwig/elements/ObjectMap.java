@@ -21,7 +21,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 /**
- * @author "João Melo <jmelo@lyncode.com>"
+ * @author "Joao Melo <jmelo@lyncode.com>"
  *
  */
 public class ObjectMap extends TreeMap<String, Object> {

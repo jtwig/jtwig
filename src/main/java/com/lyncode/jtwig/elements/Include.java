@@ -25,7 +25,7 @@ import com.lyncode.jtwig.manager.JtwigResource;
 import com.lyncode.jtwig.parser.JtwigExtendedParser;
 
 /**
- * @author "João Melo <jmelo@lyncode.com>"
+ * @author "Joao Melo <jmelo@lyncode.com>"
  *
  */
 public class Include {

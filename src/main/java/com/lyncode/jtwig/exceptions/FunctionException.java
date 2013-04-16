@@ -16,7 +16,7 @@
 package com.lyncode.jtwig.exceptions;
 
 /**
- * @author "João Melo <jmelo@lyncode.com>"
+ * @author "Joao Melo <jmelo@lyncode.com>"
  *
  */
 public class FunctionException extends Exception {

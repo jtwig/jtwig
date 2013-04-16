@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 import com.lyncode.jtwig.api.ThemeResolver;
 
 /**
- * @author "João Melo <jmelo@lyncode.com>"
+ * @author "Joao Melo <jmelo@lyncode.com>"
  *
  */
 @Component

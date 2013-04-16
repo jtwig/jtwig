@@ -27,7 +27,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.web.context.support.ServletContextResourceLoader;
 
 /**
- * @author "João Melo <jmelo@lyncode.com>"
+ * @author "Joao Melo <jmelo@lyncode.com>"
  *
  */
 public class ServletContextResource implements JtwigResource {

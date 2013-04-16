@@ -30,7 +30,7 @@ import com.lyncode.jtwig.render.Calculable;
 import com.lyncode.jtwig.render.Renderable;
 
 /**
- * @author "João Melo <jmelo@lyncode.com>"
+ * @author "Joao Melo <jmelo@lyncode.com>"
  *
  */
 public class FastExpression implements Renderable {

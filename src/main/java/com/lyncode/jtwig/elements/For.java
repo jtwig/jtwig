@@ -29,7 +29,7 @@ import com.lyncode.jtwig.exceptions.JtwigRenderException;
 import com.lyncode.jtwig.render.Calculable;
 
 /**
- * @author "João Melo <jmelo@lyncode.com>"
+ * @author "Joao Melo <jmelo@lyncode.com>"
  *
  */
 public class For extends ObjectList {

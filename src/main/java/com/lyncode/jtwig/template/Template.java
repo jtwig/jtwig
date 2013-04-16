@@ -32,7 +32,7 @@ import com.lyncode.jtwig.manager.ServletContextResource;
 import com.lyncode.jtwig.parser.JtwigExtendedParser;
 
 /**
- * @author "João Melo <jmelo@lyncode.com>"
+ * @author "Joao Melo <jmelo@lyncode.com>"
  *
  */
 public class Template {

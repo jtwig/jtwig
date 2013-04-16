@@ -28,7 +28,7 @@ import com.lyncode.jtwig.render.Renderable;
 import com.lyncode.jtwig.render.Resolvable;
 
 /**
- * @author "João Melo <jmelo@lyncode.com>"
+ * @author "Joao Melo <jmelo@lyncode.com>"
  *
  */
 public class ObjectList extends ArrayList<Object> implements Renderable, Resolvable {

@@ -35,7 +35,7 @@ import com.lyncode.jtwig.render.Argumentable;
 import com.lyncode.jtwig.render.Calculable;
 
 /**
- * @author "João Melo <jmelo@lyncode.com>"
+ * @author "Joao Melo <jmelo@lyncode.com>"
  *
  */
 public class FunctionExpr implements Calculable, Argumentable {

@@ -18,7 +18,7 @@ package com.lyncode.jtwig.manager;
 import java.io.IOException;
 
 /**
- * @author "João Melo <jmelo@lyncode.com>"
+ * @author "Joao Melo <jmelo@lyncode.com>"
  *
  */
 public interface JtwigResource {

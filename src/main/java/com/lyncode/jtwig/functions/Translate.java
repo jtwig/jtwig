@@ -16,7 +16,7 @@
 package com.lyncode.jtwig.functions;
 
 /**
- * @author "João Melo <jmelo@lyncode.com>"
+ * @author "Joao Melo <jmelo@lyncode.com>"
  *
  */
 public class Translate extends Message {

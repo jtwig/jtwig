@@ -22,7 +22,7 @@ import java.util.List;
 import com.lyncode.jtwig.exceptions.FunctionException;
 
 /**
- * @author "João Melo <jmelo@lyncode.com>"
+ * @author "Joao Melo <jmelo@lyncode.com>"
  *
  */
 public class FormatNumber extends Function {

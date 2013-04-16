@@ -31,7 +31,7 @@ import com.lyncode.jtwig.manager.JtwigResource;
 import com.lyncode.jtwig.render.Calculable;
 
 /**
- * @author "João Melo <jmelo@lyncode.com>"
+ * @author "Joao Melo <jmelo@lyncode.com>"
  *
  */
 public class If extends ObjectList {
