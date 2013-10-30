@@ -10,3 +10,6 @@
 .classpath
 
 target/
+
+.idea
+*.iml
