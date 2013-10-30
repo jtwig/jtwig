@@ -39,6 +39,17 @@ The wiki contains more [documentation](/lyncode/jtwig/wiki).
 
 ----------
 
+Maven
+-----
+
+XOAI could be integrated with maven support.
+
+	<dependency>
+	    <groupId>com.lyncode</groupId>
+	    <artifactId>xoai</artifactId>
+	    <version>3.1.0</version>
+	</dependency>
+
 ### License
 
 
