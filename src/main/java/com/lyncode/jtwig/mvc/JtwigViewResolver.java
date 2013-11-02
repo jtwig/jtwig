@@ -15,52 +15,71 @@
  */
 package com.lyncode.jtwig.mvc;
 
+import org.springframework.web.servlet.view.AbstractTemplateViewResolver;
+
 import java.io.File;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.servlet.view.AbstractTemplateViewResolver;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 /**
  * @author "Joao Melo <jmelo@lyncode.com>"
- *
  */
-public class JtwigViewResolver extends AbstractTemplateViewResolver  {
-	@Autowired DefaultThemeResolver theme;
-	
-	private boolean cached;
-	
-	public boolean isCached () {
-		return cached;
-	}
-	
-	public void setCached (boolean b) {
-		cached = b;
-	}
-	
-	public JtwigViewResolver () {
-		setViewClass(requiredViewClass());
-	}
+public class JtwigViewResolver extends AbstractTemplateViewResolver {
+    private String theme;
+    private boolean cached;
+    private String encoding;
 
-	@Override
-	protected Class<?> requiredViewClass() {
-		return JtwigView.class;
-	}
-	
-	@Override
-	protected String getPrefix() {
-		if (theme == null)
-			return super.getPrefix();
-		else
-			return super.getPrefix() + theme.getTheme() + File.separator;
-	}
+    public JtwigViewResolver() {
+        setViewClass(requiredViewClass());
+    }
 
-	private String encoding;
+    @Override
+    protected Class<?> requiredViewClass() {
+        return JtwigView.class;
+    }
 
-	public void setEncoding(String encoding) {
-		this.encoding = encoding;
-	}
+    @Override
+    protected String getPrefix() {
+        if (isBlank(theme))
+            return super.getPrefix();
+        else
+            return getPrefixWithTheme();
+    }
 
-	public String getEncoding() {
-		return encoding;
-	}
+    private String getPrefixWithTheme() {
+        if (isNotBlank(super.getPrefix()) && super.getPrefix().endsWith(File.separator))
+            return super.getPrefix() + getTheme() + File.separator;
+        else
+            return super.getPrefix() + File.separator + getTheme();
+    }
+
+    public boolean isCached() {
+        return cached;
+    }
+
+    public String getEncoding() {
+        return encoding;
+    }
+
+    public String getTheme() {
+        return this.theme;
+    }
+
+    public boolean hasTheme() {
+        return isNotBlank(theme);
+    }
+
+    public void setCached(boolean b) {
+        cached = b;
+    }
+
+    public void setEncoding(String encoding) {
+        this.encoding = encoding;
+    }
+
+    public void setTheme(String theme) {
+        this.theme = theme;
+    }
+
 }
