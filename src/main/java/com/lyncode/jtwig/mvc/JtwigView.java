@@ -34,10 +34,13 @@ public class JtwigView extends AbstractTemplateView {
     public static final String KEY_INCLUDE = "include_page";
     public static final String KEY_REQUEST_PARAMETERS = "RequestParameters";
     public static final String KEY_SESSION = "Session";
-    
-	protected String getEncoding() {
-		return this.getApplicationContext().getBean(JtwigViewResolver.class).getEncoding();
-	}
+
+    protected String getEncoding() {
+        return this.getApplicationContext().getBean(JtwigViewResolver.class).getEncoding();
+    }
+    protected String getTheme() {
+        return this.getApplicationContext().getBean(JtwigViewResolver.class).getTheme();
+    }
 	
 	protected void initApplicationContext() throws BeansException {
 		super.initApplicationContext();
@@ -55,9 +58,9 @@ public class JtwigView extends AbstractTemplateView {
 			throws Exception {
 		exposeModelAsRequestAttributes(model, request);
 		try {
-			DefaultThemeResolver theme = this.getWebApplicationContext().getBean(DefaultThemeResolver.class);
+            String theme = this.getTheme();
 			if (theme == null) model.put("theme", "");
-			else model.put("theme", theme.getTheme());
+			else model.put("theme", theme);
 		} catch (BeanCreationException e) {
 			log.debug(e.getMessage(), e);
 		}
@@ -71,9 +74,9 @@ public class JtwigView extends AbstractTemplateView {
 		
 		JtwigViewResolver viewResolver = this.getApplicationContext().getBean(JtwigViewResolver.class);
 		if (!viewResolver.isCached()) {
-			processTemplate(getTemplate(request.getServletContext(), getUrl()), request, model, response);
+			processTemplate(getTemplate(request.getSession().getServletContext(), getUrl()), request, model, response);
 		} else {
-			processTemplate(getCachedTemplate(request.getServletContext(), getUrl()), request, model, response);
+			processTemplate(getCachedTemplate(request.getSession().getServletContext(), getUrl()), request, model, response);
 		}
 		
 	}
