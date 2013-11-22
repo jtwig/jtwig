@@ -100,8 +100,11 @@ public class For extends ObjectList {
         List<Object> forValues = null;
 
         if (values == null) forValues = new ObjectList();
-        else if (values instanceof List<?>) {
-            forValues = (List<Object>) values;
+        else if (values instanceof Iterable<?>) {
+            forValues = new ArrayList<Object>();
+            Iterator<Object> iterator = ((Iterable<Object>) values).iterator();
+            while (iterator.hasNext())
+                forValues.add(iterator.next());
         } else if (values.getClass().isArray()) {
             Object[] list = (Object[]) values;
             forValues = new ArrayList<Object>();
