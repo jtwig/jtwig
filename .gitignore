@@ -1,15 +1,20 @@
+# Build files
 *.class
+target/
+
+# Release files
+release.properties
 
 # Package Files #
 *.jar
 *.war
 *.ear
 
+# IDE files (Eclipse)
 .settings
 .project
 .classpath
 
-target/
-
-.idea
+# IDE files (IntelliJ)
+.idea/
 *.iml
