@@ -1,0 +1,177 @@
+/**
+ * Copyright 2012 Lyncode
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.lyncode.jtwig.util;
+
+import com.google.common.base.Predicate;
+import org.hamcrest.Matcher;
+
+import javax.annotation.Nullable;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
+import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
+import static org.reflections.ReflectionUtils.getFields;
+import static org.reflections.ReflectionUtils.getMethods;
+
+public class ObjectExtractor {
+    private Object context;
+
+    public ObjectExtractor(Object context) {
+        this.context = context;
+    }
+
+    public Object extract (final String name, Object... parameters) throws ExtractException {
+        List<Callable> callables = new ArrayList<Callable>();
+        if (parameters.length == 0)
+            callables.add(tryField());
+
+        callables.add(tryMethod());
+
+        for (Callable callable : callables) {
+            Result<Object> result = callable.execute(name, parameters);
+            if (result.hasResult()) return result.getResult();
+        }
+
+        throw new ExtractException("Unable to find field or method "+name+" in "+context);
+    }
+
+    private Callable tryField() {
+        return new Callable() {
+            @Override
+            public Result<Object> execute(String name, Object... args) {
+                Set<Field> fields = getFields(context.getClass(), fieldPredicate(name));
+                if (!fields.isEmpty()) {
+                    Iterator<Field> iterator = fields.iterator();
+                    while (iterator.hasNext()) {
+                        try {
+                            return new Result<Object>(iterator.next().get(context));
+                        } catch (IllegalAccessException e) {
+                            // do nothing
+                        }
+                    }
+                    return new Result<Object>();
+                } else return new Result<Object>();
+            }
+        };
+    }
+
+    private Predicate<Field> fieldPredicate(final String name) {
+        return new Predicate<Field>() {
+            @Override
+            public boolean apply(@Nullable Field field) {
+                if (field == null) return false;
+                return equalToIgnoringCase(name).matches(field.getName());
+            }
+        };
+    }
+
+    private Callable tryMethod() {
+        return new Callable() {
+            @Override
+            public Result<Object> execute(final String name, Object... args) throws ExtractException {
+                String[] prefixes = new String[]{
+                        "get",
+                        "is",
+                        "has"
+                };
+
+                Set<Method> methods = getMethods(context.getClass(), methodMatcher(equalToIgnoringCase(name), args.length));
+                int i = 0;
+                while (methods.isEmpty() && i < prefixes.length) {
+                    methods = getMethods(context.getClass(), methodMatcher(equalToIgnoringCase(prefixes[i++] + name), args.length));
+                }
+
+                if (methods.isEmpty()) return new Result<Object>();
+                else {
+                    Iterator<Method> iterator = methods.iterator();
+                    while (iterator.hasNext()) {
+                        try {
+                            return new Result<Object>(iterator.next().invoke(context, args));
+                        } catch (InvocationTargetException e) {
+                            throw new ExtractException(e);
+                        } catch (IllegalAccessException e) {
+                            // do nothing
+                        }
+                    }
+                }
+
+                return new Result<Object>();
+            }
+        };
+    }
+
+    private Predicate<Method> methodMatcher(final Matcher<? super String> nameMatcher, final int numberOfArguments) {
+        return new Predicate<Method>() {
+            @Override
+            public boolean apply(@Nullable Method method) {
+                if (method == null) return false;
+                else {
+                    return nameMatcher.matches(method.getName()) &&
+                            method.getParameterTypes().length == numberOfArguments;
+                }
+            }
+        };
+    }
+
+    private static interface Callable {
+        Result<Object> execute (String name, Object... args) throws ExtractException;
+    }
+
+    private static class Result<T> {
+        private T result;
+        private boolean has;
+
+        public Result () {
+            has = false;
+        }
+
+        public Result (T result) {
+            has = true;
+            this.result = result;
+        }
+
+        private T getResult() {
+            return result;
+        }
+
+        private boolean hasResult() {
+            return has;
+        }
+    }
+
+    public static class ExtractException extends Exception {
+        public ExtractException() {
+        }
+
+        public ExtractException(String message) {
+            super(message);
+        }
+
+        public ExtractException(String message, Throwable cause) {
+            super(message, cause);
+        }
+
+        public ExtractException(Throwable cause) {
+            super(cause);
+        }
+    }
+}
