@@ -2,6 +2,9 @@
 
 *JTwig is a template mechanism, inspired in [Twig](http://twig.sensiolabs.org/) (PHP), for [SpringFramework Web MVC](http://www.springsource.org) (Java).*
 
+### Build Status
+
+[![Build Status](https://travis-ci.org/lyncode/jtwig.png)](https://travis-ci.org/lyncode/jtwig)
 
 ### Architecture
 
