@@ -14,29 +14,21 @@
  * limitations under the License.
  */
 
-package com.lyncode.jtwig;
+package com.lyncode.jtwig.functions.repository;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.lyncode.jtwig.functions.Translate;
 
-public class JtwigModelMap {
-    private Map<String, Object> model = new HashMap<String, Object>();
+public class WebFunctionRepository extends AbstractFunctionRepository {
+    private static WebFunctionRepository instance = null;
 
-    public JtwigModelMap add (String key, Object object) {
-        model.put(key, object);
-        return this;
+    public static WebFunctionRepository getInstance () {
+        if (instance == null) instance = new WebFunctionRepository();
+        return instance;
     }
 
-    public boolean has (String key) {
-        return model.containsKey(key);
-    }
-
-    public Object get (String key) {
-        return model.get(key);
-    }
-
-    public JtwigModelMap add(Map<String, Object> model) {
-        model.putAll(model);
-        return this;
+    public WebFunctionRepository () {
+        super(
+            new FunctionDeclaration(new Translate(), "translate", "message", "trans")
+        );
     }
 }

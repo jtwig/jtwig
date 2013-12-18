@@ -23,7 +23,6 @@ import org.springframework.web.servlet.view.AbstractTemplateViewResolver;
 
 import java.io.File;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class JtwigViewResolver extends AbstractTemplateViewResolver {
@@ -36,7 +35,7 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
         };
     }
 
-
+    private String encoding;
     private String theme;
     private boolean cached;
     private ThemePrefixResolver prefixResolver;
@@ -84,5 +83,13 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
 
     public void setTheme(String theme) {
         this.theme = theme;
+    }
+
+    public String getEncoding() {
+        return encoding;
+    }
+
+    public void setEncoding(String encoding) {
+        this.encoding = encoding;
     }
 }

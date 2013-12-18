@@ -18,10 +18,15 @@ package com.lyncode.jtwig.resource;
 
 import com.lyncode.jtwig.exception.ResourceException;
 
+import javax.servlet.ServletContext;
 import java.io.InputStream;
 
 public class WebJtwigResource implements JtwigResource {
 
+
+    public WebJtwigResource(ServletContext servletContext, String url) {
+        //To change body of created methods use File | Settings | File Templates.
+    }
 
     @Override
     public InputStream retrieve() throws ResourceException {

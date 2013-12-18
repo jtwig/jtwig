@@ -50,6 +50,7 @@
         <module>jtwig-core</module>
         <module>jtwig-functions</module>
         <module>jtwig-core-test</module>
+        <module>jtwig-spring</module>
     </modules>
 
     <build>

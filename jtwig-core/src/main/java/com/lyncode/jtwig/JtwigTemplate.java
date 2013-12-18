@@ -22,6 +22,7 @@ import com.lyncode.jtwig.exception.RenderException;
 import com.lyncode.jtwig.parser.JtwigParser;
 import com.lyncode.jtwig.resource.JtwigResource;
 import com.lyncode.jtwig.resource.StringJtwigResource;
+import com.lyncode.jtwig.tree.content.Content;
 
 import java.io.OutputStream;
 
@@ -56,9 +57,7 @@ public class JtwigTemplate {
     }
 
 
-    public void output (OutputStream outputStream, JtwigContext context) throws ParseException, ComposeException, RenderException {
-        JtwigParser.parse(resource)
-                .compose(resource)
-                .render(outputStream, context);
+    public Content compile () throws ParseException, ComposeException {
+        return JtwigParser.parse(resource).compose(resource);
     }
 }

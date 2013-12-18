@@ -16,20 +16,115 @@
 
 package com.lyncode.jtwig.mvc;
 
+import com.lyncode.jtwig.JtwigContext;
+import com.lyncode.jtwig.JtwigModelMap;
+import com.lyncode.jtwig.JtwigTemplate;
+import com.lyncode.jtwig.exception.ComposeException;
+import com.lyncode.jtwig.exception.ParseException;
+import com.lyncode.jtwig.resource.WebJtwigResource;
+import com.lyncode.jtwig.tree.content.Content;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.springframework.web.servlet.support.RequestContextUtils;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.web.servlet.view.AbstractTemplateView;
 
+import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Map;
+
+import static com.lyncode.jtwig.functions.repository.WebFunctionRepository.getInstance;
 
 public class JtwigView extends AbstractTemplateView {
     private static Logger log = LogManager.getLogger(JtwigView.class);
 
+    private Map<String, Content> compiledTemplates = new HashMap<String, Content>();
+
+    protected String getEncoding() {
+        return getViewResolver().getEncoding();
+    }
+    protected String getTheme() {
+        return getViewResolver().getTheme();
+    }
+
+    private JtwigViewResolver getViewResolver() {
+        return this.getApplicationContext().getBean(JtwigViewResolver.class);
+    }
+
+    protected void initApplicationContext() throws BeansException {
+        super.initApplicationContext();
+        GenericServlet servlet = new GenericServletAdapter();
+        try {
+            servlet.init(new DelegatingServletConfig());
+        } catch (ServletException ex) {
+            throw new BeanInitializationException("Initialization of GenericServlet adapter failed", ex);
+        }
+    }
+
     @Override
-    protected void renderMergedTemplateModel(Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
-        RequestContextUtils.getTheme(request).getName();
+    protected void renderMergedTemplateModel(Map<String, Object> model,
+                                             HttpServletRequest request, HttpServletResponse response)
+            throws Exception {
+
+        // Adding model information
+        JtwigModelMap modelMap = new JtwigModelMap()
+                .add(model)
+                .add("theme", getTheme())
+                .add("request", request)
+            ;
+
+        if (log.isDebugEnabled()) {
+            log.debug("Rendering Jtwig template [" + getUrl() + "] in JtwigView '" + getBeanName() + "'");
+            log.debug("Model: "+model);
+        }
+
+
+        response.setContentType(this.getContentType());
+        if (this.getEncoding() != null)
+            response.setCharacterEncoding(this.getEncoding());
+
+        getContent(request).render(response.getOutputStream(), new JtwigContext(modelMap, getInstance()));
+    }
+
+    public Content getContent(HttpServletRequest request) throws ComposeException, ParseException {
+        if (getViewResolver().isCached()) {
+            if (!compiledTemplates.containsKey(getUrl())) {
+                compiledTemplates.put(getUrl(), getCompiledJtwigTemplate(request));
+            }
+            return compiledTemplates.get(getUrl());
+        }
+        return getCompiledJtwigTemplate(request);
+    }
+
+    private Content getCompiledJtwigTemplate(HttpServletRequest request) throws ParseException, ComposeException {
+        return new JtwigTemplate(new WebJtwigResource(request.getSession().getServletContext(), getUrl())).compile();
+    }
+
+    @SuppressWarnings("serial")
+    private static class GenericServletAdapter extends GenericServlet {
+        public void service(ServletRequest servletRequest, ServletResponse servletResponse) {
+            // no-op
+        }
+    }
+
+    private class DelegatingServletConfig implements ServletConfig {
+        public String getServletName() {
+            return JtwigView.this.getBeanName();
+        }
+        public ServletContext getServletContext() {
+            return JtwigView.this.getServletContext();
+        }
+        public String getInitParameter(String paramName) {
+            return null;
+        }
+
+        @SuppressWarnings({ "unchecked", "rawtypes" })
+        public Enumeration getInitParameterNames() {
+            return Collections.enumeration(Collections.EMPTY_SET);
+        }
     }
 }

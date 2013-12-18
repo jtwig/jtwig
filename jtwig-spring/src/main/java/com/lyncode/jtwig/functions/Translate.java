@@ -14,29 +14,13 @@
  * limitations under the License.
  */
 
-package com.lyncode.jtwig;
+package com.lyncode.jtwig.functions;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.lyncode.jtwig.functions.exceptions.FunctionException;
 
-public class JtwigModelMap {
-    private Map<String, Object> model = new HashMap<String, Object>();
-
-    public JtwigModelMap add (String key, Object object) {
-        model.put(key, object);
-        return this;
-    }
-
-    public boolean has (String key) {
-        return model.containsKey(key);
-    }
-
-    public Object get (String key) {
-        return model.get(key);
-    }
-
-    public JtwigModelMap add(Map<String, Object> model) {
-        model.putAll(model);
-        return this;
+public class Translate implements Function {
+    @Override
+    public Object execute(Object... arguments) throws FunctionException {
+        return null;
     }
 }
