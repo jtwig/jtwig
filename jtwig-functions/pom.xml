@@ -10,6 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>jtwig-functions</artifactId>
+    <name>Jtwig Core Functions</name>
 
 
 </project>

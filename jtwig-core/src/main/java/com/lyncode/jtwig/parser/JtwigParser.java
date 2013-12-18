@@ -102,6 +102,23 @@ public class JtwigParser extends BaseParser<Object> {
                                 AddToContent(ForExpression()),
                                 AddToContent(IfExpression()),
                                 AddToContent(SetExpression()),
+                                Sequence(
+                                        OpenCode(),
+                                        TestNot(
+                                                FirstOf(
+                                                        SpecificKeyword(ENDBLOCK),
+                                                        SpecificKeyword(ENDFOR),
+                                                        SpecificKeyword(ENDIF),
+                                                        SpecificKeyword(IF),
+                                                        SpecificKeyword(BLOCK),
+                                                        SpecificKeyword(FOR),
+                                                        SpecificKeyword(SET),
+                                                        SpecificKeyword(ELSE),
+                                                        SpecificKeyword(ELSEIF)
+                                                )
+                                        ),
+                                        throwException(new UnknownExpressionException())
+                                ),
                                 AddToContent(TextExpression())
                         )
                 )
@@ -548,14 +565,18 @@ public class JtwigParser extends BaseParser<Object> {
                 push(new ElementMap()),
                 Optional(
                         Identifier(),
+                        Spacing(),
                         FreeSymbol(DIV),
                         BasicExpression(),
+                        Spacing(),
                         ((ElementMap) peek(2)).add((String) pop(1), pop()),
                         ZeroOrMore(
                                 FreeSymbol(COMMA),
                                 Identifier(),
+                                Spacing(),
                                 FreeSymbol(DIV),
                                 BasicExpression(),
+                                Spacing(),
                                 ((ElementMap) peek(2)).add((String) pop(1), pop())
                         )
                 ),

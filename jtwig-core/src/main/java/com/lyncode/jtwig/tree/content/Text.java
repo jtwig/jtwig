@@ -44,4 +44,8 @@ public class Text implements Renderable {
             throw new RenderException(e);
         }
     }
+
+    public String toString () {
+        return "Text: "+ builder.toString();
+    }
 }

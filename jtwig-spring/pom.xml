@@ -10,6 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>jtwig-spring</artifactId>
+    <name>Jtwig for Spring MVC</name>
 
     <dependencies>
         <dependency>

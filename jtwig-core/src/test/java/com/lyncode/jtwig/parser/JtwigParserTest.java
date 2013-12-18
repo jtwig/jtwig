@@ -26,6 +26,7 @@ import org.junit.Test;
 import org.parboiled.Rule;
 import org.parboiled.errors.ParserRuntimeException;
 import org.parboiled.parserunners.ReportingParseRunner;
+import org.parboiled.support.ParsingResult;
 
 import static com.lyncode.jtwig.matcher.ElementListMatcher.emptyElementList;
 import static com.lyncode.jtwig.matcher.ElementListMatcher.hasElement;
@@ -326,7 +327,8 @@ public class JtwigParserTest {
     }
 
     private <T> T parse(Rule rule, String input, Class<T> entity) {
-        return (T) new ReportingParseRunner<Object>(rule).run(input).resultValue;
+        ParsingResult<Object> run = new ReportingParseRunner<Object>(rule).run(input);
+        return (T) run.resultValue;
     }
 
     private OperationBinaryMatcherBuilder binary() {
