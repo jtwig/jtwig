@@ -17,16 +17,16 @@
 package com.lyncode.jtwig.tree.structural;
 
 import com.lyncode.jtwig.JtwigContext;
-import com.lyncode.jtwig.exception.ComposeException;
+import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.RenderException;
 import com.lyncode.jtwig.resource.JtwigResource;
-import com.lyncode.jtwig.tree.api.Composable;
+import com.lyncode.jtwig.tree.api.Compilable;
 import com.lyncode.jtwig.tree.api.Renderable;
 import com.lyncode.jtwig.tree.content.Content;
 
 import java.io.OutputStream;
 
-public class BlockExpression implements Renderable, Composable<BlockExpression> {
+public class BlockExpression implements Renderable, Compilable<BlockExpression> {
     private String name;
 
     private Content content;
@@ -59,13 +59,13 @@ public class BlockExpression implements Renderable, Composable<BlockExpression> 
     }
 
     @Override
-    public BlockExpression compose(JtwigResource resource) throws ComposeException {
-        this.content = content.compose(resource);
+    public BlockExpression compile(JtwigResource resource) throws CompileException {
+        this.content = content.compile(resource);
         return this;
     }
 
     @Override
-    public boolean replace(BlockExpression expression) throws ComposeException {
+    public boolean replace(BlockExpression expression) throws CompileException {
         return content.replace(expression);
     }
 }

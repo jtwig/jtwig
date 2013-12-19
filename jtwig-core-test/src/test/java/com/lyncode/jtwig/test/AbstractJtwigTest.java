@@ -16,6 +16,7 @@
 
 package com.lyncode.jtwig.test;
 
+import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.JtwigTemplate;
 import com.lyncode.jtwig.builder.JtwigResourceBuilder;
 
@@ -24,7 +25,7 @@ import java.io.ByteArrayOutputStream;
 public class AbstractJtwigTest {
     protected String theResultOfRendering(JtwigTemplate template) throws Exception {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        template.output(outputStream);
+        template.output(outputStream, new JtwigContext());
         return outputStream.toString();
     }
 

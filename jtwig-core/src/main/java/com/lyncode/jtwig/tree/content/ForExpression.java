@@ -18,10 +18,10 @@ package com.lyncode.jtwig.tree.content;
 
 import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.exception.CalculateException;
-import com.lyncode.jtwig.exception.ComposeException;
+import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.RenderException;
 import com.lyncode.jtwig.resource.JtwigResource;
-import com.lyncode.jtwig.tree.api.Composable;
+import com.lyncode.jtwig.tree.api.Compilable;
 import com.lyncode.jtwig.tree.api.Renderable;
 import com.lyncode.jtwig.tree.structural.BlockExpression;
 import com.lyncode.jtwig.tree.value.FunctionElement;
@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class ForExpression implements Renderable, Composable<ForExpression> {
+public class ForExpression implements Renderable, Compilable<ForExpression> {
     private Variable item;
     private Object list;
     private List<FunctionElement> filters = new ArrayList<FunctionElement>();
@@ -85,13 +85,13 @@ public class ForExpression implements Renderable, Composable<ForExpression> {
     }
 
     @Override
-    public ForExpression compose(JtwigResource resource) throws ComposeException {
-        content = content.compose(resource);
+    public ForExpression compile(JtwigResource resource) throws CompileException {
+        content = content.compile(resource);
         return this;
     }
 
     @Override
-    public boolean replace(BlockExpression expression) throws ComposeException {
+    public boolean replace(BlockExpression expression) throws CompileException {
         return content.replace(expression);
     }
 

@@ -16,7 +16,7 @@
 
 package com.lyncode.jtwig.tree.documents;
 
-import com.lyncode.jtwig.exception.ComposeException;
+import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.resource.JtwigResource;
 import com.lyncode.jtwig.tree.content.Content;
 import com.lyncode.jtwig.tree.structural.BlockExpression;
@@ -33,12 +33,12 @@ public class JtwigRootDocument implements JtwigDocument {
     }
 
     @Override
-    public Content compose(JtwigResource resource) throws ComposeException {
-        return content.compose(resource);
+    public Content compile(JtwigResource resource) throws CompileException {
+        return content.compile(resource);
     }
 
     @Override
-    public boolean replace(BlockExpression expression) throws ComposeException {
+    public boolean replace(BlockExpression expression) throws CompileException {
         return content.replace(expression);
     }
 }

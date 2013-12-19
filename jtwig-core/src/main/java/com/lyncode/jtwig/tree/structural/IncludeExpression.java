@@ -16,16 +16,16 @@
 
 package com.lyncode.jtwig.tree.structural;
 
-import com.lyncode.jtwig.exception.ComposeException;
+import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.ParseException;
 import com.lyncode.jtwig.exception.ResourceException;
 import com.lyncode.jtwig.parser.JtwigParser;
 import com.lyncode.jtwig.resource.JtwigResource;
-import com.lyncode.jtwig.tree.api.Composable;
+import com.lyncode.jtwig.tree.api.Compilable;
 import com.lyncode.jtwig.tree.content.Content;
 import com.lyncode.jtwig.tree.documents.JtwigDocument;
 
-public class IncludeExpression implements Composable<Content> {
+public class IncludeExpression implements Compilable<Content> {
     private String path;
 
     public IncludeExpression(String path) {
@@ -37,20 +37,20 @@ public class IncludeExpression implements Composable<Content> {
     }
 
     @Override
-    public Content compose(JtwigResource resource) throws ComposeException {
+    public Content compile(JtwigResource resource) throws CompileException {
         try {
             JtwigResource jtwigResource = resource.resolve(path);
             JtwigDocument jtwigDocument = JtwigParser.parse(jtwigResource);
-            return jtwigDocument.compose(jtwigResource);
+            return jtwigDocument.compile(jtwigResource);
         } catch (ParseException e) {
-            throw new ComposeException(e);
+            throw new CompileException(e);
         } catch (ResourceException e) {
-            throw new ComposeException(e);
+            throw new CompileException(e);
         }
     }
 
     @Override
-    public boolean replace(BlockExpression expression) throws ComposeException {
+    public boolean replace(BlockExpression expression) throws CompileException {
         return false;
     }
 }

@@ -16,48 +16,41 @@
 
 package com.lyncode.jtwig;
 
-import com.lyncode.jtwig.exception.ComposeException;
+import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.ParseException;
 import com.lyncode.jtwig.exception.RenderException;
 import com.lyncode.jtwig.parser.JtwigParser;
+import com.lyncode.jtwig.resource.FileJtwigResource;
 import com.lyncode.jtwig.resource.JtwigResource;
 import com.lyncode.jtwig.resource.StringJtwigResource;
 import com.lyncode.jtwig.tree.content.Content;
 
+import java.io.File;
 import java.io.OutputStream;
 
 public class JtwigTemplate {
     private JtwigResource resource;
-    private JtwigContext context;
-
-    public JtwigTemplate(JtwigResource resource, JtwigContext context) {
-        this.resource = resource;
-        this.context = context;
-    }
 
     public JtwigTemplate(JtwigResource resource) {
         this.resource = resource;
-        this.context = new JtwigContext();
     }
 
     public JtwigTemplate (String content) {
         this.resource = new StringJtwigResource(content);
-        this.context = new JtwigContext();
     }
 
-    public JtwigTemplate withModelAttribute(String key, Object value) {
-        this.context.withModelAttribute(key, value);
-        return this;
+    public JtwigTemplate (File file) {
+        this.resource = new FileJtwigResource(file);
     }
 
-    public void output (OutputStream outputStream) throws ParseException, ComposeException, RenderException {
+    public void output (OutputStream outputStream, JtwigContext context) throws ParseException, CompileException, RenderException {
         JtwigParser.parse(resource)
-                .compose(resource)
+                .compile(resource)
                 .render(outputStream, context);
     }
 
 
-    public Content compile () throws ParseException, ComposeException {
-        return JtwigParser.parse(resource).compose(resource);
+    public Content compile () throws ParseException, CompileException {
+        return JtwigParser.parse(resource).compile(resource);
     }
 }

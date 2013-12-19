@@ -17,17 +17,17 @@
 package com.lyncode.jtwig.tree.content;
 
 import com.lyncode.jtwig.JtwigContext;
-import com.lyncode.jtwig.exception.ComposeException;
+import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.RenderException;
 import com.lyncode.jtwig.resource.JtwigResource;
-import com.lyncode.jtwig.tree.api.Composable;
+import com.lyncode.jtwig.tree.api.Compilable;
 import com.lyncode.jtwig.tree.api.Renderable;
 import com.lyncode.jtwig.tree.helper.ElementList;
 import com.lyncode.jtwig.tree.structural.BlockExpression;
 
 import java.io.OutputStream;
 
-public class Content extends ElementList implements Renderable, Composable<Content> {
+public class Content extends ElementList implements Renderable, Compilable<Content> {
     @Override
     public boolean render(OutputStream outputStream, JtwigContext context) throws RenderException {
         for (Object obj : getList()) {
@@ -39,16 +39,16 @@ public class Content extends ElementList implements Renderable, Composable<Conte
     }
 
     @Override
-    public Content compose(JtwigResource resource) throws ComposeException {
+    public Content compile(JtwigResource resource) throws CompileException {
         for (int i=0;i<getList().size();i++) {
-            if (getList().get(i) instanceof Composable)
-                getList().set(i, ((Composable) getList().get(i)).compose(resource));
+            if (getList().get(i) instanceof Compilable)
+                getList().set(i, ((Compilable) getList().get(i)).compile(resource));
         }
         return this;
     }
 
     @Override
-    public boolean replace(BlockExpression expression) throws ComposeException {
+    public boolean replace(BlockExpression expression) throws CompileException {
         boolean replaced = false;
         for (int i=0;i<getList().size();i++) {
             if (getList().get(i) instanceof BlockExpression) {
@@ -58,8 +58,8 @@ public class Content extends ElementList implements Renderable, Composable<Conte
                     replaced = true;
                 }
             }
-            else if (getList().get(i) instanceof Composable)
-                replaced = replaced || ((Composable) getList().get(i)).replace(expression);
+            else if (getList().get(i) instanceof Compilable)
+                replaced = replaced || ((Compilable) getList().get(i)).replace(expression);
         }
         return replaced;
     }

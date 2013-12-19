@@ -18,10 +18,10 @@ package com.lyncode.jtwig.tree.content;
 
 import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.exception.CalculateException;
-import com.lyncode.jtwig.exception.ComposeException;
+import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.RenderException;
 import com.lyncode.jtwig.resource.JtwigResource;
-import com.lyncode.jtwig.tree.api.Composable;
+import com.lyncode.jtwig.tree.api.Compilable;
 import com.lyncode.jtwig.tree.api.Renderable;
 import com.lyncode.jtwig.tree.structural.BlockExpression;
 
@@ -31,7 +31,7 @@ import java.util.List;
 
 import static com.lyncode.jtwig.util.BooleanOperations.isTrue;
 
-public class IfExpression implements Renderable, Composable<IfExpression> {
+public class IfExpression implements Renderable, Compilable<IfExpression> {
     private Object conditionalExpression;
     private Content content;
     private ElseExpression elseExpression = null;
@@ -93,19 +93,19 @@ public class IfExpression implements Renderable, Composable<IfExpression> {
     }
 
     @Override
-    public IfExpression compose(JtwigResource resource) throws ComposeException {
-        this.content = content.compose(resource);
+    public IfExpression compile(JtwigResource resource) throws CompileException {
+        this.content = content.compile(resource);
         for (int i = 0;i<this.elseIfExpressions.size();i++)
-            elseIfExpressions.set(i, elseIfExpressions.get(i).compose(resource));
+            elseIfExpressions.set(i, elseIfExpressions.get(i).compile(resource));
 
         if (elseExpression != null)
-            elseExpression = elseExpression.compose(resource);
+            elseExpression = elseExpression.compile(resource);
 
         return this;
     }
 
     @Override
-    public boolean replace(BlockExpression expression) throws ComposeException {
+    public boolean replace(BlockExpression expression) throws CompileException {
         boolean replaced = this.content.replace(expression);
 
         for (int i = 0;i<this.elseIfExpressions.size();i++)
@@ -117,7 +117,7 @@ public class IfExpression implements Renderable, Composable<IfExpression> {
         return replaced;
     }
 
-    public static class ElseIfExpression implements Renderable, Composable<ElseIfExpression> {
+    public static class ElseIfExpression implements Renderable, Compilable<ElseIfExpression> {
         private Object condition;
         private Content content;
 
@@ -147,18 +147,18 @@ public class IfExpression implements Renderable, Composable<IfExpression> {
         }
 
         @Override
-        public ElseIfExpression compose(JtwigResource resource) throws ComposeException {
-            content = content.compose(resource);
+        public ElseIfExpression compile(JtwigResource resource) throws CompileException {
+            content = content.compile(resource);
             return this;
         }
 
         @Override
-        public boolean replace(BlockExpression expression) throws ComposeException {
+        public boolean replace(BlockExpression expression) throws CompileException {
             return content.replace(expression);
         }
     }
 
-    public static class ElseExpression implements Renderable, Composable<ElseExpression> {
+    public static class ElseExpression implements Renderable, Compilable<ElseExpression> {
         private Content content;
 
         public ElseExpression(Content content) {
@@ -172,13 +172,13 @@ public class IfExpression implements Renderable, Composable<IfExpression> {
         }
 
         @Override
-        public ElseExpression compose(JtwigResource resource) throws ComposeException {
-            content = content.compose(resource);
+        public ElseExpression compile(JtwigResource resource) throws CompileException {
+            content = content.compile(resource);
             return this;
         }
 
         @Override
-        public boolean replace(BlockExpression expression) throws ComposeException {
+        public boolean replace(BlockExpression expression) throws CompileException {
             return content.replace(expression);
         }
     }

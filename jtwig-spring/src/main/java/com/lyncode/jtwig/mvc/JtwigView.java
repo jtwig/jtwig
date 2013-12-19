@@ -19,7 +19,7 @@ package com.lyncode.jtwig.mvc;
 import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.JtwigModelMap;
 import com.lyncode.jtwig.JtwigTemplate;
-import com.lyncode.jtwig.exception.ComposeException;
+import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.ParseException;
 import com.lyncode.jtwig.resource.WebJtwigResource;
 import com.lyncode.jtwig.tree.content.Content;
@@ -90,7 +90,7 @@ public class JtwigView extends AbstractTemplateView {
         getContent(request).render(response.getOutputStream(), new JtwigContext(modelMap, getInstance()));
     }
 
-    public Content getContent(HttpServletRequest request) throws ComposeException, ParseException {
+    public Content getContent(HttpServletRequest request) throws CompileException, ParseException {
         if (getViewResolver().isCached()) {
             if (!compiledTemplates.containsKey(getUrl())) {
                 compiledTemplates.put(getUrl(), getCompiledJtwigTemplate(request));
@@ -100,7 +100,7 @@ public class JtwigView extends AbstractTemplateView {
         return getCompiledJtwigTemplate(request);
     }
 
-    private Content getCompiledJtwigTemplate(HttpServletRequest request) throws ParseException, ComposeException {
+    private Content getCompiledJtwigTemplate(HttpServletRequest request) throws ParseException, CompileException {
         return new JtwigTemplate(new WebJtwigResource(request.getSession().getServletContext(), getUrl())).compile();
     }
 

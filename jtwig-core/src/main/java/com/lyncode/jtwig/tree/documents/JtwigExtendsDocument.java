@@ -16,7 +16,7 @@
 
 package com.lyncode.jtwig.tree.documents;
 
-import com.lyncode.jtwig.exception.ComposeException;
+import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.ParseException;
 import com.lyncode.jtwig.exception.ResourceException;
 import com.lyncode.jtwig.parser.JtwigParser;
@@ -42,28 +42,28 @@ public class JtwigExtendsDocument implements JtwigDocument {
     }
 
     @Override
-    public Content compose(JtwigResource resource) throws ComposeException {
+    public Content compile(JtwigResource resource) throws CompileException {
         try {
             for (int i = 0; i < blocks.size(); i++)
-                blocks.set(i, blocks.get(i).compose(resource));
+                blocks.set(i, blocks.get(i).compile(resource));
 
             JtwigResource jtwigResource = resource.resolve(extendsExpression.getPath());
 
-            Content content = JtwigParser.parse(jtwigResource).compose(jtwigResource);
+            Content content = JtwigParser.parse(jtwigResource).compile(jtwigResource);
             for (BlockExpression expression : blocks) {
                 content.replace(expression);
             }
 
             return content;
         } catch (ResourceException e) {
-            throw new ComposeException(e);
+            throw new CompileException(e);
         } catch (ParseException e) {
-            throw new ComposeException(e);
+            throw new CompileException(e);
         }
     }
 
     @Override
-    public boolean replace(BlockExpression expression) throws ComposeException {
+    public boolean replace(BlockExpression expression) throws CompileException {
         boolean replaced = false;
         for (BlockExpression container : blocks)
             replaced = replaced || container.replace(expression);

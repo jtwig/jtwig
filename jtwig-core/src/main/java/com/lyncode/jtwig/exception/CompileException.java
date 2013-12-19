@@ -14,13 +14,21 @@
  * limitations under the License.
  */
 
-package com.lyncode.jtwig.tree.api;
+package com.lyncode.jtwig.exception;
 
-import com.lyncode.jtwig.exception.ComposeException;
-import com.lyncode.jtwig.resource.JtwigResource;
-import com.lyncode.jtwig.tree.structural.BlockExpression;
+public class CompileException extends Exception {
+    public CompileException() {
+    }
 
-public interface Composable<T extends Renderable> {
-    T compose (JtwigResource resource) throws ComposeException;
-    boolean replace (BlockExpression expression) throws ComposeException;
+    public CompileException(String message) {
+        super(message);
+    }
+
+    public CompileException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public CompileException(Throwable cause) {
+        super(cause);
+    }
 }

@@ -30,13 +30,14 @@ import static org.mockito.Mockito.when;
 
 public class JtwigTemplateTest {
     private JtwigResource resource = mock(JtwigResource.class);
+    private JtwigContext context = new JtwigContext();
     private JtwigTemplate underTest = new JtwigTemplate(resource);
     private ByteArrayOutputStream outputStream;
 
     @Test
     public void testRootDocument() throws Exception {
         when(resource.retrieve()).thenReturn(new ByteArrayInputStream("joao".getBytes()));
-        underTest.output(toTheOutputStream());
+        underTest.output(toTheOutputStream(), context);
 
         assertThat(theOutput(), is("joao"));
     }
@@ -50,7 +51,7 @@ public class JtwigTemplateTest {
         when(resource.resolve("test")).thenReturn(joaoResource);
         when(joaoResource.retrieve()).thenReturn(new ByteArrayInputStream("I am {% block joao %}no one{% endblock %}".getBytes()));
 
-        underTest.output(toTheOutputStream());
+        underTest.output(toTheOutputStream(), context);
 
         assertThat(theOutput(), is("I am joao"));
     }
@@ -70,7 +71,7 @@ public class JtwigTemplateTest {
         when(oneResource.resolve("root")).thenReturn(twoResource);
         when(twoResource.retrieve()).thenReturn(new ByteArrayInputStream("Block {% block one %}1{% endblock %} and {% block two %}2{% endblock %}".getBytes()));
 
-        underTest.output(toTheOutputStream());
+        underTest.output(toTheOutputStream(), context);
 
         assertThat(theOutput(), is("Block one and two"));
     }

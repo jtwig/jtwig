@@ -16,9 +16,9 @@
 
 package com.lyncode.jtwig.tree.documents;
 
-import com.lyncode.jtwig.tree.api.Composable;
+import com.lyncode.jtwig.tree.api.Compilable;
 import com.lyncode.jtwig.tree.content.Content;
 
-public interface JtwigDocument extends Composable<Content> {
+public interface JtwigDocument extends Compilable<Content> {
 
 }
