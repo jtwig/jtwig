@@ -16,9 +16,7 @@
 
 package com.lyncode.jtwig.mvc;
 
-import com.lyncode.jtwig.theme.ThemePrefixResolver;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.servlet.ThemeResolver;
+import com.lyncode.jtwig.services.theme.ThemePrefixResolver;
 import org.springframework.web.servlet.view.AbstractTemplateViewResolver;
 
 import java.io.File;
@@ -39,9 +37,6 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
     private String theme;
     private boolean cached;
     private ThemePrefixResolver prefixResolver;
-
-    @Autowired(required = false)
-    private ThemeResolver themeResolver;
 
     public JtwigViewResolver() {
         this.prefixResolver = defaultPrefixResolver();
@@ -74,7 +69,7 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
     }
 
     public boolean hasTheme() {
-        return isNotBlank(theme) && themeResolver == null;
+        return isNotBlank(theme);
     }
 
     public void setCached(boolean cached) {

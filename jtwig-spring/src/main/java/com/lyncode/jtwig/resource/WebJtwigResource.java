@@ -19,22 +19,26 @@ package com.lyncode.jtwig.resource;
 import com.lyncode.jtwig.exception.ResourceException;
 
 import javax.servlet.ServletContext;
+import java.io.File;
 import java.io.InputStream;
 
 public class WebJtwigResource implements JtwigResource {
-
+    private ServletContext servletContext;
+    private String url;
 
     public WebJtwigResource(ServletContext servletContext, String url) {
-        //To change body of created methods use File | Settings | File Templates.
+        this.servletContext = servletContext;
+        this.url = url;
     }
 
     @Override
     public InputStream retrieve() throws ResourceException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return servletContext.getResourceAsStream(url);
     }
 
     @Override
     public JtwigResource resolve(String relativePath) throws ResourceException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        String relativeUrl = new File(new File(url).getParent(), relativePath).getPath();
+        return new WebJtwigResource(servletContext, relativeUrl);
     }
 }

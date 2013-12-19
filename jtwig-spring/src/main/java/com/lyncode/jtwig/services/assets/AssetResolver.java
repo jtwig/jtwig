@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-package com.lyncode.jtwig.theme;
+package com.lyncode.jtwig.services.assets;
 
-public interface ThemePrefixResolver {
-    String getPrefix (String prefix, String theme);
+public interface AssetResolver {
+
 }

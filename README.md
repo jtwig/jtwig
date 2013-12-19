@@ -1,40 +1,14 @@
 # JTwig 2.0 Beta
 
-*JTwig is a template mechanism, inspired in [Twig](http://twig.sensiolabs.org/) (PHP), for [SpringFramework Web MVC](http://www.springsource.org) (Java).*
+*JTwig is a template mechanism, inspired in [Twig](http://twig.sensiolabs.org/) (PHP) for Java, with support for [SpringFramework Web MVC](http://www.springsource.org).*
 
 ### Build Status
 
 [![Build Status](https://travis-ci.org/lyncode/jtwig.png)](https://travis-ci.org/lyncode/jtwig)
 
-### Architecture
+### Documentation
 
-JTwig architecture is really simple. It consists of a [Parboiled Parser](https://github.com/sirthias/parboiled), that processes the template. After assembling all Extends and Includes macros, it renders the output.
-
-### Example
-
-File: layout.twig
-<pre><code>&lt;html&gt;
-	&lt;head&gt;
-		&lt;title&gt;{% block title %}Unknown{% endblock %}&lt;/title&gt;
-	&lt;/head&gt;
-	&lt;body&gt;
-		&lt;h1&gt;This is a test&lt;/h1&gt;
-		{% block content %}
-		No content defined
-		{% endblock %}
-	&lt;/body&gt;
-&lt;/html&gt;
-</code></pre>
-
-File: hello.twig
-<pre><code>{% extends 'layout.twig' %}
-{% block title %}Hello World Page{% endblock %}
-{% block content %}
-&lt;p&gt;Hello World&lt;/p&gt;
-{% endblock %}
-</code></pre>
-
-The wiki contains more [documentation](/lyncode/jtwig/wiki).
+Look the wiki for [documentation](/lyncode/jtwig/wiki).
 
 ----------
 

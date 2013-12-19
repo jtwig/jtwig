@@ -32,7 +32,11 @@ public class Translate implements Function {
     @Override
     public Object execute(Object... arguments) throws FunctionException {
         ApplicationContext applicationContext = getApplicationContext();
+        if (applicationContext == null) throw new FunctionException("Unable to get the application context from local thread. Are you using spring framework?");
+
         MessageSource messageSource = getMessageSource(applicationContext);
+
+
 
         if (arguments.length < 1) throw new FunctionException("Expecting at least one argument");
         else {
