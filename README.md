@@ -8,14 +8,14 @@
 
 ### Documentation
 
-Look the wiki for [documentation](/lyncode/jtwig/wiki).
+Look the wiki for [documentation](https://github.com/lyncode/jtwig/wiki).
 
 ----------
 
 ### License
 
 
-Copyright 2012 **Lyncode**
+Copyright 2013 **Lyncode**
 
 Licensed under the Apache License, Version 2.0 (the "License"); 
 you may not use this file except in compliance with the License. You may obtain a copy of the License at
