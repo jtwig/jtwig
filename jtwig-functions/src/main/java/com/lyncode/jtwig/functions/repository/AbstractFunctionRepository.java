@@ -36,7 +36,7 @@ public abstract class AbstractFunctionRepository {
                 new FunctionDeclaration(new Join(), "join"),
 
                 // Cast functions
-                new FunctionDeclaration(new ToDouble(), "toDouble"),
+                new FunctionDeclaration(new ToDouble(), "toDouble", "toFloat"),
                 new FunctionDeclaration(new ToInt(), "toInt")
         );
         addFunctions(functions);
