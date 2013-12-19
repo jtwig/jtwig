@@ -18,6 +18,8 @@ package com.lyncode.jtwig.functions.repository;
 
 import com.lyncode.jtwig.functions.Function;
 import com.lyncode.jtwig.functions.exceptions.FunctionNotFoundException;
+import com.lyncode.jtwig.functions.internal.cast.ToDouble;
+import com.lyncode.jtwig.functions.internal.cast.ToInt;
 import com.lyncode.jtwig.functions.internal.string.Concatenate;
 import com.lyncode.jtwig.functions.internal.string.Join;
 
@@ -29,8 +31,13 @@ public abstract class AbstractFunctionRepository {
 
     public AbstractFunctionRepository(FunctionDeclaration... functions) {
         addFunctions(
+                // String functions
                 new FunctionDeclaration(new Concatenate(), "concat", "concatenate"),
-                new FunctionDeclaration(new Join(), "join")
+                new FunctionDeclaration(new Join(), "join"),
+
+                // Cast functions
+                new FunctionDeclaration(new ToDouble(), "toDouble"),
+                new FunctionDeclaration(new ToInt(), "toInt")
         );
         addFunctions(functions);
     }
