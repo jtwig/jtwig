@@ -19,6 +19,7 @@ package com.lyncode.jtwig.functions.repository;
 import com.lyncode.jtwig.functions.Function;
 import com.lyncode.jtwig.functions.exceptions.FunctionNotFoundException;
 import com.lyncode.jtwig.functions.internal.string.Concatenate;
+import com.lyncode.jtwig.functions.internal.string.Join;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +29,8 @@ public abstract class AbstractFunctionRepository {
 
     public AbstractFunctionRepository(FunctionDeclaration... functions) {
         addFunctions(
-                new FunctionDeclaration(new Concatenate(), "concat")
+                new FunctionDeclaration(new Concatenate(), "concat", "concatenate"),
+                new FunctionDeclaration(new Join(), "join")
         );
         addFunctions(functions);
     }
