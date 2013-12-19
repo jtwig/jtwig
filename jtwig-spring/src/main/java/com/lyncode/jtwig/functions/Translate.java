@@ -36,8 +36,6 @@ public class Translate implements Function {
 
         MessageSource messageSource = getMessageSource(applicationContext);
 
-
-
         if (arguments.length < 1) throw new FunctionException("Expecting at least one argument");
         else {
             HttpServletRequest request = getServletRequest();

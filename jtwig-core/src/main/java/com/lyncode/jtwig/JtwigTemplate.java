@@ -25,6 +25,7 @@ import com.lyncode.jtwig.resource.JtwigResource;
 import com.lyncode.jtwig.resource.StringJtwigResource;
 import com.lyncode.jtwig.tree.content.Content;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.OutputStream;
 
@@ -47,6 +48,12 @@ public class JtwigTemplate {
         JtwigParser.parse(resource)
                 .compile(resource)
                 .render(outputStream, context);
+    }
+
+    public String output (JtwigContext context) throws ParseException, CompileException, RenderException {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        output(outputStream, context);
+        return outputStream.toString();
     }
 
 

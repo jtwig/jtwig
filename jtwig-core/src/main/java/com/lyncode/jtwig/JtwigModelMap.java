@@ -17,6 +17,7 @@
 package com.lyncode.jtwig;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 public class JtwigModelMap {
@@ -38,5 +39,17 @@ public class JtwigModelMap {
     public JtwigModelMap add(Map<String, Object> model) {
         model.putAll(model);
         return this;
+    }
+
+    public String toString () {
+        StringBuilder builder = new StringBuilder().append("{");
+        Iterator<String> keys = model.keySet().iterator();
+        while (keys.hasNext()) {
+            String key = keys.next();
+            builder.append(key).append(" = ").append(model.get(key));
+            if (keys.hasNext()) builder.append(", ");
+        }
+        builder.append("}");
+        return builder.toString();
     }
 }

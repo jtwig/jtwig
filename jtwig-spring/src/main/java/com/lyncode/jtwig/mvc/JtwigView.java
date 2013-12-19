@@ -79,7 +79,7 @@ public class JtwigView extends AbstractTemplateView {
 
         if (log.isDebugEnabled()) {
             log.debug("Rendering Jtwig template [" + getUrl() + "] in JtwigView '" + getBeanName() + "'");
-            log.debug("Model: "+model);
+            log.debug("Model: "+modelMap);
         }
 
 
