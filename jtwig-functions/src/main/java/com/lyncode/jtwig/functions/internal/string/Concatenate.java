@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.lyncode.jtwig.functions.internal;
+package com.lyncode.jtwig.functions.internal.string;
 
 import com.lyncode.jtwig.functions.Function;
 import com.lyncode.jtwig.functions.exceptions.FunctionException;
@@ -24,7 +24,8 @@ public class Concatenate implements Function {
     public Object execute(Object... arguments) throws FunctionException {
         String result = "";
         for (Object obj : arguments)
-            result += obj.toString();
+            if (obj != null)
+                result += obj.toString();
 
         return result;
     }

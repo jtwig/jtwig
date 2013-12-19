@@ -18,7 +18,7 @@ package com.lyncode.jtwig.functions.repository;
 
 import com.lyncode.jtwig.functions.Function;
 import com.lyncode.jtwig.functions.exceptions.FunctionNotFoundException;
-import com.lyncode.jtwig.functions.internal.Concatenate;
+import com.lyncode.jtwig.functions.internal.string.Concatenate;
 
 import java.util.HashMap;
 import java.util.Map;
