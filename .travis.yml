@@ -1,1 +1,2 @@
 language: java
+after_failure: "cat /home/travis/build/lyncode/jtwig/jtwig-functions/target/invoker/*"
