@@ -51,6 +51,7 @@
         <module>jtwig-functions</module>
         <module>jtwig-core-test</module>
         <module>jtwig-spring</module>
+        <module>jtwig-spring-test</module>
     </modules>
 
     <build>
