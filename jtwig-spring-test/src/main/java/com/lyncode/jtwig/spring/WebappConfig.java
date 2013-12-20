@@ -18,9 +18,13 @@ package com.lyncode.jtwig.spring;
 
 import com.lyncode.jtwig.controller.DynamicController;
 import com.lyncode.jtwig.mvc.JtwigViewResolver;
+import com.lyncode.jtwig.services.api.ModelMapFiller;
 import com.lyncode.jtwig.services.api.ViewShownResolver;
+import com.lyncode.jtwig.services.api.assets.AssetResolver;
 import com.lyncode.jtwig.services.impl.InMemoryMessageSource;
+import com.lyncode.jtwig.services.impl.TestModelMapFiller;
 import com.lyncode.jtwig.services.impl.TestViewShownResolver;
+import com.lyncode.jtwig.services.impl.assets.BaseAssetResolver;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -44,6 +48,7 @@ public class WebappConfig extends WebMvcConfigurerAdapter {
         viewResolver.setEncoding("UTF-8");
         viewResolver.setPrefix("/WEB-INF/views/");
         viewResolver.setSuffix(".twig.html");
+        viewResolver.setTheme("default");
         return viewResolver;
     }
 
@@ -66,5 +71,17 @@ public class WebappConfig extends WebMvcConfigurerAdapter {
     @Bean
     public MessageSource messageSource () {
         return new InMemoryMessageSource();
+    }
+
+    @Bean
+    public ModelMapFiller modelMapFiller () {
+        return new TestModelMapFiller();
+    }
+
+    @Bean
+    public AssetResolver assetResolver () {
+        BaseAssetResolver baseAssetResolver = new BaseAssetResolver();
+        baseAssetResolver.setPrefix("public");
+        return baseAssetResolver;
     }
 }

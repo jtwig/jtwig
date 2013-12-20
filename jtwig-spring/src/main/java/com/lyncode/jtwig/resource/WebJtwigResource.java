@@ -34,7 +34,7 @@ public class WebJtwigResource implements JtwigResource {
     @Override
     public InputStream retrieve() throws ResourceException {
         InputStream resourceAsStream = servletContext.getResourceAsStream(url);
-        if (resourceAsStream == null) throw new ResourceException("Resource not found");
+        if (resourceAsStream == null) throw new ResourceException("Resource "+url+" not found");
         return resourceAsStream;
     }
 

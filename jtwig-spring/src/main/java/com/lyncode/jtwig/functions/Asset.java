@@ -16,37 +16,27 @@
 
 package com.lyncode.jtwig.functions;
 
+import com.lyncode.jtwig.exceptions.AssetResolveException;
 import com.lyncode.jtwig.functions.exceptions.FunctionException;
+import com.lyncode.jtwig.services.api.assets.AssetResolver;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
-import org.springframework.web.servlet.LocaleResolver;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Locale;
 
-import static com.lyncode.jtwig.util.LocalThreadHolder.getServletRequest;
-import static java.util.Arrays.copyOfRange;
-
-public class Translate extends AutowiredFunction {
+public class Asset extends AutowiredFunction {
     @Autowired
-    private MessageSource messageSource;
-
-    @Autowired
-    private LocaleResolver localeResolver;
+    private AssetResolver assetResolver;
 
     @Autowired
     private HttpServletRequest request;
 
     @Override
-    public Object call(Object... arguments) throws FunctionException {
-
-        if (arguments.length < 1) throw new FunctionException("Expecting at least one argument");
-        else {
-            HttpServletRequest request = getServletRequest();
-            Locale locale = localeResolver.resolveLocale(request);
-            Object[] parameters = copyOfRange(arguments, 1, arguments.length);
-
-            return messageSource.getMessage(String.valueOf(arguments[0]), parameters, locale);
+    protected Object call(Object... arguments) throws FunctionException {
+        if (arguments.length != 1) throw new FunctionException("Invalid number of arguments");
+        try {
+            return request.getContextPath() + assetResolver.resolve(arguments[0].toString());
+        } catch (AssetResolveException e) {
+            throw new FunctionException(e);
         }
     }
 }

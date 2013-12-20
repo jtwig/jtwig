@@ -14,8 +14,21 @@
  * limitations under the License.
  */
 
-package com.lyncode.jtwig.services.theme;
+package com.lyncode.jtwig.exceptions;
 
-public interface ThemePrefixResolver {
-    String getPrefix (String prefix, String theme);
+public class AssetResolveException  extends Exception {
+    public AssetResolveException() {
+    }
+
+    public AssetResolveException(String message) {
+        super(message);
+    }
+
+    public AssetResolveException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public AssetResolveException(Throwable cause) {
+        super(cause);
+    }
 }

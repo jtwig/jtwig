@@ -14,32 +14,30 @@
  * limitations under the License.
  */
 
-package com.lyncode.acceptance.translate;
+package com.lyncode.jtwig.services.impl;
 
-import com.lyncode.acceptance.AbstractViewTest;
 import com.lyncode.jtwig.services.api.ModelMapFiller;
-import com.lyncode.jtwig.services.impl.InMemoryMessageSource;
-import org.hamcrest.Matcher;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ui.ModelMap;
 
-import static org.hamcrest.CoreMatchers.is;
-
-public class ExistentCodeTest extends AbstractViewTest {
-    @Autowired
-    private InMemoryMessageSource messageSource;
+public class TestModelMapFiller implements ModelMapFiller {
+    private ModelMap modelMap = new ModelMap();
 
     @Override
-    protected void given(ModelMapFiller modelMap) {
-        messageSource.add("test", "Hi {0}");
+    public ModelMapFiller addAttribute(String key, Object value) {
+        modelMap.addAttribute(key, value);
+        return this;
     }
 
     @Override
-    protected String forView() {
-        return "translate/existent-code";
+    public void fillModelMap(ModelMap modelMap) {
+        for (String key : this.modelMap.keySet())
+            modelMap.addAttribute(key, this.modelMap.get(key));
     }
 
     @Override
-    protected Matcher<? super String> contentMatcher() {
-        return is("Hi JTwig");
+    public void clean() {
+        modelMap.clear();
     }
+
+
 }

@@ -16,9 +16,11 @@
 
 package com.lyncode.jtwig.controller;
 
+import com.lyncode.jtwig.services.api.ModelMapFiller;
 import com.lyncode.jtwig.services.api.ViewShownResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
@@ -26,8 +28,12 @@ public class DynamicController {
     @Autowired
     private ViewShownResolver viewShownResolver;
 
+    @Autowired
+    private ModelMapFiller filler;
+
     @RequestMapping("/")
-    public String index () {
+    public String index (ModelMap model) {
+        filler.fillModelMap(model);
         return viewShownResolver.getView();
     }
 }

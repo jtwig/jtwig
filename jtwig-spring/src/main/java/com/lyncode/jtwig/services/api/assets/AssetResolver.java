@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-package com.lyncode.jtwig.services.assets;
+package com.lyncode.jtwig.services.api.assets;
+
+import com.lyncode.jtwig.exceptions.AssetResolveException;
 
 public interface AssetResolver {
-
+    String resolve(String asset) throws AssetResolveException;
 }

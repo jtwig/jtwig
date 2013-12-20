@@ -16,7 +16,7 @@
 
 package com.lyncode.jtwig.mvc;
 
-import com.lyncode.jtwig.services.theme.ThemePrefixResolver;
+import com.lyncode.jtwig.services.api.theme.ThemePrefixResolver;
 import org.springframework.web.servlet.view.AbstractTemplateViewResolver;
 
 import java.io.File;
@@ -57,7 +57,10 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
     }
 
     private String getPrefixWithTheme() {
-        return prefixResolver.getPrefix(super.getPrefix(), getTheme());
+        String prefix = prefixResolver.getPrefix(super.getPrefix(), getTheme());
+        if (super.getPrefix().endsWith(File.separator))
+            prefix += File.separator;
+        return prefix;
     }
 
     public boolean isCached() {

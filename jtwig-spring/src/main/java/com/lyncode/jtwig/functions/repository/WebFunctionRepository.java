@@ -16,6 +16,7 @@
 
 package com.lyncode.jtwig.functions.repository;
 
+import com.lyncode.jtwig.functions.Asset;
 import com.lyncode.jtwig.functions.Translate;
 
 public class WebFunctionRepository extends AbstractFunctionRepository {
@@ -28,7 +29,8 @@ public class WebFunctionRepository extends AbstractFunctionRepository {
 
     public WebFunctionRepository () {
         super(
-            new FunctionDeclaration(new Translate(), "translate", "message", "trans")
+            new FunctionDeclaration(new Translate(), "translate", "message", "trans"),
+            new FunctionDeclaration(new Asset(), "asset")
         );
     }
 }

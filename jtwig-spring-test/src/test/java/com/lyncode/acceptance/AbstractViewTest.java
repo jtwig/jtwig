@@ -16,6 +16,7 @@
 
 package com.lyncode.acceptance;
 
+import com.lyncode.jtwig.services.api.ModelMapFiller;
 import com.lyncode.jtwig.services.api.ViewShownResolver;
 import com.lyncode.jtwig.spring.WebappConfig;
 import org.hamcrest.Matcher;
@@ -46,22 +47,27 @@ public abstract class AbstractViewTest {
     @Autowired
     private WebApplicationContext webApplicationContext;
 
+    @Autowired
+    private ModelMapFiller filler;
+
 
     @Before
     public void setUp() {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-        prepare();
     }
 
-    protected abstract void prepare ();
-    protected abstract String view ();
-    protected abstract Matcher<? super String> matches ();
+    protected abstract void given(ModelMapFiller modelMap);
+    protected abstract String forView();
+    protected abstract Matcher<? super String> contentMatcher();
 
     @Test
     public void test () throws Exception {
-        viewShownResolver.setView(view());
+        filler.clean();
+        given(filler);
+
+        viewShownResolver.setView(forView());
 
         mockMvc.perform(get("/"))
-                .andExpect(content().string(matches()));
+                .andExpect(content().string(contentMatcher()));
     }
 }
