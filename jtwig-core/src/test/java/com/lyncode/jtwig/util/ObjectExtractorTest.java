@@ -18,10 +18,13 @@ package com.lyncode.jtwig.util;
 
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class ObjectExtractorTest {
@@ -32,5 +35,13 @@ public class ObjectExtractorTest {
         ObjectExtractor underTest = new ObjectExtractor(map);
 
         assertThat(underTest.extract("key"), is((Object) "value"));
+    }
+
+    @Test
+    public void shouldExtractFromInheritedMethod () throws ObjectExtractor.ExtractException {
+        List<String> list = new ArrayList<String>();
+        ObjectExtractor underTest = new ObjectExtractor(list);
+
+        assertThat(underTest.extract("tostring"), is(notNullValue()));
     }
 }
