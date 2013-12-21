@@ -472,13 +472,13 @@ public class JtwigParser extends BaseParser<Object> {
 
     protected Rule Primary() {
         return FirstOf(
+                Composition(),
                 Sequence(
                         FreeSymbol(OPEN_PARENT),
                         Expression(),
                         Spacing(),
                         Symbol(CLOSE_PARENT)
                 ),
-                Composition(),
                 BasicExpression()
         );
     }
@@ -534,7 +534,7 @@ public class JtwigParser extends BaseParser<Object> {
     protected Rule FunctionWithBrackets() {
         return Sequence(
                 Identifier(),
-                Optional(Spacing()),
+                Spacing(),
                 push(new FunctionElement((String) pop())),
                 FreeSymbol(OPEN_PARENT),
                 Optional(Arguments()),
@@ -553,12 +553,12 @@ public class JtwigParser extends BaseParser<Object> {
 
     protected Rule Arguments() {
         return Sequence(
-                BasicExpression(),
+                Primary(),
                 Spacing(),
                 ((Argumentable) peek(1)).add(pop()),
                 ZeroOrMore(
                         FreeSymbol(COMMA),
-                        BasicExpression(),
+                        Primary(),
                         Spacing(),
                         ((Argumentable) peek(1)).add(pop())
                 )

@@ -248,6 +248,12 @@ public class JtwigParserTest {
         assertThat(value.getArguments(), hasElement(123));
         assertThat(value.getArguments(), hasElement(234));
     }
+    @Test
+    public void shouldMatchNestedFunction () {
+        FunctionElement value = parse(underTest.Function(), "joao(teste(213,123),234)", FunctionElement.class);
+        assertThat(value.getName(), is("joao"));
+        assertThat(value.getArguments(), hasElement(234));
+    }
 
     @Test
     public void shouldNotMatchInlineMapNeitherHaveMapOnTopOfTheStack () {
