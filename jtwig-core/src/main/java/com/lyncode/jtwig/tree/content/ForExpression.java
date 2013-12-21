@@ -121,4 +121,8 @@ public class ForExpression implements Renderable, Compilable<ForExpression> {
             return iterator.next();
         }
     }
+
+    public String toString () {
+        return "For each element of "+list + " render " + content;
+    }
 }

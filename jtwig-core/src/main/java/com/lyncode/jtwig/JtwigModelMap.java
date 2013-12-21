@@ -37,7 +37,7 @@ public class JtwigModelMap {
     }
 
     public JtwigModelMap add(Map<String, Object> model) {
-        model.putAll(model);
+        this.model.putAll(model);
         return this;
     }
 

@@ -73,4 +73,8 @@ public class FastExpression implements Renderable {
             throw new RenderException(e);
         }
     }
+
+    public String toString () {
+        return "Render the result of "+expression;
+    }
 }
