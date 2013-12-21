@@ -26,8 +26,8 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
+import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.getAllMethods;
-import static org.reflections.ReflectionUtils.getFields;
 
 public class ObjectExtractor {
     private Object context;
@@ -71,7 +71,7 @@ public class ObjectExtractor {
         return new Callable() {
             @Override
             public Result<Object> execute(String name, Object... args) {
-                Set<Field> fields = getFields(context.getClass(), fieldPredicate(name));
+                Set<Field> fields = getAllFields(context.getClass(), fieldPredicate(name));
                 if (!fields.isEmpty()) {
                     Iterator<Field> iterator = fields.iterator();
                     while (iterator.hasNext()) {

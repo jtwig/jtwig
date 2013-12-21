@@ -44,4 +44,22 @@ public class ObjectExtractorTest {
 
         assertThat(underTest.extract("tostring"), is(notNullValue()));
     }
+    @Test
+    public void shouldExtractFromInheritedField () throws ObjectExtractor.ExtractException {
+        B b = new B();
+        b.a = "a";
+        b.b = "b";
+        ObjectExtractor underTest = new ObjectExtractor(b);
+
+        assertThat(underTest.extract("a"), is((Object) "a"));
+        assertThat(underTest.extract("b"), is((Object) "b"));
+    }
+
+    private static class A {
+        public String a;
+    }
+
+    private static class B extends A {
+        public String b;
+    }
 }
