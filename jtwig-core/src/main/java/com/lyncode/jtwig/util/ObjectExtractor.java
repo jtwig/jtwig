@@ -23,14 +23,11 @@ import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
+import static org.reflections.ReflectionUtils.getAllMethods;
 import static org.reflections.ReflectionUtils.getFields;
-import static org.reflections.ReflectionUtils.getMethods;
 
 public class ObjectExtractor {
     private Object context;
@@ -41,6 +38,9 @@ public class ObjectExtractor {
 
     public Object extract (final String name, Object... parameters) throws ExtractException {
         List<Callable> callables = new ArrayList<Callable>();
+        if (knownType(context))
+            return extractKnownType(name, parameters);
+
         if (parameters.length == 0)
             callables.add(tryField());
 
@@ -52,6 +52,19 @@ public class ObjectExtractor {
         }
 
         throw new ExtractException("Unable to find field or method "+name+" in "+context);
+    }
+
+    private Object extractKnownType(String name, Object... parameters) {
+        if (context instanceof Map) {
+            return ((Map) context).get(name);
+        }
+        return null;
+    }
+
+    private boolean knownType(Object context) {
+        if (context instanceof Map)
+            return true;
+        else return false;
     }
 
     private Callable tryField() {
@@ -94,10 +107,10 @@ public class ObjectExtractor {
                         "has"
                 };
 
-                Set<Method> methods = getMethods(context.getClass(), methodMatcher(equalToIgnoringCase(name), args.length));
+                Set<Method> methods = getAllMethods(context.getClass(), methodMatcher(equalToIgnoringCase(name), args.length));
                 int i = 0;
                 while (methods.isEmpty() && i < prefixes.length) {
-                    methods = getMethods(context.getClass(), methodMatcher(equalToIgnoringCase(prefixes[i++] + name), args.length));
+                    methods = getAllMethods(context.getClass(), methodMatcher(equalToIgnoringCase(prefixes[i++] + name), args.length));
                 }
 
                 if (methods.isEmpty()) return new Result<Object>();

@@ -524,12 +524,14 @@ public class JtwigParser extends BaseParser<Object> {
         );
     }
 
-    /**
-     * Pushes a Function
-     *
-     * @return
-     */
     protected Rule Function() {
+        return FirstOf(
+                FunctionWithBrackets(),
+                FunctionWithoutBrackets()
+        );
+    }
+
+    protected Rule FunctionWithBrackets() {
         return Sequence(
                 Identifier(),
                 Optional(Spacing()),
@@ -537,6 +539,15 @@ public class JtwigParser extends BaseParser<Object> {
                 FreeSymbol(OPEN_PARENT),
                 Optional(Arguments()),
                 FreeSymbol(CLOSE_PARENT)
+        );
+    }
+    protected Rule FunctionWithoutBrackets() {
+        return Sequence(
+                Identifier(),
+                Spacing(),
+                push(new FunctionElement((String) pop())),
+                Primary(),
+                (((FunctionElement) peek(1)).add(pop()))
         );
     }
 

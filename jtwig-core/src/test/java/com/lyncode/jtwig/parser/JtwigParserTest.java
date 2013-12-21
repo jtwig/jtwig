@@ -235,6 +235,13 @@ public class JtwigParserTest {
     }
 
     @Test
+    public void shouldMatchFunctionWithoutBrackets () {
+        FunctionElement value = parse(underTest.Function(), "joao 'test'", FunctionElement.class);
+        assertThat(value.getName(), is("joao"));
+        assertThat(value.getArguments(), hasElement(is("test")));
+    }
+
+    @Test
     public void shouldMatchFunction () {
         FunctionElement value = parse(underTest.Function(), "joao(123,234)", FunctionElement.class);
         assertThat(value.getName(), is("joao"));

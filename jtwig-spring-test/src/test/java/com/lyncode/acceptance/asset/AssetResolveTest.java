@@ -40,6 +40,6 @@ public class AssetResolveTest extends AbstractViewTest {
 
     @Override
     protected Matcher<? super String> contentMatcher() {
-        return is("public/"+jtwigViewResolver.getTheme()+"/test");
+        return is("/public/"+jtwigViewResolver.getTheme()+"/test");
     }
 }

@@ -16,28 +16,19 @@
 
 package com.lyncode.jtwig.functions;
 
-import com.lyncode.jtwig.exceptions.AssetResolveException;
 import com.lyncode.jtwig.functions.exceptions.FunctionException;
-import com.lyncode.jtwig.services.api.assets.AssetResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 
-public class Asset extends AutowiredFunction {
-    @Autowired
-    private AssetResolver assetResolver;
-
+public class Path extends AutowiredFunction {
     @Autowired
     private HttpServletRequest request;
 
     @Override
     protected Object call(Object... arguments) throws FunctionException {
         if (arguments.length != 1) throw new FunctionException("Invalid number of arguments");
-        try {
-            return new File(request.getContextPath(), assetResolver.resolve(arguments[0].toString())).getPath();
-        } catch (AssetResolveException e) {
-            throw new FunctionException(e);
-        }
+        else return new File(request.getContextPath(), arguments[0].toString()).getPath();
     }
 }
