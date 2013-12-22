@@ -61,4 +61,12 @@ public class ForExpressionTest {
         context.withModelAttribute("list", value);
         assertThat(template.output(context), is("First I: 1 R: 3 I: 2 R: 2 I: 3 R: 1 Last"));
     }
+
+    @Test
+    public void shouldNotOutputNothingIfListIsNull () throws ParseException, CompileException, RenderException {
+        JtwigTemplate template = new JtwigTemplate("{% for item in list %}a{% endfor %}");
+        JtwigContext context = new JtwigContext();
+        context.withModelAttribute("list", null);
+        assertThat(template.output(context), is(""));
+    }
 }

@@ -38,12 +38,12 @@ public class ForExpression implements Renderable, Compilable<ForExpression> {
     private List<FunctionElement> filters = new ArrayList<FunctionElement>();
     private Content content;
 
-    public ForExpression (Variable item, Object list) {
+    public ForExpression(Variable item, Object list) {
         this.item = item;
         this.list = list;
     }
 
-    public boolean add (FunctionElement function) {
+    public boolean add(FunctionElement function) {
         filters.add(function);
         return true;
     }
@@ -105,35 +105,36 @@ public class ForExpression implements Renderable, Compilable<ForExpression> {
 
         public ObjectIterator(Object context) {
             List<Object> list = new ArrayList<Object>();
-            if (context instanceof Iterable) {
-                Iterator iterator = ((Iterable) context).iterator();
-                while (iterator.hasNext())
-                    list.add(iterator.next());
-            } else if (context.getClass().isArray()) {
-                Object[] objects = (Object[]) context;
-                for (Object obj : objects)
-                    list.add(obj);
-            } else list.add(context);
-
+            if (context != null) {
+                if (context instanceof Iterable) {
+                    Iterator iterator = ((Iterable) context).iterator();
+                    while (iterator.hasNext())
+                        list.add(iterator.next());
+                } else if (context.getClass().isArray()) {
+                    Object[] objects = (Object[]) context;
+                    for (Object obj : objects)
+                        list.add(obj);
+                } else list.add(context);
+            }
             size = list.size();
             iterator = list.iterator();
         }
 
-        public boolean hasNext () {
+        public boolean hasNext() {
             return iterator.hasNext();
         }
 
-        public Object next () {
+        public Object next() {
             return iterator.next();
         }
 
-        public int size () {
+        public int size() {
             return size;
         }
     }
 
-    public String toString () {
-        return "For each element of "+list + " render " + content;
+    public String toString() {
+        return "For each element of " + list + " render " + content;
     }
 
     public static class Loop {
@@ -144,7 +145,7 @@ public class ForExpression implements Renderable, Compilable<ForExpression> {
             this.length = length;
         }
 
-        public void update (int index) {
+        public void update(int index) {
             this.index = index;
         }
 
