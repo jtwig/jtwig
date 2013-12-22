@@ -46,4 +46,19 @@ public class ForExpressionTest {
         context.withModelAttribute("list", value);
         assertThat(template.output(context), is("Item a"));
     }
+    @Test
+    public void forLoopMustExposeTheLoopVariable () throws ParseException, CompileException, RenderException {
+        JtwigTemplate template = new JtwigTemplate("{% for item in list %}" +
+                "{% if loop.first %}First {% elseif loop.last %}Last{% else %}I: {{ loop.index }} R: {{ loop.revindex }} {% endif %}" +
+                "{% endfor %}");
+        JtwigContext context = new JtwigContext();
+        ArrayList<String> value = new ArrayList<String>();
+        value.add("a");
+        value.add("b");
+        value.add("c");
+        value.add("d");
+        value.add("e");
+        context.withModelAttribute("list", value);
+        assertThat(template.output(context), is("First I: 1 R: 3 I: 2 R: 2 I: 3 R: 1 Last"));
+    }
 }

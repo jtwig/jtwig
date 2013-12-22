@@ -73,7 +73,11 @@ public class ForExpression implements Renderable, Compilable<ForExpression> {
     public boolean render(OutputStream outputStream, JtwigContext context) throws RenderException {
         try {
             ObjectIterator iterator = new ObjectIterator(context.resolve(list));
+            Loop loop = new Loop(iterator.size());
+            context.set("loop", loop);
+            int index = 0;
             while (iterator.hasNext()) {
+                loop.update(index++);
                 Object object = iterator.next();
                 context.set(item.getIdentifier(), object);
                 content.render(outputStream, context);
@@ -97,6 +101,7 @@ public class ForExpression implements Renderable, Compilable<ForExpression> {
 
     public static class ObjectIterator {
         private Iterator<Object> iterator = null;
+        private int size;
 
         public ObjectIterator(Object context) {
             List<Object> list = new ArrayList<Object>();
@@ -110,6 +115,7 @@ public class ForExpression implements Renderable, Compilable<ForExpression> {
                     list.add(obj);
             } else list.add(context);
 
+            size = list.size();
             iterator = list.iterator();
         }
 
@@ -120,9 +126,46 @@ public class ForExpression implements Renderable, Compilable<ForExpression> {
         public Object next () {
             return iterator.next();
         }
+
+        public int size () {
+            return size;
+        }
     }
 
     public String toString () {
         return "For each element of "+list + " render " + content;
+    }
+
+    public static class Loop {
+        private int index = 0;
+        private int length;
+
+        public Loop(int length) {
+            this.length = length;
+        }
+
+        public void update (int index) {
+            this.index = index;
+        }
+
+        public int getLength() {
+            return length;
+        }
+
+        public int getIndex() {
+            return index;
+        }
+
+        public int getRevindex() {
+            return length - index - 1;
+        }
+
+        public boolean isFirst() {
+            return index == 0;
+        }
+
+        public boolean isLast() {
+            return index == length - 1;
+        }
     }
 }
