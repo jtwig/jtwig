@@ -20,10 +20,11 @@ import com.lyncode.builder.ListBuilder;
 import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.exception.CalculateException;
 import com.lyncode.jtwig.exception.RenderException;
+import com.lyncode.jtwig.functions.exceptions.FunctionException;
+import com.lyncode.jtwig.functions.exceptions.FunctionNotFoundException;
 import com.lyncode.jtwig.tree.api.Renderable;
 import com.lyncode.jtwig.tree.value.FunctionElement;
 import com.lyncode.jtwig.tree.value.Variable;
-import com.lyncode.jtwig.util.ObjectExtractor;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -60,16 +61,21 @@ public class FastExpression implements Renderable {
         try {
             Object resolved = context.resolve(expression);
             for (FunctionElement functionElement : filters) {
-                List<Object> arguments = new ListBuilder<Object>().add(resolved).add(context.resolve(functionElement.getArguments())).build();
-                resolved = new ObjectExtractor(resolved).extract(functionElement.getName(), arguments.toArray());
+                List<Object> arguments = new ListBuilder<Object>()
+                        .add(resolved)
+                        .add(((List<Object>) context.resolve(functionElement.getArguments())).toArray())
+                        .build();
+                resolved = context.function(functionElement.getName()).execute(arguments.toArray());
             }
             outputStream.write(String.valueOf(resolved).getBytes());
             return true;
-        } catch (ObjectExtractor.ExtractException e) {
-            throw new RenderException(e);
         } catch (IOException e) {
             throw new RenderException(e);
         } catch (CalculateException e) {
+            throw new RenderException(e);
+        } catch (FunctionException e) {
+            throw new RenderException(e);
+        } catch (FunctionNotFoundException e) {
             throw new RenderException(e);
         }
     }

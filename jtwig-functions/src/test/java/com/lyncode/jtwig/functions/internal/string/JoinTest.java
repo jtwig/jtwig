@@ -32,8 +32,15 @@ public class JoinTest {
         assertThat(result, is(", 1, 2"));
     }
 
-    @Test(expected = FunctionException.class)
+    @Test
     public void shouldThrowExceptionIfInvalidArgumentsAreGiven () throws FunctionException {
-        underTest.execute(null, ", ");
+        String execute = (String) underTest.execute(null, ", ");
+        assertThat(execute, is(""));
+    }
+
+    @Test
+    public void shouldUseEmptyStringIfSecondArgumentIsNotGiven () throws FunctionException {
+        String result = (String) underTest.execute(asList(null, "1", "2"));
+        assertThat(result, is("12"));
     }
 }

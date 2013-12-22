@@ -28,11 +28,11 @@ import java.util.List;
 
 public class FunctionElement implements Element, Argumentable, Calculable {
     private String name;
-    private ExpressionList arguments;
+    private ValueList arguments;
 
     public FunctionElement(String name) {
         this.name = name;
-        arguments = new ExpressionList();
+        arguments = new ValueList();
     }
 
     @Override
@@ -44,7 +44,7 @@ public class FunctionElement implements Element, Argumentable, Calculable {
         return name;
     }
 
-    public ExpressionList getArguments() {
+    public ValueList getArguments() {
         return arguments;
     }
 

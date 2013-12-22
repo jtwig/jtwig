@@ -612,13 +612,13 @@ public class JtwigParser extends BaseParser<Object> {
                                 push(new IntegerList((Integer) pop(1), (Integer) pop()))
                         ),
                         Sequence(
-                                push(new ElementList()),
+                                push(new ValueList()),
                                 Optional(
-                                        BasicExpression(),
+                                        Expression(),
                                         ((ElementList) peek(1)).add(pop()),
                                         ZeroOrMore(
                                                 FreeSymbol(COMMA),
-                                                BasicExpression(),
+                                                Expression(),
                                                 ((ElementList) peek(1)).add(pop())
                                         )
                                 )

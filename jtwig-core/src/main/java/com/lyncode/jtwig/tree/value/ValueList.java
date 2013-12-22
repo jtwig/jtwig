@@ -24,7 +24,7 @@ import com.lyncode.jtwig.tree.helper.ElementList;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ExpressionList extends ElementList implements Calculable {
+public class ValueList extends ElementList implements Calculable {
     @Override
     public Object calculate(JtwigContext context) throws CalculateException {
         List<Object> result = new ArrayList<Object>();

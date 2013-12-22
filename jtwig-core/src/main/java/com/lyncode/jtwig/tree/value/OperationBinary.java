@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OperationBinary implements Calculable {
-    private ExpressionList operands = new ExpressionList();
+    private ValueList operands = new ValueList();
     private List<Operator> operators = new ArrayList<Operator>();
 
 
@@ -34,7 +34,7 @@ public class OperationBinary implements Calculable {
         operands.add(operand);
     }
 
-    public ExpressionList getOperands() {
+    public ValueList getOperands() {
         return operands;
     }
 

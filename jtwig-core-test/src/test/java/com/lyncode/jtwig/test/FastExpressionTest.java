@@ -36,4 +36,11 @@ public class FastExpressionTest {
         context.withModelAttribute("list", new ArrayList<Object>());
         assertThat(template.output(context), is("103"));
     }
+
+    @Test
+    public void shouldAllowFilters () throws ParseException, CompileException, RenderException {
+        JtwigTemplate template = new JtwigTemplate("{{ ['1', '2' ,'3'] | join(',') }}");
+        JtwigContext context = new JtwigContext();
+        assertThat(template.output(context), is("1,2,3"));
+    }
 }

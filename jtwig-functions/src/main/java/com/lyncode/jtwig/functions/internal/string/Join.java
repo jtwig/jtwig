@@ -23,14 +23,18 @@ import org.apache.commons.lang3.StringUtils;
 public class Join implements Function {
     @Override
     public Object execute(Object... arguments) throws FunctionException {
-        if (arguments.length != 2) throw new FunctionException("Requires two arguments");
+        if (arguments.length < 1) throw new FunctionException("Requires at least a list as argument");
 
+        String separator = "";
+        if (arguments.length == 2)
+            separator = arguments[1].toString();
 
-        if (arguments[0] == null || arguments[1] == null) throw new FunctionException("Invalid arguments");
+        if (arguments[0] == null)
+            return "";
         else if (arguments[0] instanceof Iterable)
-            return StringUtils.join((Iterable) arguments[0], arguments[1].toString());
+            return StringUtils.join((Iterable) arguments[0], separator);
         else if (arguments[0].getClass().isArray())
-            return StringUtils.join((Object[]) arguments[0], arguments[1].toString());
+            return StringUtils.join((Object[]) arguments[0], separator);
         else throw new FunctionException("First arguments must be a list or an array.");
     }
 }
