@@ -49,6 +49,7 @@ public abstract class AbstractFunctionRepository {
                 new FunctionDeclaration(new Trim(), "trim"),
                 new FunctionDeclaration(new Split(), "split"),
                 new FunctionDeclaration(new Capitalize(), "capitalize"),
+                new FunctionDeclaration(new Title(), "title"),
 
                 // Math functions
                 new FunctionDeclaration(new Abs(), "abs"),
