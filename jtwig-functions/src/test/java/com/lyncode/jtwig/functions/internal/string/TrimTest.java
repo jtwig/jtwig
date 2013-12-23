@@ -17,24 +17,30 @@
 package com.lyncode.jtwig.functions.internal.string;
 
 import com.lyncode.jtwig.functions.exceptions.FunctionException;
-import com.lyncode.jtwig.functions.internal.list.Concatenate;
 import org.junit.Test;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
-public class ConcatenateTest {
-    private Concatenate underTest = new Concatenate();
+public class TrimTest {
+    private Trim underTest = new Trim();
 
     @Test
-    public void shouldNotIncludeNullValues () throws FunctionException {
-        String result = (String) underTest.execute("Hi! ", null, "My name is Twig!");
-        assertThat(result, is("Hi! My name is Twig!"));
+    public void shouldGiveTrimmedString() throws Exception {
+        assertEquals(underTest.execute(" abc "), "abc");
     }
 
     @Test
-    public void shouldGiveEmptyStringIfExecutedWithoutArguments () throws FunctionException {
-        String result = (String) underTest.execute();
-        assertThat(result, is(""));
+    public void shouldGiveStringInUppercase2() throws Exception {
+        assertEquals(underTest.execute("abc"), "abc");
+    }
+
+    @Test(expected = FunctionException.class)
+    public void invalidNumberOfArguments() throws Exception {
+        underTest.execute("abc", "a");
+    }
+    @Test
+    public void nullPointer() throws Exception {
+        assertNull(underTest.execute((Object) null));
     }
 }

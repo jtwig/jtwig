@@ -23,6 +23,7 @@ import com.lyncode.jtwig.functions.internal.cast.ToInt;
 import com.lyncode.jtwig.functions.internal.list.Concatenate;
 import com.lyncode.jtwig.functions.internal.list.Join;
 import com.lyncode.jtwig.functions.internal.math.Abs;
+import com.lyncode.jtwig.functions.internal.string.Trim;
 import com.lyncode.jtwig.functions.internal.string.Upper;
 
 import java.util.HashMap;
@@ -39,6 +40,7 @@ public abstract class AbstractFunctionRepository {
 
                 // String function
                 new FunctionDeclaration(new Upper(), "upper"),
+                new FunctionDeclaration(new Trim(), "trim"),
 
                 // Math functions
                 new FunctionDeclaration(new Abs(), "abs"),
