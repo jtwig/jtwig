@@ -52,6 +52,7 @@ public abstract class AbstractFunctionRepository {
                 new FunctionDeclaration(new Format(), "format"),
                 new FunctionDeclaration(new Nl2Br(), "nl2br"),
                 new FunctionDeclaration(new UrlEncode(), "url_encode"),
+                new FunctionDeclaration(new DateFormat(), "date", "date_format"),
 
                 // Math functions
                 new FunctionDeclaration(new Abs(), "abs"),
