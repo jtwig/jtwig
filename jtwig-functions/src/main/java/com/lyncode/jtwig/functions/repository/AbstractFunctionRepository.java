@@ -21,10 +21,7 @@ import com.lyncode.jtwig.functions.exceptions.FunctionNotFoundException;
 import com.lyncode.jtwig.functions.internal.cast.ToDouble;
 import com.lyncode.jtwig.functions.internal.cast.ToInt;
 import com.lyncode.jtwig.functions.internal.generic.*;
-import com.lyncode.jtwig.functions.internal.list.Batch;
-import com.lyncode.jtwig.functions.internal.list.Concatenate;
-import com.lyncode.jtwig.functions.internal.list.Join;
-import com.lyncode.jtwig.functions.internal.list.Merge;
+import com.lyncode.jtwig.functions.internal.list.*;
 import com.lyncode.jtwig.functions.internal.math.Abs;
 import com.lyncode.jtwig.functions.internal.math.JNumberFormat;
 import com.lyncode.jtwig.functions.internal.string.*;
@@ -42,6 +39,7 @@ public abstract class AbstractFunctionRepository {
                 new FunctionDeclaration(new Join(), "join"),
                 new FunctionDeclaration(new Batch(), "batch"),
                 new FunctionDeclaration(new Merge(), "merge"),
+                new FunctionDeclaration(new Slice(), "slice"),
 
                 // String function
                 new FunctionDeclaration(new Upper(), "upper"),
