@@ -28,10 +28,7 @@ import com.lyncode.jtwig.functions.internal.list.Batch;
 import com.lyncode.jtwig.functions.internal.list.Concatenate;
 import com.lyncode.jtwig.functions.internal.list.Join;
 import com.lyncode.jtwig.functions.internal.math.Abs;
-import com.lyncode.jtwig.functions.internal.string.Lower;
-import com.lyncode.jtwig.functions.internal.string.Split;
-import com.lyncode.jtwig.functions.internal.string.Trim;
-import com.lyncode.jtwig.functions.internal.string.Upper;
+import com.lyncode.jtwig.functions.internal.string.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -51,6 +48,7 @@ public abstract class AbstractFunctionRepository {
                 new FunctionDeclaration(new Lower(), "lower"),
                 new FunctionDeclaration(new Trim(), "trim"),
                 new FunctionDeclaration(new Split(), "split"),
+                new FunctionDeclaration(new Capitalize(), "capitalize"),
 
                 // Math functions
                 new FunctionDeclaration(new Abs(), "abs"),
