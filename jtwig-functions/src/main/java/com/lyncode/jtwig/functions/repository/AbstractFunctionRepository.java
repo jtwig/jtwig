@@ -27,6 +27,7 @@ import com.lyncode.jtwig.functions.internal.generic.Length;
 import com.lyncode.jtwig.functions.internal.list.Batch;
 import com.lyncode.jtwig.functions.internal.list.Concatenate;
 import com.lyncode.jtwig.functions.internal.list.Join;
+import com.lyncode.jtwig.functions.internal.list.Merge;
 import com.lyncode.jtwig.functions.internal.math.Abs;
 import com.lyncode.jtwig.functions.internal.string.*;
 
@@ -42,6 +43,7 @@ public abstract class AbstractFunctionRepository {
                 new FunctionDeclaration(new Concatenate(), "concat", "concatenate"),
                 new FunctionDeclaration(new Join(), "join"),
                 new FunctionDeclaration(new Batch(), "batch"),
+                new FunctionDeclaration(new Merge(), "merge"),
 
                 // String function
                 new FunctionDeclaration(new Upper(), "upper"),
