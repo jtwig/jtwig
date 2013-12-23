@@ -65,7 +65,8 @@ public abstract class AbstractFunctionRepository {
                 new FunctionDeclaration(new Default(), "default"),
                 new FunctionDeclaration(new First(), "first"),
                 new FunctionDeclaration(new Last(), "last"),
-                new FunctionDeclaration(new JsonEncode(), "json_encode")
+                new FunctionDeclaration(new JsonEncode(), "json_encode"),
+                new FunctionDeclaration(new Reverse(), "reverse")
         );
         addFunctions(functions);
     }
