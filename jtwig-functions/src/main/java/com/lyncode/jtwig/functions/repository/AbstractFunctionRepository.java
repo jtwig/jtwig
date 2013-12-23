@@ -22,6 +22,7 @@ import com.lyncode.jtwig.functions.internal.cast.ToDouble;
 import com.lyncode.jtwig.functions.internal.cast.ToInt;
 import com.lyncode.jtwig.functions.internal.generic.Default;
 import com.lyncode.jtwig.functions.internal.generic.First;
+import com.lyncode.jtwig.functions.internal.generic.Last;
 import com.lyncode.jtwig.functions.internal.generic.Length;
 import com.lyncode.jtwig.functions.internal.list.Batch;
 import com.lyncode.jtwig.functions.internal.list.Concatenate;
@@ -61,7 +62,8 @@ public abstract class AbstractFunctionRepository {
                 // Generic functions
                 new FunctionDeclaration(new Length(), "length"),
                 new FunctionDeclaration(new Default(), "default"),
-                new FunctionDeclaration(new First(), "first")
+                new FunctionDeclaration(new First(), "first"),
+                new FunctionDeclaration(new Last(), "last")
         );
         addFunctions(functions);
     }
