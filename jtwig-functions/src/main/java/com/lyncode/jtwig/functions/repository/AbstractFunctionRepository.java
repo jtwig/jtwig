@@ -26,6 +26,7 @@ import com.lyncode.jtwig.functions.internal.list.Concatenate;
 import com.lyncode.jtwig.functions.internal.list.Join;
 import com.lyncode.jtwig.functions.internal.list.Merge;
 import com.lyncode.jtwig.functions.internal.math.Abs;
+import com.lyncode.jtwig.functions.internal.math.JNumberFormat;
 import com.lyncode.jtwig.functions.internal.string.*;
 
 import java.util.HashMap;
@@ -56,6 +57,7 @@ public abstract class AbstractFunctionRepository {
 
                 // Math functions
                 new FunctionDeclaration(new Abs(), "abs"),
+                new FunctionDeclaration(new JNumberFormat(), "number_format"),
 
                 // Cast functions
                 new FunctionDeclaration(new ToDouble(), "toDouble", "toFloat"),
