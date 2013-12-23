@@ -20,6 +20,7 @@ import com.lyncode.jtwig.functions.Function;
 import com.lyncode.jtwig.functions.exceptions.FunctionNotFoundException;
 import com.lyncode.jtwig.functions.internal.cast.ToDouble;
 import com.lyncode.jtwig.functions.internal.cast.ToInt;
+import com.lyncode.jtwig.functions.internal.generic.Default;
 import com.lyncode.jtwig.functions.internal.list.Concatenate;
 import com.lyncode.jtwig.functions.internal.list.Join;
 import com.lyncode.jtwig.functions.internal.math.Abs;
@@ -49,7 +50,10 @@ public abstract class AbstractFunctionRepository {
 
                 // Cast functions
                 new FunctionDeclaration(new ToDouble(), "toDouble", "toFloat"),
-                new FunctionDeclaration(new ToInt(), "toInt")
+                new FunctionDeclaration(new ToInt(), "toInt"),
+
+                // Generic functions
+                new FunctionDeclaration(new Default(), "default")
         );
         addFunctions(functions);
     }
