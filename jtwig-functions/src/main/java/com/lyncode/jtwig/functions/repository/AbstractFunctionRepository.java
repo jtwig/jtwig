@@ -25,6 +25,7 @@ import com.lyncode.jtwig.functions.internal.list.Concatenate;
 import com.lyncode.jtwig.functions.internal.list.Join;
 import com.lyncode.jtwig.functions.internal.math.Abs;
 import com.lyncode.jtwig.functions.internal.string.Lower;
+import com.lyncode.jtwig.functions.internal.string.Split;
 import com.lyncode.jtwig.functions.internal.string.Trim;
 import com.lyncode.jtwig.functions.internal.string.Upper;
 
@@ -44,6 +45,7 @@ public abstract class AbstractFunctionRepository {
                 new FunctionDeclaration(new Upper(), "upper"),
                 new FunctionDeclaration(new Lower(), "lower"),
                 new FunctionDeclaration(new Trim(), "trim"),
+                new FunctionDeclaration(new Split(), "split"),
 
                 // Math functions
                 new FunctionDeclaration(new Abs(), "abs"),
