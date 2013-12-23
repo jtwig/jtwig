@@ -58,7 +58,11 @@ public enum JtwigSymbol {
     CLOSE_CODE("%}"),
     OPEN_CODE("{%"),
 
-    ATTR("=");
+    ATTR("="),
+
+    QUOTE("'"),
+
+    TWO_DOTS("..");
 
     private String symbol;
 

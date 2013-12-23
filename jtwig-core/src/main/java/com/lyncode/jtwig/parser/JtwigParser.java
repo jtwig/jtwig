@@ -507,9 +507,9 @@ public class JtwigParser extends BaseParser<Object> {
 
     protected Rule NativeExpression() {
         return FirstOf(
-                StringLiteral(),
                 ListExpression(),
                 MapExpression(),
+                StringLiteral(),
                 Boolean(),
                 Double(),
                 Integer(),
@@ -595,36 +595,56 @@ public class JtwigParser extends BaseParser<Object> {
         );
     }
 
-    protected Rule InlineListExpression() {
+
+    protected Rule ComprehensionListExpression () {
+        return FirstOf(
+                ComprehensionIntegerListExpression(),
+                ComprehensionCharacterListExpression()
+        );
+    }
+
+
+    protected Rule ComprehensionIntegerListExpression() {
         return Sequence(
                 Integer(),
-                FreeSymbol(DIV),
-                Integer()
+                Symbol(TWO_DOTS),
+                Integer(),
+                push(new IntegerList((Integer) pop(1), (Integer) pop()))
+        );
+    }
+
+    protected Rule ComprehensionCharacterListExpression() {
+        return Sequence(
+                Char(),
+                Symbol(TWO_DOTS),
+                Char(),
+                push(new CharacterList((Character) pop(1), (Character) pop()))
+        );
+    }
+
+    protected Rule EnumerationList () {
+        return Sequence(
+                FreeSymbol(OPEN_BRACKET),
+                push(new ValueList()),
+                Optional(
+                        Expression(),
+                        Spacing(),
+                        ((ElementList) peek(1)).add(pop()),
+                        ZeroOrMore(
+                                FreeSymbol(COMMA),
+                                Expression(),
+                                Spacing(),
+                                ((ElementList) peek(1)).add(pop())
+                        )
+                ),
+                FreeSymbol(CLOSE_BRACKET)
         );
     }
 
     protected Rule ListExpression() {
-        return Sequence(
-                FreeSymbol(OPEN_BRACKET),
-                FirstOf(
-                        Sequence(
-                                InlineListExpression(),
-                                push(new IntegerList((Integer) pop(1), (Integer) pop()))
-                        ),
-                        Sequence(
-                                push(new ValueList()),
-                                Optional(
-                                        Expression(),
-                                        ((ElementList) peek(1)).add(pop()),
-                                        ZeroOrMore(
-                                                FreeSymbol(COMMA),
-                                                Expression(),
-                                                ((ElementList) peek(1)).add(pop())
-                                        )
-                                )
-                        )
-                ),
-                FreeSymbol(CLOSE_BRACKET)
+        return FirstOf(
+                ComprehensionListExpression(),
+                EnumerationList()
         );
     }
 
@@ -665,6 +685,16 @@ public class JtwigParser extends BaseParser<Object> {
                         OneOrMore(Digit())
                 ),
                 push(Integer.parseInt(match()))
+        );
+    }
+
+
+    protected Rule Char() {
+        return Sequence(
+                Symbol(QUOTE),
+                CharOnly(),
+                push(match().charAt(0)),
+                Symbol(QUOTE)
         );
     }
 
@@ -809,6 +839,13 @@ public class JtwigParser extends BaseParser<Object> {
         return Sequence(
                 FirstOf(JtwigKeyword.keywords()),
                 TestNot(LetterOrDigit())
+        );
+    }
+
+    protected Rule CharOnly () {
+        return FirstOf(
+                CharRange('a', 'z'),
+                CharRange('A', 'Z')
         );
     }
 

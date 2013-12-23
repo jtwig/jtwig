@@ -115,7 +115,7 @@ public class JtwigParserTest {
 
     @Test
     public void shouldMatchForExpression() throws Exception {
-        ForExpression exp = parse(underTest.ForExpression(), "{% for a in [1:10] %}" +
+        ForExpression exp = parse(underTest.ForExpression(), "{% for a in 1..10 %}" +
                 "{% endfor %}", ForExpression.class);
         assertThat(exp.getItem().getIdentifier(), is("a"));
         assertThat((ElementList) exp.getList(), hasElement(2));
@@ -123,12 +123,12 @@ public class JtwigParserTest {
 
     @Test(expected = ParserRuntimeException.class)
     public void shouldNotMatchForExpression() throws Exception {
-        ForExpression exp = parse(underTest.ForExpression(), "{% for a in [1:10] %}" +
+        ForExpression exp = parse(underTest.ForExpression(), "{% for a in 1..10 %}" +
                 "{% endfora %}", ForExpression.class);
     }
     @Test(expected = ParserRuntimeException.class)
     public void unknownExpression() throws Exception {
-        ForExpression exp = parse(underTest.Content(), "{% fora a in [1:10] %}" +
+        ForExpression exp = parse(underTest.Content(), "{% fora a in 1..10 %}" +
                 "{% endfora %}", ForExpression.class);
     }
 
@@ -295,9 +295,15 @@ public class JtwigParserTest {
 
     @Test
     public void shouldMatchIntegerList () {
-        IntegerList value = parse(underTest.ListExpression(), "[1:10]", IntegerList.class);
+        IntegerList value = parse(underTest.ListExpression(), "1..10", IntegerList.class);
         assertThat(value.getStart(), is(1));
         assertThat(value.getEnd(), is(10));
+    }
+    @Test
+    public void shouldMatchCharacterList () {
+        CharacterList value = parse(underTest.ListExpression(), "'a'..'z'", CharacterList.class);
+        assertThat(value.getStart(), is('a'));
+        assertThat(value.getEnd(), is('z'));
     }
 
     @Test
