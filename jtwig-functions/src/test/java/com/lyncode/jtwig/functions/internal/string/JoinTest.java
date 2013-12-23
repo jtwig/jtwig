@@ -17,6 +17,7 @@
 package com.lyncode.jtwig.functions.internal.string;
 
 import com.lyncode.jtwig.functions.exceptions.FunctionException;
+import com.lyncode.jtwig.functions.internal.list.Join;
 import org.junit.Test;
 
 import static java.util.Arrays.asList;

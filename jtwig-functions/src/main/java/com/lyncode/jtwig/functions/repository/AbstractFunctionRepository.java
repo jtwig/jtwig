@@ -20,8 +20,9 @@ import com.lyncode.jtwig.functions.Function;
 import com.lyncode.jtwig.functions.exceptions.FunctionNotFoundException;
 import com.lyncode.jtwig.functions.internal.cast.ToDouble;
 import com.lyncode.jtwig.functions.internal.cast.ToInt;
-import com.lyncode.jtwig.functions.internal.string.Concatenate;
-import com.lyncode.jtwig.functions.internal.string.Join;
+import com.lyncode.jtwig.functions.internal.list.Concatenate;
+import com.lyncode.jtwig.functions.internal.list.Join;
+import com.lyncode.jtwig.functions.internal.math.Abs;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,9 +32,12 @@ public abstract class AbstractFunctionRepository {
 
     public AbstractFunctionRepository(FunctionDeclaration... functions) {
         addFunctions(
-                // String functions
+                // List functions
                 new FunctionDeclaration(new Concatenate(), "concat", "concatenate"),
                 new FunctionDeclaration(new Join(), "join"),
+
+                // Math functions
+                new FunctionDeclaration(new Abs(), "abs"),
 
                 // Cast functions
                 new FunctionDeclaration(new ToDouble(), "toDouble", "toFloat"),
