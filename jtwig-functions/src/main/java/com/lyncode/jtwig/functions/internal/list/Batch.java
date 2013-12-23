@@ -18,9 +18,9 @@ package com.lyncode.jtwig.functions.internal.list;
 
 import com.lyncode.jtwig.functions.Function;
 import com.lyncode.jtwig.functions.exceptions.FunctionException;
+import com.lyncode.jtwig.functions.util.ObjectIterator;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class Batch implements Function {
@@ -47,37 +47,4 @@ public class Batch implements Function {
     }
 
 
-    public static class ObjectIterator {
-        private Iterator<Object> iterator = null;
-        private int size;
-
-        public ObjectIterator(Object context) {
-            List<Object> list = new ArrayList<Object>();
-            if (context != null) {
-                if (context instanceof Iterable) {
-                    Iterator iterator = ((Iterable) context).iterator();
-                    while (iterator.hasNext())
-                        list.add(iterator.next());
-                } else if (context.getClass().isArray()) {
-                    Object[] objects = (Object[]) context;
-                    for (Object obj : objects)
-                        list.add(obj);
-                } else list.add(context);
-            }
-            size = list.size();
-            iterator = list.iterator();
-        }
-
-        public boolean hasNext() {
-            return iterator.hasNext();
-        }
-
-        public Object next() {
-            return iterator.next();
-        }
-
-        public int size() {
-            return size;
-        }
-    }
 }

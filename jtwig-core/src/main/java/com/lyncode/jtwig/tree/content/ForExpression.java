@@ -20,6 +20,7 @@ import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.exception.CalculateException;
 import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.RenderException;
+import com.lyncode.jtwig.functions.util.ObjectIterator;
 import com.lyncode.jtwig.resource.JtwigResource;
 import com.lyncode.jtwig.tree.api.Compilable;
 import com.lyncode.jtwig.tree.api.Renderable;
@@ -29,7 +30,6 @@ import com.lyncode.jtwig.tree.value.Variable;
 
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class ForExpression implements Renderable, Compilable<ForExpression> {
@@ -97,40 +97,6 @@ public class ForExpression implements Renderable, Compilable<ForExpression> {
     @Override
     public boolean replace(BlockExpression expression) throws CompileException {
         return content.replace(expression);
-    }
-
-    public static class ObjectIterator {
-        private Iterator<Object> iterator = null;
-        private int size;
-
-        public ObjectIterator(Object context) {
-            List<Object> list = new ArrayList<Object>();
-            if (context != null) {
-                if (context instanceof Iterable) {
-                    Iterator iterator = ((Iterable) context).iterator();
-                    while (iterator.hasNext())
-                        list.add(iterator.next());
-                } else if (context.getClass().isArray()) {
-                    Object[] objects = (Object[]) context;
-                    for (Object obj : objects)
-                        list.add(obj);
-                } else list.add(context);
-            }
-            size = list.size();
-            iterator = list.iterator();
-        }
-
-        public boolean hasNext() {
-            return iterator.hasNext();
-        }
-
-        public Object next() {
-            return iterator.next();
-        }
-
-        public int size() {
-            return size;
-        }
     }
 
     public String toString() {
