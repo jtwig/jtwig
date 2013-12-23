@@ -51,6 +51,7 @@ public abstract class AbstractFunctionRepository {
                 new FunctionDeclaration(new Title(), "title"),
                 new FunctionDeclaration(new Replace(), "replace"),
                 new FunctionDeclaration(new Format(), "format"),
+                new FunctionDeclaration(new Nl2Br(), "nl2br"),
 
                 // Math functions
                 new FunctionDeclaration(new Abs(), "abs"),
