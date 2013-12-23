@@ -20,10 +20,7 @@ import com.lyncode.jtwig.functions.Function;
 import com.lyncode.jtwig.functions.exceptions.FunctionNotFoundException;
 import com.lyncode.jtwig.functions.internal.cast.ToDouble;
 import com.lyncode.jtwig.functions.internal.cast.ToInt;
-import com.lyncode.jtwig.functions.internal.generic.Default;
-import com.lyncode.jtwig.functions.internal.generic.First;
-import com.lyncode.jtwig.functions.internal.generic.Last;
-import com.lyncode.jtwig.functions.internal.generic.Length;
+import com.lyncode.jtwig.functions.internal.generic.*;
 import com.lyncode.jtwig.functions.internal.list.Batch;
 import com.lyncode.jtwig.functions.internal.list.Concatenate;
 import com.lyncode.jtwig.functions.internal.list.Join;
@@ -66,7 +63,8 @@ public abstract class AbstractFunctionRepository {
                 new FunctionDeclaration(new Length(), "length"),
                 new FunctionDeclaration(new Default(), "default"),
                 new FunctionDeclaration(new First(), "first"),
-                new FunctionDeclaration(new Last(), "last")
+                new FunctionDeclaration(new Last(), "last"),
+                new FunctionDeclaration(new JsonEncode(), "json_encode")
         );
         addFunctions(functions);
     }
