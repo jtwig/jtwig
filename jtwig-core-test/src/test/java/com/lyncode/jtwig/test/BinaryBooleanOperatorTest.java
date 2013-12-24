@@ -100,4 +100,16 @@ public class BinaryBooleanOperatorTest extends AbstractJtwigTest {
         JtwigTemplate template = new JtwigTemplate("{% if ('Hello' matches '^A.*') %}Hi{% endif %}");
         assertThat(template.output(new JtwigContext()), is(""));
     }
+
+    @Test
+    public void Contains () throws ParseException, CompileException, RenderException {
+        JtwigTemplate template = new JtwigTemplate("{% if ('a' in 'abc') %}Hi{% endif %}");
+        assertThat(template.output(new JtwigContext()), is("Hi"));
+    }
+
+    @Test
+    public void ContainsFail () throws ParseException, CompileException, RenderException {
+        JtwigTemplate template = new JtwigTemplate("{% if ('a' in ['b','c']) %}Hi{% endif %}");
+        assertThat(template.output(new JtwigContext()), is(""));
+    }
 }

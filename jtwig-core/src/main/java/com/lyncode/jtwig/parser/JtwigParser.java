@@ -380,7 +380,8 @@ public class JtwigParser extends BaseParser<Object> {
                 OrExpression(),
                 Operator.STARTS_WITH,
                 Operator.ENDS_WITH,
-                Operator.MATCHES
+                Operator.MATCHES,
+                Operator.IN
         );
     }
 

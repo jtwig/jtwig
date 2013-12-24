@@ -18,6 +18,7 @@ package com.lyncode.jtwig.tree.helper;
 
 import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.exception.CalculateException;
+import com.lyncode.jtwig.functions.util.ObjectIterator;
 import com.lyncode.jtwig.tree.api.Calculable;
 import com.lyncode.jtwig.tree.value.OperationBinary;
 import com.lyncode.jtwig.tree.value.Operator;
@@ -89,6 +90,14 @@ public class StrictBinaryOperation implements Calculable {
             case MATCHES:
                 if (leftResolved == null) return false;
                 return leftResolved.toString().matches(rightResolved.toString());
+            case IN:
+                if (rightResolved == null) return false;
+                if ((rightResolved instanceof Iterable) || rightResolved.getClass().isArray())
+                    return new ObjectIterator(rightResolved).contains(leftResolved);
+                else if (rightResolved instanceof String)
+                    return ((String) rightResolved).contains(leftResolved.toString());
+                else
+                    return false;
         }
         throw new CalculateException("Unknown operator " + operator.toString());
     }

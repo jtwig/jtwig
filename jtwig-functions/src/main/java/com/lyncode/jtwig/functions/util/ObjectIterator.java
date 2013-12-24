@@ -21,11 +21,12 @@ import java.util.Iterator;
 import java.util.List;
 
 public class ObjectIterator {
+    private List<Object> list = new ArrayList<Object>();
     private Iterator<Object> iterator = null;
     private int size;
 
     public ObjectIterator(Object context) {
-        List<Object> list = new ArrayList<Object>();
+        list = new ArrayList<Object>();
         if (context != null) {
             if (context instanceof Iterable) {
                 Iterator iterator = ((Iterable) context).iterator();
@@ -51,5 +52,9 @@ public class ObjectIterator {
 
     public int size() {
         return size;
+    }
+
+    public boolean contains(Object item) {
+        return list.contains(item);
     }
 }
