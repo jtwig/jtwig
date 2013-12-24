@@ -16,5 +16,5 @@
 
 package com.lyncode.jtwig.exception;
 
-public class ExtendMayOnlyBlocksException extends RuntimeParseException {
+public class ExtendMayOnlyBlocksException extends ParseException {
 }

@@ -17,13 +17,9 @@
 package com.lyncode.jtwig.exception;
 
 import com.lyncode.jtwig.parser.JtwigKeyword;
-import com.lyncode.jtwig.parser.JtwigSymbol;
 
-public class EndClauseMissingRuntimeException extends RuntimeParseException {
-    public EndClauseMissingRuntimeException(JtwigKeyword initialClause) {
-        super("Missing end clause of "+initialClause);
-    }
-    public EndClauseMissingRuntimeException(JtwigSymbol initialClause) {
-        super("Missing end clause  "+initialClause.getSymbol());
+public class EndCodeMissingException extends ParseException {
+    public EndCodeMissingException(JtwigKeyword initialClause) {
+        super("Missing close brackets of "+initialClause);
     }
 }

@@ -47,8 +47,6 @@ public enum JtwigKeyword {
     EXCLUDE("exclude"),
     IN("in"),
     FILTER("filter")
-
-
     ;
 
     public static String[] keywords () {

@@ -16,19 +16,14 @@
 
 package com.lyncode.jtwig.exception;
 
-public abstract class RuntimeParseException extends RuntimeException {
-    protected RuntimeParseException() {
+public class ParseBypassException extends RuntimeException {
+    private ParseException innerException;
+
+    public ParseBypassException(ParseException innerException) {
+        this.innerException = innerException;
     }
 
-    protected RuntimeParseException(String message) {
-        super(message);
-    }
-
-    protected RuntimeParseException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    protected RuntimeParseException(Throwable cause) {
-        super(cause);
+    public ParseException getInnerException() {
+        return innerException;
     }
 }

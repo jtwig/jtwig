@@ -35,6 +35,7 @@ import org.parboiled.annotations.MemoMismatches;
 import org.parboiled.annotations.SuppressNode;
 import org.parboiled.annotations.SuppressSubnodes;
 import org.parboiled.common.FileUtils;
+import org.parboiled.errors.ParserRuntimeException;
 import org.parboiled.parserunners.ReportingParseRunner;
 import org.parboiled.support.ParsingResult;
 
@@ -53,8 +54,11 @@ public class JtwigParser extends BaseParser<Object> {
             ReportingParseRunner<Object> runner = new ReportingParseRunner<Object>(createParser(JtwigParser.class).Start());
             ParsingResult<Object> result = runner.run(FileUtils.readAllText(input.retrieve(), Charset.defaultCharset()));
             return (JtwigDocument) result.resultValue;
-        } catch (RuntimeParseException e) {
-            throw new ParseException(e.getMessage());
+        } catch (ParserRuntimeException e) {
+            if (e.getCause() instanceof ParseBypassException)
+                throw ((ParseBypassException) e.getCause()).getInnerException();
+            else
+                throw new ParseException(e);
         } catch (ResourceException e) {
             throw new ParseException(e);
         }
@@ -80,15 +84,15 @@ public class JtwigParser extends BaseParser<Object> {
         );
     }
 
-    protected Rule Ensure(RuntimeParseException e, Rule... innerRule) {
+    protected Rule Ensure(ParseException e, Rule... innerRule) {
         return FirstOf(
                 Sequence(innerRule),
                 throwException(e)
         );
     }
 
-    protected boolean throwException(RuntimeParseException exception) throws RuntimeParseException {
-        throw exception;
+    protected boolean throwException(ParseException exception) throws ParseBypassException {
+        throw new ParseBypassException(exception);
     }
 
     protected Rule Content() {
@@ -170,7 +174,7 @@ public class JtwigParser extends BaseParser<Object> {
                 Content(),
                 (((BlockExpression) peek(1)).setContent((Content) pop())),
                 Ensure(
-                        new EndClauseMissingRuntimeException(BLOCK),
+                        new EndClauseMissingException(BLOCK),
                         OpenCode(),
                         SpecificKeyword(ENDBLOCK),
                         Spacing(),
@@ -187,7 +191,7 @@ public class JtwigParser extends BaseParser<Object> {
                 push(new ExtendsExpression((String) pop())),
                 Spacing(),
                 Ensure(
-                        new EndClauseMissingRuntimeException(EXTENDS),
+                        new EndClauseMissingException(EXTENDS),
                         CloseCode()
                 )
         );
@@ -201,7 +205,7 @@ public class JtwigParser extends BaseParser<Object> {
                 push(new IncludeExpression((String) pop())),
                 Spacing(),
                 Ensure(
-                        new EndClauseMissingRuntimeException(INCLUDE),
+                        new EndClauseMissingException(INCLUDE),
                         CloseCode()
                 )
         );
@@ -237,10 +241,13 @@ public class JtwigParser extends BaseParser<Object> {
                 OpenCode(),
                 SpecificKeyword(IF),
                 Spacing(),
-                Expression(),
+                Ensure(
+                    new ExpectingExpressionException(),
+                    Expression()
+                ),
                 Spacing(),
                 Ensure(
-                        new EndCodeMissingRuntimeException(IF),
+                        new EndCodeMissingException(IF),
                         CloseCode()
                 ),
                 push(new IfExpression(pop())),
@@ -271,7 +278,7 @@ public class JtwigParser extends BaseParser<Object> {
                         )
                 ),
                 Ensure(
-                        new EndClauseMissingRuntimeException(IF),
+                        new EndClauseMissingException(IF),
                         OpenCode(),
                         SpecificKeyword(ENDIF),
                         Spacing(),
@@ -297,7 +304,7 @@ public class JtwigParser extends BaseParser<Object> {
                 Content(),
                 ((ForExpression) peek(1)).setContent((Content) pop()),
                 Ensure(
-                        new EndCodeMissingRuntimeException(FOR),
+                        new EndCodeMissingException(FOR),
                         OpenCode(),
                         SpecificKeyword(ENDFOR),
                         CloseCode()
@@ -328,7 +335,7 @@ public class JtwigParser extends BaseParser<Object> {
                 Spacing(),
                 (((SetExpression) peek(1))).setAssignment(pop()),
                 Ensure(
-                        new EndClauseMissingRuntimeException(SET),
+                        new EndClauseMissingException(SET),
                         CloseCode()
                 )
         );
@@ -350,7 +357,7 @@ public class JtwigParser extends BaseParser<Object> {
                         )
                 ),
                 Ensure(
-                        new EndClauseMissingRuntimeException(JtwigSymbol.OPEN_FAST),
+                        new EndClauseMissingException(JtwigSymbol.OPEN_FAST),
                         Symbol(JtwigSymbol.CLOSE_FAST)
                 )
         );

@@ -16,17 +16,8 @@
 
 package com.lyncode.jtwig.exception;
 
-import com.lyncode.jtwig.parser.JtwigKeyword;
-import org.apache.commons.lang3.StringUtils;
-
-public class UnknownExpressionException extends ParseException {
-    public UnknownExpressionException() {
-        super("Known expressions: "+ StringUtils.join(new String[]{
-                JtwigKeyword.FOR.toString(),
-                JtwigKeyword.IF.toString(),
-                JtwigKeyword.BLOCK.toString(),
-                JtwigKeyword.INCLUDE.toString(),
-                JtwigKeyword.SET.toString()
-        }, ", "));
+public class ExpectingExpressionException extends ParseException {
+    public ExpectingExpressionException() {
+        super("Expecting an expression. Are you using the correct syntax?");
     }
 }

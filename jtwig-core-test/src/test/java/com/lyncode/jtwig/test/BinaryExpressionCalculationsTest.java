@@ -34,11 +34,11 @@ public class BinaryExpressionCalculationsTest extends AbstractJtwigTest {
 
     @Test
     public void shouldResolveToBoolean () throws Exception {
-        assertThat(theResultOfRendering(theTemplate("{{ 3 && 2.0 }}")), is("true"));
+        assertThat(theResultOfRendering(theTemplate("{{ 3 and 2.0 }}")), is("true"));
     }
 
     @Test
     public void shouldResolveToBooleanFalse () throws Exception {
-        assertThat(theResultOfRendering(theTemplate("{{ 3 && false }}")), is("false"));
+        assertThat(theResultOfRendering(theTemplate("{{ 3 and false }}")), is("false"));
     }
 }

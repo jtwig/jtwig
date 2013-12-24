@@ -32,8 +32,8 @@ public enum JtwigSymbol {
     TIMES("*"),
     PERCENTAGE("%"),
 
-    AND("&&"),
-    OR("||"),
+    AND("and"),
+    OR("or"),
 
     AND_WORD("and"),
     OR_WORD("or"),

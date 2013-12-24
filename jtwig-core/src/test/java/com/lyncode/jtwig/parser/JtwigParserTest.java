@@ -148,7 +148,7 @@ public class JtwigParserTest {
 
     @Test
     public void shouldMatchComplexExpression () {
-        OperationBinary parse = parse(underTest.Expression(), "!2 && 2 + 2 * 3", OperationBinary.class);
+        OperationBinary parse = parse(underTest.Expression(), "not 2 and 2 + 2 * 3", OperationBinary.class);
         assertThat(parse, anOperation(binary()
                 .whichOperand(0, is(anOperation(unary().withOperator(NOT).and().withOperand(is(2)))))
                 .whichOperator(0, Operator.AND)
@@ -165,7 +165,7 @@ public class JtwigParserTest {
 
     @Test
     public void shouldMatchAndExpression () {
-        OperationBinary parse = parse(underTest.Expression(), "!2 && 2", OperationBinary.class);
+        OperationBinary parse = parse(underTest.Expression(), "not 2 and 2", OperationBinary.class);
         assertThat(parse, anOperation(binary()
                 .whichOperand(0, is(anOperation(unary().withOperator(NOT).and().withOperand(is(2)))))
                 .whichOperand(1, is(2))

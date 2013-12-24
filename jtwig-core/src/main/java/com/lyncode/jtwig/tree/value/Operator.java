@@ -28,13 +28,13 @@ public enum Operator {
     GTE(">="),
     LTE("<="),
 
-    AND("&&"),
-    OR("||"),
+    AND("and"),
+    OR("or"),
 
     EQUAL("=="),
     DIFF("!="),
 
-    NOT("!")
+    NOT("not")
     ;
 
     public static Operator fromString (String operatorRepresentation) {
