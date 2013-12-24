@@ -244,8 +244,8 @@ public class JtwigParser extends BaseParser<Object> {
                 SpecificKeyword(IF),
                 Spacing(),
                 Ensure(
-                    new ExpectingExpressionException(),
-                    Expression()
+                        new ExpectingExpressionException(),
+                        Expression()
                 ),
                 Spacing(),
                 Ensure(
@@ -439,12 +439,36 @@ public class JtwigParser extends BaseParser<Object> {
 
     protected Rule Multiplication() {
         return BinaryOperation(
-                Primary(),
+                ExtendedPrimary(),
                 Operator.INT_DIV,
                 Operator.INT_TIMES,
                 Operator.TIMES,
                 Operator.DIV,
                 Operator.MOD
+        );
+    }
+
+    protected Rule ExtendedPrimary () {
+        return FirstOf(
+                TernaryExpression(),
+                Primary()
+        );
+    }
+
+    protected Rule TernaryExpression () {
+        return Sequence(
+                Primary(),
+                push(new IfTernaryOperator(pop())),
+                Spacing(),
+                FreeSymbol(QUESTION),
+                Expression(),
+                Spacing(),
+                ((IfTernaryOperator) peek(1)).setIfTrueExpression(pop()),
+                FreeSymbol(DIV),
+                Expression(),
+                Spacing(),
+                ((IfTernaryOperator) peek(1)).setIfFalseExpression(pop())
+
         );
     }
 
@@ -497,13 +521,13 @@ public class JtwigParser extends BaseParser<Object> {
     protected Rule Primary() {
         return FirstOf(
                 Composition(),
+                BasicExpression(),
                 Sequence(
                         FreeSymbol(OPEN_PARENT),
                         Expression(),
                         Spacing(),
                         Symbol(CLOSE_PARENT)
-                ),
-                BasicExpression()
+                )
         );
     }
 

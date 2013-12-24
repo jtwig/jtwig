@@ -62,7 +62,8 @@ public enum JtwigSymbol {
 
     QUOTE("'"),
 
-    TWO_DOTS("..");
+    TWO_DOTS(".."),
+    QUESTION("?");
 
     private String symbol;
 

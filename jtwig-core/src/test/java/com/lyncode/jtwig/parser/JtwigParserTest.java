@@ -16,6 +16,8 @@
 
 package com.lyncode.jtwig.parser;
 
+import com.lyncode.jtwig.JtwigContext;
+import com.lyncode.jtwig.exception.CalculateException;
 import com.lyncode.jtwig.tree.content.*;
 import com.lyncode.jtwig.tree.helper.ElementList;
 import com.lyncode.jtwig.tree.structural.BlockExpression;
@@ -38,6 +40,7 @@ import static com.lyncode.jtwig.tree.value.Operator.NOT;
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.AllOf.allOf;
+import static org.junit.Assert.assertEquals;
 import static org.parboiled.Parboiled.createParser;
 
 public class JtwigParserTest {
@@ -194,6 +197,12 @@ public class JtwigParserTest {
     public void shouldMatchStringSingleQuoted () {
         String composition = parse(underTest.Primary(), "'hello'", String.class);
         assertThat(composition, equalTo("hello"));
+    }
+
+    @Test
+    public void shouldMatchTernaryOperator () throws CalculateException {
+        IfTernaryOperator composition = parse(underTest.TernaryExpression(), "true ? 1 : 2", IfTernaryOperator.class);
+        assertEquals(1, composition.calculate(new JtwigContext()));
     }
 
     @Test
