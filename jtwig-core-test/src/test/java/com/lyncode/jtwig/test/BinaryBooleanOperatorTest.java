@@ -64,4 +64,40 @@ public class BinaryBooleanOperatorTest extends AbstractJtwigTest {
         context.withModelAttribute("items", value);
         assertThat(template.output(context), is("Hi"));
     }
+
+    @Test
+    public void StartsWith () throws ParseException, CompileException, RenderException {
+        JtwigTemplate template = new JtwigTemplate("{% if ('Hello' starts with 'H') %}Hi{% endif %}");
+        assertThat(template.output(new JtwigContext()), is("Hi"));
+    }
+
+    @Test
+    public void StartsWithFail () throws ParseException, CompileException, RenderException {
+        JtwigTemplate template = new JtwigTemplate("{% if ('Hello' starts with 'e') %}Hi{% endif %}");
+        assertThat(template.output(new JtwigContext()), is(""));
+    }
+
+    @Test
+    public void EndsWith () throws ParseException, CompileException, RenderException {
+        JtwigTemplate template = new JtwigTemplate("{% if ('Hello' ends with 'llo') %}Hi{% endif %}");
+        assertThat(template.output(new JtwigContext()), is("Hi"));
+    }
+
+    @Test
+    public void EndsWithFail () throws ParseException, CompileException, RenderException {
+        JtwigTemplate template = new JtwigTemplate("{% if ('Hello' ends with 'a') %}Hi{% endif %}");
+        assertThat(template.output(new JtwigContext()), is(""));
+    }
+
+    @Test
+    public void Matches () throws ParseException, CompileException, RenderException {
+        JtwigTemplate template = new JtwigTemplate("{% if ('Hello' matches 'H.*') %}Hi{% endif %}");
+        assertThat(template.output(new JtwigContext()), is("Hi"));
+    }
+
+    @Test
+    public void MatchesFail () throws ParseException, CompileException, RenderException {
+        JtwigTemplate template = new JtwigTemplate("{% if ('Hello' matches '^A.*') %}Hi{% endif %}");
+        assertThat(template.output(new JtwigContext()), is(""));
+    }
 }

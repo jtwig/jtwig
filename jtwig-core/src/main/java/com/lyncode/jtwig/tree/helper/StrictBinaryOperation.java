@@ -65,19 +65,30 @@ public class StrictBinaryOperation implements Calculable {
     }
 
     private Object relationalExecute(JtwigContext resolver) throws CalculateException {
+        Object leftResolved = resolver.resolve(left);
+        Object rightResolved = resolver.resolve(right);
         switch (operator) {
             case GT:
-                return RelationalOperations.gt(resolver.resolve(left), resolver.resolve(right));
+                return RelationalOperations.gt(leftResolved, rightResolved);
             case GTE:
-                return RelationalOperations.gte(resolver.resolve(left), resolver.resolve(right));
+                return RelationalOperations.gte(leftResolved, rightResolved);
             case LT:
-                return RelationalOperations.lt(resolver.resolve(left), resolver.resolve(right));
+                return RelationalOperations.lt(leftResolved, rightResolved);
             case LTE:
-                return RelationalOperations.lte(resolver.resolve(left), resolver.resolve(right));
+                return RelationalOperations.lte(leftResolved, rightResolved);
             case EQUAL:
-                return RelationalOperations.eq(resolver.resolve(left), resolver.resolve(right));
+                return RelationalOperations.eq(leftResolved, rightResolved);
             case DIFF:
-                return RelationalOperations.neq(resolver.resolve(left), resolver.resolve(right));
+                return RelationalOperations.neq(leftResolved, rightResolved);
+            case STARTS_WITH:
+                if (leftResolved == null) return false;
+                return leftResolved.toString().startsWith(rightResolved.toString());
+            case ENDS_WITH:
+                if (leftResolved == null) return false;
+                return leftResolved.toString().endsWith(rightResolved.toString());
+            case MATCHES:
+                if (leftResolved == null) return false;
+                return leftResolved.toString().matches(rightResolved.toString());
         }
         throw new CalculateException("Unknown operator " + operator.toString());
     }
@@ -101,6 +112,8 @@ public class StrictBinaryOperation implements Calculable {
             case TIMES:
             case DIV:
             case MOD:
+            case INT_DIV:
+            case INT_TIMES:
                 return numericExecute(context);
             case AND:
             case OR:

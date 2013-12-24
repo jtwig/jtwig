@@ -19,8 +19,10 @@ package com.lyncode.jtwig.tree.value;
 public enum Operator {
     ADD("+"),
     SUB("-"),
+    INT_TIMES("**"),
     TIMES("*"),
-    DIV("*"),
+    INT_DIV("//"),
+    DIV("/"),
     MOD("%"),
 
     GT(">"),
@@ -34,8 +36,10 @@ public enum Operator {
     EQUAL("=="),
     DIFF("!="),
 
-    NOT("not")
-    ;
+    NOT("not"),
+    STARTS_WITH("starts with"),
+    ENDS_WITH("ends with"),
+    MATCHES("matches");
 
     public static Operator fromString (String operatorRepresentation) {
         for (Operator op : values())

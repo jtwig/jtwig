@@ -55,9 +55,11 @@ public class JtwigParser extends BaseParser<Object> {
             ParsingResult<Object> result = runner.run(FileUtils.readAllText(input.retrieve(), Charset.defaultCharset()));
             return (JtwigDocument) result.resultValue;
         } catch (ParserRuntimeException e) {
-            if (e.getCause() instanceof ParseBypassException)
-                throw ((ParseBypassException) e.getCause()).getInnerException();
-            else
+            if (e.getCause() instanceof ParseBypassException) {
+                ParseException innerException = ((ParseBypassException) e.getCause()).getInnerException();
+                innerException.setExpression(e.getMessage());
+                throw innerException;
+            } else
                 throw new ParseException(e);
         } catch (ResourceException e) {
             throw new ParseException(e);
@@ -366,8 +368,19 @@ public class JtwigParser extends BaseParser<Object> {
     // Boolean Grammar
     protected Rule Expression() {
         return Sequence(
-                OrExpression(),
+                SpecificJtwigOperators(),
                 push(simplify(pop()))
+        );
+    }
+
+
+
+    protected Rule SpecificJtwigOperators () {
+        return BinaryOperation(
+                OrExpression(),
+                Operator.STARTS_WITH,
+                Operator.ENDS_WITH,
+                Operator.MATCHES
         );
     }
 
@@ -413,6 +426,7 @@ public class JtwigParser extends BaseParser<Object> {
         );
     }
 
+
     // Math Grammar
     protected Rule Addition() {
         return BinaryOperation(
@@ -425,6 +439,8 @@ public class JtwigParser extends BaseParser<Object> {
     protected Rule Multiplication() {
         return BinaryOperation(
                 Primary(),
+                Operator.INT_DIV,
+                Operator.INT_TIMES,
                 Operator.TIMES,
                 Operator.DIV,
                 Operator.MOD

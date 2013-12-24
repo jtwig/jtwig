@@ -17,18 +17,31 @@
 package com.lyncode.jtwig.exception;
 
 public class ParseException extends Exception {
-    public ParseException(String message) {
-        super(message);
-    }
-
-    public ParseException(String message, Throwable cause) {
-        super(message, cause);
-    }
+    private String expression;
 
     public ParseException(Throwable cause) {
         super(cause);
     }
 
+    public ParseException(String message) {
+        super(message);
+    }
+
     public ParseException() {
+    }
+
+    public void setExpression(String expression) {
+        String result = expression.substring(expression.indexOf("input position"));
+        this.expression = result.substring(0, 1).toUpperCase() + result.substring(1);
+        this.expression = this.expression
+                .substring(0, this.expression.indexOf("com.lyncode.jtwig.exception.ParseBypassException"));
+    }
+
+    @Override
+    public String getMessage() {
+        if (expression != null)
+            return super.getMessage() + "\n" + "Explanation: " + expression;
+        else
+            return super.getMessage();
     }
 }
