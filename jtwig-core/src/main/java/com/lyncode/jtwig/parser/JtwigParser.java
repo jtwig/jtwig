@@ -567,8 +567,20 @@ public class JtwigParser extends BaseParser<Object> {
 
     protected Rule DeclaredExpression() {
         return FirstOf(
+                MapSelection(),
                 Function(),
                 Variable()
+        );
+    }
+
+    Rule MapSelection() {
+        return Sequence(
+                Variable(),
+                FreeSymbol(JtwigSymbol.OPEN_BRACKET),
+                StringLiteral(),
+                Spacing(),
+                FreeSymbol(JtwigSymbol.CLOSE_BRACKET),
+                push(new MapSelection((Variable) pop(1), (String) pop()))
         );
     }
 
@@ -764,11 +776,6 @@ public class JtwigParser extends BaseParser<Object> {
         );
     }
 
-    /**
-     * Pushes the variable (String)
-     *
-     * @return
-     */
     Rule Variable() {
         return Sequence(
                 Identifier(),
