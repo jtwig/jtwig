@@ -84,6 +84,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
+                <configuration>
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
+                    <pushChanges>true</pushChanges>
+                </configuration>
                 <executions>
                     <execution>
                         <id>default</id>
