@@ -1,6 +1,6 @@
 # JTwig 2.0 Beta
 
-*JTwig is a template mechanism, inspired in [Twig](http://twig.sensiolabs.org/) (PHP) for Java, with support for [SpringFramework Web MVC](http://www.springsource.org).*
+*JTwig is a template system for Java inspired in [Twig](http://twig.sensiolabs.org/). Jtwig is also distributed with support for [SpringFramework Web MVC](http://www.springsource.org).*
 
 ### Build Status
 
@@ -8,7 +8,7 @@
 
 ### Documentation
 
-Look the wiki for [documentation](https://github.com/lyncode/jtwig/wiki).
+- [Documentation](https://github.com/lyncode/jtwig/wiki).
 
 ----------
 
