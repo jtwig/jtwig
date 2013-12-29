@@ -38,13 +38,15 @@ public class ObjectExtractor {
 
     public Object extract (final String name, Object... parameters) throws ExtractException {
         List<Callable> callables = new ArrayList<Callable>();
-        if (knownType(context))
-            callables.add(tryKnownType());
 
-        if (parameters.length == 0)
+        if (parameters.length == 0) {
             callables.add(tryField());
+        }
 
         callables.add(tryMethod());
+
+        if (knownType(context))
+            callables.add(tryKnownType());
 
         for (Callable callable : callables) {
             Result<Object> result = callable.execute(name, parameters);
@@ -58,9 +60,7 @@ public class ObjectExtractor {
         return new Callable() {
             @Override
             public Result<Object> execute(String name, Object... args) throws ExtractException {
-                Object rest = extractKnownType(name, args);
-                if (rest != null) return new Result<Object>(rest);
-                else return new Result<Object>();
+                return new Result<Object>(extractKnownType(name, args));
             }
         };
     }
