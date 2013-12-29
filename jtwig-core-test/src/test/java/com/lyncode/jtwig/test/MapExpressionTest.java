@@ -45,12 +45,12 @@ public class MapExpressionTest extends AbstractJtwigTest {
         assertThat(template.output(context), is("0"));
     }
     @Test
-    public void ifKeyInMapGiveValue () throws ParseException, CompileException, RenderException {
+    public void methodsAndFieldsShouldPrevail () throws ParseException, CompileException, RenderException {
         JtwigTemplate template = new JtwigTemplate("{{ map.size }}");
         JtwigContext context = new JtwigContext();
         HashMap value = new HashMap();
         value.put("size", "Hello!");
         context.withModelAttribute("map", value);
-        assertThat(template.output(context), is("Hello!"));
+        assertThat(template.output(context), is("1"));
     }
 }
