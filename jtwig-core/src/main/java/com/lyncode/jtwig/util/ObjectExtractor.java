@@ -39,7 +39,7 @@ public class ObjectExtractor {
     public Object extract (final String name, Object... parameters) throws ExtractException {
         List<Callable> callables = new ArrayList<Callable>();
         if (knownType(context))
-            return extractKnownType(name, parameters);
+            callables.add(tryKnownType());
 
         if (parameters.length == 0)
             callables.add(tryField());
@@ -54,8 +54,19 @@ public class ObjectExtractor {
         throw new ExtractException("Unable to find field or method "+name+" in "+context);
     }
 
+    private Callable tryKnownType() {
+        return new Callable() {
+            @Override
+            public Result<Object> execute(String name, Object... args) throws ExtractException {
+                Object rest = extractKnownType(name, args);
+                if (rest != null) return new Result<Object>(rest);
+                else return new Result<Object>();
+            }
+        };
+    }
+
     private Object extractKnownType(String name, Object... parameters) {
-        if (context instanceof Map) {
+        if ((context instanceof Map) && parameters.length == 0) {
             return ((Map) context).get(name);
         }
         return null;

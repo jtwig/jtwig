@@ -16,6 +16,8 @@
 
 package com.lyncode.jtwig.util;
 
+import java.util.Map;
+
 public class BooleanOperations {
     public static Object and (Object a, Object b) {
         return isTrue(a) && isTrue(b);
@@ -37,6 +39,7 @@ public class BooleanOperations {
             if (obj instanceof Integer) return ((Integer) obj) != 0;
             if (obj instanceof Double) return ((Double) obj) != 0;
             if (obj instanceof Iterable) return ((Iterable) obj).iterator().hasNext();
+            if (obj instanceof Map) return !((Map) obj).isEmpty();
             if (obj.getClass().isArray()) return ((Object[]) obj).length > 0;
             return true;
         }
