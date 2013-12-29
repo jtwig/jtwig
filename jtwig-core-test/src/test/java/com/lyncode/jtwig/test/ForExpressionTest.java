@@ -24,6 +24,7 @@ import com.lyncode.jtwig.exception.RenderException;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -68,5 +69,18 @@ public class ForExpressionTest {
         JtwigContext context = new JtwigContext();
         context.withModelAttribute("list", null);
         assertThat(template.output(context), is(""));
+    }
+
+
+    @Test
+    public void iterateOverMap () throws ParseException, CompileException, RenderException {
+        JtwigTemplate template = new JtwigTemplate("{% for key, value in map %}{{ key }} = {{ value }}|{% endfor %}");
+        JtwigContext context = new JtwigContext();
+        LinkedHashMap<String, String> value = new  LinkedHashMap<String, String>();
+        value.put("one", "1");
+        value.put("two", "2");
+        value.put("three", "3");
+        context.withModelAttribute("map", value);
+        assertThat(template.output(context), is("one = 1|two = 2|three = 3|"));
     }
 }

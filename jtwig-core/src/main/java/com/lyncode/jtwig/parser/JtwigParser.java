@@ -290,6 +290,13 @@ public class JtwigParser extends BaseParser<Object> {
     }
 
     protected Rule ForExpression() {
+        return FirstOf(
+                ForEachMapExpression(),
+                ForEachExpression()
+        );
+    }
+
+    protected Rule ForEachExpression() {
         return Sequence(
                 OpenCode(),
                 SpecificKeyword(FOR),
@@ -305,6 +312,35 @@ public class JtwigParser extends BaseParser<Object> {
                 CloseCode(),
                 Content(),
                 ((ForExpression) peek(1)).setContent((Content) pop()),
+                Ensure(
+                        new EndCodeMissingException(FOR),
+                        OpenCode(),
+                        SpecificKeyword(ENDFOR),
+                        CloseCode()
+                )
+        );
+    }
+
+
+    protected Rule ForEachMapExpression() {
+        return Sequence(
+                OpenCode(),
+                SpecificKeyword(FOR),
+                Variable(),
+                Spacing(),
+                FreeSymbol(COMMA),
+                Variable(),
+                Spacing(),
+                SpecificKeyword(JtwigKeyword.IN),
+                Expression(),
+                Spacing(),
+                push(new ForPairExpression((Variable) pop(2), (Variable) pop(1), pop())),
+                Optional(
+                        ForFilters()
+                ),
+                CloseCode(),
+                Content(),
+                ((ForPairExpression) peek(1)).setContent((Content) pop()),
                 Ensure(
                         new EndCodeMissingException(FOR),
                         OpenCode(),
