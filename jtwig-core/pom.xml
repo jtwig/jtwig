@@ -52,6 +52,11 @@
             <version>${hamcrest.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>15.0</version>
+        </dependency>
         <!-- Fix Guava -->
         <dependency>
             <groupId>com.google.code.findbugs</groupId>

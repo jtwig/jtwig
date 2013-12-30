@@ -19,7 +19,7 @@
         <dependency>
             <groupId>com.lyncode</groupId>
             <artifactId>builder-commons</artifactId>
-            <version>1.0.1</version>
+            <version>${lyncode.builder.commons.version}</version>
         </dependency>
         <dependency>
             <groupId>com.lyncode</groupId>
