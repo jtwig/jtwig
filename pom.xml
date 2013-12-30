@@ -34,7 +34,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <lyncode.builder.commons.version>1.0.1</lyncode.builder.commons.version>
+        <lyncode.builder.commons.version>1.0.2</lyncode.builder.commons.version>
 
         <spring.version>3.2.5.RELEASE</spring.version>
         <parboiled.version>1.1.6</parboiled.version>

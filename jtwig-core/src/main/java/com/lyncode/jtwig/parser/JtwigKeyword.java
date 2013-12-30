@@ -16,6 +16,7 @@
 
 package com.lyncode.jtwig.parser;
 
+import com.google.common.base.Function;
 import com.lyncode.builder.ListBuilder;
 
 import java.util.List;
@@ -50,13 +51,16 @@ public enum JtwigKeyword {
     ;
 
     public static String[] keywords () {
-        List<String> list = new ListBuilder<JtwigKeyword>().add(JtwigKeyword.values()).build(new ListBuilder.Transformer<JtwigKeyword, String>() {
-            @Override
-            public String transform(JtwigKeyword elem) {
+        List<String> list = new ListBuilder<JtwigKeyword>().add(JtwigKeyword.values()).build(extractWord());
+        return list.toArray(new String[list.size()]);
+    }
+
+    private static Function<JtwigKeyword, String> extractWord() {
+        return new Function<JtwigKeyword, String>() {
+            public String apply(JtwigKeyword elem) {
                 return elem.getKeyword();
             }
-        });
-        return list.toArray(new String[list.size()]);
+        };
     }
 
     private final String keyword;
