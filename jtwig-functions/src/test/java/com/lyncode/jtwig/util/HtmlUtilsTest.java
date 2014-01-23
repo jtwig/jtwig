@@ -18,9 +18,10 @@ package com.lyncode.jtwig.util;
 
 import org.junit.Test;
 
-import static com.lyncode.jtwig.util.HtmlUtils.stripTags;
+import static com.lyncode.jtwig.functions.util.HtmlUtils.stripTags;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class HtmlUtilsTest {
     @Test
