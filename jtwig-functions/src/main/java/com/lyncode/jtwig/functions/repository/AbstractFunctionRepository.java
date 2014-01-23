@@ -45,6 +45,7 @@ public abstract class AbstractFunctionRepository {
                 // String function
                 new FunctionDeclaration(new Upper(), "upper"),
                 new FunctionDeclaration(new Lower(), "lower"),
+                new FunctionDeclaration(new StripTags(), "striptags"),
                 new FunctionDeclaration(new Trim(), "trim"),
                 new FunctionDeclaration(new Split(), "split"),
                 new FunctionDeclaration(new Capitalize(), "capitalize"),
