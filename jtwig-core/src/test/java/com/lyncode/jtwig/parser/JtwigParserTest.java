@@ -146,7 +146,6 @@ public class JtwigParserTest {
     public void shouldMatchFastExpression() throws Exception {
         FastExpression exp = parse(underTest.FastExpression(), "{{ 'test' |     translate | joao(joao) }}", FastExpression.class);
         assertThat(exp.getExpression(), is(notNullValue()));
-        assertThat(exp.getFilters(), allOf(hasItem(function(equalTo("translate"))), hasItem(function(equalTo("joao")))));
     }
 
     @Test
@@ -212,22 +211,22 @@ public class JtwigParserTest {
     }
     @Test
     public void shouldNotMatchCompositionWithNativeTypesAtTheEnd () {
-        Composition composition = parse(underTest.Composition(), "hello.123", Composition.class);
-        assertThat(composition, is(nullValue()));
+        Selection selection = parse(underTest.Selection(), "hello.123", Selection.class);
+        assertThat(selection, is(nullValue()));
     }
 
     @Test
     public void shouldMatchCompositionOfVariables () {
-        Composition composition = parse(underTest.Composition(), "hello.dois", Composition.class);
-        assertThat(composition, hasElement(variable(equalTo("hello"))));
-        assertThat(composition, hasElement(variable(equalTo("dois"))));
+        Selection selection = parse(underTest.Selection(), "hello.dois", Selection.class);
+        assertThat(selection, hasElement(variable(equalTo("hello"))));
+        assertThat(selection, hasElement(variable(equalTo("dois"))));
     }
 
     @Test
     public void shouldMatchCompositionOfVariableAndFunction () {
-        Composition composition = parse(underTest.Composition(), "hello.dois()", Composition.class);
-        assertThat(composition, hasElement(variable(equalTo("hello"))));
-        assertThat(composition, hasElement(function(equalTo("dois"))));
+        Selection selection = parse(underTest.Selection(), "hello.dois()", Selection.class);
+        assertThat(selection, hasElement(variable(equalTo("hello"))));
+        assertThat(selection, hasElement(function(equalTo("dois"))));
     }
 
     @Test

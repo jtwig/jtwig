@@ -16,49 +16,51 @@
 
 package com.lyncode.jtwig.tree.value;
 
+import com.lyncode.builder.ListBuilder;
 import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.exception.CalculateException;
+import com.lyncode.jtwig.functions.exceptions.FunctionException;
+import com.lyncode.jtwig.functions.exceptions.FunctionNotFoundException;
 import com.lyncode.jtwig.tree.api.Calculable;
-import com.lyncode.jtwig.tree.helper.ElementList;
-import com.lyncode.jtwig.util.ObjectExtractor;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class Composition extends ElementList implements Calculable {
-    public Composition(Object... list) {
-        super(list);
+public class Composition implements Calculable {
+    private Object context;
+    private List<FunctionElement> filters = new ArrayList<FunctionElement>();
+
+    public Composition(Object context) {
+        this.context = context;
+    }
+
+    public boolean add (Object functionElement) {
+        if (functionElement instanceof FunctionElement)
+            this.filters.add((FunctionElement) functionElement);
+        else if (functionElement instanceof Variable)
+            filters.add(new FunctionElement(((Variable) functionElement).getIdentifier()));
+        else
+            return false;
+        return true;
     }
 
     @Override
     public Object calculate(JtwigContext context) throws CalculateException {
-        Object contextObject = null;
-        for (Object obj : getList()) {
-            if (contextObject == null) contextObject = resolve(obj, context);
-            else {
-                ObjectExtractor objectExtractor = new ObjectExtractor(contextObject);
-                if (obj instanceof Variable) {
-                    try {
-                        contextObject = objectExtractor.extract(((Variable) obj).getIdentifier());
-                    } catch (ObjectExtractor.ExtractException e) {
-                        throw new CalculateException(e);
-                    }
-                } else if (obj instanceof FunctionElement) {
-                    try {
-                        List<?> arguments = (List<?>) ((FunctionElement) obj).getArguments().calculate(context);
-                        contextObject = objectExtractor.extract(((FunctionElement) obj).getName(), arguments.toArray());
-                    } catch (ObjectExtractor.ExtractException e) {
-                        throw new CalculateException(e);
-                    }
-                }
+        try {
+            Object resolved = context.resolve(this.context);
+            for (FunctionElement functionElement : filters) {
+                List<Object> arguments = new ListBuilder<Object>()
+                        .add(resolved)
+                        .add(((List) context.resolve(functionElement.getArguments())).toArray())
+                        .build();
+                resolved = context.function(functionElement.getName()).execute(arguments.toArray());
             }
+            return resolved;
+        } catch (FunctionException e) {
+            throw new CalculateException(e);
+        } catch (FunctionNotFoundException e) {
+            throw new CalculateException(e);
         }
-        return contextObject;
-    }
 
-    private Object resolve(Object obj, JtwigContext context) throws CalculateException {
-        if (obj instanceof Calculable)
-            return ((Calculable) obj).calculate(context);
-        else
-            return obj;
     }
 }

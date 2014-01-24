@@ -386,14 +386,6 @@ public class JtwigParser extends BaseParser<Object> {
                 Expression(),
                 Spacing(),
                 push(new FastExpression(pop())),
-                ZeroOrMore(
-                        Sequence(
-                                FreeSymbol(JtwigSymbol.PIPE),
-                                DeclaredExpression(),
-                                Spacing(),
-                                (((FastExpression) peek(1))).add(pop())
-                        )
-                ),
                 Ensure(
                         new EndClauseMissingException(JtwigSymbol.OPEN_FAST),
                         Symbol(JtwigSymbol.CLOSE_FAST)
@@ -556,6 +548,7 @@ public class JtwigParser extends BaseParser<Object> {
 
     protected Rule Primary() {
         return FirstOf(
+                Selection(),
                 Composition(),
                 BasicExpression(),
                 Sequence(
@@ -574,9 +567,27 @@ public class JtwigParser extends BaseParser<Object> {
                 OneOrMore(
                         Sequence(
                                 Spacing(),
+                                FreeSymbol(PIPE),
+                                FirstOf(
+                                        Function(),
+                                        Variable()
+                                ),
+                                ((Composition) peek(1)).add(pop())
+                        )
+                )
+        );
+    }
+
+    protected Rule Selection() {
+        return Sequence(
+                BasicExpression(),
+                push(new Selection(pop())),
+                OneOrMore(
+                        Sequence(
+                                Spacing(),
                                 FreeSymbol(DOT),
                                 DeclaredExpression(),
-                                ((Composition) peek(1)).add(pop())
+                                ((Selection) peek(1)).add(pop())
                         )
                 )
         );

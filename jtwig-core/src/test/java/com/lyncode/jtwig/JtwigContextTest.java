@@ -16,8 +16,8 @@
 
 package com.lyncode.jtwig;
 
-import com.lyncode.jtwig.tree.value.Composition;
 import com.lyncode.jtwig.tree.value.FunctionElement;
+import com.lyncode.jtwig.tree.value.Selection;
 import com.lyncode.jtwig.tree.value.Variable;
 import org.junit.Test;
 
@@ -41,11 +41,11 @@ public class JtwigContextTest {
     @Test
     public void shouldResolveComposition() throws Exception {
         when(modelMap.get("name")).thenReturn(new ArrayList<Object>());
-        Composition composition = new Composition(
+        Selection selection = new Selection(
                 new Variable("name"),
                 new Variable("size")
         );
-        assertThat(resolver.resolve(composition), is((Object) 0));
+        assertThat(resolver.resolve(selection), is((Object) 0));
     }
     @Test
     public void shouldResolveCompositionWithFunction() throws Exception {
@@ -54,10 +54,10 @@ public class JtwigContextTest {
         when(modelMap.get("name")).thenReturn(objects);
         FunctionElement function = new FunctionElement("get");
         function.add(0);
-        Composition composition = new Composition(
+        Selection selection = new Selection(
                 new Variable("name"),
                 function
         );
-        assertThat(resolver.resolve(composition), is((Object) "a"));
+        assertThat(resolver.resolve(selection), is((Object) "a"));
     }
 }
