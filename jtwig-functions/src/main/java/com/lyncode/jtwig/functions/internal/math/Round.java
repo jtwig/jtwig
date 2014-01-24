@@ -19,17 +19,22 @@ package com.lyncode.jtwig.functions.internal.math;
 import com.lyncode.jtwig.functions.Function;
 import com.lyncode.jtwig.functions.exceptions.FunctionException;
 
+import static com.lyncode.jtwig.functions.util.Requirements.between;
+import static com.lyncode.jtwig.functions.util.Requirements.requires;
+import static org.hamcrest.core.AnyOf.anyOf;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
+
 public class Round implements Function {
     @Override
     public Object execute(Object... arguments) throws FunctionException {
-        if (arguments.length < 1 || arguments.length > 2) throw new FunctionException("Invalid number of arguments");
+        requires(arguments)
+                .withNumberOfArguments(between(1, 2))
+                .withArgument(0, anyOf(instanceOf(Integer.class), instanceOf(Double.class), instanceOf(Float.class)));
 
         if (arguments[0] instanceof Integer)
             return arguments[0];
-        else if (arguments[0] instanceof Float)
+        else
             arguments[0] = (Double) arguments[0];
-        else if (!(arguments[0] instanceof Number))
-            throw new FunctionException("Invalid first argument. Must be a number");
 
         String strategy = "common";
         if (arguments.length == 2)

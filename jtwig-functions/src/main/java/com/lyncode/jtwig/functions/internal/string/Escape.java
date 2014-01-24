@@ -22,12 +22,15 @@ import org.apache.commons.lang3.StringEscapeUtils;
 
 import java.util.List;
 
+import static com.lyncode.jtwig.functions.util.Requirements.between;
+import static com.lyncode.jtwig.functions.util.Requirements.requires;
 import static java.util.Arrays.asList;
 
 public class Escape implements Function {
     @Override
     public Object execute(Object... arguments) throws FunctionException {
-        if (arguments.length < 1 || arguments.length > 2) throw new FunctionException("Invalid number of arguments");
+        requires(arguments)
+                .withNumberOfArguments(between(1, 2));
 
         String strategy = "html";
         if (arguments.length == 2)

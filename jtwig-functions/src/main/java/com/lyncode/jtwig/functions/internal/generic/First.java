@@ -23,11 +23,16 @@ import com.lyncode.jtwig.functions.util.ObjectIterator;
 import java.util.Iterator;
 import java.util.Map;
 
+import static com.lyncode.jtwig.functions.util.Requirements.requires;
+import static org.hamcrest.CoreMatchers.equalTo;
+
 public class First implements Function {
 
     @Override
     public Object execute(Object... arguments) throws FunctionException {
-        if (arguments.length != 1) throw new FunctionException("Invalid number of arguments");
+        requires(arguments)
+                .withNumberOfArguments(equalTo(1));
+
         if ((arguments[0] instanceof Iterable) || arguments[0].getClass().isArray()) {
             ObjectIterator objectIterator = new ObjectIterator(arguments[0]);
             if (objectIterator.hasNext()) return objectIterator.next();

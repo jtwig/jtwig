@@ -24,10 +24,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static com.lyncode.jtwig.functions.util.Requirements.requires;
+import static org.hamcrest.CoreMatchers.equalTo;
+
 public class Reverse implements Function {
     @Override
     public Object execute(Object... arguments) throws FunctionException {
-        if (arguments.length != 1) throw new FunctionException("Invalid number of arguments");
+        requires(arguments)
+            .withNumberOfArguments(equalTo(1));
+
         if ((arguments[0] instanceof Iterable) || arguments[0].getClass().isArray())
             return reverse(new ObjectIterator(arguments[0]), arguments[0] instanceof Iterable);
         else if (arguments[0] instanceof String)

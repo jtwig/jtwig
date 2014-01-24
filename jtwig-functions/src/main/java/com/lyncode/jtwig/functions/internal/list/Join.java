@@ -20,10 +20,14 @@ import com.lyncode.jtwig.functions.Function;
 import com.lyncode.jtwig.functions.exceptions.FunctionException;
 import org.apache.commons.lang3.StringUtils;
 
+import static com.lyncode.jtwig.functions.util.Requirements.between;
+import static com.lyncode.jtwig.functions.util.Requirements.requires;
+
 public class Join implements Function {
     @Override
     public Object execute(Object... arguments) throws FunctionException {
-        if (arguments.length < 1) throw new FunctionException("Requires at least a list as argument");
+        requires(arguments)
+                .withNumberOfArguments(between(1, 2));
 
         String separator = "";
         if (arguments.length == 2)

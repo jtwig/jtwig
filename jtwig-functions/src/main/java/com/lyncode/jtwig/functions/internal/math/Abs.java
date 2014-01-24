@@ -19,12 +19,17 @@ package com.lyncode.jtwig.functions.internal.math;
 import com.lyncode.jtwig.functions.Function;
 import com.lyncode.jtwig.functions.exceptions.FunctionException;
 
+import static com.lyncode.jtwig.functions.util.Requirements.requires;
 import static java.lang.Math.abs;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
 
 public class Abs implements Function {
     @Override
     public Object execute(Object... arguments) throws FunctionException {
-        if (arguments.length != 1) throw new FunctionException("Invalid number of arguments");
+        requires(arguments)
+                .withNumberOfArguments(equalTo(1))
+                .withArgument(0, instanceOf(Number.class));
 
         if (arguments[0] instanceof Double)
             return abs((Double) arguments[0]);
@@ -34,6 +39,7 @@ public class Abs implements Function {
             return abs((Integer) arguments[0]);
         else if (arguments[0] instanceof Long)
             return abs((Long) arguments[0]);
-        throw new FunctionException("Invalid argument type. It must be a number");
+        else
+            return arguments[0];
     }
 }

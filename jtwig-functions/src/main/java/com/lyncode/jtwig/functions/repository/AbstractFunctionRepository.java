@@ -22,6 +22,7 @@ import com.lyncode.jtwig.functions.internal.cast.ToDouble;
 import com.lyncode.jtwig.functions.internal.cast.ToInt;
 import com.lyncode.jtwig.functions.internal.generic.*;
 import com.lyncode.jtwig.functions.internal.list.*;
+import com.lyncode.jtwig.functions.internal.map.MapKeys;
 import com.lyncode.jtwig.functions.internal.math.Abs;
 import com.lyncode.jtwig.functions.internal.math.JNumberFormat;
 import com.lyncode.jtwig.functions.internal.math.Round;
@@ -41,6 +42,7 @@ public abstract class AbstractFunctionRepository {
                 new FunctionDeclaration(new Batch(), "batch"),
                 new FunctionDeclaration(new Merge(), "merge"),
                 new FunctionDeclaration(new Slice(), "slice"),
+                new FunctionDeclaration(new MapKeys(), "keys"),
 
                 // String function
                 new FunctionDeclaration(new Upper(), "upper"),

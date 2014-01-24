@@ -23,15 +23,19 @@ import com.lyncode.jtwig.functions.util.ObjectIterator;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.lyncode.jtwig.functions.util.Requirements.isArray;
+import static com.lyncode.jtwig.functions.util.Requirements.requires;
 import static java.lang.Math.min;
+import static org.hamcrest.CoreMatchers.*;
 
 public class Slice implements Function {
     @Override
     public Object execute(Object... arguments) throws FunctionException {
-        if (arguments.length != 3) throw new FunctionException("Invalid number of arguments");
-        if (!(arguments[0] instanceof String) && !(arguments[0] instanceof Iterable) && !arguments[0].getClass().isArray()) throw new FunctionException("Invalid first argument. Must be a list or an array");
-        if (!(arguments[1] instanceof Integer)) throw new FunctionException("Invalid second argument. Must be an integer");
-        if (!(arguments[2] instanceof Integer)) throw new FunctionException("Invalid third argument. Must be an integer");
+        requires(arguments)
+                .withNumberOfArguments(equalTo(3))
+                .withArgument(0, anyOf(instanceOf(String.class), instanceOf(Iterable.class), isArray()))
+                .withArgument(1, instanceOf(Integer.class))
+                .withArgument(2, instanceOf(Integer.class));
 
         int begin = (Integer) arguments[1];
         int length = (Integer) arguments[2];

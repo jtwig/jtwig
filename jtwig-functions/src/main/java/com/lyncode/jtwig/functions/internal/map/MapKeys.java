@@ -14,29 +14,24 @@
  * limitations under the License.
  */
 
-package com.lyncode.jtwig.functions.internal.string;
+package com.lyncode.jtwig.functions.internal.map;
 
 import com.lyncode.jtwig.functions.Function;
 import com.lyncode.jtwig.functions.exceptions.FunctionException;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.Map;
 
-import static com.lyncode.jtwig.functions.util.Requirements.between;
 import static com.lyncode.jtwig.functions.util.Requirements.requires;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 
-public class DateFormat implements Function {
+public class MapKeys implements Function {
     @Override
     public Object execute(Object... arguments) throws FunctionException {
         requires(arguments)
-                .withNumberOfArguments(between(1, 2))
-                .withArgument(0, instanceOf(Date.class));
-
-        java.text.DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        if (arguments.length == 2)
-            dateFormat = new SimpleDateFormat(arguments[1].toString());
-
-        return dateFormat.format(arguments[0]);
+                .withNumberOfArguments(equalTo(1))
+                .withArgument(0, instanceOf(Map.class));
+        return new ArrayList(((Map)arguments[0]).keySet());
     }
 }

@@ -21,11 +21,17 @@ import com.lyncode.jtwig.functions.exceptions.FunctionException;
 
 import java.util.Map;
 
+import static com.lyncode.jtwig.functions.util.Requirements.requires;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
+
 public class Replace implements Function {
     @Override
     public Object execute(Object... arguments) throws FunctionException {
-        if (arguments.length != 2) throw new FunctionException("Invalid number of arguments");
-        if (!(arguments[1] instanceof Map)) throw new FunctionException("Invalid 2nd argument. Must be a map.");
+        requires(arguments)
+                .withNumberOfArguments(equalTo(2))
+                .withArgument(1, instanceOf(Map.class));
+
         if (arguments[0] == null) return null;
         String input = arguments[0].toString();
         Map<String, Object> replacements = (Map<String, Object>) arguments[1];

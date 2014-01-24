@@ -23,11 +23,17 @@ import com.lyncode.jtwig.functions.util.ObjectIterator;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.lyncode.jtwig.functions.util.Requirements.between;
+import static com.lyncode.jtwig.functions.util.Requirements.requires;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
+
 public class Batch implements Function {
     @Override
     public Object execute(Object... arguments) throws FunctionException {
-        if (arguments.length < 2 || arguments.length > 3) throw new FunctionException("Invalid number of arguments");
-        if (!(arguments[1] instanceof Integer)) throw new FunctionException("Second arguments must be an integer");
+        requires(arguments)
+                .withNumberOfArguments(between(2, 3))
+                .withArgument(1, instanceOf(Integer.class));
+
         ObjectIterator iterator = new ObjectIterator(arguments[0]);
         int groupSize = (Integer) arguments[1];
         boolean end = false;

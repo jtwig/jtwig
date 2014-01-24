@@ -19,12 +19,16 @@ package com.lyncode.jtwig.functions.internal.string;
 import com.lyncode.jtwig.functions.Function;
 import com.lyncode.jtwig.functions.exceptions.FunctionException;
 
+import static com.lyncode.jtwig.functions.util.Requirements.requires;
 import static java.util.Arrays.copyOfRange;
+import static org.hamcrest.Matchers.greaterThan;
 
 public class Format implements Function {
     @Override
     public Object execute(Object... arguments) throws FunctionException {
-        if (arguments.length < 1) throw new FunctionException("Invalid number of arguments. Expecting at least one.");
+        requires(arguments)
+                .withNumberOfArguments(greaterThan(0));
+
         if (arguments[0] == null) return null;
         String input = arguments[0].toString();
         return String.format(input, copyOfRange(arguments, 1, arguments.length));

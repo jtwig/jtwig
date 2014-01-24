@@ -22,10 +22,15 @@ import com.lyncode.jtwig.functions.util.ObjectIterator;
 
 import java.util.Map;
 
+import static com.lyncode.jtwig.functions.util.Requirements.requires;
+import static org.hamcrest.CoreMatchers.equalTo;
+
 public class Length implements Function {
     @Override
     public Object execute(Object... arguments) throws FunctionException {
-        if (arguments.length != 1) throw new FunctionException("Invalid number of arguments");
+        requires(arguments)
+                .withNumberOfArguments(equalTo(1));
+
         if ((arguments[0] instanceof Iterable) || arguments[0].getClass().isArray())
             return new ObjectIterator(arguments[0]).size();
         else if (arguments[0] instanceof Map)

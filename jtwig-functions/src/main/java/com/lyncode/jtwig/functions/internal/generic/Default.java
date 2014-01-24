@@ -19,10 +19,15 @@ package com.lyncode.jtwig.functions.internal.generic;
 import com.lyncode.jtwig.functions.Function;
 import com.lyncode.jtwig.functions.exceptions.FunctionException;
 
+import static com.lyncode.jtwig.functions.util.Requirements.requires;
+import static org.hamcrest.CoreMatchers.equalTo;
+
 public class Default implements Function {
     @Override
     public Object execute(Object... arguments) throws FunctionException {
-        if (arguments.length != 2) throw new FunctionException("Invalid number of arguments");
+        requires(arguments)
+                .withNumberOfArguments(equalTo(2));
+
         if (arguments[0] == null)
             return arguments[1];
         else

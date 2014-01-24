@@ -21,18 +21,23 @@ import com.lyncode.jtwig.functions.exceptions.FunctionException;
 
 import java.util.*;
 
+import static com.lyncode.jtwig.functions.util.Requirements.isArray;
+import static com.lyncode.jtwig.functions.util.Requirements.requires;
+import static org.hamcrest.Matchers.*;
+
 public class Merge implements Function {
     @Override
     public Object execute(Object... arguments) throws FunctionException {
-        if (arguments.length < 2) throw new FunctionException("Invalid number of arguments. Expecting at least two arguments.");
+        requires(arguments)
+                .withNumberOfArguments(greaterThan(1))
+                .withArgument(0, anyOf(instanceOf(Iterable.class), instanceOf(Map.class), isArray()));
+
         if (arguments[0] instanceof Iterable)
             return mergeList(arguments);
         else if (arguments[0] instanceof Map)
             return mergeMap(arguments);
-        else if (arguments[0].getClass().isArray())
+        else // is array (precondition)
             return mergeArray(arguments);
-        else
-            throw new FunctionException("Invalid arguments. Expecting lists, arrays or maps values.");
     }
 
     private Object mergeArray(Object... arguments) {

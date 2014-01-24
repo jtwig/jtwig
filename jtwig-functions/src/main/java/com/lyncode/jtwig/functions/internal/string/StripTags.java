@@ -20,12 +20,14 @@ import com.lyncode.jtwig.functions.Function;
 import com.lyncode.jtwig.functions.exceptions.FunctionException;
 
 import static com.lyncode.jtwig.functions.util.HtmlUtils.stripTags;
+import static com.lyncode.jtwig.functions.util.Requirements.between;
+import static com.lyncode.jtwig.functions.util.Requirements.requires;
 
 public class StripTags implements Function {
     @Override
     public Object execute(Object... arguments) throws FunctionException {
-        if (arguments.length < 1 || arguments.length > 2)
-            throw new FunctionException("Invalid number of arguments");
+        requires(arguments)
+                .withNumberOfArguments(between(1, 2));
 
         String input = arguments[0].toString();
         String allowed = arguments.length == 2 ? arguments[1].toString() : "";

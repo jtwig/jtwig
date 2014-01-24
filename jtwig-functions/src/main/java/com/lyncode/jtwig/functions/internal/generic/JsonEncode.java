@@ -22,11 +22,18 @@ import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.IOException;
 
+import static com.lyncode.jtwig.functions.util.Requirements.requires;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.notNullValue;
+
 public class JsonEncode implements Function {
     private ObjectMapper mapper = new ObjectMapper();
     @Override
     public Object execute(Object... arguments) throws FunctionException {
-        if (arguments.length != 1) throw new FunctionException("Invalid number of arguments");
+        requires(arguments)
+                .withNumberOfArguments(equalTo(1))
+                .withArgument(0, notNullValue());
+
         try {
             return mapper.writeValueAsString(arguments[0]);
         } catch (IOException e) {

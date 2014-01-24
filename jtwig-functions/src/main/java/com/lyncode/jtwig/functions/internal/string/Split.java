@@ -19,12 +19,16 @@ package com.lyncode.jtwig.functions.internal.string;
 import com.lyncode.jtwig.functions.Function;
 import com.lyncode.jtwig.functions.exceptions.FunctionException;
 
+import static com.lyncode.jtwig.functions.util.Requirements.requires;
 import static java.util.Arrays.asList;
+import static org.hamcrest.CoreMatchers.equalTo;
 
 public class Split implements Function {
     @Override
     public Object execute(Object... arguments) throws FunctionException {
-        if (arguments.length != 2) throw new FunctionException("Invalid number of arguments");
+        requires(arguments)
+                .withNumberOfArguments(equalTo(2));
+
         if (arguments[0] == null) return null;
         if (arguments[1] == null) return arguments[0];
         return asList(arguments[0].toString().split(arguments[1].toString()));

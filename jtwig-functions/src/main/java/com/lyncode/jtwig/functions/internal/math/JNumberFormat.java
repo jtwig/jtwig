@@ -22,10 +22,17 @@ import com.lyncode.jtwig.functions.exceptions.FunctionException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 
+import static com.lyncode.jtwig.functions.util.Requirements.between;
+import static com.lyncode.jtwig.functions.util.Requirements.requires;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
+
 public class JNumberFormat implements Function {
     @Override
     public Object execute(Object... arguments) throws FunctionException {
-        if (arguments.length < 1 || arguments.length > 4) throw new FunctionException("Invalid number of arguments");
+        requires(arguments)
+                .withNumberOfArguments(between(1, 4))
+                .withArgument(1, instanceOf(Integer.class));
+
         DecimalFormat numberFormat = new DecimalFormat();
         DecimalFormatSymbols decimalFormatSymbols = numberFormat.getDecimalFormatSymbols();
 
