@@ -63,6 +63,7 @@ public abstract class AbstractFunctionRepository {
                 // Date Functions
                 new FunctionDeclaration(new DateModify(), "date_modify"),
                 new FunctionDeclaration(new DateFormat(), "date", "date_format"),
+                new FunctionDeclaration(new ConvertEncoding(), "convert_encoding"),
 
                 // Math functions
                 new FunctionDeclaration(new Abs(), "abs"),
