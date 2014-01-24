@@ -20,6 +20,8 @@ import com.lyncode.jtwig.functions.Function;
 import com.lyncode.jtwig.functions.exceptions.FunctionNotFoundException;
 import com.lyncode.jtwig.functions.internal.cast.ToDouble;
 import com.lyncode.jtwig.functions.internal.cast.ToInt;
+import com.lyncode.jtwig.functions.internal.date.DateFormat;
+import com.lyncode.jtwig.functions.internal.date.DateModify;
 import com.lyncode.jtwig.functions.internal.generic.*;
 import com.lyncode.jtwig.functions.internal.list.*;
 import com.lyncode.jtwig.functions.internal.map.MapKeys;
@@ -56,8 +58,11 @@ public abstract class AbstractFunctionRepository {
                 new FunctionDeclaration(new Format(), "format"),
                 new FunctionDeclaration(new Nl2Br(), "nl2br"),
                 new FunctionDeclaration(new UrlEncode(), "url_encode"),
-                new FunctionDeclaration(new DateFormat(), "date", "date_format"),
                 new FunctionDeclaration(new Escape(), "escape", "e"),
+
+                // Date Functions
+                new FunctionDeclaration(new DateModify(), "date_modify"),
+                new FunctionDeclaration(new DateFormat(), "date", "date_format"),
 
                 // Math functions
                 new FunctionDeclaration(new Abs(), "abs"),

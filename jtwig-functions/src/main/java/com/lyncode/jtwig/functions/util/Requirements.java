@@ -44,7 +44,7 @@ public class Requirements {
         BaseDescription description = new StringDescription();
         predicate.describeTo(description);
         if (!predicate.matches(arguments[number]))
-            throw new FunctionException("Invalid argument "+arguments[number]+": "+description.toString());
+            throw new FunctionException("Invalid argument "+number+" ("+arguments[number]+"). It should "+description.toString());
         return this;
     }
 

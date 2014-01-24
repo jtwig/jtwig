@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.lyncode.jtwig.functions.internal.string;
+package com.lyncode.jtwig.functions.internal.date;
 
 import com.lyncode.jtwig.functions.Function;
 import com.lyncode.jtwig.functions.exceptions.FunctionException;

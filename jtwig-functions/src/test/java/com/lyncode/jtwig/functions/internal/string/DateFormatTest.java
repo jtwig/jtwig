@@ -16,6 +16,7 @@
 
 package com.lyncode.jtwig.functions.internal.string;
 
+import com.lyncode.jtwig.functions.internal.date.DateFormat;
 import org.junit.Test;
 
 import java.text.SimpleDateFormat;
