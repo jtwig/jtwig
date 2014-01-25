@@ -21,32 +21,12 @@ import com.lyncode.jtwig.JtwigTemplate;
 import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.ParseException;
 import com.lyncode.jtwig.exception.RenderException;
-import com.lyncode.jtwig.exception.ResourceException;
-import com.lyncode.jtwig.resource.JtwigResource;
 
-import java.io.InputStream;
+import java.io.File;
 
 public class Sample {
     public static void main (String... args) throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = new JtwigTemplate(getClasspathResource("template.twig"));
-        JtwigContext context = new JtwigContext();
-
-        context.withModelAttribute("name", "JTwig User");
-
-        System.out.println(template.output(context));
-    }
-
-    private static JtwigResource getClasspathResource(final String resourcePath) {
-        return new JtwigResource() {
-            @Override
-            public InputStream retrieve() throws ResourceException {
-                return Sample.class.getClassLoader().getResourceAsStream(resourcePath);
-            }
-
-            @Override
-            public JtwigResource resolve(String relativePath) throws ResourceException {
-                return null;
-            }
-        };
+        JtwigTemplate template = new JtwigTemplate(new File("template.twig"));
+        String result = template.output(new JtwigContext().withModelAttribute("name", "Hi"));
     }
 }

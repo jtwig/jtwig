@@ -24,6 +24,10 @@ import com.lyncode.jtwig.functions.repository.DefaultFunctionRepository;
 import com.lyncode.jtwig.tree.api.Calculable;
 
 public class JtwigContext {
+    public static JtwigContext context () {
+        return new JtwigContext();
+    }
+
     private AbstractFunctionRepository functionRepository;
     private JtwigModelMap modelMap;
 
