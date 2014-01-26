@@ -108,6 +108,7 @@ public class JtwigParser extends BaseParser<Object> {
                                 AddToContent(ForExpression()),
                                 AddToContent(IfExpression()),
                                 AddToContent(SetExpression()),
+                                AddToContent(Verbatim()),
                                 Sequence(
                                         OpenCode(),
                                         TestNot(
@@ -127,6 +128,25 @@ public class JtwigParser extends BaseParser<Object> {
                                 ),
                                 AddToContent(TextExpression())
                         )
+                )
+        );
+    }
+
+    protected Rule Verbatim () {
+        return Sequence(
+                Sequence(
+                        OpenCode(),
+                        SpecificKeyword(VERBATIM),
+                        CloseCode()
+                ),
+                TextExpression(Sequence(OpenCode(), SpecificKeyword(JtwigKeyword.ENDVERBATIM))),
+                Ensure(
+                    new EndClauseMissingException(VERBATIM),
+                    Sequence(
+                            OpenCode(),
+                            SpecificKeyword(JtwigKeyword.ENDVERBATIM),
+                            CloseCode()
+                    )
                 )
         );
     }
@@ -229,6 +249,27 @@ public class JtwigParser extends BaseParser<Object> {
                                                         Symbol(OPEN_FAST),
                                                         Symbol(OPEN_CODE)
                                                 )
+                                        ),
+                                        ANY,
+                                        ((Text) peek()).append(match())
+                                )
+                        )
+                ).suppressSubnodes()
+        );
+    }
+
+    protected Rule TextExpression(Rule until) {
+        return Sequence(
+                push(new Text()),
+                OneOrMore(
+                        FirstOf(
+                                Sequence(
+                                        Escape(),
+                                        ((Text) peek()).append(match())
+                                ),
+                                Sequence(
+                                        TestNot(
+                                                until
                                         ),
                                         ANY,
                                         ((Text) peek()).append(match())

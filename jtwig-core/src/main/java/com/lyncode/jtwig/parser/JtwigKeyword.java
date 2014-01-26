@@ -47,8 +47,10 @@ public enum JtwigKeyword {
     INCLUDE("include"),
     EXCLUDE("exclude"),
     IN("in"),
-    FILTER("filter")
-    ;
+    FILTER("filter"),
+
+    VERBATIM("verbatim"),
+    ENDVERBATIM("endverbatim");
 
     public static String[] keywords () {
         List<String> list = new ListBuilder<JtwigKeyword>().add(JtwigKeyword.values()).build(extractWord());
