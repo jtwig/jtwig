@@ -16,6 +16,7 @@
 
 package com.lyncode.jtwig.mvc;
 
+import com.lyncode.jtwig.functions.builders.FunctionRepositoryBuilder;
 import com.lyncode.jtwig.functions.repository.AbstractFunctionRepository;
 import com.lyncode.jtwig.functions.repository.WebFunctionRepository;
 import com.lyncode.jtwig.services.api.theme.ThemePrefixResolver;
@@ -96,6 +97,9 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
 
     public void setFunctionRepository(AbstractFunctionRepository abstractFunctionRepository) {
         this.abstractFunctionRepository = abstractFunctionRepository;
+    }
+    public void setFunctionRepository(FunctionRepositoryBuilder functionRepository) {
+        this.abstractFunctionRepository = functionRepository.build();
     }
 
     public AbstractFunctionRepository getFunctionRepository() {

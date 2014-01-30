@@ -22,6 +22,10 @@ import com.lyncode.jtwig.functions.Translate;
 
 public class WebFunctionRepository extends AbstractFunctionRepository {
 
+    public static WebFunctionRepository springMvcFunctionRepository() {
+        return new WebFunctionRepository();
+    }
+
     public WebFunctionRepository (FunctionDeclaration... declarations) {
         super(
             new FunctionDeclaration(new Translate(), "translate", "message", "trans"),

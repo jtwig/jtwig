@@ -19,8 +19,6 @@ package com.lyncode.jtwig.spring;
 import com.lyncode.jtwig.controller.DynamicController;
 import com.lyncode.jtwig.functions.Function;
 import com.lyncode.jtwig.functions.exceptions.FunctionException;
-import com.lyncode.jtwig.functions.repository.FunctionDeclaration;
-import com.lyncode.jtwig.functions.repository.WebFunctionRepository;
 import com.lyncode.jtwig.mvc.JtwigViewResolver;
 import com.lyncode.jtwig.services.api.ModelMapFiller;
 import com.lyncode.jtwig.services.api.ViewShownResolver;
@@ -40,7 +38,12 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.i18n.FixedLocaleResolver;
 
+import static com.lyncode.jtwig.functions.builders.FunctionDeclarationBuilder.aFunction;
+import static com.lyncode.jtwig.functions.builders.FunctionRepositoryBuilder.aFunctionRepositoryExtending;
+import static com.lyncode.jtwig.functions.repository.WebFunctionRepository.springMvcFunctionRepository;
+import static com.lyncode.jtwig.functions.util.Requirements.requires;
 import static java.util.Locale.ENGLISH;
+import static org.hamcrest.CoreMatchers.equalTo;
 
 @Configuration
 @ComponentScan(basePackageClasses = { DynamicController.class })
@@ -54,14 +57,20 @@ public class WebappConfig extends WebMvcConfigurerAdapter {
         viewResolver.setSuffix(".twig.html");
         viewResolver.setTheme("default");
         viewResolver.setFunctionRepository(
-                new WebFunctionRepository(new FunctionDeclaration(new Function() {
-                    @Override
-                    public Object execute(Object... arguments) throws FunctionException {
-                        return arguments[0];
-                    }
-                }, "other"))
+                aFunctionRepositoryExtending(springMvcFunctionRepository())
+                        .withFunction(aFunction(constant()).withName("other").andAlias("constant"))
         );
         return viewResolver;
+    }
+
+    private Function constant() {
+        return new Function() {
+            @Override
+            public Object execute(Object... arguments) throws FunctionException {
+                requires(arguments).withNumberOfArguments(equalTo(1));
+                return arguments[0];
+            }
+        };
     }
 
     @Bean
