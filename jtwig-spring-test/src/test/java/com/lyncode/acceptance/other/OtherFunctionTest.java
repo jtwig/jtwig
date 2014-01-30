@@ -14,21 +14,27 @@
  * limitations under the License.
  */
 
-package com.lyncode.jtwig.functions.repository;
+package com.lyncode.acceptance.other;
 
-import com.lyncode.jtwig.functions.Asset;
-import com.lyncode.jtwig.functions.Path;
-import com.lyncode.jtwig.functions.Translate;
+import com.lyncode.acceptance.AbstractViewTest;
+import com.lyncode.jtwig.services.api.ModelMapFiller;
+import org.hamcrest.Matcher;
 
-public class WebFunctionRepository extends AbstractFunctionRepository {
+import static org.hamcrest.CoreMatchers.equalTo;
 
-    public WebFunctionRepository (FunctionDeclaration... declarations) {
-        super(
-            new FunctionDeclaration(new Translate(), "translate", "message", "trans"),
-            new FunctionDeclaration(new Asset(), "asset"),
-            new FunctionDeclaration(new Path(), "path")
-        );
+public class OtherFunctionTest extends AbstractViewTest {
+    @Override
+    protected void given(ModelMapFiller modelMap) {
+        // Nothing
+    }
 
-        addFunctions(declarations);
+    @Override
+    protected String forView() {
+        return "other/test";
+    }
+
+    @Override
+    protected Matcher<? super String> contentMatcher() {
+        return equalTo("a");
     }
 }

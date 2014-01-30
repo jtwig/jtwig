@@ -85,7 +85,7 @@ public abstract class AbstractFunctionRepository {
         addFunctions(functions);
     }
 
-    private void addFunctions(FunctionDeclaration... functions) {
+    protected void addFunctions(FunctionDeclaration... functions) {
         for (FunctionDeclaration declaration : functions) {
             for (String alias : declaration.getAliases()) {
                 functionMap.put(alias, declaration.getFunction());

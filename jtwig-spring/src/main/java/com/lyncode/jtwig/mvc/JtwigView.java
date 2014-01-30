@@ -37,8 +37,6 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.lyncode.jtwig.functions.repository.WebFunctionRepository.getInstance;
-
 public class JtwigView extends AbstractTemplateView {
     private static Logger log = LogManager.getLogger(JtwigView.class);
 
@@ -87,7 +85,7 @@ public class JtwigView extends AbstractTemplateView {
         if (this.getEncoding() != null)
             response.setCharacterEncoding(this.getEncoding());
 
-        getContent(request).render(response.getOutputStream(), new JtwigContext(modelMap, getInstance()));
+        getContent(request).render(response.getOutputStream(), new JtwigContext(modelMap, getViewResolver().getFunctionRepository()));
     }
 
     public Content getContent(HttpServletRequest request) throws CompileException, ParseException {

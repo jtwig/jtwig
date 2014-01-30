@@ -16,6 +16,8 @@
 
 package com.lyncode.jtwig.mvc;
 
+import com.lyncode.jtwig.functions.repository.AbstractFunctionRepository;
+import com.lyncode.jtwig.functions.repository.WebFunctionRepository;
 import com.lyncode.jtwig.services.api.theme.ThemePrefixResolver;
 import org.springframework.web.servlet.view.AbstractTemplateViewResolver;
 
@@ -37,6 +39,7 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
     private String theme;
     private boolean cached;
     private ThemePrefixResolver prefixResolver;
+    private AbstractFunctionRepository abstractFunctionRepository = new WebFunctionRepository();
 
     public JtwigViewResolver() {
         this.prefixResolver = defaultPrefixResolver();
@@ -89,5 +92,13 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
 
     public void setEncoding(String encoding) {
         this.encoding = encoding;
+    }
+
+    public void setFunctionRepository(AbstractFunctionRepository abstractFunctionRepository) {
+        this.abstractFunctionRepository = abstractFunctionRepository;
+    }
+
+    public AbstractFunctionRepository getFunctionRepository() {
+        return abstractFunctionRepository;
     }
 }
