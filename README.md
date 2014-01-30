@@ -6,9 +6,9 @@
 
 [![Build Status](https://travis-ci.org/lyncode/jtwig.png)](https://travis-ci.org/lyncode/jtwig)
 
-### Documentation
+### Official Website
 
-- [Documentation](https://github.com/lyncode/jtwig/wiki).
+http://jtwig.org
 
 ----------
 
