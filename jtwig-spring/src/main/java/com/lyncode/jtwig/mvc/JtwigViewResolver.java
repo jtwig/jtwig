@@ -45,6 +45,7 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
     public JtwigViewResolver() {
         this.prefixResolver = defaultPrefixResolver();
         setViewClass(requiredViewClass());
+        setContentType("text/html; charset=UTF-8");
     }
 
     @Override
