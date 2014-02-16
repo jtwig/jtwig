@@ -1,6 +1,6 @@
-# JTwig 2.0
+# JTwig
 
-*JTwig is a template system for Java inspired in [Twig](http://twig.sensiolabs.org/). Jtwig is also distributed with support for [SpringFramework Web MVC](http://www.springsource.org).*
+*JTwig is a modern Java template engine designed for web development*
 
 ### Build Status
 
@@ -13,9 +13,6 @@ http://jtwig.org
 ----------
 
 ### License
-
-
-Copyright 2013 **Lyncode**
 
 Licensed under the Apache License, Version 2.0 (the "License"); 
 you may not use this file except in compliance with the License. You may obtain a copy of the License at
