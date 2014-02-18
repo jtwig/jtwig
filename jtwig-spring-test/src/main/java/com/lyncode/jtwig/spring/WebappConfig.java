@@ -17,9 +17,6 @@
 package com.lyncode.jtwig.spring;
 
 import com.lyncode.jtwig.controller.DynamicController;
-import com.lyncode.jtwig.functions.Function;
-import com.lyncode.jtwig.functions.exceptions.FunctionException;
-import com.lyncode.jtwig.mvc.JtwigViewResolver;
 import com.lyncode.jtwig.services.api.ModelMapFiller;
 import com.lyncode.jtwig.services.api.ViewShownResolver;
 import com.lyncode.jtwig.services.api.assets.AssetResolver;
@@ -31,48 +28,22 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.web.servlet.LocaleResolver;
-import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.i18n.FixedLocaleResolver;
 
-import static com.lyncode.jtwig.functions.builders.FunctionDeclarationBuilder.aFunction;
-import static com.lyncode.jtwig.functions.builders.FunctionRepositoryBuilder.aFunctionRepositoryExtending;
-import static com.lyncode.jtwig.functions.repository.WebFunctionRepository.springMvcFunctionRepository;
-import static com.lyncode.jtwig.functions.util.Requirements.requires;
 import static java.util.Locale.ENGLISH;
-import static org.hamcrest.CoreMatchers.equalTo;
 
+@Import({
+        JtwigConfig.class
+})
 @Configuration
 @ComponentScan(basePackageClasses = { DynamicController.class })
 @EnableWebMvc
 public class WebappConfig extends WebMvcConfigurerAdapter {
-    @Bean
-    public ViewResolver viewResolver () {
-        JtwigViewResolver viewResolver = new JtwigViewResolver();
-        viewResolver.setEncoding("UTF-8");
-        viewResolver.setPrefix("/WEB-INF/views/");
-        viewResolver.setSuffix(".twig.html");
-        viewResolver.setTheme("default");
-        viewResolver.setFunctionRepository(
-                aFunctionRepositoryExtending(springMvcFunctionRepository())
-                        .withFunction(aFunction(constant()).withName("other").andAlias("constant"))
-        );
-        return viewResolver;
-    }
-
-    private Function constant() {
-        return new Function() {
-            @Override
-            public Object execute(Object... arguments) throws FunctionException {
-                requires(arguments).withNumberOfArguments(equalTo(1));
-                return arguments[0];
-            }
-        };
-    }
-
     @Bean
     public ViewShownResolver viewShownResolver () {
         return new TestViewShownResolver();

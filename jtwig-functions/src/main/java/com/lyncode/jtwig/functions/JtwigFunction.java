@@ -17,22 +17,7 @@
 package com.lyncode.jtwig.functions;
 
 import com.lyncode.jtwig.functions.exceptions.FunctionException;
-import com.lyncode.jtwig.util.LocalThreadHolder;
-import org.springframework.beans.BeansException;
 
-public abstract class AutowiredFunction implements Function {
-    public AutowiredFunction () {
-        super();
-    }
-
-    public Object execute (Object... arguments) throws FunctionException {
-        try {
-            LocalThreadHolder.getApplicationContext().getAutowireCapableBeanFactory().autowireBean(this);
-            return call(arguments);
-        } catch (BeansException e) {
-            throw new FunctionException(e);
-        }
-    }
-
-    protected abstract Object call (Object... arguments) throws FunctionException;
+public interface JtwigFunction {
+    public abstract Object execute (Object... arguments) throws FunctionException;
 }

@@ -16,7 +16,8 @@
 
 package com.lyncode.jtwig.functions.repository;
 
-import com.lyncode.jtwig.functions.Function;
+import com.lyncode.jtwig.functions.JtwigFunction;
+import com.lyncode.jtwig.functions.annotations.JtwigFunctionDeclaration;
 import com.lyncode.jtwig.functions.exceptions.FunctionNotFoundException;
 import com.lyncode.jtwig.functions.internal.cast.ToDouble;
 import com.lyncode.jtwig.functions.internal.cast.ToInt;
@@ -34,66 +35,95 @@ import java.util.HashMap;
 import java.util.Map;
 
 public abstract class AbstractFunctionRepository {
-    private Map<String, Function> functionMap = new HashMap<String, Function>();
+    private Map<String, JtwigFunction> functionMap = new HashMap<String, JtwigFunction>();
 
-    public AbstractFunctionRepository(FunctionDeclaration... functions) {
-        addFunctions(
+    public AbstractFunctionRepository(JtwigFunction... jtwigFunctions) {
+        add(
                 // List functions
-                new FunctionDeclaration(new Concatenate(), "concat", "concatenate"),
-                new FunctionDeclaration(new Join(), "join"),
-                new FunctionDeclaration(new Batch(), "batch"),
-                new FunctionDeclaration(new Merge(), "merge"),
-                new FunctionDeclaration(new Slice(), "slice"),
-                new FunctionDeclaration(new MapKeys(), "keys"),
+                new Concatenate(),
+                new Join(),
+                new Batch(),
+                new Merge(),
+                new Slice(),
+                new MapKeys(),
 
                 // String function
-                new FunctionDeclaration(new Upper(), "upper"),
-                new FunctionDeclaration(new Lower(), "lower"),
-                new FunctionDeclaration(new StripTags(), "striptags"),
-                new FunctionDeclaration(new Trim(), "trim"),
-                new FunctionDeclaration(new Split(), "split"),
-                new FunctionDeclaration(new Capitalize(), "capitalize"),
-                new FunctionDeclaration(new Title(), "title"),
-                new FunctionDeclaration(new Replace(), "replace"),
-                new FunctionDeclaration(new Format(), "format"),
-                new FunctionDeclaration(new Nl2Br(), "nl2br"),
-                new FunctionDeclaration(new UrlEncode(), "url_encode"),
-                new FunctionDeclaration(new Escape(), "escape", "e"),
+                new Upper(),
+                new Lower(),
+                new StripTags(),
+                new Trim(),
+                new Split(),
+                new Capitalize(),
+                new Title(),
+                new Replace(),
+                new Format(),
+                new Nl2Br(),
+                new UrlEncode(),
+                new Escape(),
 
                 // Date Functions
-                new FunctionDeclaration(new DateModify(), "date_modify"),
-                new FunctionDeclaration(new DateFormat(), "date", "date_format"),
-                new FunctionDeclaration(new ConvertEncoding(), "convert_encoding"),
+                new DateModify(),
+                new DateFormat(),
+                new ConvertEncoding(),
 
                 // Math functions
-                new FunctionDeclaration(new Abs(), "abs"),
-                new FunctionDeclaration(new JNumberFormat(), "number_format"),
-                new FunctionDeclaration(new Round(), "round"),
+                new Abs(),
+                new JNumberFormat(),
+                new Round(),
 
                 // Cast functions
-                new FunctionDeclaration(new ToDouble(), "toDouble", "toFloat"),
-                new FunctionDeclaration(new ToInt(), "toInt"),
+                new ToDouble(),
+                new ToInt(),
 
                 // Generic functions
-                new FunctionDeclaration(new Length(), "length"),
-                new FunctionDeclaration(new Default(), "default"),
-                new FunctionDeclaration(new First(), "first"),
-                new FunctionDeclaration(new Last(), "last"),
-                new FunctionDeclaration(new JsonEncode(), "json_encode"),
-                new FunctionDeclaration(new Reverse(), "reverse")
+                new Length(),
+                new Default(),
+                new First(),
+                new Last(),
+                new JsonEncode(),
+                new Reverse()
         );
-        addFunctions(functions);
+        add(jtwigFunctions);
     }
 
-    public void addFunctions(FunctionDeclaration... functions) {
-        for (FunctionDeclaration declaration : functions) {
-            for (String alias : declaration.getAliases()) {
-                functionMap.put(alias, declaration.getFunction());
-            }
+    public void add(JtwigFunction... jtwigFunctions) {
+        for (JtwigFunction jtwigFunction : jtwigFunctions)
+            add(jtwigFunction);
+    }
+
+    public void add (JtwigFunction jtwigFunction) {
+        Class<? extends JtwigFunction> functionClass = jtwigFunction.getClass();
+        if (functionClass.isAnnotationPresent(JtwigFunctionDeclaration.class)) {
+            JtwigFunctionDeclaration declaration = functionClass.getAnnotation(JtwigFunctionDeclaration.class);
+            add(jtwigFunction, getName(declaration, functionClass), declaration.aliases());
+        }
+        else {
+            add(jtwigFunction, getNameFromClass(functionClass));
         }
     }
 
-    public Function retrieve (String functionName) throws FunctionNotFoundException {
+    private String getName(JtwigFunctionDeclaration declaration, Class<? extends JtwigFunction> functionClass) {
+        if (!declaration.name().equals(""))
+            return declaration.name();
+        else
+            return getNameFromClass(functionClass);
+    }
+
+    private String getNameFromClass(Class<? extends JtwigFunction> functionClass) {
+        String functionName = functionClass.getSimpleName();
+        if (functionName == null || functionName.equals(""))
+            throw new RuntimeException("Function without name, try to use add(function, name) method");
+        return functionName.substring(0, 1).toLowerCase() + functionName.substring(1);
+    }
+
+    public void add(JtwigFunction jtwigFunction, String name, String... aliases) {
+        functionMap.put(name, jtwigFunction);
+        for (String alias : aliases) {
+            functionMap.put(alias, jtwigFunction);
+        }
+    }
+
+    public JtwigFunction retrieve (String functionName) throws FunctionNotFoundException {
         if (!functionMap.containsKey(functionName)) throw new FunctionNotFoundException();
         return functionMap.get(functionName);
     }

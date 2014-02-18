@@ -16,7 +16,8 @@
 
 package com.lyncode.jtwig.functions.internal.generic;
 
-import com.lyncode.jtwig.functions.Function;
+import com.lyncode.jtwig.functions.JtwigFunction;
+import com.lyncode.jtwig.functions.annotations.JtwigFunctionDeclaration;
 import com.lyncode.jtwig.functions.exceptions.FunctionException;
 import com.lyncode.jtwig.functions.util.ObjectIterator;
 
@@ -27,7 +28,8 @@ import java.util.List;
 import static com.lyncode.jtwig.functions.util.Requirements.requires;
 import static org.hamcrest.CoreMatchers.equalTo;
 
-public class Reverse implements Function {
+@JtwigFunctionDeclaration(name = "reverse")
+public class Reverse implements JtwigFunction {
     @Override
     public Object execute(Object... arguments) throws FunctionException {
         requires(arguments)

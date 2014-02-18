@@ -16,14 +16,16 @@
 
 package com.lyncode.jtwig.functions.internal.string;
 
-import com.lyncode.jtwig.functions.Function;
+import com.lyncode.jtwig.functions.JtwigFunction;
+import com.lyncode.jtwig.functions.annotations.JtwigFunctionDeclaration;
 import com.lyncode.jtwig.functions.exceptions.FunctionException;
 
 import static com.lyncode.jtwig.functions.util.HtmlUtils.stripTags;
 import static com.lyncode.jtwig.functions.util.Requirements.between;
 import static com.lyncode.jtwig.functions.util.Requirements.requires;
 
-public class StripTags implements Function {
+@JtwigFunctionDeclaration(name = "striptags")
+public class StripTags implements JtwigFunction {
     @Override
     public Object execute(Object... arguments) throws FunctionException {
         requires(arguments)

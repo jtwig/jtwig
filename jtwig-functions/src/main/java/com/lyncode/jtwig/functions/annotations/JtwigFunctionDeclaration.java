@@ -14,23 +14,17 @@
  * limitations under the License.
  */
 
-package com.lyncode.jtwig.functions.repository;
+package com.lyncode.jtwig.functions.annotations;
 
-import com.lyncode.jtwig.functions.Asset;
-import com.lyncode.jtwig.functions.Path;
-import com.lyncode.jtwig.functions.Translate;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
-public class WebFunctionRepository extends AbstractFunctionRepository {
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-    public static WebFunctionRepository springMvcFunctionRepository() {
-        return new WebFunctionRepository();
-    }
-
-    public WebFunctionRepository () {
-        super(
-                new Translate(),
-                new Asset(),
-                new Path()
-        );
-    }
+@Retention(RUNTIME)
+@Target(TYPE)
+public @interface JtwigFunctionDeclaration {
+    String name () default "";
+    String[] aliases () default {};
 }

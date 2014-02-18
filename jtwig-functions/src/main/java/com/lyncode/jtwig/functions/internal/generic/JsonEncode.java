@@ -16,7 +16,8 @@
 
 package com.lyncode.jtwig.functions.internal.generic;
 
-import com.lyncode.jtwig.functions.Function;
+import com.lyncode.jtwig.functions.JtwigFunction;
+import com.lyncode.jtwig.functions.annotations.JtwigFunctionDeclaration;
 import com.lyncode.jtwig.functions.exceptions.FunctionException;
 import org.codehaus.jackson.map.ObjectMapper;
 
@@ -26,7 +27,8 @@ import static com.lyncode.jtwig.functions.util.Requirements.requires;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 
-public class JsonEncode implements Function {
+@JtwigFunctionDeclaration(name = "json_encode")
+public class JsonEncode implements JtwigFunction {
     private ObjectMapper mapper = new ObjectMapper();
     @Override
     public Object execute(Object... arguments) throws FunctionException {

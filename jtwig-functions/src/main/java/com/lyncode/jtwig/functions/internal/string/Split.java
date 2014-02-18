@@ -16,14 +16,16 @@
 
 package com.lyncode.jtwig.functions.internal.string;
 
-import com.lyncode.jtwig.functions.Function;
+import com.lyncode.jtwig.functions.JtwigFunction;
+import com.lyncode.jtwig.functions.annotations.JtwigFunctionDeclaration;
 import com.lyncode.jtwig.functions.exceptions.FunctionException;
 
 import static com.lyncode.jtwig.functions.util.Requirements.requires;
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
 
-public class Split implements Function {
+@JtwigFunctionDeclaration(name = "split")
+public class Split implements JtwigFunction {
     @Override
     public Object execute(Object... arguments) throws FunctionException {
         requires(arguments)

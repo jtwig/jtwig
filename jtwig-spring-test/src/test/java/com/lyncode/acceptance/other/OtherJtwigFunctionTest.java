@@ -22,7 +22,7 @@ import org.hamcrest.Matcher;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 
-public class OtherFunctionTest extends AbstractViewTest {
+public class OtherJtwigFunctionTest extends AbstractViewTest {
     @Override
     protected void given(ModelMapFiller modelMap) {
         // Nothing

@@ -16,7 +16,8 @@
 
 package com.lyncode.jtwig.functions.internal.list;
 
-import com.lyncode.jtwig.functions.Function;
+import com.lyncode.jtwig.functions.JtwigFunction;
+import com.lyncode.jtwig.functions.annotations.JtwigFunctionDeclaration;
 import com.lyncode.jtwig.functions.exceptions.FunctionException;
 import com.lyncode.jtwig.functions.util.ObjectIterator;
 
@@ -28,7 +29,8 @@ import static com.lyncode.jtwig.functions.util.Requirements.requires;
 import static java.lang.Math.min;
 import static org.hamcrest.CoreMatchers.*;
 
-public class Slice implements Function {
+@JtwigFunctionDeclaration(name = "slice")
+public class Slice implements JtwigFunction {
     @Override
     public Object execute(Object... arguments) throws FunctionException {
         requires(arguments)

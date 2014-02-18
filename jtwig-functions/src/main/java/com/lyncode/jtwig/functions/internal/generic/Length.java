@@ -16,7 +16,8 @@
 
 package com.lyncode.jtwig.functions.internal.generic;
 
-import com.lyncode.jtwig.functions.Function;
+import com.lyncode.jtwig.functions.JtwigFunction;
+import com.lyncode.jtwig.functions.annotations.JtwigFunctionDeclaration;
 import com.lyncode.jtwig.functions.exceptions.FunctionException;
 import com.lyncode.jtwig.functions.util.ObjectIterator;
 
@@ -25,7 +26,8 @@ import java.util.Map;
 import static com.lyncode.jtwig.functions.util.Requirements.requires;
 import static org.hamcrest.CoreMatchers.equalTo;
 
-public class Length implements Function {
+@JtwigFunctionDeclaration(name = "length")
+public class Length implements JtwigFunction {
     @Override
     public Object execute(Object... arguments) throws FunctionException {
         requires(arguments)

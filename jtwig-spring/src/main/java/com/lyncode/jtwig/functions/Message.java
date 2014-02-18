@@ -16,39 +16,30 @@
 
 package com.lyncode.jtwig.functions;
 
-import com.lyncode.jtwig.functions.annotations.JtwigFunctionDeclaration;
 import com.lyncode.jtwig.functions.exceptions.FunctionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.web.servlet.LocaleResolver;
 
-import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
 import java.util.Locale;
 
+import static com.lyncode.jtwig.functions.util.Requirements.requires;
 import static com.lyncode.jtwig.util.LocalThreadHolder.getServletRequest;
-import static java.util.Arrays.copyOfRange;
+import static org.hamcrest.Matchers.greaterThan;
 
-@JtwigFunctionDeclaration(name = "translate", aliases = {"message", "trans"})
-public class Translate extends AutowiredJtwigFunction {
+public class Message extends AutowiredJtwigFunction {
     @Autowired
     private MessageSource messageSource;
 
     @Autowired
     private LocaleResolver localeResolver;
 
-    @Autowired
-    private HttpServletRequest request;
-
     @Override
-    public Object call(Object... arguments) throws FunctionException {
-
-        if (arguments.length < 1) throw new FunctionException("Expecting at least one argument");
-        else {
-            HttpServletRequest request = getServletRequest();
-            Locale locale = localeResolver.resolveLocale(request);
-            Object[] parameters = copyOfRange(arguments, 1, arguments.length);
-
-            return messageSource.getMessage(String.valueOf(arguments[0]), parameters, locale);
-        }
+    protected Object call(Object... arguments) throws FunctionException {
+        requires(arguments)
+                .withNumberOfArguments(greaterThan(1));
+        Locale locale = localeResolver.resolveLocale(getServletRequest());
+        return messageSource.getMessage(arguments[0].toString(), Arrays.copyOfRange(arguments, 1, arguments.length), locale);
     }
 }

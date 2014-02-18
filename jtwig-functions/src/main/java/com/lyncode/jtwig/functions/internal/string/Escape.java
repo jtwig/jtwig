@@ -16,7 +16,8 @@
 
 package com.lyncode.jtwig.functions.internal.string;
 
-import com.lyncode.jtwig.functions.Function;
+import com.lyncode.jtwig.functions.JtwigFunction;
+import com.lyncode.jtwig.functions.annotations.JtwigFunctionDeclaration;
 import com.lyncode.jtwig.functions.exceptions.FunctionException;
 import org.apache.commons.lang3.StringEscapeUtils;
 
@@ -26,7 +27,8 @@ import static com.lyncode.jtwig.functions.util.Requirements.between;
 import static com.lyncode.jtwig.functions.util.Requirements.requires;
 import static java.util.Arrays.asList;
 
-public class Escape implements Function {
+@JtwigFunctionDeclaration(name = "escape", aliases = { "e" })
+public class Escape implements JtwigFunction {
     @Override
     public Object execute(Object... arguments) throws FunctionException {
         requires(arguments)

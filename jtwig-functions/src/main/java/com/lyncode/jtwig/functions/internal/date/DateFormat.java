@@ -16,7 +16,8 @@
 
 package com.lyncode.jtwig.functions.internal.date;
 
-import com.lyncode.jtwig.functions.Function;
+import com.lyncode.jtwig.functions.JtwigFunction;
+import com.lyncode.jtwig.functions.annotations.JtwigFunctionDeclaration;
 import com.lyncode.jtwig.functions.exceptions.FunctionException;
 
 import java.text.SimpleDateFormat;
@@ -26,7 +27,8 @@ import static com.lyncode.jtwig.functions.util.Requirements.between;
 import static com.lyncode.jtwig.functions.util.Requirements.requires;
 import static org.hamcrest.CoreMatchers.instanceOf;
 
-public class DateFormat implements Function {
+@JtwigFunctionDeclaration(name = "date_format")
+public class DateFormat implements JtwigFunction {
     @Override
     public Object execute(Object... arguments) throws FunctionException {
         requires(arguments)

@@ -16,7 +16,8 @@
 
 package com.lyncode.jtwig.functions.internal.map;
 
-import com.lyncode.jtwig.functions.Function;
+import com.lyncode.jtwig.functions.JtwigFunction;
+import com.lyncode.jtwig.functions.annotations.JtwigFunctionDeclaration;
 import com.lyncode.jtwig.functions.exceptions.FunctionException;
 
 import java.util.ArrayList;
@@ -26,7 +27,8 @@ import static com.lyncode.jtwig.functions.util.Requirements.requires;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 
-public class MapKeys implements Function {
+@JtwigFunctionDeclaration(name = "keys")
+public class MapKeys implements JtwigFunction {
     @Override
     public Object execute(Object... arguments) throws FunctionException {
         requires(arguments)

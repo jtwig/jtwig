@@ -16,9 +16,9 @@
 
 package com.lyncode.jtwig.functions.builders;
 
+import com.lyncode.jtwig.functions.JtwigFunction;
 import com.lyncode.jtwig.functions.repository.AbstractFunctionRepository;
 import com.lyncode.jtwig.functions.repository.DefaultFunctionRepository;
-import com.lyncode.jtwig.functions.repository.FunctionDeclaration;
 
 public class FunctionRepositoryBuilder {
     public static FunctionRepositoryBuilder aFunctionRepository () {
@@ -38,12 +38,13 @@ public class FunctionRepositoryBuilder {
         this.inherits = inherits;
     }
 
-    public FunctionRepositoryBuilder withFunction (FunctionDeclarationBuilder builder) {
-        this.inherits.addFunctions(builder.build());
+    public FunctionRepositoryBuilder withFunction (JtwigFunction function) {
+        this.inherits.add(function);
         return this;
     }
-    public FunctionRepositoryBuilder withFunction (FunctionDeclaration functionDeclaration) {
-        this.inherits.addFunctions(functionDeclaration);
+
+    public FunctionRepositoryBuilder withFunction (JtwigFunction function, String name, String... aliases) {
+        this.inherits.add(function, name, aliases);
         return this;
     }
 

@@ -16,7 +16,8 @@
 
 package com.lyncode.jtwig.functions.internal.string;
 
-import com.lyncode.jtwig.functions.Function;
+import com.lyncode.jtwig.functions.JtwigFunction;
+import com.lyncode.jtwig.functions.annotations.JtwigFunctionDeclaration;
 import com.lyncode.jtwig.functions.exceptions.FunctionException;
 import org.apache.commons.lang3.StringUtils;
 
@@ -30,7 +31,8 @@ import java.util.Map;
 import static com.lyncode.jtwig.functions.util.Requirements.requires;
 import static org.hamcrest.CoreMatchers.equalTo;
 
-public class UrlEncode implements Function {
+@JtwigFunctionDeclaration(name = "url_encode")
+public class UrlEncode implements JtwigFunction {
     @Override
     public Object execute(Object... arguments) throws FunctionException {
         requires(arguments)

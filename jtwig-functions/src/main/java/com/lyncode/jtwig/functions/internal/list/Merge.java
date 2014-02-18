@@ -16,7 +16,8 @@
 
 package com.lyncode.jtwig.functions.internal.list;
 
-import com.lyncode.jtwig.functions.Function;
+import com.lyncode.jtwig.functions.JtwigFunction;
+import com.lyncode.jtwig.functions.annotations.JtwigFunctionDeclaration;
 import com.lyncode.jtwig.functions.exceptions.FunctionException;
 
 import java.util.*;
@@ -25,7 +26,8 @@ import static com.lyncode.jtwig.functions.util.Requirements.isArray;
 import static com.lyncode.jtwig.functions.util.Requirements.requires;
 import static org.hamcrest.Matchers.*;
 
-public class Merge implements Function {
+@JtwigFunctionDeclaration(name = "merge")
+public class Merge implements JtwigFunction {
     @Override
     public Object execute(Object... arguments) throws FunctionException {
         requires(arguments)

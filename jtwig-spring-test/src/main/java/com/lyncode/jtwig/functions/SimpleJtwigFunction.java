@@ -16,8 +16,15 @@
 
 package com.lyncode.jtwig.functions;
 
+import com.lyncode.jtwig.functions.annotations.JtwigFunctionDeclaration;
 import com.lyncode.jtwig.functions.exceptions.FunctionException;
+import org.springframework.stereotype.Component;
 
-public interface Function {
-    public abstract Object execute (Object... arguments) throws FunctionException;
+@Component
+@JtwigFunctionDeclaration(name = "other")
+public class SimpleJtwigFunction implements JtwigFunction {
+    @Override
+    public Object execute(Object... arguments) throws FunctionException {
+        return arguments[0];
+    }
 }

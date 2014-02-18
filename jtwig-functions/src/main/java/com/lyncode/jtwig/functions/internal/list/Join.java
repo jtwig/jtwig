@@ -16,14 +16,16 @@
 
 package com.lyncode.jtwig.functions.internal.list;
 
-import com.lyncode.jtwig.functions.Function;
+import com.lyncode.jtwig.functions.JtwigFunction;
+import com.lyncode.jtwig.functions.annotations.JtwigFunctionDeclaration;
 import com.lyncode.jtwig.functions.exceptions.FunctionException;
 import org.apache.commons.lang3.StringUtils;
 
 import static com.lyncode.jtwig.functions.util.Requirements.between;
 import static com.lyncode.jtwig.functions.util.Requirements.requires;
 
-public class Join implements Function {
+@JtwigFunctionDeclaration(name = "join")
+public class Join implements JtwigFunction {
     @Override
     public Object execute(Object... arguments) throws FunctionException {
         requires(arguments)

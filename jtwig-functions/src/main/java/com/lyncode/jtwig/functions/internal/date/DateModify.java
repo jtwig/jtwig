@@ -16,7 +16,8 @@
 
 package com.lyncode.jtwig.functions.internal.date;
 
-import com.lyncode.jtwig.functions.Function;
+import com.lyncode.jtwig.functions.JtwigFunction;
+import com.lyncode.jtwig.functions.annotations.JtwigFunctionDeclaration;
 import com.lyncode.jtwig.functions.exceptions.FunctionException;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
@@ -29,7 +30,8 @@ import static com.lyncode.jtwig.functions.util.Requirements.requires;
 import static java.util.regex.Pattern.compile;
 import static org.hamcrest.CoreMatchers.*;
 
-public class DateModify implements Function {
+@JtwigFunctionDeclaration(name  = "date_modify")
+public class DateModify implements JtwigFunction {
 
     private static final String PATTERN = "^([\\\\+\\\\-])([0-9]+) ([a-zA-Z]+)$";
 

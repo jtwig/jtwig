@@ -17,6 +17,7 @@
 package com.lyncode.jtwig.functions;
 
 import com.lyncode.jtwig.exceptions.AssetResolveException;
+import com.lyncode.jtwig.functions.annotations.JtwigFunctionDeclaration;
 import com.lyncode.jtwig.functions.exceptions.FunctionException;
 import com.lyncode.jtwig.services.api.assets.AssetResolver;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 
-public class Asset extends AutowiredFunction {
+@JtwigFunctionDeclaration(name = "asset")
+public class Asset extends AutowiredJtwigFunction {
     @Autowired
     private AssetResolver assetResolver;
 

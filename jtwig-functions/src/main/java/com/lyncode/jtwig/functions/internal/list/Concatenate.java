@@ -16,10 +16,12 @@
 
 package com.lyncode.jtwig.functions.internal.list;
 
-import com.lyncode.jtwig.functions.Function;
+import com.lyncode.jtwig.functions.JtwigFunction;
+import com.lyncode.jtwig.functions.annotations.JtwigFunctionDeclaration;
 import com.lyncode.jtwig.functions.exceptions.FunctionException;
 
-public class Concatenate implements Function {
+@JtwigFunctionDeclaration(name = "concatenate", aliases = { "concat" })
+public class Concatenate implements JtwigFunction {
     @Override
     public Object execute(Object... arguments) throws FunctionException {
         String result = "";

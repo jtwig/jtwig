@@ -17,7 +17,7 @@
 package com.lyncode.jtwig;
 
 import com.lyncode.jtwig.exception.CalculateException;
-import com.lyncode.jtwig.functions.Function;
+import com.lyncode.jtwig.functions.JtwigFunction;
 import com.lyncode.jtwig.functions.exceptions.FunctionNotFoundException;
 import com.lyncode.jtwig.functions.repository.AbstractFunctionRepository;
 import com.lyncode.jtwig.functions.repository.DefaultFunctionRepository;
@@ -51,7 +51,7 @@ public class JtwigContext {
         return this;
     }
 
-    public Function function(String name) throws FunctionNotFoundException {
+    public JtwigFunction function(String name) throws FunctionNotFoundException {
         return functionRepository.retrieve(name);
     }
 

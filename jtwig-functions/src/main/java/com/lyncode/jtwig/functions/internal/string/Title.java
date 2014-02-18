@@ -16,14 +16,16 @@
 
 package com.lyncode.jtwig.functions.internal.string;
 
-import com.lyncode.jtwig.functions.Function;
+import com.lyncode.jtwig.functions.JtwigFunction;
+import com.lyncode.jtwig.functions.annotations.JtwigFunctionDeclaration;
 import com.lyncode.jtwig.functions.exceptions.FunctionException;
 import org.apache.commons.lang3.text.WordUtils;
 
 import static com.lyncode.jtwig.functions.util.Requirements.requires;
 import static org.hamcrest.CoreMatchers.equalTo;
 
-public class Title implements Function {
+@JtwigFunctionDeclaration(name = "title")
+public class Title implements JtwigFunction {
     @Override
     public Object execute(Object... arguments) throws FunctionException {
         requires(arguments)

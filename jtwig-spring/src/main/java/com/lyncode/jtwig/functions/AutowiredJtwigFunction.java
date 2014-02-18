@@ -16,21 +16,23 @@
 
 package com.lyncode.jtwig.functions;
 
-import com.lyncode.jtwig.functions.annotations.JtwigFunctionDeclaration;
 import com.lyncode.jtwig.functions.exceptions.FunctionException;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.lyncode.jtwig.util.LocalThreadHolder;
+import org.springframework.beans.BeansException;
 
-import javax.servlet.http.HttpServletRequest;
-import java.io.File;
-
-@JtwigFunctionDeclaration(name = "path")
-public class Path extends AutowiredJtwigFunction {
-    @Autowired
-    private HttpServletRequest request;
-
-    @Override
-    protected Object call(Object... arguments) throws FunctionException {
-        if (arguments.length != 1) throw new FunctionException("Invalid number of arguments");
-        else return new File(request.getContextPath(), arguments[0].toString()).getPath();
+public abstract class AutowiredJtwigFunction implements JtwigFunction {
+    public AutowiredJtwigFunction() {
+        super();
     }
+
+    public Object execute (Object... arguments) throws FunctionException {
+        try {
+            LocalThreadHolder.getApplicationContext().getAutowireCapableBeanFactory().autowireBean(this);
+            return call(arguments);
+        } catch (BeansException e) {
+            throw new FunctionException(e);
+        }
+    }
+
+    protected abstract Object call (Object... arguments) throws FunctionException;
 }

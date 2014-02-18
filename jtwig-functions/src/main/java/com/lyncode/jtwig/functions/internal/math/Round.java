@@ -16,7 +16,8 @@
 
 package com.lyncode.jtwig.functions.internal.math;
 
-import com.lyncode.jtwig.functions.Function;
+import com.lyncode.jtwig.functions.JtwigFunction;
+import com.lyncode.jtwig.functions.annotations.JtwigFunctionDeclaration;
 import com.lyncode.jtwig.functions.exceptions.FunctionException;
 
 import static com.lyncode.jtwig.functions.util.Requirements.between;
@@ -24,7 +25,8 @@ import static com.lyncode.jtwig.functions.util.Requirements.requires;
 import static org.hamcrest.core.AnyOf.anyOf;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 
-public class Round implements Function {
+@JtwigFunctionDeclaration(name = "round")
+public class Round implements JtwigFunction {
     @Override
     public Object execute(Object... arguments) throws FunctionException {
         requires(arguments)

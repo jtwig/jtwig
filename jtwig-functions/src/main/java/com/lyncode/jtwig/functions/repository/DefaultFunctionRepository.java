@@ -16,8 +16,10 @@
 
 package com.lyncode.jtwig.functions.repository;
 
+import com.lyncode.jtwig.functions.JtwigFunction;
+
 public class DefaultFunctionRepository extends AbstractFunctionRepository {
-    public DefaultFunctionRepository(FunctionDeclaration... functions) {
+    public DefaultFunctionRepository(JtwigFunction... functions) {
         super(functions);
     }
 }

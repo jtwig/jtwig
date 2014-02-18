@@ -16,14 +16,16 @@
 
 package com.lyncode.jtwig.functions.internal.cast;
 
-import com.lyncode.jtwig.functions.Function;
+import com.lyncode.jtwig.functions.JtwigFunction;
+import com.lyncode.jtwig.functions.annotations.JtwigFunctionDeclaration;
 import com.lyncode.jtwig.functions.exceptions.FunctionException;
 
 import static com.lyncode.jtwig.functions.util.Requirements.requires;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
 
-public class ToInt implements Function {
+@JtwigFunctionDeclaration(name = "toInt")
+public class ToInt implements JtwigFunction {
     @Override
     public Object execute(Object... arguments) throws FunctionException {
         requires(arguments)
