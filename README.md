@@ -10,9 +10,13 @@
 
 http://jtwig.org
 
+## Versioning
+
+Jtwig uses [Semantic Versioning](http://semver.org/)
+
 ## Changes
 
-2.0.3 - 2.0.4
+2.0.3 - 2.1
 
 - Function declarations brought to function itself as annotation
 - Function components (beans) in spring are now loaded to the repository function, if the BeanFunctionDeclarationProcessor is used.
