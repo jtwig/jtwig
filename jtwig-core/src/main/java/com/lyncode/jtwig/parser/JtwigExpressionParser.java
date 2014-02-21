@@ -24,9 +24,11 @@ import org.parboiled.BaseParser;
 import org.parboiled.Rule;
 import org.parboiled.annotations.SuppressNode;
 
+import static com.lyncode.jtwig.parser.JtwigKeyword.NULL;
 import static com.lyncode.jtwig.parser.JtwigSymbol.*;
 import static com.lyncode.jtwig.parser.JtwigSymbol.DIV;
 import static com.lyncode.jtwig.tree.expressions.Operator.*;
+import static com.lyncode.jtwig.tree.expressions.Operator.NOT;
 import static com.lyncode.jtwig.util.Simplifier.simplify;
 import static org.parboiled.Parboiled.createParser;
 
@@ -42,7 +44,7 @@ public class JtwigExpressionParser extends BaseParser<Expression> {
     }
 
 
-    Rule specificJtwigOperators () {
+    Rule specificJtwigOperators() {
         return binary(
                 orExpression(),
                 Operator.STARTS_WITH,
@@ -115,7 +117,7 @@ public class JtwigExpressionParser extends BaseParser<Expression> {
         );
     }
 
-    Rule composition () {
+    Rule composition() {
         return binary(
                 selection(),
                 FirstOf(
@@ -128,7 +130,7 @@ public class JtwigExpressionParser extends BaseParser<Expression> {
 
     Rule selection() {
         return binary(
-                primary(),
+                isOperation(),
                 FirstOf(
                         functionWithBrackets(),
                         mapEntry(),
@@ -138,7 +140,39 @@ public class JtwigExpressionParser extends BaseParser<Expression> {
         );
     }
 
-    Rule primary () {
+    Rule isOperation() {
+        return Sequence(
+                primary(),
+                push(new OperationBinary(simplify(pop()))),
+                ZeroOrMore(
+                        operator(IS),
+                        popValue(),
+                        mandatory(
+                                Sequence(
+                                        FirstOf(
+                                                Sequence(
+                                                        operator(NOT),
+                                                        popValue(),
+                                                        ((OperationBinary) peek()).addOperator(Operator.IS_NOT)
+                                                ),
+                                                ((OperationBinary) peek()).addOperator(Operator.IS)
+                                        ),
+                                        FirstOf(
+                                                functionWithBrackets(),
+                                                functionWithTwoWordsAsName(),
+                                                variable(),
+                                                keywordAsVariable(NULL)
+                                        ),
+                                        ((OperationBinary) peek(1)).add(simplify(pop()))
+                                ),
+                                new ParseException("Wrong binary operation syntax")
+                        )
+
+                )
+        );
+    }
+
+    Rule primary() {
         return FirstOf(
                 ternaryOperation(),
                 elementar()
@@ -162,6 +196,7 @@ public class JtwigExpressionParser extends BaseParser<Expression> {
                 )
         );
     }
+
 
     Rule elementar() {
         return FirstOf(
@@ -201,11 +236,26 @@ public class JtwigExpressionParser extends BaseParser<Expression> {
         );
     }
 
+    Rule functionWithTwoWordsAsName() {
+        return Sequence(
+                variable(),
+                variable(),
+                push(new FunctionElement(popVariableName(1)+" "+popVariableName())),
+                mandatory(
+                        Sequence(
+                                expression(),
+                                ((FunctionElement) peek(1)).add(pop())
+                        ),
+                        new ParseException("Wrong function named with two words syntax")
+                )
+        );
+    }
+
     Rule functionWithoutBrackets() {
         return Sequence(
                 variable(),
                 expression(),
-                push(new FunctionElement(((Variable) pop(1)).getIdentifier(), pop()))
+                push(new FunctionElement(popVariableName(1), pop()))
         );
     }
 
@@ -213,16 +263,16 @@ public class JtwigExpressionParser extends BaseParser<Expression> {
         return Sequence(
                 variable(),
                 symbol(OPEN_PARENT),
-                push(new FunctionElement(((Variable) pop()).getIdentifier())),
+                push(new FunctionElement(popVariableName())),
                 mandatory(
                         Sequence(
+                                expression(),
+                                ((FunctionElement) peek(1)).add(pop()),
+                                ZeroOrMore(
+                                        symbol(COMMA),
                                         expression(),
-                                        ((FunctionElement) peek(1)).add(pop()),
-                                        ZeroOrMore(
-                                                symbol(COMMA),
-                                                expression(),
-                                                ((FunctionElement) peek(1)).add(pop())
-                                        ),
+                                        ((FunctionElement) peek(1)).add(pop())
+                                ),
                                 symbol(CLOSE_PARENT)
                         ),
                         new ParseException("Wrong function syntax")
@@ -240,13 +290,13 @@ public class JtwigExpressionParser extends BaseParser<Expression> {
                                         variable(),
                                         symbol(DIV),
                                         expression(),
-                                        ((ValueMap) peek(2)).add(((Variable) pop(1)).getIdentifier(), pop()),
+                                        ((ValueMap) peek(2)).add(popVariableName(1), pop()),
                                         ZeroOrMore(
                                                 symbol(COMMA),
                                                 variable(),
                                                 symbol(DIV),
                                                 expression(),
-                                                ((ValueMap) peek(2)).add(((Variable) pop(1)).getIdentifier(), pop())
+                                                ((ValueMap) peek(2)).add(popVariableName(1), pop())
                                         )
                                 ),
                                 symbol(CLOSE_CURLY_BRACKET)
@@ -329,6 +379,14 @@ public class JtwigExpressionParser extends BaseParser<Expression> {
         );
     }
 
+    Rule keywordAsVariable(JtwigKeyword keyword) {
+        return Sequence(
+                basic.keyword(keyword),
+                push(new Variable(basic.match())),
+                basic.spacing()
+        );
+    }
+
     @SuppressNode
     Rule firstOperatorOf(Operator... operators) {
         Rule[] rules = new Rule[operators.length];
@@ -338,7 +396,7 @@ public class JtwigExpressionParser extends BaseParser<Expression> {
         return FirstOf(rules);
     }
 
-    Rule operator (Operator operator) {
+    Rule operator(Operator operator) {
         if (operator == MOD) {
             return Sequence(
                     basic.terminal(operator.toString()),
@@ -355,7 +413,7 @@ public class JtwigExpressionParser extends BaseParser<Expression> {
         }
     }
 
-    Rule binary (Rule first, Rule rest, Operator... operators) {
+    Rule binary(Rule first, Rule rest, Operator... operators) {
         return Sequence(
                 first,
                 push(new OperationBinary(simplify(pop()))),
@@ -373,7 +431,7 @@ public class JtwigExpressionParser extends BaseParser<Expression> {
         );
     }
 
-    Rule binary (Rule innerExpression, Operator... operators) {
+    Rule binary(Rule innerExpression, Operator... operators) {
         return binary(innerExpression, innerExpression, operators);
     }
 
@@ -389,5 +447,18 @@ public class JtwigExpressionParser extends BaseParser<Expression> {
                         new ParseException("Wrong unary operator syntax")
                 )
         );
+    }
+
+    protected String popVariableName (int i) {
+        return ((Variable) pop(i)).getIdentifier();
+    }
+
+    protected String popVariableName () {
+        return popVariableName(0);
+    }
+
+    boolean popValue() {
+        pop();
+        return true;
     }
 }

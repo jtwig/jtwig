@@ -28,6 +28,8 @@ import com.lyncode.jtwig.util.BooleanOperations;
 import com.lyncode.jtwig.util.MathOperations;
 import com.lyncode.jtwig.util.RelationalOperations;
 
+import static com.lyncode.jtwig.util.BooleanOperations.isTrue;
+
 public class StrictBinaryOperation implements Expression {
     private Operator operator;
     private Expression left;
@@ -126,6 +128,14 @@ public class StrictBinaryOperation implements Expression {
                 Selection selection = new Selection(left);
                 selection.add(right);
                 return selection.calculate(context);
+            case IS:
+                composition = new Composition(left);
+                composition.add(right);
+                return isTrue(composition.calculate(context));
+            case IS_NOT:
+                composition = new Composition(left);
+                composition.add(right);
+                return !isTrue(composition.calculate(context));
             case ADD:
             case SUB:
             case TIMES:

@@ -33,7 +33,7 @@ public class MapSelection implements Expression {
 
     @Override
     public Object calculate(JtwigContext context) throws CalculateException {
-        Object resolved = context.resolve(variable);
+        Object resolved = variable.calculate(context);
         if (resolved instanceof Map)
             return ((Map) resolved).get(key.calculate(context));
         else

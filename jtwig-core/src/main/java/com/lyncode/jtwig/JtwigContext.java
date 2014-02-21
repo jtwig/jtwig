@@ -16,12 +16,10 @@
 
 package com.lyncode.jtwig;
 
-import com.lyncode.jtwig.exception.CalculateException;
 import com.lyncode.jtwig.functions.JtwigFunction;
 import com.lyncode.jtwig.functions.exceptions.FunctionNotFoundException;
 import com.lyncode.jtwig.functions.repository.AbstractFunctionRepository;
 import com.lyncode.jtwig.functions.repository.DefaultFunctionRepository;
-import com.lyncode.jtwig.tree.api.Expression;
 
 public class JtwigContext {
     public static JtwigContext context () {
@@ -62,12 +60,6 @@ public class JtwigContext {
 
     public Object map(String key) {
         return modelMap.get(key);
-    }
-
-    public Object resolve(Object obj) throws CalculateException {
-        if (obj instanceof Expression)
-            return ((Expression) obj).calculate(this);
-        else return obj;
     }
 
     public void set(String key, Object value) {

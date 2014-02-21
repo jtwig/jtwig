@@ -19,6 +19,7 @@ package com.lyncode.jtwig.functions.util;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 public class ObjectIterator {
     private List<Object> list = new ArrayList<Object>();
@@ -36,7 +37,10 @@ public class ObjectIterator {
                 Object[] objects = (Object[]) context;
                 for (Object obj : objects)
                     list.add(obj);
-            } else list.add(context);
+            } else if (context instanceof Map) {
+                list.addAll(((Map) context).keySet());
+            }
+            else list.add(context);
         }
         size = list.size();
         iterator = list.iterator();

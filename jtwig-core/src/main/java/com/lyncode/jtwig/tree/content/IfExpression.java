@@ -22,6 +22,7 @@ import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.RenderException;
 import com.lyncode.jtwig.resource.JtwigResource;
 import com.lyncode.jtwig.tree.api.Content;
+import com.lyncode.jtwig.tree.api.Expression;
 import com.lyncode.jtwig.tree.structural.Block;
 
 import java.io.OutputStream;
@@ -31,12 +32,12 @@ import java.util.List;
 import static com.lyncode.jtwig.util.BooleanOperations.isTrue;
 
 public class IfExpression implements Content {
-    private Object conditionalExpression;
+    private Expression conditionalExpression;
     private Content content;
     private ElseExpression elseExpression = null;
     private List<ElseIfExpression> elseIfExpressions = new ArrayList<ElseIfExpression>();
 
-    public IfExpression(Object conditionalExpression) {
+    public IfExpression(Expression conditionalExpression) {
         this.conditionalExpression = conditionalExpression;
     }
 
@@ -50,27 +51,15 @@ public class IfExpression implements Content {
         return true;
     }
 
-    public Object getConditionalExpression() {
-        return conditionalExpression;
-    }
-
-    public ElseExpression getElseExpression() {
-        return elseExpression;
-    }
-
-    public List<ElseIfExpression> getElseIfExpressions() {
-        return elseIfExpressions;
-    }
-
-    public boolean setContent(Content abstractContent) {
-        this.content = abstractContent;
+    public boolean setContent(Content content) {
+        this.content = content;
         return true;
     }
 
     @Override
     public boolean render(OutputStream outputStream, JtwigContext context) throws RenderException {
         try {
-            if (isTrue(context.resolve(conditionalExpression))) {
+            if (isTrue(conditionalExpression.calculate(context))) {
                 return content.render(outputStream, context);
             } else {
                 for (ElseIfExpression exp : elseIfExpressions) {
@@ -113,10 +102,10 @@ public class IfExpression implements Content {
     }
 
     public static class ElseIfExpression implements Content {
-        private Object condition;
+        private Expression condition;
         private Content content;
 
-        public ElseIfExpression(Object condition) {
+        public ElseIfExpression(Expression condition) {
             this.condition = condition;
         }
 
@@ -132,7 +121,7 @@ public class IfExpression implements Content {
         @Override
         public boolean render(OutputStream outputStream, JtwigContext context) throws RenderException {
             try {
-                if (isTrue(context.resolve(condition))) {
+                if (isTrue(condition.calculate(context))) {
                     return content.render(outputStream, context);
                 }
                 return false;

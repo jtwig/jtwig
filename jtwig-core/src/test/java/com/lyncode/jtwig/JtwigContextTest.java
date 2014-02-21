@@ -29,12 +29,12 @@ import static org.mockito.Mockito.when;
 
 public class JtwigContextTest {
     private JtwigModelMap modelMap = mock(JtwigModelMap.class);
-    private JtwigContext resolver = new JtwigContext(modelMap);
+    private JtwigContext context = new JtwigContext(modelMap);
 
     @Test
     public void shouldResolveVariable() throws Exception {
         when(modelMap.get("name")).thenReturn("joao");
-        assertThat(resolver.resolve(new Variable("name")), is((Object) "joao"));
+        assertThat(new Variable("name").calculate(context), is((Object) "joao"));
     }
 
     @Test
@@ -44,19 +44,6 @@ public class JtwigContextTest {
                 new Variable("name"),
                 new Variable("size")
         );
-        assertThat(resolver.resolve(selection), is((Object) 0));
+        assertThat(selection.calculate(context), is((Object) 0));
     }
-//    @Test
-//    public void shouldResolveCompositionWithFunction() throws Exception {
-//        ArrayList<Object> objects = new ArrayList<Object>();
-//        objects.add("a");
-//        when(modelMap.get("name")).thenReturn(objects);
-//        FunctionElement function = new FunctionElement("get");
-//        function.add(0);
-//        Selection selection = new Selection(
-//                new Variable("name"),
-//                function
-//        );
-//        assertThat(resolver.resolve(selection), is((Object) "a"));
-//    }
 }

@@ -43,7 +43,9 @@ public enum Operator {
     STARTS_WITH("starts with"),
     ENDS_WITH("ends with"),
     MATCHES("matches"),
-    IN("in");
+    IN("in"),
+    IS("is"),
+    IS_NOT("is not");
 
     public static Operator fromString (String operatorRepresentation) {
         for (Operator op : values())

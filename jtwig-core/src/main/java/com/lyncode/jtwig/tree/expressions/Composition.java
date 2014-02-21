@@ -51,7 +51,7 @@ public class Composition implements Expression {
             for (FunctionElement functionElement : filters) {
                 List<Object> arguments = new ListBuilder<Object>()
                         .add(resolved)
-                        .add(((List) context.resolve(functionElement.getArguments())).toArray())
+                        .add(functionElement.getArguments().calculate(context).toArray())
                         .build();
                 resolved = context.function(functionElement.getName()).execute(arguments.toArray());
             }

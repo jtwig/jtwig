@@ -23,29 +23,29 @@ import com.lyncode.jtwig.tree.api.Expression;
 import static com.lyncode.jtwig.util.BooleanOperations.isTrue;
 
 public class OperationTernary implements Expression {
-    private Object booleanExpression;
-    private Object ifTrueExpression;
-    private Object ifFalseExpression;
+    private Expression booleanExpression;
+    private Expression ifTrueExpression;
+    private Expression ifFalseExpression;
 
-    public OperationTernary(Object booleanExpression) {
+    public OperationTernary(Expression booleanExpression) {
         this.booleanExpression = booleanExpression;
     }
 
-    public boolean setIfTrueExpression(Object ifTrueExpression) {
+    public boolean setIfTrueExpression(Expression ifTrueExpression) {
         this.ifTrueExpression = ifTrueExpression;
         return true;
     }
 
-    public boolean setIfFalseExpression(Object ifFalseExpression) {
+    public boolean setIfFalseExpression(Expression ifFalseExpression) {
         this.ifFalseExpression = ifFalseExpression;
         return true;
     }
 
     @Override
     public Object calculate(JtwigContext context) throws CalculateException {
-        if (isTrue(context.resolve(booleanExpression)))
-            return context.resolve(ifTrueExpression);
+        if (isTrue(booleanExpression.calculate(context)))
+            return ifTrueExpression.calculate(context);
         else
-            return context.resolve(ifFalseExpression);
+            return ifFalseExpression.calculate(context);
     }
 }

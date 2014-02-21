@@ -19,6 +19,7 @@ package com.lyncode.jtwig.functions.repository;
 import com.lyncode.jtwig.functions.JtwigFunction;
 import com.lyncode.jtwig.functions.annotations.JtwigFunctionDeclaration;
 import com.lyncode.jtwig.functions.exceptions.FunctionNotFoundException;
+import com.lyncode.jtwig.functions.internal.bool.*;
 import com.lyncode.jtwig.functions.internal.cast.ToDouble;
 import com.lyncode.jtwig.functions.internal.cast.ToInt;
 import com.lyncode.jtwig.functions.internal.date.DateFormat;
@@ -81,7 +82,17 @@ public abstract class AbstractFunctionRepository {
                 new First(),
                 new Last(),
                 new JsonEncode(),
-                new Reverse()
+                new Reverse(),
+
+                // Boolean functions
+                new Empty(),
+                new Constant(),
+                new Defined(),
+                new Even(),
+                new Odd(),
+                new IsIterable(),
+                new IsNull(),
+                new DivisableBy()
         );
         add(jtwigFunctions);
     }

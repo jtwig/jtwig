@@ -36,7 +36,7 @@ public class Requirements {
         BaseDescription description = new StringDescription();
         predicate.describeTo(description);
         if (!predicate.matches(arguments.length))
-            throw new FunctionException("Invalid number of arguments: "+description.toString());
+            throw new FunctionException("Invalid number of arguments, it should be "+description.toString());
         return this;
     }
 
