@@ -17,7 +17,7 @@
 package com.lyncode.jtwig.spring;
 
 import com.lyncode.jtwig.controller.DynamicController;
-import com.lyncode.jtwig.functions.SimpleJtwigFunction;
+import com.lyncode.jtwig.functions.test.SimpleJtwigFunction;
 import com.lyncode.jtwig.mvc.JtwigViewResolver;
 import com.lyncode.jtwig.services.api.ModelMapFiller;
 import com.lyncode.jtwig.services.api.ViewShownResolver;
@@ -82,8 +82,8 @@ public class WebappConfig extends WebMvcConfigurerAdapter {
         jtwigViewResolver.setPrefix("/WEB-INF/views/");
         jtwigViewResolver.setSuffix(".twig.html");
         jtwigViewResolver.setTheme("default");
-        jtwigViewResolver.addFunctions(
-                SimpleJtwigFunction.class
+        jtwigViewResolver.addFunctionPackages(
+                SimpleJtwigFunction.class.getPackage().getName()
         );
         return jtwigViewResolver;
     }

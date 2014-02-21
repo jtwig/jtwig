@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package com.lyncode.jtwig.functions;
+package com.lyncode.jtwig.functions.test;
 
+import com.lyncode.jtwig.functions.JtwigFunction;
 import com.lyncode.jtwig.functions.annotations.JtwigFunctionDeclaration;
 import com.lyncode.jtwig.functions.exceptions.FunctionException;
 
