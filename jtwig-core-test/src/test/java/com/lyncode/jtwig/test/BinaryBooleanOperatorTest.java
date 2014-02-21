@@ -19,7 +19,6 @@ package com.lyncode.jtwig.test;
 import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.JtwigTemplate;
 import com.lyncode.jtwig.exception.CompileException;
-import com.lyncode.jtwig.exception.ExpectingExpressionException;
 import com.lyncode.jtwig.exception.ParseException;
 import com.lyncode.jtwig.exception.RenderException;
 import org.junit.Test;
@@ -31,7 +30,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 public class BinaryBooleanOperatorTest extends AbstractJtwigTest {
 
-    @Test(expected = ExpectingExpressionException.class)
+    @Test(expected = ParseException.class)
     public void AndBadSyntax () throws ParseException, CompileException, RenderException {
         JtwigTemplate template = new JtwigTemplate("{% if (items && true) %}Hi{% endif %}");
         JtwigContext context = new JtwigContext();
@@ -48,7 +47,7 @@ public class BinaryBooleanOperatorTest extends AbstractJtwigTest {
         assertThat(template.output(context), is("Hi"));
     }
 
-    @Test(expected = ExpectingExpressionException.class)
+    @Test(expected = ParseException.class)
     public void OrBadSyntax () throws ParseException, CompileException, RenderException {
         JtwigTemplate template = new JtwigTemplate("{% if (items || true) %}Hi{% endif %}");
         JtwigContext context = new JtwigContext();

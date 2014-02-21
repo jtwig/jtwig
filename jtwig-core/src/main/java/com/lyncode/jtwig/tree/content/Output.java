@@ -17,39 +17,42 @@
 package com.lyncode.jtwig.tree.content;
 
 import com.lyncode.jtwig.JtwigContext;
+import com.lyncode.jtwig.exception.CalculateException;
 import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.RenderException;
 import com.lyncode.jtwig.resource.JtwigResource;
 import com.lyncode.jtwig.tree.api.Content;
+import com.lyncode.jtwig.tree.api.Expression;
 import com.lyncode.jtwig.tree.structural.Block;
 
 import java.io.IOException;
 import java.io.OutputStream;
 
-public class Text implements Content {
-    private StringBuilder builder = new StringBuilder();
+public class Output implements Content {
+    private Expression expression;
 
-    public boolean append (String piece) {
-        builder.append(piece);
-        return true;
+    public Output(Expression expression) {
+        this.expression = expression;
     }
 
-    public String getText () {
-        return builder.toString();
+    public Object getExpression() {
+        return expression;
     }
 
     @Override
     public boolean render(OutputStream outputStream, JtwigContext context) throws RenderException {
         try {
-            outputStream.write(builder.toString().getBytes());
+            outputStream.write(String.valueOf(expression.calculate(context)).getBytes());
             return true;
         } catch (IOException e) {
+            throw new RenderException(e);
+        } catch (CalculateException e) {
             throw new RenderException(e);
         }
     }
 
     @Override
-    public Content compile(JtwigResource resource) throws CompileException {
+    public Output compile(JtwigResource resource) throws CompileException {
         return this;
     }
 
@@ -59,6 +62,6 @@ public class Text implements Content {
     }
 
     public String toString () {
-        return "Text: "+ builder.toString();
+        return "Render the result of "+expression;
     }
 }

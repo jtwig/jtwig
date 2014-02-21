@@ -17,48 +17,55 @@
 package com.lyncode.jtwig.tree.content;
 
 import com.lyncode.jtwig.JtwigContext;
+import com.lyncode.jtwig.exception.CalculateException;
 import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.RenderException;
 import com.lyncode.jtwig.resource.JtwigResource;
 import com.lyncode.jtwig.tree.api.Content;
+import com.lyncode.jtwig.tree.api.Expression;
+import com.lyncode.jtwig.tree.expressions.Variable;
 import com.lyncode.jtwig.tree.structural.Block;
 
-import java.io.IOException;
 import java.io.OutputStream;
 
-public class Text implements Content {
-    private StringBuilder builder = new StringBuilder();
+public class SetVariable implements Content {
+    private Variable name;
+    private Expression assignment;
 
-    public boolean append (String piece) {
-        builder.append(piece);
+    public SetVariable(Variable name) {
+        this.name = name;
+    }
+
+    public boolean setAssignment(Expression assignment) {
+        this.assignment = assignment;
         return true;
     }
 
-    public String getText () {
-        return builder.toString();
+    public Variable getName() {
+        return name;
+    }
+
+    public Object getAssignment() {
+        return assignment;
     }
 
     @Override
     public boolean render(OutputStream outputStream, JtwigContext context) throws RenderException {
         try {
-            outputStream.write(builder.toString().getBytes());
+            context.set(name.getIdentifier(), assignment.calculate(context));
             return true;
-        } catch (IOException e) {
+        } catch (CalculateException e) {
             throw new RenderException(e);
         }
     }
 
     @Override
-    public Content compile(JtwigResource resource) throws CompileException {
+    public SetVariable compile(JtwigResource resource) throws CompileException {
         return this;
     }
 
     @Override
     public boolean replace(Block expression) throws CompileException {
         return false;
-    }
-
-    public String toString () {
-        return "Text: "+ builder.toString();
     }
 }

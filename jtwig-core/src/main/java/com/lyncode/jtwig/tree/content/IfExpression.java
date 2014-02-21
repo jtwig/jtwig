@@ -21,9 +21,8 @@ import com.lyncode.jtwig.exception.CalculateException;
 import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.RenderException;
 import com.lyncode.jtwig.resource.JtwigResource;
-import com.lyncode.jtwig.tree.api.Compilable;
-import com.lyncode.jtwig.tree.api.Renderable;
-import com.lyncode.jtwig.tree.structural.BlockExpression;
+import com.lyncode.jtwig.tree.api.Content;
+import com.lyncode.jtwig.tree.structural.Block;
 
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -31,7 +30,7 @@ import java.util.List;
 
 import static com.lyncode.jtwig.util.BooleanOperations.isTrue;
 
-public class IfExpression implements Renderable, Compilable<IfExpression> {
+public class IfExpression implements Content {
     private Object conditionalExpression;
     private Content content;
     private ElseExpression elseExpression = null;
@@ -63,12 +62,8 @@ public class IfExpression implements Renderable, Compilable<IfExpression> {
         return elseIfExpressions;
     }
 
-    public Content getContent() {
-        return content;
-    }
-
-    public boolean setContent(Content content) {
-        this.content = content;
+    public boolean setContent(Content abstractContent) {
+        this.content = abstractContent;
         return true;
     }
 
@@ -105,7 +100,7 @@ public class IfExpression implements Renderable, Compilable<IfExpression> {
     }
 
     @Override
-    public boolean replace(BlockExpression expression) throws CompileException {
+    public boolean replace(Block expression) throws CompileException {
         boolean replaced = this.content.replace(expression);
 
         for (int i = 0;i<this.elseIfExpressions.size();i++)
@@ -117,7 +112,7 @@ public class IfExpression implements Renderable, Compilable<IfExpression> {
         return replaced;
     }
 
-    public static class ElseIfExpression implements Renderable, Compilable<ElseIfExpression> {
+    public static class ElseIfExpression implements Content {
         private Object condition;
         private Content content;
 
@@ -125,8 +120,8 @@ public class IfExpression implements Renderable, Compilable<IfExpression> {
             this.condition = condition;
         }
 
-        public boolean setContent(Content content) {
-            this.content = content;
+        public boolean setContent(Content abstractContent) {
+            this.content = abstractContent;
             return true;
         }
 
@@ -153,12 +148,12 @@ public class IfExpression implements Renderable, Compilable<IfExpression> {
         }
 
         @Override
-        public boolean replace(BlockExpression expression) throws CompileException {
+        public boolean replace(Block expression) throws CompileException {
             return content.replace(expression);
         }
     }
 
-    public static class ElseExpression implements Renderable, Compilable<ElseExpression> {
+    public static class ElseExpression implements Content {
         private Content content;
 
         public ElseExpression(Content content) {
@@ -178,7 +173,7 @@ public class IfExpression implements Renderable, Compilable<IfExpression> {
         }
 
         @Override
-        public boolean replace(BlockExpression expression) throws CompileException {
+        public boolean replace(Block expression) throws CompileException {
             return content.replace(expression);
         }
     }

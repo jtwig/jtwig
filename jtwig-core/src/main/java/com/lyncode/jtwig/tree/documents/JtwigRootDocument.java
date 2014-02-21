@@ -16,10 +16,14 @@
 
 package com.lyncode.jtwig.tree.documents;
 
+import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.exception.CompileException;
+import com.lyncode.jtwig.exception.RenderException;
 import com.lyncode.jtwig.resource.JtwigResource;
-import com.lyncode.jtwig.tree.content.Content;
-import com.lyncode.jtwig.tree.structural.BlockExpression;
+import com.lyncode.jtwig.tree.api.Content;
+import com.lyncode.jtwig.tree.structural.Block;
+
+import java.io.OutputStream;
 
 public class JtwigRootDocument implements JtwigDocument {
     private Content content;
@@ -33,12 +37,17 @@ public class JtwigRootDocument implements JtwigDocument {
     }
 
     @Override
+    public boolean render(OutputStream outputStream, JtwigContext context) throws RenderException {
+        return false;
+    }
+
+    @Override
     public Content compile(JtwigResource resource) throws CompileException {
         return content.compile(resource);
     }
 
     @Override
-    public boolean replace(BlockExpression expression) throws CompileException {
+    public boolean replace(Block expression) throws CompileException {
         return content.replace(expression);
     }
 }

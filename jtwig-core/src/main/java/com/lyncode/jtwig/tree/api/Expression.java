@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package com.lyncode.jtwig.tree.documents;
+package com.lyncode.jtwig.tree.api;
 
-import com.lyncode.jtwig.tree.api.Content;
+import com.lyncode.jtwig.JtwigContext;
+import com.lyncode.jtwig.exception.CalculateException;
 
-public interface JtwigDocument extends Content {
-
+public interface Expression {
+    Object calculate (JtwigContext context) throws CalculateException;
 }

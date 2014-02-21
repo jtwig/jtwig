@@ -16,24 +16,21 @@
 
 package com.lyncode.jtwig.parser;
 
-import com.lyncode.jtwig.exception.*;
+import com.lyncode.jtwig.exception.ParseBypassException;
+import com.lyncode.jtwig.exception.ParseException;
+import com.lyncode.jtwig.exception.ResourceException;
 import com.lyncode.jtwig.resource.JtwigResource;
-import com.lyncode.jtwig.tree.api.Argumentable;
+import com.lyncode.jtwig.tree.api.Content;
 import com.lyncode.jtwig.tree.content.*;
 import com.lyncode.jtwig.tree.documents.JtwigDocument;
 import com.lyncode.jtwig.tree.documents.JtwigExtendsDocument;
 import com.lyncode.jtwig.tree.documents.JtwigRootDocument;
-import com.lyncode.jtwig.tree.helper.ElementList;
-import com.lyncode.jtwig.tree.structural.BlockExpression;
-import com.lyncode.jtwig.tree.structural.ExtendsExpression;
-import com.lyncode.jtwig.tree.structural.IncludeExpression;
-import com.lyncode.jtwig.tree.value.*;
+import com.lyncode.jtwig.tree.expressions.Variable;
+import com.lyncode.jtwig.tree.structural.Block;
+import com.lyncode.jtwig.tree.structural.Extends;
+import com.lyncode.jtwig.tree.structural.Include;
 import org.parboiled.BaseParser;
 import org.parboiled.Rule;
-import org.parboiled.annotations.DontLabel;
-import org.parboiled.annotations.MemoMismatches;
-import org.parboiled.annotations.SuppressNode;
-import org.parboiled.annotations.SuppressSubnodes;
 import org.parboiled.common.FileUtils;
 import org.parboiled.errors.ParserRuntimeException;
 import org.parboiled.parserunners.ReportingParseRunner;
@@ -43,15 +40,12 @@ import java.nio.charset.Charset;
 
 import static com.lyncode.jtwig.parser.JtwigKeyword.*;
 import static com.lyncode.jtwig.parser.JtwigSymbol.*;
-import static com.lyncode.jtwig.tree.content.IfExpression.ElseExpression;
-import static com.lyncode.jtwig.tree.content.IfExpression.ElseIfExpression;
-import static com.lyncode.jtwig.util.Simplifier.simplify;
 import static org.parboiled.Parboiled.createParser;
 
-public class JtwigParser extends BaseParser<Object> {
+public class JtwigParser extends BaseParser<Content> {
     public static JtwigDocument parse (JtwigResource input) throws ParseException {
         try {
-            ReportingParseRunner<Object> runner = new ReportingParseRunner<Object>(createParser(JtwigParser.class).Start());
+            ReportingParseRunner<Object> runner = new ReportingParseRunner<Object>(createParser(JtwigParser.class).start());
             ParsingResult<Object> result = runner.run(FileUtils.readAllText(input.retrieve(), Charset.defaultCharset()));
             return (JtwigDocument) result.resultValue;
         } catch (ParserRuntimeException e) {
@@ -66,188 +60,159 @@ public class JtwigParser extends BaseParser<Object> {
         }
     }
 
-    protected boolean Debug() {
-        System.out.println("Level: " + this.getContext().getLevel());
+    JtwigBasicParser basicParser = createParser(JtwigBasicParser.class);
+    JtwigExpressionParser expressionParser = createParser(JtwigExpressionParser.class);
 
-        if (!this.getContext().getValueStack().isEmpty()) {
-            int i = 0;
-            for (Object v : this.getContext().getValueStack())
-                System.out.println("Position " + (i++) + " of the stack " + v.getClass().getSimpleName() + " = '" + v.toString() + "'");
-        }
 
-        System.out.println("Left to process: " + this.getContext().getMatch());
-        return true;
-    }
-
-    protected Rule Start() {
+    public Rule start() {
         return FirstOf(
-                ExtendingTemplate(),
-                NormalTemplate()
+                extendTemplate(),
+                normalTemplate()
         );
     }
 
-    protected Rule Ensure(ParseException e, Rule... innerRule) {
-        return FirstOf(
-                Sequence(innerRule),
-                throwException(e)
-        );
-    }
-
-    protected boolean throwException(ParseException exception) throws ParseBypassException {
-        throw new ParseBypassException(exception);
-    }
-
-    protected Rule Content() {
+    Rule extendTemplate() {
         return Sequence(
-                push(new Content()),
-                ZeroOrMore(
-                        FirstOf(
-                                AddToContent(FastExpression()),
-                                AddToContent(BlockExpression()),
-                                AddToContent(IncludeExpression()),
-                                AddToContent(ForExpression()),
-                                AddToContent(IfExpression()),
-                                AddToContent(SetExpression()),
-                                AddToContent(Verbatim()),
+                basicParser.spacing(),
+                Sequence(
+                        openCode(),
+                        keyword(EXTENDS),
+                        mandatory(
                                 Sequence(
-                                        OpenCode(),
-                                        TestNot(
-                                                FirstOf(
-                                                        SpecificKeyword(ENDBLOCK),
-                                                        SpecificKeyword(ENDFOR),
-                                                        SpecificKeyword(ENDIF),
-                                                        SpecificKeyword(IF),
-                                                        SpecificKeyword(BLOCK),
-                                                        SpecificKeyword(FOR),
-                                                        SpecificKeyword(SET),
-                                                        SpecificKeyword(ELSE),
-                                                        SpecificKeyword(ELSEIF)
-                                                )
+                                        basicParser.stringLiteral(),
+                                        basicParser.spacing(),
+                                        closeCode(),
+                                        push(new JtwigExtendsDocument(new Extends(basicParser.pop()))),
+                                        ZeroOrMore(
+                                                basicParser.spacing(),
+                                                block(),
+                                                ((JtwigExtendsDocument) peek(1)).add((Block) pop())
                                         ),
-                                        throwException(new UnknownExpressionException())
+                                        basicParser.spacing(),
+                                        EOI
                                 ),
-                                AddToContent(TextExpression())
+                                new ParseException("Wrong include syntax")
                         )
                 )
         );
     }
 
-    protected Rule Verbatim () {
+    Rule normalTemplate() {
         return Sequence(
-                Sequence(
-                        OpenCode(),
-                        SpecificKeyword(VERBATIM),
-                        CloseCode()
-                ),
-                TextExpression(Sequence(OpenCode(), SpecificKeyword(JtwigKeyword.ENDVERBATIM))),
-                Ensure(
-                    new EndClauseMissingException(VERBATIM),
-                    Sequence(
-                            OpenCode(),
-                            SpecificKeyword(JtwigKeyword.ENDVERBATIM),
-                            CloseCode()
-                    )
-                )
-        );
-    }
-
-    protected Rule AddToContent(Rule innerRule) {
-        return Sequence(
-                innerRule,
-                ((Content) peek(1)).add(pop())
-        );
-    }
-
-    protected Rule NormalTemplate() {
-        return Sequence(
-                Spacing(),
-                Content(),
-                push(new JtwigRootDocument((Content) pop())),
+                content(),
+                push(new JtwigRootDocument(pop())),
                 EOI
         );
     }
 
-    protected Rule ExtendingTemplate() {
+    Rule content() {
         return Sequence(
-                Spacing(),
-                ExtendsExpression(),
-                push(new JtwigExtendsDocument((ExtendsExpression) pop())),
+                push(new JtwigContent()),
                 ZeroOrMore(
-                        Spacing(),
-                        BlockExpression(),
-                        ((JtwigExtendsDocument) peek(1)).add((BlockExpression) pop())
-                ),
-                Spacing(),
-                Ensure(
-                        new ExtendMayOnlyBlocksException(),
-                        EOI
+                        FirstOf(
+                                addToContent(output()),
+                                addToContent(block()),
+                                addToContent(include()),
+                                addToContent(forEach()),
+                                addToContent(ifCondition()),
+                                addToContent(set()),
+                                addToContent(verbatim()),
+                                Sequence(
+                                        openCode(),
+                                        TestNot(
+                                                FirstOf(
+                                                        keyword(ENDBLOCK),
+                                                        keyword(ENDFOR),
+                                                        keyword(ENDIF),
+                                                        keyword(IF),
+                                                        keyword(BLOCK),
+                                                        keyword(FOR),
+                                                        keyword(SET),
+                                                        keyword(ELSE),
+                                                        keyword(ELSEIF),
+                                                        keyword(VERBATIM)
+                                                )
+                                        ),
+                                        throwException(new ParseException("Unknown tag"))
+                                ),
+                                addToContent(text())
+                        )
                 )
         );
     }
 
-    protected Rule BlockExpression() {
+    Rule addToContent(Rule innerRule) {
         return Sequence(
-                OpenCode(),
-                SpecificKeyword(BLOCK),
-                Identifier(),
-                Spacing(),
-                push(new BlockExpression((String) pop())),
-                CloseCode(),
-                Content(),
-                (((BlockExpression) peek(1)).setContent((Content) pop())),
-                Ensure(
-                        new EndClauseMissingException(BLOCK),
-                        OpenCode(),
-                        SpecificKeyword(ENDBLOCK),
-                        Spacing(),
-                        CloseCode()
-                )
+                innerRule,
+                ((JtwigContent) peek(1)).add(pop())
         );
     }
 
-    protected Rule ExtendsExpression() {
+    Rule block() {
         return Sequence(
-                OpenCode(),
-                SpecificKeyword(EXTENDS),
-                StringLiteral(),
-                push(new ExtendsExpression((String) pop())),
-                Spacing(),
-                Ensure(
-                        new EndClauseMissingException(EXTENDS),
-                        CloseCode()
+                openCode(),
+                keyword(BLOCK),
+                mandatory(
+                        Sequence(
+                                expressionParser.variable(),
+                                push(new Block(((Variable) expressionParser.pop()).getIdentifier())),
+                                closeCode(),
+                                content(),
+                                (((Block) peek(1)).setContent(pop())),
+                                openCode(),
+                                keyword(ENDBLOCK),
+                                Optional(
+                                        expressionParser.variable(),
+                                        assertEqual(
+                                                ((Block)peek()).getName(),
+                                                ((Variable) expressionParser.pop()).getIdentifier()
+                                        )
+                                ),
+                                closeCode()
+                        ),
+                        new ParseException("Wrong block syntax")
                 )
         );
     }
 
-    protected Rule IncludeExpression() {
+    boolean assertEqual(String value1, String value2) {
+        if (!value1.equals(value2))
+            return throwException(new ParseException("Start statement and ending block names do not match"));
+        else
+            return true;
+    }
+
+    Rule include() {
         return Sequence(
-                OpenCode(),
-                SpecificKeyword(INCLUDE),
-                StringLiteral(),
-                push(new IncludeExpression((String) pop())),
-                Spacing(),
-                Ensure(
-                        new EndClauseMissingException(INCLUDE),
-                        CloseCode()
+                openCode(),
+                keyword(INCLUDE),
+                mandatory(
+                        Sequence(
+                                basicParser.stringLiteral(),
+                                basicParser.spacing(),
+                                push(new Include(basicParser.pop())),
+                                closeCode()
+                        ),
+                        new ParseException("Wrong include syntax")
                 )
         );
     }
 
-    protected Rule TextExpression() {
+    Rule text() {
         return Sequence(
                 push(new Text()),
                 OneOrMore(
                         FirstOf(
                                 Sequence("{#", ZeroOrMore(TestNot("#}"), ANY), "#}"),
                                 Sequence(
-                                        Escape(),
+                                        basicParser.escape(),
                                         ((Text) peek()).append(match())
                                 ),
                                 Sequence(
                                         TestNot(
                                                 FirstOf(
-                                                        Symbol(OPEN_FAST),
-                                                        Symbol(OPEN_CODE)
+                                                        basicParser.symbol(OPEN_OUTPUT),
+                                                        basicParser.symbol(OPEN_CODE)
                                                 )
                                         ),
                                         ANY,
@@ -258,13 +223,30 @@ public class JtwigParser extends BaseParser<Object> {
         );
     }
 
-    protected Rule TextExpression(Rule until) {
+    Rule verbatim () {
+        return Sequence(
+                openCode(),
+                keyword(VERBATIM),
+                mandatory(
+                        Sequence(
+                                closeCode(),
+                                text(Sequence(openCode(), keyword(ENDVERBATIM))),
+                                openCode(),
+                                keyword(JtwigKeyword.ENDVERBATIM),
+                                closeCode()
+                        ),
+                        new ParseException("Wrong verbatim syntax")
+                )
+        );
+    }
+
+    Rule text (Rule until) {
         return Sequence(
                 push(new Text()),
                 OneOrMore(
                         FirstOf(
                                 Sequence(
-                                        Escape(),
+                                        basicParser.escape(),
                                         ((Text) peek()).append(match())
                                 ),
                                 Sequence(
@@ -279,759 +261,148 @@ public class JtwigParser extends BaseParser<Object> {
         );
     }
 
-    protected Rule IfExpression() {
+    Rule ifCondition() {
         return Sequence(
-                OpenCode(),
-                SpecificKeyword(IF),
-                Spacing(),
-                Ensure(
-                        new ExpectingExpressionException(),
-                        Expression()
-                ),
-                Spacing(),
-                Ensure(
-                        new EndCodeMissingException(IF),
-                        CloseCode()
-                ),
-                push(new IfExpression(pop())),
-                Content(),
-                ((IfExpression) peek(1)).setContent((Content) pop()),
-                ZeroOrMore(
+                openCode(),
+                keyword(IF),
+                mandatory(
                         Sequence(
-                                OpenCode(),
-                                SpecificKeyword(ELSEIF),
-                                Spacing(),
-                                Expression(),
-                                Spacing(),
-                                push(new ElseIfExpression(pop())),
-                                CloseCode(),
-                                Content(),
-                                ((ElseIfExpression) peek(1)).setContent((Content) pop()),
-                                ((IfExpression) peek(1)).addElseIf((ElseIfExpression) pop())
-                        )
-                ),
-                Optional(
-                        Sequence(
-                                OpenCode(),
-                                SpecificKeyword(ELSE),
-                                Spacing(),
-                                CloseCode(),
-                                Content(),
-                                ((IfExpression) peek(1)).setElseExpression(new ElseExpression((Content) pop()))
-                        )
-                ),
-                Ensure(
-                        new EndClauseMissingException(IF),
-                        OpenCode(),
-                        SpecificKeyword(ENDIF),
-                        Spacing(),
-                        CloseCode()
-                )
-        );
-    }
-
-    protected Rule ForExpression() {
-        return FirstOf(
-                ForEachMapExpression(),
-                ForEachExpression()
-        );
-    }
-
-    protected Rule ForEachExpression() {
-        return Sequence(
-                OpenCode(),
-                SpecificKeyword(FOR),
-                Variable(),
-                Spacing(),
-                SpecificKeyword(JtwigKeyword.IN),
-                Expression(),
-                Spacing(),
-                push(new ForExpression((Variable) pop(1), pop())),
-                Optional(
-                        ForFilters()
-                ),
-                CloseCode(),
-                Content(),
-                ((ForExpression) peek(1)).setContent((Content) pop()),
-                Ensure(
-                        new EndCodeMissingException(FOR),
-                        OpenCode(),
-                        SpecificKeyword(ENDFOR),
-                        CloseCode()
-                )
-        );
-    }
-
-
-    protected Rule ForEachMapExpression() {
-        return Sequence(
-                OpenCode(),
-                SpecificKeyword(FOR),
-                Variable(),
-                Spacing(),
-                FreeSymbol(COMMA),
-                Variable(),
-                Spacing(),
-                SpecificKeyword(JtwigKeyword.IN),
-                Expression(),
-                Spacing(),
-                push(new ForPairExpression((Variable) pop(2), (Variable) pop(1), pop())),
-                Optional(
-                        ForFilters()
-                ),
-                CloseCode(),
-                Content(),
-                ((ForPairExpression) peek(1)).setContent((Content) pop()),
-                Ensure(
-                        new EndCodeMissingException(FOR),
-                        OpenCode(),
-                        SpecificKeyword(ENDFOR),
-                        CloseCode()
-                )
-        );
-    }
-
-    Rule ForFilters() {
-        return ZeroOrMore(
-                Sequence(
-                        FreeSymbol(PIPE),
-                        SpecificKeyword(FILTER),
-                        Expression(),
-                        ((ForExpression) peek(1)).add((FunctionElement) pop())
-                )
-        );
-    }
-
-    protected Rule SetExpression() {
-        return Sequence(
-                OpenCode(),
-                SpecificKeyword(JtwigKeyword.SET),
-                Variable(),
-                Spacing(),
-                push(new SetExpression((Variable) pop())),
-                FreeSymbol(JtwigSymbol.ATTR),
-                Expression(),
-                Spacing(),
-                (((SetExpression) peek(1))).setAssignment(pop()),
-                Ensure(
-                        new EndClauseMissingException(SET),
-                        CloseCode()
-                )
-        );
-    }
-
-    protected Rule FastExpression() {
-        return Sequence(
-                Symbol(JtwigSymbol.OPEN_FAST),
-                Spacing(),
-                Expression(),
-                Spacing(),
-                push(new FastExpression(pop())),
-                Ensure(
-                        new EndClauseMissingException(JtwigSymbol.OPEN_FAST),
-                        Symbol(JtwigSymbol.CLOSE_FAST)
-                )
-        );
-    }
-
-    // Boolean Grammar
-    protected Rule Expression() {
-        return Sequence(
-                SpecificJtwigOperators(),
-                push(simplify(pop()))
-        );
-    }
-
-
-
-    protected Rule SpecificJtwigOperators () {
-        return BinaryOperation(
-                OrExpression(),
-                Operator.STARTS_WITH,
-                Operator.ENDS_WITH,
-                Operator.MATCHES,
-                Operator.IN
-        );
-    }
-
-    protected Rule OrExpression() {
-        return BinaryOperation(
-                AndExpression(),
-                Operator.OR
-        );
-    }
-
-    Rule AndExpression() {
-        return BinaryOperation(
-                EqualityExpression(),
-                Operator.AND
-        );
-    }
-
-    Rule EqualityExpression() {
-        return BinaryOperation(
-                RelationalExpression(),
-                Operator.EQUAL,
-                Operator.DIFF
-        );
-    }
-
-    protected Rule RelationalExpression() {
-        return BinaryOperation(
-                FirstOf(
-                        NotExpression(),
-                        Addition()
-                ),
-                Operator.LTE,
-                Operator.GTE,
-                Operator.LT,
-                Operator.GT
-        );
-    }
-
-    protected Rule NotExpression() {
-        return UnaryOperation(
-                Addition(),
-                Operator.NOT
-        );
-    }
-
-
-    // Math Grammar
-    protected Rule Addition() {
-        return BinaryOperation(
-                Multiplication(),
-                Operator.ADD,
-                Operator.SUB
-        );
-    }
-
-    protected Rule Multiplication() {
-        return BinaryOperation(
-                ExtendedPrimary(),
-                Operator.INT_DIV,
-                Operator.INT_TIMES,
-                Operator.TIMES,
-                Operator.DIV,
-                Operator.MOD
-        );
-    }
-
-    protected Rule ExtendedPrimary () {
-        return FirstOf(
-                TernaryExpression(),
-                Primary()
-        );
-    }
-
-    protected Rule TernaryExpression () {
-        return Sequence(
-                Primary(),
-                push(new IfTernaryOperator(pop())),
-                Spacing(),
-                FreeSymbol(QUESTION),
-                Expression(),
-                Spacing(),
-                ((IfTernaryOperator) peek(1)).setIfTrueExpression(pop()),
-                FreeSymbol(DIV),
-                Expression(),
-                Spacing(),
-                ((IfTernaryOperator) peek(1)).setIfFalseExpression(pop())
-
-        );
-    }
-
-    // Basic Grammar and Help methods
-    protected Rule UnaryOperation(Rule innerRule, Operator... operatorSymbols) {
-        return Sequence(
-                Save(FirstSymbolOf(false, operatorSymbols)),
-                Spacing(),
-                push(new OperationUnary()),
-                ((OperationUnary) peek()).setOperator(Operator.fromString((String) pop(1))),
-                innerRule,
-                ((OperationUnary) peek(1)).setOperand(simplify(pop()))
-        );
-    }
-
-
-    protected Rule BinaryOperation(Rule innerExpression, Operator... operatorSymbols) {
-        return Sequence(
-                innerExpression,
-                Spacing(),
-                push(new OperationBinary(simplify(pop()))),
-                ZeroOrMore(
-                        Sequence(
-                                Save(FirstSymbolOf(false, operatorSymbols)),
-                                Spacing(),
-                                innerExpression,
-                                ((OperationBinary) peek(2)).addOperator(Operator.fromString((String) pop(1))),
-                                ((OperationBinary) peek(1)).add(simplify(pop()))
-                        )
-                )
-        );
-    }
-
-    @SuppressNode
-    protected Rule FirstSymbolOf(boolean spacing, Operator... operators) {
-        Rule[] rules = new Rule[operators.length];
-        int i = 0;
-        for (Operator operator : operators)
-            rules[i++] = Terminal(operator.toString(), spacing);
-        return FirstOf(rules);
-    }
-
-    protected Rule Save(Rule rule) {
-        return Sequence(
-                rule,
-                push(match())
-        );
-    }
-
-    protected Rule Primary() {
-        return FirstOf(
-                Selection(),
-                Composition(),
-                BasicExpression(),
-                Sequence(
-                        FreeSymbol(OPEN_PARENT),
-                        Expression(),
-                        Spacing(),
-                        Symbol(CLOSE_PARENT)
-                )
-        );
-    }
-
-    protected Rule Composition() {
-        return Sequence(
-                BasicExpression(),
-                push(new Composition(pop())),
-                OneOrMore(
-                        Sequence(
-                                Spacing(),
-                                FreeSymbol(PIPE),
-                                FirstOf(
-                                        Function(),
-                                        Variable()
+                                expressionParser.expression(),
+                                closeCode(),
+                                push(new IfExpression(expressionParser.pop())),
+                                content(),
+                                ((IfExpression) peek(1)).setContent(pop()),
+                                ZeroOrMore(
+                                        Sequence(
+                                                openCode(),
+                                                keyword(ELSEIF),
+                                                expressionParser.expression(),
+                                                push(new IfExpression.ElseIfExpression(expressionParser.pop())),
+                                                closeCode(),
+                                                content(),
+                                                ((IfExpression.ElseIfExpression) peek(1)).setContent(pop()),
+                                                ((IfExpression) peek(1)).addElseIf((IfExpression.ElseIfExpression) pop())
+                                        )
                                 ),
-                                ((Composition) peek(1)).add(pop())
-                        )
+                                Optional(
+                                        Sequence(
+                                                openCode(),
+                                                keyword(ELSE),
+                                                closeCode(),
+                                                content(),
+                                                ((IfExpression) peek(1)).setElseExpression(new IfExpression.ElseExpression((JtwigContent) pop()))
+                                        )
+                                ),
+                                openCode(),
+                                keyword(ENDIF),
+                                closeCode()
+                        ),
+                        new ParseException("Wrong if syntax")
                 )
         );
     }
 
-    protected Rule Selection() {
+    Rule forEach() {
         return Sequence(
-                BasicExpression(),
-                push(new Selection(pop())),
-                OneOrMore(
+                openCode(),
+                keyword(FOR),
+                mandatory(
                         Sequence(
-                                Spacing(),
-                                FreeSymbol(DOT),
-                                DeclaredExpression(),
-                                ((Selection) peek(1)).add(pop())
-                        )
-                )
-        );
-    }
-
-    protected Rule BasicExpression() {
-        return FirstOf(
-                NativeExpression(),
-                DeclaredExpression()
-        );
-    }
-
-    protected Rule NativeExpression() {
-        return FirstOf(
-                ListExpression(),
-                MapExpression(),
-                StringLiteral(),
-                Boolean(),
-                Double(),
-                Integer(),
-                Null()
-        );
-    }
-
-    protected Rule DeclaredExpression() {
-        return FirstOf(
-                MapSelection(),
-                Function(),
-                Variable()
-        );
-    }
-
-    Rule MapSelection() {
-        return Sequence(
-                Variable(),
-                FreeSymbol(JtwigSymbol.OPEN_BRACKET),
-                StringLiteral(),
-                Spacing(),
-                FreeSymbol(JtwigSymbol.CLOSE_BRACKET),
-                push(new MapSelection((Variable) pop(1), (String) pop()))
-        );
-    }
-
-    protected Rule Function() {
-        return FirstOf(
-                FunctionWithBrackets(),
-                FunctionWithoutBrackets()
-        );
-    }
-
-    protected Rule FunctionWithBrackets() {
-        return Sequence(
-                Identifier(),
-                Spacing(),
-                push(new FunctionElement((String) pop())),
-                FreeSymbol(OPEN_PARENT),
-                Optional(Arguments()),
-                FreeSymbol(CLOSE_PARENT)
-        );
-    }
-    protected Rule FunctionWithoutBrackets() {
-        return Sequence(
-                Identifier(),
-                Spacing(),
-                push(new FunctionElement((String) pop())),
-                Primary(),
-                (((FunctionElement) peek(1)).add(pop()))
-        );
-    }
-
-    protected Rule Arguments() {
-        return Sequence(
-                Primary(),
-                Spacing(),
-                ((Argumentable) peek(1)).add(pop()),
-                ZeroOrMore(
-                        FreeSymbol(COMMA),
-                        Primary(),
-                        Spacing(),
-                        ((Argumentable) peek(1)).add(pop())
-                )
-        );
-    }
-
-    /**
-     * Pushes a MAP
-     *
-     * @return
-     */
-    Rule MapExpression() {
-        return Sequence(
-                FreeSymbol(OPEN_CURLY_BRACKET),
-                push(new ElementMap()),
-                Optional(
-                        Identifier(),
-                        Spacing(),
-                        FreeSymbol(DIV),
-                        BasicExpression(),
-                        Spacing(),
-                        ((ElementMap) peek(2)).add((String) pop(1), pop()),
-                        ZeroOrMore(
-                                FreeSymbol(COMMA),
-                                Identifier(),
-                                Spacing(),
-                                FreeSymbol(DIV),
-                                BasicExpression(),
-                                Spacing(),
-                                ((ElementMap) peek(2)).add((String) pop(1), pop())
-                        )
-                ),
-                FreeSymbol(CLOSE_CURLY_BRACKET)
-        );
-    }
-
-
-    protected Rule ComprehensionListExpression () {
-        return FirstOf(
-                ComprehensionIntegerListExpression(),
-                ComprehensionCharacterListExpression()
-        );
-    }
-
-
-    protected Rule ComprehensionIntegerListExpression() {
-        return Sequence(
-                Integer(),
-                Symbol(TWO_DOTS),
-                Integer(),
-                push(new IntegerList((Integer) pop(1), (Integer) pop()))
-        );
-    }
-
-    protected Rule ComprehensionCharacterListExpression() {
-        return Sequence(
-                Char(),
-                Symbol(TWO_DOTS),
-                Char(),
-                push(new CharacterList((Character) pop(1), (Character) pop()))
-        );
-    }
-
-    protected Rule EnumerationList () {
-        return Sequence(
-                FreeSymbol(OPEN_BRACKET),
-                push(new ValueList()),
-                Optional(
-                        Expression(),
-                        Spacing(),
-                        ((ElementList) peek(1)).add(pop()),
-                        ZeroOrMore(
-                                FreeSymbol(COMMA),
-                                Expression(),
-                                Spacing(),
-                                ((ElementList) peek(1)).add(pop())
-                        )
-                ),
-                FreeSymbol(CLOSE_BRACKET)
-        );
-    }
-
-    protected Rule ListExpression() {
-        return FirstOf(
-                ComprehensionListExpression(),
-                EnumerationList()
-        );
-    }
-
-    /**
-     * Pushes a boolean
-     *
-     * @return
-     */
-    protected Rule Boolean() {
-        return FirstOf(
-                Sequence(
-                        SpecificKeyword(TRUE),
-                        push(true)
-                ),
-                Sequence(
-                        SpecificKeyword(FALSE),
-                        push(false)
-                )
-        );
-    }
-
-    protected Rule Null() {
-        return Sequence(
-                SpecificKeyword(JtwigKeyword.NULL),
-                push(null)
-        );
-    }
-
-    /**
-     * Pushes the integer (as integer)
-     *
-     * @return
-     */
-    protected Rule Integer() {
-        return Sequence(
-                Sequence(
-                        Optional(Symbol(MINUS)),
-                        OneOrMore(Digit())
-                ),
-                push(Integer.parseInt(match()))
-        );
-    }
-
-
-    protected Rule Char() {
-        return Sequence(
-                Symbol(QUOTE),
-                CharOnly(),
-                push(match().charAt(0)),
-                Symbol(QUOTE)
-        );
-    }
-
-
-    /**
-     * Pushes the integer (as integer)
-     *
-     * @return
-     */
-    protected Rule Double() {
-        return Sequence(
-                Sequence(
-                        Optional(Symbol(MINUS)),
-                        OneOrMore(Digit()),
-                        Symbol(DOT),
-                        OneOrMore(Digit())
-                ),
-                push(Double.valueOf(match()))
-        );
-    }
-
-    Rule Variable() {
-        return Sequence(
-                Identifier(),
-                push(new Variable((String) pop()))
-        );
-    }
-
-    protected Rule CloseCode() {
-        return Symbol(JtwigSymbol.CLOSE_CODE);
-    }
-
-    protected Rule OpenCode() {
-        return FreeSymbol(JtwigSymbol.OPEN_CODE);
-    }
-
-    /**
-     * Pushes the String (without quotes)
-     *
-     * @return
-     */
-    protected Rule StringLiteral() {
-        return FirstOf(
-                Sequence(
-                        '"',
-                        ZeroOrMore(
+                                expressionParser.variable(),
                                 FirstOf(
-                                        Escape(),
-                                        Sequence(TestNot(AnyOf("\r\n\"\\")), ANY)
-                                )
-                        ).suppressSubnodes(),
-                        push(match()),
-                        '"'
-                ),
-                Sequence(
-                        "'",
-                        ZeroOrMore(
-                                FirstOf(
-                                        Escape(),
-                                        Sequence(TestNot(AnyOf("\r\n'\\")), ANY)
-                                )
-                        ).suppressSubnodes(),
-                        push(match()),
-                        "'"
+                                        Sequence(
+                                                symbol(COMMA),
+                                                expressionParser.variable(),
+                                                keyword(IN),
+                                                expressionParser.expression(),
+                                                push(new ForPairLoop((Variable) expressionParser.pop(2), (Variable) expressionParser.pop(1), expressionParser.pop()))
+                                        ),
+                                        Sequence(
+                                                keyword(IN),
+                                                expressionParser.expression(),
+                                                push(new ForLoop((Variable) expressionParser.pop(1), expressionParser.pop()))
+                                        )
+                                ),
+                                closeCode(),
+                                content(),
+                                ((ForLoop) peek(1)).setContent(pop()),
+                                openCode(),
+                                keyword(ENDFOR),
+                                closeCode()
+                        ),
+                        new ParseException("Wrong for each syntax")
                 )
         );
     }
 
-    Rule Escape() {
-        return Sequence('\\', FirstOf(AnyOf("btnfr\"\'\\"), OctalEscape(), UnicodeEscape()));
+    Rule set() {
+        return Sequence(
+                openCode(),
+                keyword(SET),
+                mandatory(
+                        Sequence(
+                                expressionParser.variable(),
+                                push(new SetVariable((Variable) expressionParser.pop())),
+                                symbol(ATTR),
+                                expressionParser.expression(),
+                                closeCode(),
+                                ((SetVariable) peek()).setAssignment(expressionParser.pop())
+                        ),
+                        new ParseException("Wrong set syntax")
+                )
+        );
     }
 
-    Rule OctalEscape() {
+    Rule output() {
+        return Sequence(
+                symbol(OPEN_OUTPUT),
+                mandatory(
+                        Sequence(
+                                expressionParser.expression(),
+                                push(new Output(expressionParser.pop())),
+                                basicParser.symbol(JtwigSymbol.CLOSE_OUTPUT)
+                        ),
+                        new ParseException("Wrong output syntax")
+                )
+        );
+    }
+
+    Rule symbol(JtwigSymbol symbol) {
+        return Sequence(
+                basicParser.symbol(symbol),
+                basicParser.spacing()
+        );
+    }
+
+
+    Rule mandatory(Rule rule, ParseException exception) {
         return FirstOf(
-                Sequence(CharRange('0', '3'), CharRange('0', '7'), CharRange('0', '7')),
-                Sequence(CharRange('0', '7'), CharRange('0', '7')),
-                CharRange('0', '7')
+                rule,
+                throwException(exception)
         );
     }
 
-    Rule UnicodeEscape() {
-        return Sequence(OneOrMore('u'), HexDigit(), HexDigit(), HexDigit(), HexDigit());
+
+    boolean throwException(ParseException exception) throws ParseBypassException {
+        throw new ParseBypassException(exception);
     }
 
-    Rule HexDigit() {
-        return FirstOf(CharRange('a', 'f'), CharRange('A', 'F'), CharRange('0', '9'));
-    }
-
-    Rule Digit() {
-        return CharRange('0', '9');
-    }
-
-    /**
-     * Pushes the identifier as String
-     *
-     * @return
-     */
-    @SuppressSubnodes
-    @MemoMismatches
-    protected Rule Identifier() {
+    Rule openCode() {
         return Sequence(
-                IdentifierExpression(),
-                push(match())
+                basicParser.openCode(),
+                basicParser.spacing()
         );
     }
 
-    protected Rule IdentifierExpression() {
+    Rule keyword(JtwigKeyword keyword) {
         return Sequence(
-                TestNot(
-                        Keyword()
-                ),
-                Letter(),
-                ZeroOrMore(LetterOrDigit())
+                basicParser.keyword(keyword),
+                basicParser.spacing()
         );
     }
 
-    @SuppressNode
-    protected Rule Symbol(JtwigSymbol symbol) {
-        return Terminal(symbol.getSymbol(), false);
+    Rule closeCode() {
+        return basicParser.closeCode();
     }
 
-    @SuppressNode
-    protected Rule FreeSymbol(JtwigSymbol symbol) {
-        return Sequence(
-                Terminal(symbol.getSymbol(), false),
-                Optional(Spacing())
-        );
-    }
-
-    @SuppressNode
-    protected Rule SpecificKeyword(JtwigKeyword keyword) {
-        return Terminal(keyword.getKeyword(), LetterOrDigit());
-    }
-
-    @MemoMismatches
-    protected Rule Keyword() {
-        return Sequence(
-                FirstOf(JtwigKeyword.keywords()),
-                TestNot(LetterOrDigit())
-        );
-    }
-
-    protected Rule CharOnly () {
-        return FirstOf(
-                CharRange('a', 'z'),
-                CharRange('A', 'Z')
-        );
-    }
-
-    protected Rule Letter() {
-        // switch to this "reduced" character space version for a ~10% parser performance speedup
-        return FirstOf(CharRange('a', 'z'), CharRange('A', 'Z'), '_', '$');
-    }
-
-    @MemoMismatches
-    protected Rule LetterOrDigit() {
-        return FirstOf(CharRange('a', 'z'), CharRange('A', 'Z'), CharRange('0', '9'), '_', '$');
-    }
-
-    @SuppressNode
-    @DontLabel
-    protected Rule Terminal(String string) {
-        return Sequence(string, Spacing()).label('\'' + string + '\'');
-    }
-
-    @SuppressNode
-    @DontLabel
-    protected Rule Terminal(String string, boolean spacing) {
-        if (spacing)
-            return Sequence(string, Spacing()).label('\'' + string + '\'');
-        else
-            return String(string).label('\'' + string + '\'');
-    }
-
-    @SuppressNode
-    @DontLabel
-    protected Rule Terminal(String string, Rule mustNotFollow) {
-        return Sequence(string, TestNot(mustNotFollow), Spacing()).label('\'' + string + '\'');
-    }
-
-    @SuppressNode
-    protected Rule Spacing() {
-        return ZeroOrMore(FirstOf(
-
-                // whitespace
-                OneOrMore(AnyOf(" \t\r\n\f").label("Whitespace")),
-
-                // traditional comment
-                Sequence("{#", ZeroOrMore(TestNot("#}"), ANY), "#}")
-        ));
-    }
 }

@@ -14,10 +14,16 @@
  * limitations under the License.
  */
 
-package com.lyncode.jtwig.tree.documents;
+package com.lyncode.jtwig.tree.structural;
 
-import com.lyncode.jtwig.tree.api.Content;
+public class Extends {
+    private String path;
 
-public interface JtwigDocument extends Content {
+    public Extends(String path) {
+        this.path = path;
+    }
 
+    public String getPath() {
+        return path;
+    }
 }

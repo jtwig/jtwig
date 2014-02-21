@@ -16,29 +16,37 @@
 
 package com.lyncode.jtwig.tree.documents;
 
+import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.ParseException;
+import com.lyncode.jtwig.exception.RenderException;
 import com.lyncode.jtwig.exception.ResourceException;
 import com.lyncode.jtwig.parser.JtwigParser;
 import com.lyncode.jtwig.resource.JtwigResource;
-import com.lyncode.jtwig.tree.content.Content;
-import com.lyncode.jtwig.tree.structural.BlockExpression;
-import com.lyncode.jtwig.tree.structural.ExtendsExpression;
+import com.lyncode.jtwig.tree.api.Content;
+import com.lyncode.jtwig.tree.structural.Block;
+import com.lyncode.jtwig.tree.structural.Extends;
 
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 public class JtwigExtendsDocument implements JtwigDocument {
-    private ExtendsExpression extendsExpression;
-    private List<BlockExpression> blocks = new ArrayList<BlockExpression>();
+    private Extends anExtends;
+    private List<Block> blocks = new ArrayList<Block>();
 
-    public JtwigExtendsDocument(ExtendsExpression extendsExpression) {
-        this.extendsExpression = extendsExpression;
+    public JtwigExtendsDocument(Extends anExtends) {
+        this.anExtends = anExtends;
     }
 
-    public boolean add (BlockExpression blockExpression) {
-        blocks.add(blockExpression);
+    public boolean add (Block block) {
+        blocks.add(block);
         return true;
+    }
+
+    @Override
+    public boolean render(OutputStream outputStream, JtwigContext context) throws RenderException {
+        return false;
     }
 
     @Override
@@ -47,10 +55,10 @@ public class JtwigExtendsDocument implements JtwigDocument {
             for (int i = 0; i < blocks.size(); i++)
                 blocks.set(i, blocks.get(i).compile(resource));
 
-            JtwigResource jtwigResource = resource.resolve(extendsExpression.getPath());
+            JtwigResource jtwigResource = resource.resolve(anExtends.getPath());
 
             Content content = JtwigParser.parse(jtwigResource).compile(jtwigResource);
-            for (BlockExpression expression : blocks) {
+            for (Block expression : blocks) {
                 content.replace(expression);
             }
 
@@ -63,9 +71,9 @@ public class JtwigExtendsDocument implements JtwigDocument {
     }
 
     @Override
-    public boolean replace(BlockExpression expression) throws CompileException {
+    public boolean replace(Block expression) throws CompileException {
         boolean replaced = false;
-        for (BlockExpression container : blocks)
+        for (Block container : blocks)
             replaced = replaced || container.replace(expression);
 
         return replaced;

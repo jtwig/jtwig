@@ -16,9 +16,9 @@
 
 package com.lyncode.jtwig.matcher;
 
-import com.lyncode.jtwig.tree.value.OperationBinary;
-import com.lyncode.jtwig.tree.value.OperationUnary;
-import com.lyncode.jtwig.tree.value.Operator;
+import com.lyncode.jtwig.tree.expressions.OperationBinary;
+import com.lyncode.jtwig.tree.expressions.OperationUnary;
+import com.lyncode.jtwig.tree.expressions.Operator;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
@@ -46,8 +46,8 @@ public class OperationMatchers {
             matchers.add(new TypeSafeMatcher<OperationBinary>() {
                 @Override
                 protected boolean matchesSafely(OperationBinary item) {
-                    if (item.getOperands().getList().size() > index) {
-                        return matcher.matches(item.getOperands().getList().get(index));
+                    if (item.getOperands().size() > index) {
+                        return matcher.matches(item.getOperands().get(index));
                     }
                     return false;
                 }
@@ -117,7 +117,7 @@ public class OperationMatchers {
         }
 
         private Object getItem(OperationBinary item, int index) {
-            return getOperand(item.getOperands().getList().get(index));
+            return getOperand(item.getOperands().get(index));
         }
 
         public OperationUnaryMatcherBuilder withOperator(final Operator operator) {

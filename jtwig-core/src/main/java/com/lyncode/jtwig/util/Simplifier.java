@@ -16,10 +16,11 @@
 
 package com.lyncode.jtwig.util;
 
-import com.lyncode.jtwig.tree.value.OperationBinary;
+import com.lyncode.jtwig.tree.api.Expression;
+import com.lyncode.jtwig.tree.expressions.OperationBinary;
 
 public class Simplifier {
-    public static Object simplify(Object object) {
+    public static Expression simplify(Expression object) {
         if (object instanceof OperationBinary) {
             if (isSingleArgumentedOperation((OperationBinary) object))
                 return simplify(getOperationArgument((OperationBinary) object));
@@ -31,7 +32,7 @@ public class Simplifier {
         return binary.getOperators().isEmpty();
     }
 
-    public static Object getOperationArgument (OperationBinary binary) {
-        return binary.getOperands().getList().get(0);
+    public static Expression getOperationArgument (OperationBinary binary) {
+        return binary.getOperands().first();
     }
 }

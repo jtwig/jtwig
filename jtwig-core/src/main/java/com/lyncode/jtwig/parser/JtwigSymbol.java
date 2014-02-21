@@ -50,8 +50,8 @@ public enum JtwigSymbol {
     NOT("!"),
     NOT_WORD("not"),
 
-    OPEN_FAST("{{"),
-    CLOSE_FAST("}}"),
+    OPEN_OUTPUT("{{"),
+    CLOSE_OUTPUT("}}"),
 
     PIPE("|"),
 

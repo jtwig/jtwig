@@ -17,9 +17,9 @@
 package com.lyncode.jtwig.matcher;
 
 import com.lyncode.jtwig.tree.content.Text;
-import com.lyncode.jtwig.tree.structural.BlockExpression;
-import com.lyncode.jtwig.tree.value.FunctionElement;
-import com.lyncode.jtwig.tree.value.Variable;
+import com.lyncode.jtwig.tree.expressions.FunctionElement;
+import com.lyncode.jtwig.tree.expressions.Variable;
+import com.lyncode.jtwig.tree.structural.Block;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
@@ -67,10 +67,10 @@ public class TreeMatchers {
         };
     }
 
-    public static TypeSafeMatcher<BlockExpression> block (final Matcher<? super String> nameMatcher) {
-        return new TypeSafeMatcher<BlockExpression>() {
+    public static TypeSafeMatcher<Block> block (final Matcher<? super String> nameMatcher) {
+        return new TypeSafeMatcher<Block>() {
             @Override
-            protected boolean matchesSafely(BlockExpression item) {
+            protected boolean matchesSafely(Block item) {
                 return nameMatcher.matches(item.getName());
             }
 

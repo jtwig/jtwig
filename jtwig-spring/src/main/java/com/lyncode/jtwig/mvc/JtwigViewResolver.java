@@ -16,13 +16,18 @@
 
 package com.lyncode.jtwig.mvc;
 
+import com.lyncode.jtwig.functions.JtwigFunction;
 import com.lyncode.jtwig.functions.builders.FunctionRepositoryBuilder;
 import com.lyncode.jtwig.functions.repository.AbstractFunctionRepository;
 import com.lyncode.jtwig.functions.repository.WebFunctionRepository;
 import com.lyncode.jtwig.services.api.theme.ThemePrefixResolver;
+import org.reflections.Reflections;
 import org.springframework.web.servlet.view.AbstractTemplateViewResolver;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
@@ -40,7 +45,8 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
     private String theme;
     private boolean cached;
     private ThemePrefixResolver prefixResolver;
-    private AbstractFunctionRepository abstractFunctionRepository = new WebFunctionRepository();
+    private AbstractFunctionRepository functionRepository = new WebFunctionRepository();
+    private List<String> loadedFunctions = new ArrayList<>();
 
     public JtwigViewResolver() {
         this.prefixResolver = defaultPrefixResolver();
@@ -97,13 +103,36 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
     }
 
     public void setFunctionRepository(AbstractFunctionRepository abstractFunctionRepository) {
-        this.abstractFunctionRepository = abstractFunctionRepository;
+        this.functionRepository = abstractFunctionRepository;
     }
     public void setFunctionRepository(FunctionRepositoryBuilder functionRepository) {
-        this.abstractFunctionRepository = functionRepository.build();
+        this.functionRepository = functionRepository.build();
     }
 
     public AbstractFunctionRepository getFunctionRepository() {
-        return abstractFunctionRepository;
+        return functionRepository;
+    }
+
+    public void addFunctions (Class<? extends JtwigFunction>... functionClasses) {
+        for (Class<? extends JtwigFunction> functionClass : functionClasses) {
+            try {
+                if (!loadedFunctions.contains(functionClass.getName())) {
+                    functionRepository.add(functionClass.newInstance());
+                    loadedFunctions.add(functionClass.getName());
+                }
+            } catch (InstantiationException e) {
+                throw new RuntimeException("Unable to create instance of jtwig function "+functionClass.getName());
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException("Unable to create instance of jtwig function "+functionClass.getName());
+            }
+        }
+    }
+
+    public void addFunctionPackages (String... packages) {
+        for (String pack : packages) {
+            Reflections reflections = new Reflections(pack);
+            Set<Class<? extends JtwigFunction>> functions = reflections.getSubTypesOf(JtwigFunction.class);
+            addFunctions(functions.toArray(new Class[functions.size()]));;
+        }
     }
 }

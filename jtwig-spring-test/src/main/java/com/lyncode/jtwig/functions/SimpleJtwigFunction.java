@@ -18,9 +18,7 @@ package com.lyncode.jtwig.functions;
 
 import com.lyncode.jtwig.functions.annotations.JtwigFunctionDeclaration;
 import com.lyncode.jtwig.functions.exceptions.FunctionException;
-import org.springframework.stereotype.Component;
 
-@Component
 @JtwigFunctionDeclaration(name = "other")
 public class SimpleJtwigFunction implements JtwigFunction {
     @Override

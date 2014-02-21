@@ -21,7 +21,7 @@ import com.lyncode.jtwig.functions.JtwigFunction;
 import com.lyncode.jtwig.functions.exceptions.FunctionNotFoundException;
 import com.lyncode.jtwig.functions.repository.AbstractFunctionRepository;
 import com.lyncode.jtwig.functions.repository.DefaultFunctionRepository;
-import com.lyncode.jtwig.tree.api.Calculable;
+import com.lyncode.jtwig.tree.api.Expression;
 
 public class JtwigContext {
     public static JtwigContext context () {
@@ -46,6 +46,11 @@ public class JtwigContext {
         this.modelMap = new JtwigModelMap();
     }
 
+    public JtwigContext withFunction(String name, JtwigFunction function) {
+        this.functionRepository.add(function, name);
+        return this;
+    }
+
     public JtwigContext withModelAttribute(String key, Object value) {
         this.modelMap.add(key, value);
         return this;
@@ -60,8 +65,8 @@ public class JtwigContext {
     }
 
     public Object resolve(Object obj) throws CalculateException {
-        if (obj instanceof Calculable)
-            return ((Calculable) obj).calculate(this);
+        if (obj instanceof Expression)
+            return ((Expression) obj).calculate(this);
         else return obj;
     }
 

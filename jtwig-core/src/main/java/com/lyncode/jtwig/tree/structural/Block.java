@@ -14,51 +14,56 @@
  * limitations under the License.
  */
 
-package com.lyncode.jtwig.tree.content;
+package com.lyncode.jtwig.tree.structural;
 
 import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.RenderException;
 import com.lyncode.jtwig.resource.JtwigResource;
 import com.lyncode.jtwig.tree.api.Content;
-import com.lyncode.jtwig.tree.structural.Block;
 
-import java.io.IOException;
 import java.io.OutputStream;
 
-public class Text implements Content {
-    private StringBuilder builder = new StringBuilder();
+public class Block implements Content {
+    private String name;
 
-    public boolean append (String piece) {
-        builder.append(piece);
+    private Content content;
+
+    public Block(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Content getContent() {
+        return content;
+    }
+
+    public boolean setContent(Content content) {
+        this.content = content;
         return true;
     }
 
-    public String getText () {
-        return builder.toString();
+    @Override
+    public String toString() {
+        return "Block "+getName();
     }
 
     @Override
     public boolean render(OutputStream outputStream, JtwigContext context) throws RenderException {
-        try {
-            outputStream.write(builder.toString().getBytes());
-            return true;
-        } catch (IOException e) {
-            throw new RenderException(e);
-        }
+        return content.render(outputStream, context);
     }
 
     @Override
-    public Content compile(JtwigResource resource) throws CompileException {
+    public Block compile(JtwigResource resource) throws CompileException {
+        this.content = content.compile(resource);
         return this;
     }
 
     @Override
     public boolean replace(Block expression) throws CompileException {
-        return false;
-    }
-
-    public String toString () {
-        return "Text: "+ builder.toString();
+        return content.replace(expression);
     }
 }

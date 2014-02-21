@@ -14,51 +14,51 @@
  * limitations under the License.
  */
 
-package com.lyncode.jtwig.tree.content;
+package com.lyncode.jtwig.tree.structural;
 
 import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.exception.CompileException;
+import com.lyncode.jtwig.exception.ParseException;
 import com.lyncode.jtwig.exception.RenderException;
+import com.lyncode.jtwig.exception.ResourceException;
+import com.lyncode.jtwig.parser.JtwigParser;
 import com.lyncode.jtwig.resource.JtwigResource;
 import com.lyncode.jtwig.tree.api.Content;
-import com.lyncode.jtwig.tree.structural.Block;
+import com.lyncode.jtwig.tree.documents.JtwigDocument;
 
-import java.io.IOException;
 import java.io.OutputStream;
 
-public class Text implements Content {
-    private StringBuilder builder = new StringBuilder();
+public class Include implements Content {
+    private String path;
 
-    public boolean append (String piece) {
-        builder.append(piece);
-        return true;
+    public Include(String path) {
+        this.path = path;
     }
 
-    public String getText () {
-        return builder.toString();
+    public String getPath() {
+        return path;
     }
 
     @Override
     public boolean render(OutputStream outputStream, JtwigContext context) throws RenderException {
-        try {
-            outputStream.write(builder.toString().getBytes());
-            return true;
-        } catch (IOException e) {
-            throw new RenderException(e);
-        }
+        return false;
     }
 
     @Override
     public Content compile(JtwigResource resource) throws CompileException {
-        return this;
+        try {
+            JtwigResource jtwigResource = resource.resolve(path);
+            JtwigDocument jtwigDocument = JtwigParser.parse(jtwigResource);
+            return jtwigDocument.compile(jtwigResource);
+        } catch (ParseException e) {
+            throw new CompileException(e);
+        } catch (ResourceException e) {
+            throw new CompileException(e);
+        }
     }
 
     @Override
     public boolean replace(Block expression) throws CompileException {
         return false;
-    }
-
-    public String toString () {
-        return "Text: "+ builder.toString();
     }
 }

@@ -19,17 +19,19 @@ package com.lyncode.jtwig.tree.helper;
 import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.exception.CalculateException;
 import com.lyncode.jtwig.functions.util.ObjectIterator;
-import com.lyncode.jtwig.tree.api.Calculable;
-import com.lyncode.jtwig.tree.value.OperationBinary;
-import com.lyncode.jtwig.tree.value.Operator;
+import com.lyncode.jtwig.tree.api.Expression;
+import com.lyncode.jtwig.tree.expressions.Composition;
+import com.lyncode.jtwig.tree.expressions.OperationBinary;
+import com.lyncode.jtwig.tree.expressions.Operator;
+import com.lyncode.jtwig.tree.expressions.Selection;
 import com.lyncode.jtwig.util.BooleanOperations;
 import com.lyncode.jtwig.util.MathOperations;
 import com.lyncode.jtwig.util.RelationalOperations;
 
-public class StrictBinaryOperation implements Calculable {
+public class StrictBinaryOperation implements Expression {
     private Operator operator;
-    private Object left;
-    private Object right;
+    private Expression left;
+    private Expression right;
 
 
     public static StrictBinaryOperation create(OperationBinary binary) {
@@ -41,9 +43,9 @@ public class StrictBinaryOperation implements Calculable {
             if (last != null)
                 operation.left = last;
             else
-                operation.left = binary.getOperands().getList().get(index);
+                operation.left = binary.getOperands().get(index);
 
-            operation.right = binary.getOperands().getList().get(index+1);
+            operation.right = binary.getOperands().get(index+1);
             last = operation;
             index++;
         }
@@ -52,22 +54,22 @@ public class StrictBinaryOperation implements Calculable {
     private Object numericExecute(JtwigContext resolver) throws CalculateException {
         switch (operator) {
             case ADD:
-                return MathOperations.sum(resolver.resolve(left), resolver.resolve(right));
+                return MathOperations.sum(left.calculate(resolver), right.calculate(resolver));
             case SUB:
-                return MathOperations.sub(resolver.resolve(left), resolver.resolve(right));
+                return MathOperations.sub(left.calculate(resolver), right.calculate(resolver));
             case DIV:
-                return MathOperations.div(resolver.resolve(left), resolver.resolve(right));
+                return MathOperations.div(left.calculate(resolver), right.calculate(resolver));
             case TIMES:
-                return MathOperations.mul(resolver.resolve(left), resolver.resolve(right));
+                return MathOperations.mul(left.calculate(resolver), right.calculate(resolver));
             case MOD:
-                return MathOperations.mod(resolver.resolve(left), resolver.resolve(right));
+                return MathOperations.mod(left.calculate(resolver), right.calculate(resolver));
         }
         throw new CalculateException("Unknown operator " + operator.toString());
     }
 
     private Object relationalExecute(JtwigContext resolver) throws CalculateException {
-        Object leftResolved = resolver.resolve(left);
-        Object rightResolved = resolver.resolve(right);
+        Object leftResolved = left.calculate(resolver);
+        Object rightResolved = right.calculate(resolver);
         switch (operator) {
             case GT:
                 return RelationalOperations.gt(leftResolved, rightResolved);
@@ -105,9 +107,9 @@ public class StrictBinaryOperation implements Calculable {
     private Object booleanExecute(JtwigContext resolver) throws CalculateException {
         switch (operator) {
             case AND:
-                return BooleanOperations.and(resolver.resolve(left), resolver.resolve(right));
+                return BooleanOperations.and(left.calculate(resolver), right.calculate(resolver));
             case OR:
-                return BooleanOperations.or(resolver.resolve(left), resolver.resolve(right));
+                return BooleanOperations.or(left.calculate(resolver), right.calculate(resolver));
         }
         throw new CalculateException("Unknown operator " + operator.toString());
     }
@@ -116,6 +118,14 @@ public class StrictBinaryOperation implements Calculable {
     @Override
     public Object calculate(JtwigContext context) throws CalculateException {
         switch (operator) {
+            case COMPOSITION:
+                Composition composition = new Composition(left);
+                composition.add(right);
+                return composition.calculate(context);
+            case SELECTION:
+                Selection selection = new Selection(left);
+                selection.add(right);
+                return selection.calculate(context);
             case ADD:
             case SUB:
             case TIMES:

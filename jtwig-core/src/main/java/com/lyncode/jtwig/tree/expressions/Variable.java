@@ -14,10 +14,29 @@
  * limitations under the License.
  */
 
-package com.lyncode.jtwig.tree.documents;
+package com.lyncode.jtwig.tree.expressions;
 
-import com.lyncode.jtwig.tree.api.Content;
+import com.lyncode.jtwig.JtwigContext;
+import com.lyncode.jtwig.tree.api.Element;
+import com.lyncode.jtwig.tree.api.Expression;
 
-public interface JtwigDocument extends Content {
+public class Variable implements Element, Expression {
+    private String identifier;
 
+    public Variable(String identifier) {
+        this.identifier = identifier;
+    }
+
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    public String toString () {
+        return identifier;
+    }
+
+    @Override
+    public Object calculate(JtwigContext context) {
+        return context.map(this.identifier);
+    }
 }

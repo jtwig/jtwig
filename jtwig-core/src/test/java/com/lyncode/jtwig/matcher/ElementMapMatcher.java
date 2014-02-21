@@ -16,7 +16,7 @@
 
 package com.lyncode.jtwig.matcher;
 
-import com.lyncode.jtwig.tree.value.ElementMap;
+import com.lyncode.jtwig.tree.expressions.ValueMap;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -25,7 +25,7 @@ import org.hamcrest.collection.IsMapContaining;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 
-public class ElementMapMatcher<K, V> extends BaseMatcher<ElementMap> {
+public class ElementMapMatcher<K, V> extends BaseMatcher<ValueMap> {
     public static <K, V> ElementMapMatcher<K, V> mapsElement (Matcher<? super K> keyMatcher, Matcher<? super V> valueMatcher) {
         return new ElementMapMatcher<K, V>(keyMatcher, valueMatcher);
     }
@@ -40,7 +40,7 @@ public class ElementMapMatcher<K, V> extends BaseMatcher<ElementMap> {
         return new BaseMatcher<T>() {
             @Override
             public boolean matches(Object item) {
-                return ((ElementMap) item).getMap().isEmpty();
+                return ((ValueMap) item).getMap().isEmpty();
             }
 
             @Override
@@ -58,7 +58,7 @@ public class ElementMapMatcher<K, V> extends BaseMatcher<ElementMap> {
 
     @Override
     public boolean matches(Object o) {
-        return mapContaining.matches(((ElementMap) o).getMap());
+        return mapContaining.matches(((ValueMap) o).getMap());
     }
 
     @Override

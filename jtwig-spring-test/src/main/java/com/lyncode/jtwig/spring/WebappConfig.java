@@ -17,6 +17,8 @@
 package com.lyncode.jtwig.spring;
 
 import com.lyncode.jtwig.controller.DynamicController;
+import com.lyncode.jtwig.functions.SimpleJtwigFunction;
+import com.lyncode.jtwig.mvc.JtwigViewResolver;
 import com.lyncode.jtwig.services.api.ModelMapFiller;
 import com.lyncode.jtwig.services.api.ViewShownResolver;
 import com.lyncode.jtwig.services.api.assets.AssetResolver;
@@ -28,8 +30,8 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.web.servlet.LocaleResolver;
+import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
@@ -37,9 +39,6 @@ import org.springframework.web.servlet.i18n.FixedLocaleResolver;
 
 import static java.util.Locale.ENGLISH;
 
-@Import({
-        JtwigConfig.class
-})
 @Configuration
 @ComponentScan(basePackageClasses = { DynamicController.class })
 @EnableWebMvc
@@ -75,5 +74,17 @@ public class WebappConfig extends WebMvcConfigurerAdapter {
         BaseAssetResolver baseAssetResolver = new BaseAssetResolver();
         baseAssetResolver.setPrefix("public");
         return baseAssetResolver;
+    }
+
+    @Bean
+    public ViewResolver viewResolver() {
+        JtwigViewResolver jtwigViewResolver = new JtwigViewResolver();
+        jtwigViewResolver.setPrefix("/WEB-INF/views/");
+        jtwigViewResolver.setSuffix(".twig.html");
+        jtwigViewResolver.setTheme("default");
+        jtwigViewResolver.addFunctions(
+                SimpleJtwigFunction.class
+        );
+        return jtwigViewResolver;
     }
 }

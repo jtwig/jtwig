@@ -22,7 +22,7 @@ import com.lyncode.jtwig.JtwigTemplate;
 import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.ParseException;
 import com.lyncode.jtwig.resource.WebJtwigResource;
-import com.lyncode.jtwig.tree.content.Content;
+import com.lyncode.jtwig.tree.api.Content;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.BeansException;
@@ -40,7 +40,7 @@ import java.util.Map;
 public class JtwigView extends AbstractTemplateView {
     private static Logger log = LogManager.getLogger(JtwigView.class);
 
-    private Map<String, Content> compiledTemplates = new HashMap<String, Content>();
+    private Map<String, Content> compiledTemplates = new HashMap<>();
 
     protected String getEncoding() {
         return getViewResolver().getEncoding();
