@@ -22,6 +22,9 @@ import com.lyncode.jtwig.functions.repository.AbstractFunctionRepository;
 import com.lyncode.jtwig.functions.repository.DefaultFunctionRepository;
 
 public class JtwigContext {
+
+    private static final String MODEL = "model";
+
     public static JtwigContext context () {
         return new JtwigContext();
     }
@@ -59,7 +62,10 @@ public class JtwigContext {
     }
 
     public Object map(String key) {
-        return modelMap.get(key);
+        if (MODEL.equals(key))
+            return modelMap;
+        else
+            return modelMap.get(key);
     }
 
     public void set(String key, Object value) {

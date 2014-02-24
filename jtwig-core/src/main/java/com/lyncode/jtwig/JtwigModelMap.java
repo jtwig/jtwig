@@ -20,33 +20,27 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-public class JtwigModelMap {
-    private Map<String, Object> model = new HashMap<String, Object>();
+public class JtwigModelMap extends HashMap<String, Object> {
+    public boolean has (String key) {
+        return containsKey(key);
+    }
 
     public JtwigModelMap add (String key, Object object) {
-        model.put(key, object);
+        put(key, object);
         return this;
     }
 
-    public boolean has (String key) {
-        return model.containsKey(key);
-    }
-
-    public Object get (String key) {
-        return model.get(key);
-    }
-
     public JtwigModelMap add(Map<String, Object> model) {
-        this.model.putAll(model);
+        putAll(model);
         return this;
     }
 
     public String toString () {
         StringBuilder builder = new StringBuilder().append("{");
-        Iterator<String> keys = model.keySet().iterator();
+        Iterator<String> keys = keySet().iterator();
         while (keys.hasNext()) {
             String key = keys.next();
-            builder.append(key).append(" = ").append(model.get(key));
+            builder.append(key).append(" = ").append(get(key));
             if (keys.hasNext()) builder.append(", ");
         }
         builder.append("}");

@@ -16,10 +16,12 @@ Jtwig uses [Semantic Versioning](http://semver.org/)
 
 ## Changes
 
-2.0.3 - 2.1
+2.0.3 - 2.1.0 (24-Feb-2014)
 
 - Function declarations brought to function itself as annotation
-- Function components (beans) in spring are now loaded to the repository function, if the BeanFunctionDeclarationProcessor is used.
+- Functions in spring are now loaded to the repository function using package scan strategy.
+- IS operator added together with several related functions
+- 'model' variable made present in all templates, so it's possible to access the model using map selection.
 
 ----------
 
