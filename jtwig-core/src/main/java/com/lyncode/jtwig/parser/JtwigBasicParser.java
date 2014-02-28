@@ -41,7 +41,7 @@ public class JtwigBasicParser extends BaseParser<String> {
     }
 
     public Rule openCode() {
-        return Sequence(symbol(JtwigSymbol.OPEN_CODE), spacing());
+        return symbol(JtwigSymbol.OPEN_CODE);
     }
 
     @MemoMismatches
