@@ -16,6 +16,11 @@ Jtwig uses [Semantic Versioning](http://semver.org/)
 
 ## Changes
 
+2.1.0 - 2.1.1 (02-Mar-2014)
+
+- FIX (blocker): Fixed set expressions
+- FIX (minor): Removed redundant parser spacing rule
+
 2.0.3 - 2.1.0 (24-Feb-2014)
 
 - Function declarations brought to function itself as annotation
