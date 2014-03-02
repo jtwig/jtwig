@@ -345,8 +345,8 @@ public class JtwigParser extends BaseParser<Content> {
                                 push(new SetVariable((Variable) expressionParser.pop())),
                                 symbol(ATTR),
                                 expressionParser.expression(),
-                                closeCode(),
-                                ((SetVariable) peek()).setAssignment(expressionParser.pop())
+                                ((SetVariable) peek(1)).setAssignment(expressionParser.pop()),
+                                closeCode()
                         ),
                         new ParseException("Wrong set syntax")
                 )
