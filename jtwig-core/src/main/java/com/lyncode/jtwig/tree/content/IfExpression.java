@@ -23,6 +23,8 @@ import com.lyncode.jtwig.exception.RenderException;
 import com.lyncode.jtwig.resource.JtwigResource;
 import com.lyncode.jtwig.tree.api.Content;
 import com.lyncode.jtwig.tree.api.Expression;
+import com.lyncode.jtwig.tree.api.Tag;
+import com.lyncode.jtwig.tree.api.TagInformation;
 import com.lyncode.jtwig.tree.structural.Block;
 
 import java.io.OutputStream;
@@ -31,11 +33,22 @@ import java.util.List;
 
 import static com.lyncode.jtwig.util.BooleanOperations.isTrue;
 
-public class IfExpression implements Content {
+public class IfExpression implements Content, Tag {
     private Expression conditionalExpression;
-    private Content content;
+    private JtwigContent content;
     private ElseExpression elseExpression = null;
     private List<ElseIfExpression> elseIfExpressions = new ArrayList<ElseIfExpression>();
+
+    private TagInformation begin = new TagInformation();
+    private TagInformation end = new TagInformation();
+
+    public TagInformation begin() {
+        return begin;
+    }
+
+    public TagInformation end() {
+        return end;
+    }
 
     public IfExpression(Expression conditionalExpression) {
         this.conditionalExpression = conditionalExpression;
@@ -51,7 +64,7 @@ public class IfExpression implements Content {
         return true;
     }
 
-    public boolean setContent(Content content) {
+    public boolean setContent(JtwigContent content) {
         this.content = content;
         return true;
     }
@@ -66,7 +79,7 @@ public class IfExpression implements Content {
                     if (exp.render(outputStream, context))
                         return true;
                 }
-                if (elseExpression != null) {
+                if (hasElse()) {
                     return elseExpression.render(outputStream, context);
                 }
                 return true;
@@ -78,14 +91,34 @@ public class IfExpression implements Content {
 
     @Override
     public IfExpression compile(JtwigResource resource) throws CompileException {
-        this.content = content.compile(resource);
-        for (int i = 0;i<this.elseIfExpressions.size();i++)
-            elseIfExpressions.set(i, elseIfExpressions.get(i).compile(resource));
+        TagInformation end = end();
+        if (!elseIfExpressions.isEmpty())
+            end = elseIfExpressions.get(0).tag();
+        else if (hasElse())
+            end = elseExpression.tag();
 
-        if (elseExpression != null)
-            elseExpression = elseExpression.compile(resource);
+        this.content = content.compile(resource, begin(), end);
+
+        int size = this.elseIfExpressions.size();
+        for (int i = 0;i < size;i++) {
+            end = end();
+            if (i < size - 1)
+                end = elseIfExpressions.get(i+1).tag();
+            else if (hasElse())
+                end = elseExpression.tag();
+            ElseIfExpression elseIfExpression = elseIfExpressions.get(i);
+            elseIfExpressions.set(i, elseIfExpression.compile(resource, elseIfExpression.tag(), end));
+        }
+
+        if (hasElse()) {
+            elseExpression = elseExpression.compile(resource, elseExpression.tag(), end());
+        }
 
         return this;
+    }
+
+    private boolean hasElse() {
+        return elseExpression != null;
     }
 
     @Override
@@ -95,7 +128,7 @@ public class IfExpression implements Content {
         for (int i = 0;i<this.elseIfExpressions.size();i++)
             replaced = replaced || elseIfExpressions.get(i).replace(expression);
 
-        if (elseExpression != null)
+        if (hasElse())
             replaced =  replaced || elseExpression.replace(expression);
 
         return replaced;
@@ -103,13 +136,14 @@ public class IfExpression implements Content {
 
     public static class ElseIfExpression implements Content {
         private Expression condition;
-        private Content content;
+        private JtwigContent content;
+        private TagInformation tag = new TagInformation();
 
         public ElseIfExpression(Expression condition) {
             this.condition = condition;
         }
 
-        public boolean setContent(Content abstractContent) {
+        public boolean setContent(JtwigContent abstractContent) {
             this.content = abstractContent;
             return true;
         }
@@ -136,17 +170,29 @@ public class IfExpression implements Content {
             return this;
         }
 
+
+        public ElseIfExpression compile(JtwigResource resource, TagInformation begin, TagInformation end) throws CompileException {
+            content = content.compile(resource, begin, end);
+            return this;
+        }
+
         @Override
         public boolean replace(Block expression) throws CompileException {
             return content.replace(expression);
         }
+
+        public TagInformation tag() {
+            return this.tag;
+        }
     }
 
     public static class ElseExpression implements Content {
-        private Content content;
+        private JtwigContent content;
+        private TagInformation tag = new TagInformation();
 
-        public ElseExpression(Content content) {
+        public boolean setContent(JtwigContent content) {
             this.content = content;
+            return true;
         }
 
         @Override
@@ -161,9 +207,18 @@ public class IfExpression implements Content {
             return this;
         }
 
+        public ElseExpression compile(JtwigResource resource, TagInformation begin, TagInformation end) throws CompileException {
+            content = content.compile(resource, begin, end);
+            return this;
+        }
+
         @Override
         public boolean replace(Block expression) throws CompileException {
             return content.replace(expression);
+        }
+
+        public TagInformation tag() {
+            return this.tag;
         }
     }
 }

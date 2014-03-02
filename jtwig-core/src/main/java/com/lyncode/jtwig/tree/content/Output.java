@@ -23,13 +23,17 @@ import com.lyncode.jtwig.exception.RenderException;
 import com.lyncode.jtwig.resource.JtwigResource;
 import com.lyncode.jtwig.tree.api.Content;
 import com.lyncode.jtwig.tree.api.Expression;
+import com.lyncode.jtwig.tree.api.Tag;
+import com.lyncode.jtwig.tree.api.TagInformation;
 import com.lyncode.jtwig.tree.structural.Block;
 
 import java.io.IOException;
 import java.io.OutputStream;
 
-public class Output implements Content {
+public class Output implements Content, Tag {
     private Expression expression;
+    private TagInformation begin = new TagInformation();
+    private TagInformation end = new TagInformation();
 
     public Output(Expression expression) {
         this.expression = expression;
@@ -44,9 +48,7 @@ public class Output implements Content {
         try {
             outputStream.write(String.valueOf(expression.calculate(context)).getBytes());
             return true;
-        } catch (IOException e) {
-            throw new RenderException(e);
-        } catch (CalculateException e) {
+        } catch (IOException | CalculateException e) {
             throw new RenderException(e);
         }
     }
@@ -63,5 +65,15 @@ public class Output implements Content {
 
     public String toString () {
         return "Render the result of "+expression;
+    }
+
+    @Override
+    public TagInformation begin() {
+        return this.begin;
+    }
+
+    @Override
+    public TagInformation end() {
+        return this.end;
     }
 }

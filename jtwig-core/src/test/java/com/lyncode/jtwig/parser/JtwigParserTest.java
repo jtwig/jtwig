@@ -20,39 +20,18 @@ import com.lyncode.jtwig.exception.ParseBypassException;
 import com.lyncode.jtwig.exception.ParseException;
 import com.lyncode.jtwig.tree.api.Content;
 import com.lyncode.jtwig.tree.content.ForLoop;
-import com.lyncode.jtwig.tree.content.JtwigContent;
 import org.junit.Test;
 import org.parboiled.Rule;
 import org.parboiled.errors.ParserRuntimeException;
 import org.parboiled.parserunners.ReportingParseRunner;
 import org.parboiled.support.ParsingResult;
 
-import static com.lyncode.jtwig.matcher.ElementListMatcher.hasElement;
 import static com.lyncode.jtwig.matcher.OperationMatchers.OperationBinaryMatcherBuilder;
 import static com.lyncode.jtwig.matcher.OperationMatchers.OperationUnaryMatcherBuilder;
-import static com.lyncode.jtwig.matcher.TreeMatchers.block;
-import static com.lyncode.jtwig.matcher.TreeMatchers.text;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.AllOf.allOf;
 import static org.parboiled.Parboiled.createParser;
 
 public class JtwigParserTest {
-
     private JtwigParser underTest = createParser(JtwigParser.class);
-
-    @Test
-    public void shouldMatchContent() throws Exception {
-        JtwigContent exp = parse(underTest.content(),
-                "{% block asd %}{% endblock      %}testest", JtwigContent.class);
-        assertThat(exp,
-                allOf(
-                        hasElement(block(is(equalTo("asd")))),
-                        hasElement(text(is(equalTo("testest"))))
-                )
-        );
-    }
 
     @Test
     public void shouldMatchForElement () throws Exception {

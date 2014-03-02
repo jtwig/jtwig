@@ -14,45 +14,38 @@
  * limitations under the License.
  */
 
-package com.lyncode.jtwig.tree.structural;
+package com.lyncode.jtwig.tree.tags;
 
 import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.exception.CompileException;
-import com.lyncode.jtwig.exception.ParseException;
 import com.lyncode.jtwig.exception.RenderException;
-import com.lyncode.jtwig.exception.ResourceException;
-import com.lyncode.jtwig.parser.JtwigParser;
 import com.lyncode.jtwig.resource.JtwigResource;
 import com.lyncode.jtwig.tree.api.Content;
 import com.lyncode.jtwig.tree.api.Tag;
 import com.lyncode.jtwig.tree.api.TagInformation;
-import com.lyncode.jtwig.tree.documents.JtwigDocument;
+import com.lyncode.jtwig.tree.content.Text;
+import com.lyncode.jtwig.tree.structural.Block;
 
 import java.io.OutputStream;
 
-public class Include implements Content, Tag {
-    private String path;
-    private TagInformation begin = new TagInformation();
+public class Verbatim implements Content, Tag {
+    private Text text;
     private TagInformation end = new TagInformation();
+    private TagInformation begin = new TagInformation();
 
-    public Include(String path) {
-        this.path = path;
+    public boolean setText(Text text) {
+        this.text = text;
+        return true;
     }
 
     @Override
     public boolean render(OutputStream outputStream, JtwigContext context) throws RenderException {
-        return false;
+        return text.render(outputStream, context);
     }
 
     @Override
     public Content compile(JtwigResource resource) throws CompileException {
-        try {
-            JtwigResource jtwigResource = resource.resolve(path);
-            JtwigDocument jtwigDocument = JtwigParser.parse(jtwigResource);
-            return jtwigDocument.compile(jtwigResource);
-        } catch (ParseException | ResourceException e) {
-            throw new CompileException(e);
-        }
+        return this;
     }
 
     @Override

@@ -21,13 +21,18 @@ import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.RenderException;
 import com.lyncode.jtwig.resource.JtwigResource;
 import com.lyncode.jtwig.tree.api.Content;
+import com.lyncode.jtwig.tree.api.Tag;
+import com.lyncode.jtwig.tree.api.TagInformation;
+import com.lyncode.jtwig.tree.content.JtwigContent;
 
 import java.io.OutputStream;
 
-public class Block implements Content {
+public class Block implements Content, Tag {
     private String name;
 
-    private Content content;
+    private JtwigContent content;
+    private TagInformation begin = new TagInformation();
+    private TagInformation end = new TagInformation();
 
     public Block(String name) {
         this.name = name;
@@ -41,7 +46,7 @@ public class Block implements Content {
         return content;
     }
 
-    public boolean setContent(Content content) {
+    public boolean setContent(JtwigContent content) {
         this.content = content;
         return true;
     }
@@ -58,12 +63,22 @@ public class Block implements Content {
 
     @Override
     public Block compile(JtwigResource resource) throws CompileException {
-        this.content = content.compile(resource);
+        this.content = content.compile(resource, begin(), end());
         return this;
     }
 
     @Override
     public boolean replace(Block expression) throws CompileException {
         return content.replace(expression);
+    }
+
+    @Override
+    public TagInformation begin() {
+        return begin;
+    }
+
+    @Override
+    public TagInformation end() {
+        return end;
     }
 }
