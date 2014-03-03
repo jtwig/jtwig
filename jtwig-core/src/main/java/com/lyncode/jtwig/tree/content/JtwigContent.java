@@ -21,45 +21,85 @@ import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.RenderException;
 import com.lyncode.jtwig.resource.JtwigResource;
 import com.lyncode.jtwig.tree.api.Content;
-import com.lyncode.jtwig.tree.helper.ElementList;
+import com.lyncode.jtwig.tree.api.Tag;
+import com.lyncode.jtwig.tree.api.TagInformation;
 import com.lyncode.jtwig.tree.structural.Block;
 
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
-public class JtwigContent extends ElementList implements Content {
+import static com.lyncode.jtwig.tree.api.TagProperty.Trim;
+
+public class JtwigContent implements Content {
+    private List<Content> contents = new ArrayList<>();
+
     @Override
     public boolean render(OutputStream outputStream, JtwigContext context) throws RenderException {
-        for (Object obj : getList()) {
-            if (!(obj instanceof Content)) throw new RenderException("Expecting only renderable objects. Object "+obj.getClass().getName()+" isn't");
-            Content renderable = (Content) obj;
-            renderable.render(outputStream, context);
+        for (Content content : contents) {
+            content.render(outputStream, context);
         }
         return true;
     }
 
     @Override
     public JtwigContent compile(JtwigResource resource) throws CompileException {
-        for (int i=0;i<getList().size();i++) {
-            if (getList().get(i) instanceof Content)
-                getList().set(i, ((Content) getList().get(i)).compile(resource));
+        return compile(resource, new TagInformation(), new TagInformation());
+    }
+
+    public JtwigContent compile(JtwigResource resource, TagInformation begin, TagInformation end) throws CompileException {
+        for (int i = 0; i < contents.size(); i++) {
+            Content content = contents.get(i);
+            if (content instanceof Text) {
+                Text text = (Text) content;
+                if (mustTrimLeft(i, begin))
+                        text.trimLeft();
+
+                if (mustTrimRight(i, end))
+                    text.trimRight();
+            }
+            contents.set(i, content.compile(resource));
         }
         return this;
+    }
+
+    private boolean mustTrimLeft(int position, TagInformation value) {
+        if (value.hasRight(Trim)) return true;
+        if (position <= 0) return false;
+        Content before = contents.get(position - 1);
+        if (!(before instanceof Tag)) return false;
+
+        Tag tag = (Tag) before;
+        return tag.end().hasRight(Trim);
+    }
+    private boolean mustTrimRight(int position, TagInformation value) {
+        if (value.hasLeft(Trim)) return true;
+        if (position >= contents.size() - 1) return false;
+        Content after = contents.get(position + 1);
+        if (!(after instanceof Tag)) return false;
+
+        Tag tag = (Tag) after;
+        return tag.begin().hasLeft(Trim);
     }
 
     @Override
     public boolean replace(Block expression) throws CompileException {
         boolean replaced = false;
-        for (int i=0;i<getList().size();i++) {
-            if (getList().get(i) instanceof Block) {
-                Block tmp = (Block) getList().get(i);
+        for (int i = 0; i < contents.size(); i++) {
+            if (contents.get(i) instanceof Block) {
+                Block tmp = (Block) contents.get(i);
                 if (expression.getName().equals(tmp.getName())) {
-                    getList().set(i, expression.getContent());
+                    contents.set(i, expression.getContent());
                     replaced = true;
                 }
-            }
-            else if (getList().get(i) instanceof Content)
-                replaced = replaced || ((Content) getList().get(i)).replace(expression);
+            } else
+                replaced = replaced || contents.get(i).replace(expression);
         }
         return replaced;
+    }
+
+    public JtwigContent add(Content content) {
+        contents.add(content);
+        return this;
     }
 }

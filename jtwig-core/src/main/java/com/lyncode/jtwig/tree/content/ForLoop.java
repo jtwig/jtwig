@@ -24,15 +24,19 @@ import com.lyncode.jtwig.functions.util.ObjectIterator;
 import com.lyncode.jtwig.resource.JtwigResource;
 import com.lyncode.jtwig.tree.api.Content;
 import com.lyncode.jtwig.tree.api.Expression;
+import com.lyncode.jtwig.tree.api.Tag;
+import com.lyncode.jtwig.tree.api.TagInformation;
 import com.lyncode.jtwig.tree.expressions.Variable;
 import com.lyncode.jtwig.tree.structural.Block;
 
 import java.io.OutputStream;
 
-public class ForLoop implements Content {
+public class ForLoop implements Content, Tag {
     protected Variable variable;
-    protected Content content;
+    protected JtwigContent content;
     protected Expression expression;
+    protected TagInformation begin = new TagInformation();
+    protected TagInformation end = new TagInformation();
 
     public ForLoop(Variable variable, Expression list) {
         this.variable = variable;
@@ -40,7 +44,7 @@ public class ForLoop implements Content {
     }
 
 
-    public boolean setContent(Content content) {
+    public boolean setContent(JtwigContent content) {
         this.content = content;
         return true;
     }
@@ -67,7 +71,7 @@ public class ForLoop implements Content {
 
     @Override
     public Content compile(JtwigResource resource) throws CompileException {
-        content = content.compile(resource);
+        content = content.compile(resource, begin(), end());
         return this;
     }
 
@@ -78,6 +82,16 @@ public class ForLoop implements Content {
 
     public String toString() {
         return "For each element of " + expression + " render " + content;
+    }
+
+    @Override
+    public TagInformation begin() {
+        return this.begin;
+    }
+
+    @Override
+    public TagInformation end() {
+        return this.end;
     }
 
     public static class Loop {

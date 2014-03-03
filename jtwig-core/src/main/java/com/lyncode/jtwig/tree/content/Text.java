@@ -28,6 +28,16 @@ import java.io.OutputStream;
 
 public class Text implements Content {
     private StringBuilder builder = new StringBuilder();
+    private boolean trimLeft = false;
+    private boolean trimRight = false;
+
+
+    public Text() {
+    }
+
+    public Text(String result) {
+        builder.append(result);
+    }
 
     public boolean append (String piece) {
         builder.append(piece);
@@ -50,7 +60,12 @@ public class Text implements Content {
 
     @Override
     public Content compile(JtwigResource resource) throws CompileException {
-        return this;
+        String result = getText();
+        if (trimLeft)
+            result = result.replaceAll("^\\s+", "");
+        if (trimRight)
+            result = result.replaceAll("\\s+$", "");
+        return new Text(result);
     }
 
     @Override
@@ -60,5 +75,13 @@ public class Text implements Content {
 
     public String toString () {
         return "Text: "+ builder.toString();
+    }
+
+    public void trimLeft() {
+        this.trimLeft = true;
+    }
+
+    public void trimRight() {
+        this.trimRight = true;
     }
 }

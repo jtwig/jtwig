@@ -397,17 +397,24 @@ public class JtwigExpressionParser extends BaseParser<Expression> {
     }
 
     Rule operator(Operator operator) {
-        if (operator == MOD) {
+        if (operator == SUB) {
+            return Sequence(
+                    basic.terminal(operator.toString()),
+                    TestNot(FirstOf(basic.symbol(CLOSE_CODE), basic.symbol(CLOSE_OUTPUT))),
+                    push(new Constant<>(operator)),
+                    basic.spacing()
+            );
+        } else if (operator == MOD) {
             return Sequence(
                     basic.terminal(operator.toString()),
                     TestNot(basic.symbol(CLOSE_CURLY_BRACKET)),
-                    push(new Constant<Operator>(operator)),
+                    push(new Constant<>(operator)),
                     basic.spacing()
             );
         } else {
             return Sequence(
                     basic.terminal(operator.toString()),
-                    push(new Constant<Operator>(operator)),
+                    push(new Constant<>(operator)),
                     basic.spacing()
             );
         }
@@ -460,5 +467,13 @@ public class JtwigExpressionParser extends BaseParser<Expression> {
     boolean popValue() {
         pop();
         return true;
+    }
+
+    public <T> T pop (Class<T> typeClass) {
+        return pop(0, typeClass);
+    }
+
+    public <T> T pop(int position, Class<T> type) {
+        return type.cast(pop(position));
     }
 }

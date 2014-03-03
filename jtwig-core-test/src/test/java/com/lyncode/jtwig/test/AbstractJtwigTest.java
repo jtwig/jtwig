@@ -23,6 +23,8 @@ import com.lyncode.jtwig.builder.JtwigResourceBuilder;
 import java.io.ByteArrayOutputStream;
 
 public class AbstractJtwigTest {
+    private JtwigContext context = new JtwigContext();
+
     protected String theResultOfRendering(JtwigTemplate template, JtwigContext context) throws Exception {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         template.output(outputStream, context);
@@ -31,7 +33,7 @@ public class AbstractJtwigTest {
 
     protected String theResultOfRendering(JtwigTemplate template) throws Exception {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        template.output(outputStream, new JtwigContext());
+        template.output(outputStream, context);
         return outputStream.toString();
     }
 
@@ -41,5 +43,9 @@ public class AbstractJtwigTest {
 
     protected JtwigResourceBuilder resource () {
         return new JtwigResourceBuilder();
+    }
+
+    protected JtwigContext theContext () {
+        return context;
     }
 }
