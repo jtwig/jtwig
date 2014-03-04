@@ -394,11 +394,16 @@ public class JtwigParser extends BaseParser<Content> {
 
     Rule output() {
         return Sequence(
-                symbol(OPEN_OUTPUT),
+                basicParser.symbol(OPEN_OUTPUT),
+                tagPropertyParser.property(),
+                basicParser.spacing(),
                 mandatory(
                         Sequence(
                                 expressionParser.expression(),
                                 push(new Output(expressionParser.pop())),
+                                doIt(peek(Output.class).begin().addToLeft(tagPropertyParser.getCurrentProperty())),
+                                tagPropertyParser.property(),
+                                doIt(peek(Output.class).end().addToRight(tagPropertyParser.getCurrentProperty())),
                                 basicParser.symbol(JtwigSymbol.CLOSE_OUTPUT)
                         ),
                         new ParseException("Wrong output syntax")
