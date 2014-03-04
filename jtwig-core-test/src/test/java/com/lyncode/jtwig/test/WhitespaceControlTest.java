@@ -51,4 +51,11 @@ public class WhitespaceControlTest extends AbstractJtwigTest {
                 is(equalTo(""))
         );
     }
+    @Test
+    public void testOutput() throws Exception {
+        assertThat(theResultOfRendering(theTemplate(
+                " {{- 'hello' -}} ")),
+                is(equalTo("hello"))
+        );
+    }
 }
