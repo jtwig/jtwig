@@ -260,6 +260,97 @@ public class JtwigParser extends BaseParser<Content> {
     }
 
     Rule keywordEmptyContent() {
+        List<Rule> rules = new ArrayList<>();
+//        if (contentAddonParsers.isEmpty())
+            return Test(false);
+//        for (JtwigEmptyContentAddonParser parser : noContentAddonParsers)
+//            rules.add(basicParser.terminal(parser.keyword()));
+//        return FirstOf(rules.toArray(new Rule[rules.size()]));
+    }
+
+    Rule emptyContentParsers() {
+        List<Rule> rules = new ArrayList<>();
+//        if (noContentAddonParsers.isEmpty())
+            return Test(false);
+//        for (JtwigEmptyContentAddonParser parser : noContentAddonParsers)
+//            rules.add(noContentAddon(parser));
+//        return FirstOf(rules.toArray(new Rule[rules.size()]));
+    }
+
+    Rule noContentAddon(JtwigEmptyContentAddonParser parser) {
+        return Sequence(
+                openCode(),
+                basicParser.terminal(parser.keyword()),
+                basicParser.spacing(),
+                parser.rule(),
+                mandatory(
+                        Test(instanceOf(JtwigEmptyContentAddon.class).matches(peek())),
+                        new ParseException("Addon parser not pushing a JtwigEmptyContent object to the top of the stack")
+                ),
+                mandatory(
+                        Sequence(
+                                doIt(peek(JtwigEmptyContentAddon.class).begin().addToLeft(tagPropertyParser.getCurrentProperty())),
+                                closeCode(),
+                                doIt(peek(JtwigEmptyContentAddon.class).end().addToLeft(tagPropertyParser.getCurrentProperty())
+                                )
+                        ),
+                        new ParseException("Wrong syntax for " + parser.keyword())
+                )
+        );
+    }
+
+    Rule keywordsContent() {
+        if (contentAddonParsers.length == 0)
+            return Test(false);
+        Rule[] rules = new Rule[contentAddonParsers.length];
+        for (int i=0;i<contentAddonParsers.length;i++) {
+            rules[i] = FirstOf(
+                    basicParser.terminal(contentAddonParsers[i].beginKeyword()),
+                    basicParser.terminal(contentAddonParsers[i].endKeyword())
+            );
+        }
+        return FirstOf(rules);
+    }
+
+    Rule contentParsers() {
+        if (contentAddonParsers.length == 0)
+            return Test(false);
+        Rule[] rules = new Rule[contentAddonParsers.length];
+        for (int i=0;i<contentAddonParsers.length;i++)
+            rules[i] = contentAddon(contentAddonParsers[i]);
+        return FirstOf(rules);
+    }
+
+    Rule contentAddon(JtwigContentAddonParser parser) {
+        return Sequence(
+                openCode(),
+                basicParser.terminal(parser.beginKeyword()),
+                basicParser.spacing(),
+                parser.startRule(),
+                mandatory(
+                        Test(instanceOf(JtwigContentAddon.class).matches(peek())),
+                        new ParseException("Addon parser not pushing a JtwigContentAddon object to the top of the stack")
+                ),
+                mandatory(
+                        Sequence(
+                                doIt(peek(JtwigContentAddon.class).begin().addToLeft(tagPropertyParser.getCurrentProperty())),
+                                closeCode(),
+                                doIt(peek(JtwigContentAddon.class).begin().addToRight(tagPropertyParser.getCurrentProperty())),
+                                content(),
+                                peek(1, JtwigContentAddon.class).setContent(pop(JtwigContent.class)),
+                                openCode(),
+                                basicParser.terminal(parser.endKeyword()),
+                                basicParser.spacing(),
+                                doIt(peek(JtwigContentAddon.class).end().addToLeft(tagPropertyParser.getCurrentProperty())),
+                                closeCode(),
+                                doIt(peek(JtwigContentAddon.class).end().addToRight(tagPropertyParser.getCurrentProperty()))
+                        ),
+                        new ParseException("Wrong syntax for "+parser.beginKeyword())
+                )
+        );
+    }
+
+    Rule keywordEmptyContent() {
         if (noContentAddonParsers.length == 0)
             return Test(false);
         Rule[] rules = new Rule[noContentAddonParsers.length];
