@@ -56,8 +56,9 @@ public class JtwigParser extends BaseParser<Content> {
                 ParseException innerException = ((ParseBypassException) e.getCause()).getInnerException();
                 innerException.setExpression(e.getMessage());
                 throw innerException;
-            } else
+            } else {
                 throw new ParseException(e);
+            }
         } catch (ResourceException e) {
             throw new ParseException(e);
         }
@@ -66,7 +67,6 @@ public class JtwigParser extends BaseParser<Content> {
     JtwigBasicParser basicParser = createParser(JtwigBasicParser.class);
     JtwigExpressionParser expressionParser = createParser(JtwigExpressionParser.class);
     JtwigTagPropertyParser tagPropertyParser = createParser(JtwigTagPropertyParser.class);
-
 
     public Rule start() {
         return FirstOf(
@@ -102,7 +102,6 @@ public class JtwigParser extends BaseParser<Content> {
         );
     }
 
-
     Rule normalTemplate() {
         return Sequence(
                 content(),
@@ -123,6 +122,7 @@ public class JtwigParser extends BaseParser<Content> {
                                 addToContent(ifCondition()),
                                 addToContent(set()),
                                 addToContent(verbatim()),
+                                addToContent(comment()),
                                 Sequence(
                                         openCode(),
                                         TestNot(
@@ -186,10 +186,11 @@ public class JtwigParser extends BaseParser<Content> {
     }
 
     boolean assertEqual(String value1, String value2) {
-        if (!value1.equals(value2))
+        if (!value1.equals(value2)) {
             return throwException(new ParseException("Start statement and ending block names do not match"));
-        else
+        } else {
             return true;
+        }
     }
 
     Rule include() {
@@ -215,7 +216,6 @@ public class JtwigParser extends BaseParser<Content> {
                 push(new Text()),
                 OneOrMore(
                         FirstOf(
-                                Sequence("{#", ZeroOrMore(TestNot("#}"), ANY), "#}"),
                                 Sequence(
                                         basicParser.escape(),
                                         peek(Text.class).append(match())
@@ -224,7 +224,8 @@ public class JtwigParser extends BaseParser<Content> {
                                         TestNot(
                                                 FirstOf(
                                                         basicParser.symbol(OPEN_OUTPUT),
-                                                        basicParser.symbol(OPEN_CODE)
+                                                        basicParser.symbol(OPEN_CODE),
+                                                        basicParser.symbol(OPEN_COMMENT)
                                                 )
                                         ),
                                         ANY,
@@ -341,19 +342,19 @@ public class JtwigParser extends BaseParser<Content> {
                                 expressionParser.variable(),
                                 FirstOf(
                                         Sequence(
-                                                symbol(COMMA),
+                                                symbolWithSpacing(COMMA),
                                                 expressionParser.variable(),
                                                 keyword(IN),
                                                 expressionParser.expression(),
                                                 push(new ForPairLoop(expressionParser.pop(2, Variable.class),
-                                                        expressionParser.pop(1, Variable.class),
-                                                        expressionParser.pop()))
+                                                                     expressionParser.pop(1, Variable.class),
+                                                                     expressionParser.pop()))
                                         ),
                                         Sequence(
                                                 keyword(IN),
                                                 expressionParser.expression(),
                                                 push(new ForLoop(expressionParser.pop(1, Variable.class),
-                                                        expressionParser.pop()))
+                                                                 expressionParser.pop()))
                                         )
                                 ),
                                 doIt(peek(ForLoop.class).begin().addToLeft(tagPropertyParser.getCurrentProperty())),
@@ -381,7 +382,7 @@ public class JtwigParser extends BaseParser<Content> {
                                 expressionParser.variable(),
                                 push(new SetVariable(expressionParser.pop(Variable.class))),
                                 doIt(peek(SetVariable.class).begin().addToLeft(tagPropertyParser.getCurrentProperty())),
-                                symbol(ATTR),
+                                symbolWithSpacing(ATTR),
                                 expressionParser.expression(),
                                 peek(1, SetVariable.class).setAssignment(expressionParser.pop()),
                                 closeCode(),
@@ -411,13 +412,12 @@ public class JtwigParser extends BaseParser<Content> {
         );
     }
 
-    Rule symbol(JtwigSymbol symbol) {
+    Rule symbolWithSpacing(JtwigSymbol symbol) {
         return Sequence(
                 basicParser.symbol(symbol),
                 basicParser.spacing()
         );
     }
-
 
     Rule mandatory(Rule rule, ParseException exception) {
         return FirstOf(
@@ -426,6 +426,18 @@ public class JtwigParser extends BaseParser<Content> {
         );
     }
 
+    Rule comment() {
+        return Sequence(
+                push(new Comment()),
+                basicParser.symbol(JtwigSymbol.OPEN_COMMENT),
+                tagPropertyParser.property(),
+                doIt(peek(Comment.class).begin().addToLeft(tagPropertyParser.getCurrentProperty())),
+                ZeroOrMore(TestNot(Sequence(symbolWithSpacing(JtwigSymbol.MINUS), symbolWithSpacing(JtwigSymbol.CLOSE_COMMENT))), TestNot(symbolWithSpacing(JtwigSymbol.CLOSE_COMMENT)), ANY),
+                tagPropertyParser.property(),
+                doIt(peek(Comment.class).end().addToRight(tagPropertyParser.getCurrentProperty())),
+                basicParser.symbol(JtwigSymbol.CLOSE_COMMENT)
+        );
+    }
 
     Rule openCode() {
         return Sequence(

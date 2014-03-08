@@ -27,35 +27,71 @@ public class WhitespaceControlTest extends AbstractJtwigTest {
     public void ifSpaceControl() throws Exception {
         assertThat(theResultOfRendering(theTemplate(
                 " {%- if true -%} A {%- endif -%} \n\t")),
-                is(equalTo("A"))
+                   is(equalTo("A"))
         );
     }
+
     @Test
     public void elseSpaceControl() throws Exception {
         assertThat(theResultOfRendering(theTemplate(
                 " {%- if false -%}{% else -%} A {% endif -%} \n\t")),
-                is(equalTo("A "))
+                   is(equalTo("A "))
         );
     }
+
     @Test
     public void elseIfSpaceControl() throws Exception {
         assertThat(theResultOfRendering(theTemplate(
                 " {%- if false -%}{% elseif true -%} A {% endif -%} \n\t")),
-                is(equalTo("A "))
+                   is(equalTo("A "))
         );
     }
+
     @Test
     public void setTest() throws Exception {
         assertThat(theResultOfRendering(theTemplate(
                 " {%- set a = 1 %}")),
-                is(equalTo(""))
+                   is(equalTo(""))
         );
     }
+
     @Test
     public void testOutput() throws Exception {
         assertThat(theResultOfRendering(theTemplate(
                 " {{- 'hello' -}} ")),
-                is(equalTo("hello"))
+                   is(equalTo("hello"))
+        );
+    }
+
+    @Test
+    public void testComment() throws Exception {
+        assertThat(theResultOfRendering(theTemplate(
+                " {#- 'hello' -#} ")),
+                   is(equalTo(""))
+        );
+    }
+
+    @Test
+    public void testCommentEmpty() throws Exception {
+        assertThat(theResultOfRendering(theTemplate(
+                " {#--#} ")),
+                   is(equalTo(""))
+        );
+    }
+
+    @Test
+    public void testCommentRight() throws Exception {
+        assertThat(theResultOfRendering(theTemplate(
+                " {# Hola -#} ")),
+                   is(equalTo(" "))
+        );
+    }
+
+    @Test
+    public void testCommentLeft() throws Exception {
+        assertThat(theResultOfRendering(theTemplate(
+                " {#- Hola #} ")),
+                   is(equalTo(" "))
         );
     }
 }

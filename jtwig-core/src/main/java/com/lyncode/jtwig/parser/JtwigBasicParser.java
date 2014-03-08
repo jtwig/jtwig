@@ -26,15 +26,14 @@ import static com.lyncode.jtwig.parser.JtwigSymbol.QUOTE;
 
 public class JtwigBasicParser extends BaseParser<String> {
     @SuppressNode
-    public Rule spacing () {
+    public Rule spacing() {
         return ZeroOrMore(FirstOf(
                 // whitespace
                 OneOrMore(AnyOf(" \t\r\n\f").label("Whitespace")),
                 // traditional comment
-                Sequence("{#", ZeroOrMore(TestNot("#}"), ANY), "#}").label("Comment")
+                Sequence(symbol(JtwigSymbol.OPEN_COMMENT), ZeroOrMore(TestNot(symbol(JtwigSymbol.CLOSE_COMMENT)), ANY), symbol(JtwigSymbol.CLOSE_COMMENT)).label("Comment")
         ));
     }
-
 
     public Rule closeCode() {
         return symbol(JtwigSymbol.CLOSE_CODE);
@@ -52,7 +51,6 @@ public class JtwigBasicParser extends BaseParser<String> {
         );
     }
 
-
     public Rule identifier() {
         return Sequence(
                 TestNot(anyKeyword()),
@@ -61,19 +59,15 @@ public class JtwigBasicParser extends BaseParser<String> {
         );
     }
 
-
     @SuppressNode
     public Rule keyword(JtwigKeyword keyword) {
         return terminal(keyword.getKeyword(), letterOrDigit());
     }
 
-
-
     @SuppressNode
     public Rule symbol(JtwigSymbol symbol) {
         return terminal(symbol.getSymbol());
     }
-
 
     @SuppressNode
     @DontLabel
@@ -81,13 +75,11 @@ public class JtwigBasicParser extends BaseParser<String> {
         return Sequence(string, TestNot(mustNotFollow)).label('\'' + string + '\'');
     }
 
-
     @SuppressNode
     @DontLabel
     Rule terminal(String string) {
         return String(string).label('\'' + string + '\'');
     }
-
 
     public Rule onlyOneChar() {
         return Sequence(
@@ -114,7 +106,6 @@ public class JtwigBasicParser extends BaseParser<String> {
     Rule letterOrDigit() {
         return FirstOf(CharRange('a', 'z'), CharRange('A', 'Z'), CharRange('0', '9'), '_', '$');
     }
-
 
     /**
      * Pushes the String (without quotes)

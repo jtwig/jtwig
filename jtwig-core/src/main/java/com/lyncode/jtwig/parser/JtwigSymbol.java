@@ -58,6 +58,9 @@ public enum JtwigSymbol {
     CLOSE_CODE("%}"),
     OPEN_CODE("{%"),
 
+    OPEN_COMMENT("{#"),
+    CLOSE_COMMENT("#}"),
+
     ATTR("="),
 
     QUOTE("'"),
@@ -67,7 +70,7 @@ public enum JtwigSymbol {
 
     private String symbol;
 
-    JtwigSymbol (String symbol) {
+    JtwigSymbol(String symbol) {
         this.symbol = symbol;
     }
 
