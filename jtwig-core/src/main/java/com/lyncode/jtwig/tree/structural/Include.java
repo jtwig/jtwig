@@ -26,7 +26,6 @@ import com.lyncode.jtwig.resource.JtwigResource;
 import com.lyncode.jtwig.tree.api.Content;
 import com.lyncode.jtwig.tree.api.Tag;
 import com.lyncode.jtwig.tree.api.TagInformation;
-import com.lyncode.jtwig.tree.documents.JtwigDocument;
 
 import java.io.OutputStream;
 
@@ -45,11 +44,10 @@ public class Include implements Content, Tag {
     }
 
     @Override
-    public Content compile(JtwigResource resource) throws CompileException {
+    public Content compile(JtwigParser parser, JtwigResource resource) throws CompileException {
         try {
             JtwigResource jtwigResource = resource.resolve(path);
-            JtwigDocument jtwigDocument = JtwigParser.parse(jtwigResource);
-            return jtwigDocument.compile(jtwigResource);
+            return JtwigParser.parse(parser, jtwigResource).compile(parser, jtwigResource);
         } catch (ParseException | ResourceException e) {
             throw new CompileException(e);
         }

@@ -28,10 +28,9 @@ import org.parboiled.support.ParsingResult;
 
 import static com.lyncode.jtwig.matcher.OperationMatchers.OperationBinaryMatcherBuilder;
 import static com.lyncode.jtwig.matcher.OperationMatchers.OperationUnaryMatcherBuilder;
-import static org.parboiled.Parboiled.createParser;
 
 public class JtwigParserTest {
-    private JtwigParser underTest = createParser(JtwigParser.class);
+    private JtwigParser underTest = new JtwigParser.Builder().build();
 
     @Test
     public void shouldMatchForElement () throws Exception {
