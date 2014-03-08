@@ -14,37 +14,46 @@
  * limitations under the License.
  */
 
-package com.lyncode.jtwig.tree.documents;
+package com.lyncode.jtwig.parser.addons;
 
-import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.exception.CompileException;
-import com.lyncode.jtwig.exception.RenderException;
 import com.lyncode.jtwig.parser.JtwigParser;
 import com.lyncode.jtwig.resource.JtwigResource;
 import com.lyncode.jtwig.tree.api.Content;
+import com.lyncode.jtwig.tree.api.Tag;
+import com.lyncode.jtwig.tree.api.TagInformation;
+import com.lyncode.jtwig.tree.content.JtwigContent;
 import com.lyncode.jtwig.tree.structural.Block;
 
-import java.io.OutputStream;
+public abstract class JtwigContentAddon implements Content, Tag {
+    private JtwigContent content;
+    private TagInformation begin = new TagInformation();
+    private TagInformation end = new TagInformation();
 
-public class JtwigRootDocument implements JtwigDocument {
-    private Content content;
 
-    public JtwigRootDocument(Content content) {
-        this.content = content;
-    }
-
-    public Content getContent() {
+    public JtwigContent getContent() {
         return content;
     }
 
+    public boolean setContent(JtwigContent content) {
+        this.content = content;
+        return true;
+    }
+
     @Override
-    public boolean render(OutputStream outputStream, JtwigContext context) throws RenderException {
-        return false;
+    public TagInformation begin() {
+        return begin;
+    }
+
+    @Override
+    public TagInformation end() {
+        return end;
     }
 
     @Override
     public Content compile(JtwigParser parser, JtwigResource resource) throws CompileException {
-        return content.compile(parser, resource);
+        content = content.compile(parser, resource);
+        return this;
     }
 
     @Override

@@ -21,6 +21,7 @@ import com.lyncode.jtwig.exception.CalculateException;
 import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.RenderException;
 import com.lyncode.jtwig.functions.util.ObjectIterator;
+import com.lyncode.jtwig.parser.JtwigParser;
 import com.lyncode.jtwig.resource.JtwigResource;
 import com.lyncode.jtwig.tree.api.Content;
 import com.lyncode.jtwig.tree.api.Expression;
@@ -70,8 +71,8 @@ public class ForLoop implements Content, Tag {
     }
 
     @Override
-    public Content compile(JtwigResource resource) throws CompileException {
-        content = content.compile(resource, begin(), end());
+    public Content compile(JtwigParser parser, JtwigResource resource) throws CompileException {
+        content = content.compile(parser, resource, begin(), end());
         return this;
     }
 

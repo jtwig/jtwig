@@ -32,11 +32,10 @@ import java.io.ByteArrayOutputStream;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.parboiled.Parboiled.createParser;
 
 public class JtwigContentParserTest {
     private JtwigContext context = new JtwigContext();
-    private JtwigParser underTest = createParser(JtwigParser.class);
+    private JtwigParser underTest = new JtwigParser.Builder().build();
 
 
     @Test

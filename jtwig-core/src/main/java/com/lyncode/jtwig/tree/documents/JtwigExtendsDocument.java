@@ -50,14 +50,15 @@ public class JtwigExtendsDocument implements JtwigDocument {
     }
 
     @Override
-    public Content compile(JtwigResource resource) throws CompileException {
+    public Content compile(JtwigParser parser, JtwigResource resource) throws CompileException {
         try {
             for (int i = 0; i < blocks.size(); i++)
-                blocks.set(i, blocks.get(i).compile(resource));
+                blocks.set(i, blocks.get(i).compile(parser, resource));
 
             JtwigResource jtwigResource = resource.resolve(anExtends.getPath());
 
-            Content content = JtwigParser.parse(jtwigResource).compile(jtwigResource);
+            Content content = JtwigParser.parse(parser, jtwigResource)
+                    .compile(parser, jtwigResource);
             for (Block expression : blocks) {
                 content.replace(expression);
             }

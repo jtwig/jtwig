@@ -19,6 +19,7 @@ package com.lyncode.jtwig.tree.content;
 import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.RenderException;
+import com.lyncode.jtwig.parser.JtwigParser;
 import com.lyncode.jtwig.resource.JtwigResource;
 import com.lyncode.jtwig.tree.api.Content;
 import com.lyncode.jtwig.tree.structural.Block;
@@ -59,7 +60,7 @@ public class Text implements Content {
     }
 
     @Override
-    public Content compile(JtwigResource resource) throws CompileException {
+    public Content compile(JtwigParser parser, JtwigResource resource) throws CompileException {
         String result = getText();
         if (trimLeft)
             result = result.replaceAll("^\\s+", "");

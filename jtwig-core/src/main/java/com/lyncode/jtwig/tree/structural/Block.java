@@ -19,6 +19,7 @@ package com.lyncode.jtwig.tree.structural;
 import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.RenderException;
+import com.lyncode.jtwig.parser.JtwigParser;
 import com.lyncode.jtwig.resource.JtwigResource;
 import com.lyncode.jtwig.tree.api.Content;
 import com.lyncode.jtwig.tree.api.Tag;
@@ -62,8 +63,8 @@ public class Block implements Content, Tag {
     }
 
     @Override
-    public Block compile(JtwigResource resource) throws CompileException {
-        this.content = content.compile(resource, begin(), end());
+    public Block compile(JtwigParser parser, JtwigResource resource) throws CompileException {
+        this.content = content.compile(parser, resource, begin(), end());
         return this;
     }
 

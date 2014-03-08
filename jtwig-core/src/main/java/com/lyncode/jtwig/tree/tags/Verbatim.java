@@ -19,6 +19,7 @@ package com.lyncode.jtwig.tree.tags;
 import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.RenderException;
+import com.lyncode.jtwig.parser.JtwigParser;
 import com.lyncode.jtwig.resource.JtwigResource;
 import com.lyncode.jtwig.tree.api.Content;
 import com.lyncode.jtwig.tree.api.Tag;
@@ -44,7 +45,7 @@ public class Verbatim implements Content, Tag {
     }
 
     @Override
-    public Content compile(JtwigResource resource) throws CompileException {
+    public Content compile(JtwigParser parser, JtwigResource resource) throws CompileException {
         return this;
     }
 

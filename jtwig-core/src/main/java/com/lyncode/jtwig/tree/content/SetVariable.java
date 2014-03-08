@@ -20,6 +20,7 @@ import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.exception.CalculateException;
 import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.RenderException;
+import com.lyncode.jtwig.parser.JtwigParser;
 import com.lyncode.jtwig.resource.JtwigResource;
 import com.lyncode.jtwig.tree.api.Content;
 import com.lyncode.jtwig.tree.api.Expression;
@@ -64,7 +65,7 @@ public class SetVariable implements Content, Tag {
     }
 
     @Override
-    public SetVariable compile(JtwigResource resource) throws CompileException {
+    public SetVariable compile(JtwigParser parser, JtwigResource resource) throws CompileException {
         return this;
     }
 
