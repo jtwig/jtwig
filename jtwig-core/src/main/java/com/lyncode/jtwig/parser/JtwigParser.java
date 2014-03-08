@@ -260,21 +260,21 @@ public class JtwigParser extends BaseParser<Content> {
     }
 
     Rule keywordEmptyContent() {
-        List<Rule> rules = new ArrayList<>();
-//        if (contentAddonParsers.isEmpty())
+        if (noContentAddonParsers.length == 0)
             return Test(false);
-//        for (JtwigEmptyContentAddonParser parser : noContentAddonParsers)
-//            rules.add(basicParser.terminal(parser.keyword()));
-//        return FirstOf(rules.toArray(new Rule[rules.size()]));
+        Rule[] rules = new Rule[noContentAddonParsers.length];
+        for (int i = 0;i<noContentAddonParsers.length;i++)
+            rules[i] = basicParser.terminal(noContentAddonParsers[i].keyword());
+        return FirstOf(rules);
     }
 
     Rule emptyContentParsers() {
-        List<Rule> rules = new ArrayList<>();
-//        if (noContentAddonParsers.isEmpty())
+        if (noContentAddonParsers.length == 0)
             return Test(false);
-//        for (JtwigEmptyContentAddonParser parser : noContentAddonParsers)
-//            rules.add(noContentAddon(parser));
-//        return FirstOf(rules.toArray(new Rule[rules.size()]));
+        Rule[] rules = new Rule[noContentAddonParsers.length];
+        for (int i = 0;i<noContentAddonParsers.length;i++)
+            rules[i] = noContentAddon(noContentAddonParsers[i]);
+        return FirstOf(rules);
     }
 
     Rule noContentAddon(JtwigEmptyContentAddonParser parser) {
