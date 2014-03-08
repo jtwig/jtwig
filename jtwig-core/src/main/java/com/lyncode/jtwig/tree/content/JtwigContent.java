@@ -19,6 +19,7 @@ package com.lyncode.jtwig.tree.content;
 import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.RenderException;
+import com.lyncode.jtwig.parser.JtwigParser;
 import com.lyncode.jtwig.resource.JtwigResource;
 import com.lyncode.jtwig.tree.api.Content;
 import com.lyncode.jtwig.tree.api.Tag;
@@ -43,11 +44,11 @@ public class JtwigContent implements Content {
     }
 
     @Override
-    public JtwigContent compile(JtwigResource resource) throws CompileException {
-        return compile(resource, new TagInformation(), new TagInformation());
+    public JtwigContent compile(JtwigParser parser, JtwigResource resource) throws CompileException {
+        return compile(parser, resource, new TagInformation(), new TagInformation());
     }
 
-    public JtwigContent compile(JtwigResource resource, TagInformation begin, TagInformation end) throws CompileException {
+    public JtwigContent compile(JtwigParser parser, JtwigResource resource, TagInformation begin, TagInformation end) throws CompileException {
         for (int i = 0; i < contents.size(); i++) {
             Content content = contents.get(i);
             if (content instanceof Text) {
@@ -58,7 +59,7 @@ public class JtwigContent implements Content {
                 if (mustTrimRight(i, end))
                     text.trimRight();
             }
-            contents.set(i, content.compile(resource));
+            contents.set(i, content.compile(parser, resource));
         }
         return this;
     }

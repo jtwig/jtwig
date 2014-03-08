@@ -20,6 +20,7 @@ import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.exception.CalculateException;
 import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.RenderException;
+import com.lyncode.jtwig.parser.JtwigParser;
 import com.lyncode.jtwig.resource.JtwigResource;
 import com.lyncode.jtwig.tree.api.Content;
 import com.lyncode.jtwig.tree.api.Expression;
@@ -90,14 +91,14 @@ public class IfExpression implements Content, Tag {
     }
 
     @Override
-    public IfExpression compile(JtwigResource resource) throws CompileException {
+    public IfExpression compile(JtwigParser parser, JtwigResource resource) throws CompileException {
         TagInformation end = end();
         if (!elseIfExpressions.isEmpty())
             end = elseIfExpressions.get(0).tag();
         else if (hasElse())
             end = elseExpression.tag();
 
-        this.content = content.compile(resource, begin(), end);
+        this.content = content.compile(parser, resource, begin(), end);
 
         int size = this.elseIfExpressions.size();
         for (int i = 0;i < size;i++) {
@@ -107,11 +108,11 @@ public class IfExpression implements Content, Tag {
             else if (hasElse())
                 end = elseExpression.tag();
             ElseIfExpression elseIfExpression = elseIfExpressions.get(i);
-            elseIfExpressions.set(i, elseIfExpression.compile(resource, elseIfExpression.tag(), end));
+            elseIfExpressions.set(i, elseIfExpression.compile(parser, resource, elseIfExpression.tag(), end));
         }
 
         if (hasElse()) {
-            elseExpression = elseExpression.compile(resource, elseExpression.tag(), end());
+            elseExpression = elseExpression.compile(parser, resource, elseExpression.tag(), end());
         }
 
         return this;
@@ -165,14 +166,14 @@ public class IfExpression implements Content, Tag {
         }
 
         @Override
-        public ElseIfExpression compile(JtwigResource resource) throws CompileException {
-            content = content.compile(resource);
+        public ElseIfExpression compile(JtwigParser parser, JtwigResource resource) throws CompileException {
+            content = content.compile(parser, resource);
             return this;
         }
 
 
-        public ElseIfExpression compile(JtwigResource resource, TagInformation begin, TagInformation end) throws CompileException {
-            content = content.compile(resource, begin, end);
+        public ElseIfExpression compile(JtwigParser parser, JtwigResource resource, TagInformation begin, TagInformation end) throws CompileException {
+            content = content.compile(parser, resource, begin, end);
             return this;
         }
 
@@ -202,13 +203,13 @@ public class IfExpression implements Content, Tag {
         }
 
         @Override
-        public ElseExpression compile(JtwigResource resource) throws CompileException {
-            content = content.compile(resource);
+        public ElseExpression compile(JtwigParser parser, JtwigResource resource) throws CompileException {
+            content = content.compile(parser, resource);
             return this;
         }
 
-        public ElseExpression compile(JtwigResource resource, TagInformation begin, TagInformation end) throws CompileException {
-            content = content.compile(resource, begin, end);
+        public ElseExpression compile(JtwigParser parser, JtwigResource resource, TagInformation begin, TagInformation end) throws CompileException {
+            content = content.compile(parser, resource, begin, end);
             return this;
         }
 
