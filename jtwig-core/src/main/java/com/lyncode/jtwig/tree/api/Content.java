@@ -19,6 +19,7 @@ package com.lyncode.jtwig.tree.api;
 import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.RenderException;
+import com.lyncode.jtwig.parser.JtwigParser;
 import com.lyncode.jtwig.resource.JtwigResource;
 import com.lyncode.jtwig.tree.structural.Block;
 
@@ -26,6 +27,6 @@ import java.io.OutputStream;
 
 public interface Content {
     boolean render (OutputStream outputStream, JtwigContext context) throws RenderException;
-    Content compile(JtwigResource resource) throws CompileException;
+    Content compile(JtwigParser parser, JtwigResource resource) throws CompileException;
     boolean replace (Block expression) throws CompileException;
 }
