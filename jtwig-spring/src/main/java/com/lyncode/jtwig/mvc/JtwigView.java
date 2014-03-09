@@ -24,6 +24,7 @@ import com.lyncode.jtwig.parser.JtwigParser;
 import com.lyncode.jtwig.parser.config.ParserConfiguration;
 import com.lyncode.jtwig.resource.WebJtwigResource;
 import com.lyncode.jtwig.tree.api.Content;
+import com.lyncode.jtwig.tree.helper.RenderStream;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.BeansException;
@@ -85,11 +86,11 @@ public class JtwigView extends AbstractTemplateView {
         }
 
         response.setContentType(this.getContentType());
-        if (this.getEncoding() != null){
+        if (this.getEncoding() != null) {
             response.setCharacterEncoding(this.getEncoding());
         }
 
-        getContent(request).render(response.getOutputStream(), new JtwigContext(modelMap, getViewResolver().getFunctionRepository()));
+        getContent(request).render(new RenderStream(response.getOutputStream()), new JtwigContext(modelMap, getViewResolver().getFunctionRepository()));
     }
 
     public Content getContent(HttpServletRequest request) throws CompileException, ParseException {

@@ -20,16 +20,15 @@ import com.lyncode.jtwig.exception.RenderException;
 import com.lyncode.jtwig.parser.JtwigParser;
 import com.lyncode.jtwig.resource.JtwigResource;
 import com.lyncode.jtwig.tree.api.Content;
+import com.lyncode.jtwig.tree.helper.RenderStream;
 import com.lyncode.jtwig.tree.structural.Block;
 
 import java.io.IOException;
-import java.io.OutputStream;
 
 public class Text implements Content {
     private StringBuilder builder = new StringBuilder();
     private boolean trimLeft = false;
     private boolean trimRight = false;
-
 
     public Text() {
     }
@@ -38,19 +37,19 @@ public class Text implements Content {
         builder.append(result);
     }
 
-    public boolean append (String piece) {
+    public boolean append(String piece) {
         builder.append(piece);
         return true;
     }
 
-    public String getText () {
+    public String getText() {
         return builder.toString();
     }
 
     @Override
-    public boolean render(OutputStream outputStream, JtwigContext context) throws RenderException {
+    public boolean render(RenderStream renderStream, JtwigContext context) throws RenderException {
         try {
-            outputStream.write(builder.toString().getBytes());
+            renderStream.write(builder.toString().getBytes());
             return true;
         } catch (IOException e) {
             throw new RenderException(e);
@@ -60,10 +59,12 @@ public class Text implements Content {
     @Override
     public Content compile(JtwigParser parser, JtwigResource resource) throws CompileException {
         String result = getText();
-        if (trimLeft)
+        if (trimLeft) {
             result = result.replaceAll("^\\s+", "");
-        if (trimRight)
+        }
+        if (trimRight) {
             result = result.replaceAll("\\s+$", "");
+        }
         return new Text(result);
     }
 
@@ -72,8 +73,8 @@ public class Text implements Content {
         return false;
     }
 
-    public String toString () {
-        return "Text: "+ builder.toString();
+    public String toString() {
+        return "Text: " + builder.toString();
     }
 
     public void trimLeft() {

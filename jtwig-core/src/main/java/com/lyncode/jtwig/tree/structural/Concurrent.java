@@ -1,4 +1,6 @@
 /**
+ * Copyright 2012 Lyncode
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,19 +27,15 @@ import com.lyncode.jtwig.tree.api.TagInformation;
 import com.lyncode.jtwig.tree.content.JtwigContent;
 import com.lyncode.jtwig.tree.helper.RenderStream;
 
-public class Block implements Content, Tag {
-    private String name;
+import java.io.OutputStream;
+
+public class Concurrent implements Content, Tag {
 
     private JtwigContent content;
     private TagInformation begin = new TagInformation();
     private TagInformation end = new TagInformation();
 
-    public Block(String name) {
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
+    public Concurrent() {
     }
 
     public Content getContent() {
@@ -51,23 +49,22 @@ public class Block implements Content, Tag {
 
     @Override
     public String toString() {
-        return "Block "+getName();
+        return "Concurrent";
     }
 
     @Override
     public boolean render(RenderStream renderStream, JtwigContext context) throws RenderException {
-        return content.render(renderStream, context);
+        return true;
     }
 
     @Override
-    public Block compile(JtwigParser parser, JtwigResource resource) throws CompileException {
-        this.content = content.compile(parser, resource, begin(), end());
+    public Concurrent compile(JtwigParser parser, JtwigResource resource) throws CompileException {
         return this;
     }
 
     @Override
     public boolean replace(Block expression) throws CompileException {
-        return content.replace(expression);
+        return false;
     }
 
     @Override
