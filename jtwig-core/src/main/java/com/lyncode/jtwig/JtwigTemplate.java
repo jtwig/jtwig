@@ -24,6 +24,7 @@ import com.lyncode.jtwig.resource.FileJtwigResource;
 import com.lyncode.jtwig.resource.JtwigResource;
 import com.lyncode.jtwig.resource.StringJtwigResource;
 import com.lyncode.jtwig.tree.api.Content;
+import com.lyncode.jtwig.tree.helper.RenderStream;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -36,27 +37,27 @@ public class JtwigTemplate {
         this.resource = resource;
     }
 
-    public JtwigTemplate (String content) {
+    public JtwigTemplate(String content) {
         this.resource = new StringJtwigResource(content);
     }
 
-    public JtwigTemplate (File file) {
+    public JtwigTemplate(File file) {
         this.resource = new FileJtwigResource(file);
     }
 
-    public void output (OutputStream outputStream, JtwigContext context) throws ParseException, CompileException, RenderException {
+    public void output(OutputStream outputStream, JtwigContext context) throws ParseException, CompileException, RenderException {
+        RenderStream renderStream = new RenderStream(outputStream);
         JtwigParser parser = new JtwigParser.Builder().build();
         JtwigParser.parse(parser, resource)
                 .compile(parser, resource)
-                .render(outputStream, context);
+                .render(renderStream, context);
     }
 
-    public String output (JtwigContext context) throws ParseException, CompileException, RenderException {
+    public String output(JtwigContext context) throws ParseException, CompileException, RenderException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         output(outputStream, context);
         return outputStream.toString();
     }
-
 
     public Content compile() throws ParseException, CompileException {
         JtwigParser parser = new JtwigParser.Builder().build();

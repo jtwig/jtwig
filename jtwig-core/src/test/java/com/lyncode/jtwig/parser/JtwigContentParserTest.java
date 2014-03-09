@@ -23,6 +23,7 @@ import com.lyncode.jtwig.exception.RenderException;
 import com.lyncode.jtwig.functions.JtwigFunction;
 import com.lyncode.jtwig.functions.exceptions.FunctionException;
 import com.lyncode.jtwig.tree.api.Content;
+import com.lyncode.jtwig.tree.helper.RenderStream;
 import org.junit.Test;
 import org.parboiled.errors.ParserRuntimeException;
 import org.parboiled.parserunners.ReportingParseRunner;
@@ -37,7 +38,6 @@ public class JtwigContentParserTest {
     private JtwigContext context = new JtwigContext();
     private JtwigParser underTest = new JtwigParser.Builder().build();
 
-
     @Test
     public void simpleOutput() throws Exception {
         context.withModelAttribute("out", "test");
@@ -50,17 +50,18 @@ public class JtwigContentParserTest {
         assertThat(theResult("{{ 2 * 3 }}"), is(equalTo("6")));
     }
 
-
     public String theResult(String input) throws ParseException, RenderException {
         ReportingParseRunner<Content> runner = new ReportingParseRunner<Content>(underTest.content());
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        RenderStream renderStream = new RenderStream(new ByteArrayOutputStream());
         try {
-            runner.run(input).resultValue.render(outputStream, context);
-            return outputStream.toString();
+            runner.run(input).resultValue.render(renderStream, context);
+            return renderStream.toString();
         } catch (ParserRuntimeException e) {
             if (e.getCause() instanceof ParseBypassException) {
                 throw ((ParseBypassException) e.getCause()).getInnerException();
-            } else throw e;
+            } else {
+                throw e;
+            }
         }
     }
 

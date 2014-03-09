@@ -21,8 +21,8 @@ import com.lyncode.jtwig.exception.CalculateException;
 import com.lyncode.jtwig.exception.RenderException;
 import com.lyncode.jtwig.tree.api.Expression;
 import com.lyncode.jtwig.tree.expressions.Variable;
+import com.lyncode.jtwig.tree.helper.RenderStream;
 
-import java.io.OutputStream;
 import java.util.Map;
 
 public class ForPairLoop extends ForLoop {
@@ -34,12 +34,13 @@ public class ForPairLoop extends ForLoop {
     }
 
     @Override
-    public boolean render(OutputStream outputStream, JtwigContext context) throws RenderException {
+    public boolean render(RenderStream renderStream, JtwigContext context) throws RenderException {
         try {
             Object resolved = expression.calculate(context);
 
-            if (!(resolved instanceof Map))
-                throw new RenderException("Expecting a map as parameter for the loop but "+expression+" was given");
+            if (!(resolved instanceof Map)) {
+                throw new RenderException("Expecting a map as parameter for the loop but " + expression + " was given");
+            }
 
             Map map = (Map) resolved;
             Loop loop = new Loop(map.size());
@@ -49,7 +50,7 @@ public class ForPairLoop extends ForLoop {
                 loop.update(index++);
                 context.set(variable.getIdentifier(), key);
                 context.set(value.getIdentifier(), map.get(key));
-                content.render(outputStream, context);
+                content.render(renderStream, context);
             }
             return true;
         } catch (CalculateException e) {

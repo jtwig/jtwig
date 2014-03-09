@@ -26,6 +26,7 @@ import com.lyncode.jtwig.resource.JtwigResource;
 import com.lyncode.jtwig.tree.api.Content;
 import com.lyncode.jtwig.tree.api.Tag;
 import com.lyncode.jtwig.tree.api.TagInformation;
+import com.lyncode.jtwig.tree.helper.RenderStream;
 
 import java.io.OutputStream;
 
@@ -39,7 +40,7 @@ public class Include implements Content, Tag {
     }
 
     @Override
-    public boolean render(OutputStream outputStream, JtwigContext context) throws RenderException {
+    public boolean render(RenderStream renderStream, JtwigContext context) throws RenderException {
         return false;
     }
 

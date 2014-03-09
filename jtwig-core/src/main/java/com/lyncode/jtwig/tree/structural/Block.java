@@ -25,8 +25,7 @@ import com.lyncode.jtwig.tree.api.Content;
 import com.lyncode.jtwig.tree.api.Tag;
 import com.lyncode.jtwig.tree.api.TagInformation;
 import com.lyncode.jtwig.tree.content.JtwigContent;
-
-import java.io.OutputStream;
+import com.lyncode.jtwig.tree.helper.RenderStream;
 
 public class Block implements Content, Tag {
     private String name;
@@ -58,8 +57,8 @@ public class Block implements Content, Tag {
     }
 
     @Override
-    public boolean render(OutputStream outputStream, JtwigContext context) throws RenderException {
-        return content.render(outputStream, context);
+    public boolean render(RenderStream renderStream, JtwigContext context) throws RenderException {
+        return content.render(renderStream, context);
     }
 
     @Override

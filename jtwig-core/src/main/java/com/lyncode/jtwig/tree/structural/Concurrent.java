@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.lyncode.jtwig.tree.tags;
+package com.lyncode.jtwig.tree.structural;
 
 import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.exception.CompileException;
@@ -24,27 +24,41 @@ import com.lyncode.jtwig.resource.JtwigResource;
 import com.lyncode.jtwig.tree.api.Content;
 import com.lyncode.jtwig.tree.api.Tag;
 import com.lyncode.jtwig.tree.api.TagInformation;
-import com.lyncode.jtwig.tree.content.Text;
+import com.lyncode.jtwig.tree.content.JtwigContent;
 import com.lyncode.jtwig.tree.helper.RenderStream;
-import com.lyncode.jtwig.tree.structural.Block;
 
-public class Verbatim implements Content, Tag {
-    private Text text;
-    private TagInformation end = new TagInformation();
+import java.io.OutputStream;
+
+public class Concurrent implements Content, Tag {
+
+    private JtwigContent content;
     private TagInformation begin = new TagInformation();
+    private TagInformation end = new TagInformation();
 
-    public boolean setText(Text text) {
-        this.text = text;
+    public Concurrent() {
+    }
+
+    public Content getContent() {
+        return content;
+    }
+
+    public boolean setContent(JtwigContent content) {
+        this.content = content;
         return true;
     }
 
     @Override
-    public boolean render(RenderStream renderStream, JtwigContext context) throws RenderException {
-        return text.render(renderStream, context);
+    public String toString() {
+        return "Concurrent";
     }
 
     @Override
-    public Content compile(JtwigParser parser, JtwigResource resource) throws CompileException {
+    public boolean render(RenderStream renderStream, JtwigContext context) throws RenderException {
+        return true;
+    }
+
+    @Override
+    public Concurrent compile(JtwigParser parser, JtwigResource resource) throws CompileException {
         return this;
     }
 
