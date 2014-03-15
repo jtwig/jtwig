@@ -16,6 +16,10 @@ Jtwig uses [Semantic Versioning](http://semver.org/)
 
 ## Changes
 
+2.1.1 - 2.1.2 (15-Mar-2014)
+
+- FIX (blocker): Fixed issues #61
+
 2.1.0 - 2.1.1 (02-Mar-2014)
 
 - FIX (blocker): Fixed set expressions
