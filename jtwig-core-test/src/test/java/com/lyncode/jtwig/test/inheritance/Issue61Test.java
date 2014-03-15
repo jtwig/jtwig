@@ -28,7 +28,7 @@ public class Issue61Test extends AbstractJtwigTest {
     @Test
     public void issue61() throws Exception {
         after(jtwigRenders(templateResource("templates/issue61/final.twig")));
-        assertThat(theRenderedTemplate(), containsString("Some title"));
+        assertThat(theRenderedTemplate(), containsString("some content"));
     }
 
 
