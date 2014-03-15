@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.lyncode.jtwig.addons.spaceless;
+package com.lyncode.jtwig.test.addons.spaceless;
 
 public abstract class AbstractAddonTest {
 }

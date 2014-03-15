@@ -19,11 +19,16 @@ package com.lyncode.jtwig.test;
 import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.JtwigTemplate;
 import com.lyncode.jtwig.builder.JtwigResourceBuilder;
+import com.lyncode.jtwig.exception.CompileException;
+import com.lyncode.jtwig.exception.ParseException;
+import com.lyncode.jtwig.exception.RenderException;
+import com.lyncode.jtwig.resource.ClasspathJtwigResource;
 
 import java.io.ByteArrayOutputStream;
 
 public class AbstractJtwigTest {
     private JtwigContext context = new JtwigContext();
+    private String output;
 
     protected String theResultOfRendering(JtwigTemplate template, JtwigContext context) throws Exception {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -47,5 +52,18 @@ public class AbstractJtwigTest {
 
     protected JtwigContext theContext () {
         return context;
+    }
+
+    protected String theRenderedTemplate() {
+        return output;
+    }
+
+    protected ClasspathJtwigResource templateResource(String resource) {
+        return new ClasspathJtwigResource(resource);
+    }
+
+    protected String jtwigRenders(ClasspathJtwigResource resource) throws ParseException, CompileException, RenderException {
+        this.output = new JtwigTemplate(resource).output(theContext());
+        return output;
     }
 }

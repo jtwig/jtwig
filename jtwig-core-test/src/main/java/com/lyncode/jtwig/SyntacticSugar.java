@@ -14,24 +14,16 @@
  * limitations under the License.
  */
 
-package com.lyncode.jtwig.addons.spaceless;
+package com.lyncode.jtwig;
 
-import com.lyncode.jtwig.parser.addons.JtwigContentAddon;
-import com.lyncode.jtwig.parser.addons.JtwigContentAddonParser;
-
-public class SpacelessParser extends JtwigContentAddonParser {
-    @Override
-    public JtwigContentAddon instance() {
-        return new Spaceless();
+public class SyntacticSugar {
+    public static <T> T when (T value) {
+        return value;
     }
-
-    @Override
-    public String beginKeyword() {
-        return "spaceless";
+    public static <T> T given (T value) {
+        return value;
     }
-
-    @Override
-    public String endKeyword() {
-        return "endspaceless";
+    public static <T> T after (T value) {
+        return value;
     }
 }

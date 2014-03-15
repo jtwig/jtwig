@@ -92,7 +92,8 @@ public class JtwigContent implements Content {
                 if (expression.getName().equals(tmp.getName())) {
                     contents.set(i, expression.getContent());
                     replaced = true;
-                }
+                } else
+                    replaced = replaced || tmp.replace(expression);
             } else
                 replaced = replaced || contents.get(i).replace(expression);
         }
