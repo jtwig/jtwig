@@ -24,6 +24,7 @@ import com.lyncode.jtwig.parser.addons.JtwigContentAddonParser;
 import com.lyncode.jtwig.parser.addons.JtwigEmptyContentAddon;
 import com.lyncode.jtwig.parser.addons.JtwigEmptyContentAddonParser;
 import com.lyncode.jtwig.resource.JtwigResource;
+import com.lyncode.jtwig.test.addons.spaceless.SpacelessParser;
 import com.lyncode.jtwig.tree.api.Content;
 import com.lyncode.jtwig.tree.content.*;
 import com.lyncode.jtwig.tree.documents.JtwigDocument;
