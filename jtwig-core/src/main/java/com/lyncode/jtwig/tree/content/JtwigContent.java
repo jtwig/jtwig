@@ -55,7 +55,8 @@ public class JtwigContent extends ElementList implements Content {
                 if (expression.getName().equals(tmp.getName())) {
                     getList().set(i, expression.getContent());
                     replaced = true;
-                }
+                } else
+                    replaced = replaced || tmp.replace(expression);
             }
             else if (getList().get(i) instanceof Content)
                 replaced = replaced || ((Content) getList().get(i)).replace(expression);
