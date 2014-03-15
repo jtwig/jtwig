@@ -12,11 +12,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.freemarker</groupId>
-            <artifactId>freemarker</artifactId>
-            <version>2.3.20</version>
-        </dependency>
-        <dependency>
             <groupId>com.lyncode</groupId>
             <artifactId>builder-commons</artifactId>
             <version>${lyncode.builder.commons.version}</version>
@@ -43,7 +38,6 @@
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest-all</artifactId>
             <version>${hamcrest.version}</version>
-            <scope>test</scope>
         </dependency>
 
 
