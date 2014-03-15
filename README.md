@@ -10,6 +10,10 @@
 
 http://jtwig.org
 
+### Twitter 
+
+[@jtwigTemplates](https://twitter.com/jtwigTemplates) - used to share relevant information 
+
 ## Versioning
 
 Jtwig uses [Semantic Versioning](http://semver.org/)
