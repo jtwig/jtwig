@@ -14,7 +14,22 @@
  * limitations under the License.
  */
 
-package com.lyncode.jtwig.addons.spaceless;
+package com.lyncode.jtwig.test.inheritance;
 
-public abstract class AbstractAddonTest {
+import com.lyncode.jtwig.test.AbstractJtwigTest;
+import org.junit.Test;
+
+import static com.lyncode.jtwig.SyntacticSugar.after;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
+
+public class Issue61Test extends AbstractJtwigTest {
+
+    @Test
+    public void issue61() throws Exception {
+        after(jtwigRenders(templateResource("templates/issue61/final.twig")));
+        assertThat(theRenderedTemplate(), containsString("Some title"));
+    }
+
+
 }

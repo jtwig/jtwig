@@ -46,6 +46,13 @@
             <scope>test</scope>
         </dependency>
 
+
+        <dependency>
+            <groupId>com.googlecode.yatspec</groupId>
+            <artifactId>yatspec</artifactId>
+            <version>${yatspec.version}</version>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -57,4 +64,12 @@
             </plugin>
         </plugins>
     </build>
+
+    <repositories>
+        <!-- a custom repository containing the Yatspec builds -->
+        <repository>
+            <id>yatspec</id>
+            <url>http://repo.bodar.com</url>
+        </repository>
+    </repositories>
 </project>
