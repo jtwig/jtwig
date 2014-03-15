@@ -47,6 +47,7 @@ public abstract class AbstractFunctionRepository {
                 new Merge(),
                 new Slice(),
                 new MapKeys(),
+                new Sort(),
 
                 // String function
                 new Upper(),
