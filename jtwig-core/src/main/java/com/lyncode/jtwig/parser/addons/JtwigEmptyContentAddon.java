@@ -20,7 +20,6 @@ import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.tree.api.Content;
 import com.lyncode.jtwig.tree.api.Tag;
 import com.lyncode.jtwig.tree.api.TagInformation;
-import com.lyncode.jtwig.tree.structural.Block;
 
 public abstract class JtwigEmptyContentAddon implements Content, Tag {
     private TagInformation tag = new TagInformation();
@@ -36,7 +35,7 @@ public abstract class JtwigEmptyContentAddon implements Content, Tag {
     }
 
     @Override
-    public boolean replace(Block expression) throws CompileException {
+    public boolean replace(Content expression) throws CompileException {
         return false;
     }
 }

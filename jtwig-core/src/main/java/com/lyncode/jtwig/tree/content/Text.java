@@ -22,7 +22,6 @@ import com.lyncode.jtwig.exception.RenderException;
 import com.lyncode.jtwig.parser.JtwigParser;
 import com.lyncode.jtwig.resource.JtwigResource;
 import com.lyncode.jtwig.tree.api.Content;
-import com.lyncode.jtwig.tree.structural.Block;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -70,7 +69,7 @@ public class Text implements Content {
     }
 
     @Override
-    public boolean replace(Block expression) throws CompileException {
+    public boolean replace(Content expression) throws CompileException {
         return false;
     }
 

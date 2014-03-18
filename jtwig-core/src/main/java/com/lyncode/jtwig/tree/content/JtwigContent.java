@@ -54,7 +54,7 @@ public class JtwigContent implements Content {
             if (content instanceof Text) {
                 Text text = (Text) content;
                 if (mustTrimLeft(i, begin))
-                        text.trimLeft();
+                    text.trimLeft();
 
                 if (mustTrimRight(i, end))
                     text.trimRight();
@@ -73,6 +73,7 @@ public class JtwigContent implements Content {
         Tag tag = (Tag) before;
         return tag.end().hasRight(Trim);
     }
+
     private boolean mustTrimRight(int position, TagInformation value) {
         if (value.hasLeft(Trim)) return true;
         if (position >= contents.size() - 1) return false;
@@ -84,19 +85,55 @@ public class JtwigContent implements Content {
     }
 
     @Override
-    public boolean replace(Block expression) throws CompileException {
+    public boolean replace(Content expression) throws CompileException {
+
         boolean replaced = false;
-        for (int i = 0; i < contents.size(); i++) {
-            if (contents.get(i) instanceof Block) {
-                Block tmp = (Block) contents.get(i);
-                if (expression.getName().equals(tmp.getName())) {
-                    contents.set(i, expression.getContent());
-                    replaced = true;
-                } else
-                    replaced = replaced || tmp.replace(expression);
-            } else
-                replaced = replaced || contents.get(i).replace(expression);
+
+        if (expression instanceof Block) {
+
+            Block replaceWith = (Block) expression;
+
+            for (int i = 0; i < contents.size(); i++) {
+
+                if (contents.get(i) instanceof Block) {
+                    Block tmp = (Block) contents.get(i);
+                    if (replaceWith.getName().equals(tmp.getName())) {
+                        contents.set(i, replaceWith.getContent());
+                        replaced = true;
+                    } else {
+                        replaced = replaced || tmp.replace(replaceWith);
+                    }
+                } else {
+                    replaced = replaced || contents.get(i).replace(replaceWith);
+                }
+            }
+
         }
+
+        if (expression instanceof SetVariable) {
+
+            SetVariable replaceWith = (SetVariable) expression;
+
+            for (Content content : contents) {
+
+                if (content instanceof SetVariable) {
+
+                    SetVariable tmp = (SetVariable) content;
+
+                    if (replaceWith.getName().getIdentifier().equals(tmp.getName().getIdentifier())) {
+                        tmp.setAssignment(replaceWith.getAssignment());
+                        replaced = true;
+                    } else {
+                        replaced = replaced || tmp.replace(replaceWith);
+                    }
+                } else {
+                    replaced = replaced || content.replace(replaceWith);
+                }
+            }
+
+        }
+
+
         return replaced;
     }
 

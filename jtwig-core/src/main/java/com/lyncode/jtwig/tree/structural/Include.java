@@ -54,7 +54,7 @@ public class Include implements Content, Tag {
     }
 
     @Override
-    public boolean replace(Block expression) throws CompileException {
+    public boolean replace(Content expression) throws CompileException {
         return false;
     }
 

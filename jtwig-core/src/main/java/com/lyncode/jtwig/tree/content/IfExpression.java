@@ -26,7 +26,6 @@ import com.lyncode.jtwig.tree.api.Content;
 import com.lyncode.jtwig.tree.api.Expression;
 import com.lyncode.jtwig.tree.api.Tag;
 import com.lyncode.jtwig.tree.api.TagInformation;
-import com.lyncode.jtwig.tree.structural.Block;
 
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -123,7 +122,7 @@ public class IfExpression implements Content, Tag {
     }
 
     @Override
-    public boolean replace(Block expression) throws CompileException {
+    public boolean replace(Content expression) throws CompileException {
         boolean replaced = this.content.replace(expression);
 
         for (int i = 0;i<this.elseIfExpressions.size();i++)
@@ -178,7 +177,7 @@ public class IfExpression implements Content, Tag {
         }
 
         @Override
-        public boolean replace(Block expression) throws CompileException {
+        public boolean replace(Content expression) throws CompileException {
             return content.replace(expression);
         }
 
@@ -214,7 +213,7 @@ public class IfExpression implements Content, Tag {
         }
 
         @Override
-        public boolean replace(Block expression) throws CompileException {
+        public boolean replace(Content expression) throws CompileException {
             return content.replace(expression);
         }
 
