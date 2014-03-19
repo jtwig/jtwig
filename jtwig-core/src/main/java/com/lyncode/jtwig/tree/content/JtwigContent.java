@@ -137,13 +137,13 @@ public class JtwigContent implements Content {
         return replaced;
     }
 
+    // @TODO Consider making the contents rendering be order independent
     /**
      * Will add a content at 0 position in the content list
      * Needed because SetVariable has to be rendered first
      * to initialize the context map for the latter components
-     * @TODO Consider making the contents rendering be order independent
-     * @param content
-     * @return
+     * @param content The content instance to add
+     * @return self
      */
     public JtwigContent addToTop(Content content){
         contents.add(0, content);
