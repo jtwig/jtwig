@@ -18,7 +18,7 @@ public class AllowSetVariableTest extends AbstractJtwigTest {
     @Test
     public void testExtendedOverrides() throws Exception {
         after(jtwigRenders(templateResource("templates/allowSetVariable/extends.twig")));
-        assertThat(theRenderedTemplate(), containsString("extends-extends"));
+        assertThat(theRenderedTemplate(), containsString("extends-extends-extends-2"));
     }
 
     @Test

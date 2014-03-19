@@ -64,21 +64,22 @@ public class JtwigExtendsDocument implements JtwigDocument {
 
         try {
 
-            for (int i = 0; i < blocks.size(); i++){
-                blocks.set(i, blocks.get(i).compile(parser, resource));
-            }
-
+            // load the extended template
             JtwigResource extendedResource = resource.resolve(anExtends.getPath());
-
             JtwigContent extendedContent = (JtwigContent) JtwigParser.parse(parser, extendedResource)
                     .compile(parser, extendedResource);
 
-            for (Block expression : blocks) {
-                extendedContent.replace(expression);
+            // replace/add variables defined in the extending template
+            for (SetVariable setVariable : setVariables) {
+                if(!extendedContent.replace(setVariable)){
+                    extendedContent.addToTop(setVariable);
+                }
             }
 
-            for (SetVariable setVariable : setVariables) {
-                extendedContent.replace(setVariable);
+            // compile and replace parent blocks
+            for (Block block : blocks) {
+                block.compile(parser, resource);
+                extendedContent.replace(block);
             }
 
             return extendedContent;

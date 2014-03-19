@@ -89,6 +89,7 @@ public class JtwigContent implements Content {
 
         boolean replaced = false;
 
+        // Replace Blocks
         if (expression instanceof Block) {
 
             Block replaceWith = (Block) expression;
@@ -107,15 +108,14 @@ public class JtwigContent implements Content {
                     replaced = replaced || contents.get(i).replace(replaceWith);
                 }
             }
-
         }
 
+        // Replace Variables
         if (expression instanceof SetVariable) {
 
             SetVariable replaceWith = (SetVariable) expression;
 
             for (Content content : contents) {
-
                 if (content instanceof SetVariable) {
 
                     SetVariable tmp = (SetVariable) content;
@@ -126,15 +126,28 @@ public class JtwigContent implements Content {
                     } else {
                         replaced = replaced || tmp.replace(replaceWith);
                     }
+
                 } else {
                     replaced = replaced || content.replace(replaceWith);
                 }
             }
-
         }
 
 
         return replaced;
+    }
+
+    /**
+     * Will add a content at 0 position in the content list
+     * Needed because SetVariable has to be rendered first
+     * to initialize the context map for the latter components
+     * @TODO Consider making the contents rendering be order independent
+     * @param content
+     * @return
+     */
+    public JtwigContent addToTop(Content content){
+        contents.add(0, content);
+        return this;
     }
 
     public JtwigContent add(Content content) {
