@@ -16,6 +16,7 @@
 
 package com.lyncode.jtwig.spring;
 
+import com.lyncode.jtwig.beans.TestService2;
 import com.lyncode.jtwig.controller.DynamicController;
 import com.lyncode.jtwig.functions.test.SimpleJtwigFunction;
 import com.lyncode.jtwig.mvc.JtwigViewResolver;
@@ -24,6 +25,7 @@ import com.lyncode.jtwig.services.api.ViewShownResolver;
 import com.lyncode.jtwig.services.api.assets.AssetResolver;
 import com.lyncode.jtwig.services.impl.InMemoryMessageSource;
 import com.lyncode.jtwig.services.impl.TestModelMapFiller;
+import com.lyncode.jtwig.beans.TestService;
 import com.lyncode.jtwig.services.impl.TestViewShownResolver;
 import com.lyncode.jtwig.services.impl.assets.BaseAssetResolver;
 import org.springframework.context.MessageSource;
@@ -40,7 +42,7 @@ import org.springframework.web.servlet.i18n.FixedLocaleResolver;
 import static java.util.Locale.ENGLISH;
 
 @Configuration
-@ComponentScan(basePackageClasses = { DynamicController.class })
+@ComponentScan(basePackageClasses = { DynamicController.class, TestService.class, TestService2.class })
 @EnableWebMvc
 public class WebappConfig extends WebMvcConfigurerAdapter {
     @Bean

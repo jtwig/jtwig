@@ -19,6 +19,7 @@ package com.lyncode.jtwig.mvc;
 import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.JtwigModelMap;
 import com.lyncode.jtwig.JtwigTemplate;
+import com.lyncode.jtwig.beans.BeanResolver;
 import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.ParseException;
 import com.lyncode.jtwig.resource.WebJtwigResource;
@@ -45,6 +46,7 @@ public class JtwigView extends AbstractTemplateView {
     protected String getEncoding() {
         return getViewResolver().getEncoding();
     }
+
     protected String getTheme() {
         return getViewResolver().getTheme();
     }
@@ -64,26 +66,24 @@ public class JtwigView extends AbstractTemplateView {
     }
 
     @Override
-    protected void renderMergedTemplateModel(Map<String, Object> model,
-                                             HttpServletRequest request, HttpServletResponse response)
-            throws Exception {
+    protected void renderMergedTemplateModel(Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         // Adding model information
         JtwigModelMap modelMap = new JtwigModelMap()
                 .add(model)
+                .add("beans", new BeanResolver(getApplicationContext()))
                 .add("theme", getTheme())
-                .add("request", request)
-            ;
+                .add("request", request);
 
         if (log.isDebugEnabled()) {
             log.debug("Rendering Jtwig template [" + getUrl() + "] in JtwigView '" + getBeanName() + "'");
-            log.debug("Model: "+modelMap);
+            log.debug("Model: " + modelMap);
         }
 
-
         response.setContentType(this.getContentType());
-        if (this.getEncoding() != null)
+        if (this.getEncoding() != null){
             response.setCharacterEncoding(this.getEncoding());
+        }
 
         getContent(request).render(response.getOutputStream(), new JtwigContext(modelMap, getViewResolver().getFunctionRepository()));
     }
@@ -113,14 +113,16 @@ public class JtwigView extends AbstractTemplateView {
         public String getServletName() {
             return JtwigView.this.getBeanName();
         }
+
         public ServletContext getServletContext() {
             return JtwigView.this.getServletContext();
         }
+
         public String getInitParameter(String paramName) {
             return null;
         }
 
-        @SuppressWarnings({ "unchecked", "rawtypes" })
+        @SuppressWarnings({"unchecked", "rawtypes"})
         public Enumeration getInitParameterNames() {
             return Collections.enumeration(Collections.EMPTY_SET);
         }
