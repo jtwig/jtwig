@@ -1,0 +1,8 @@
+{% extends 'base.twig' %}
+
+{% set var = 'extends' %}
+{% set var2 = 'extends-2' %}
+
+{% block main %}
+    extends-{{ var }}-{{ var2 }}
+{% endblock %}

@@ -22,7 +22,6 @@ import com.lyncode.jtwig.resource.JtwigResource;
 import com.lyncode.jtwig.tree.api.Content;
 import com.lyncode.jtwig.tree.api.Tag;
 import com.lyncode.jtwig.tree.api.TagInformation;
-import com.lyncode.jtwig.tree.structural.Block;
 
 import java.io.OutputStream;
 
@@ -44,7 +43,7 @@ public class Comment implements Content, Tag {
     }
 
     @Override
-    public boolean replace(Block expression) throws CompileException {
+    public boolean replace(Content expression) throws CompileException {
         return false;
     }
 

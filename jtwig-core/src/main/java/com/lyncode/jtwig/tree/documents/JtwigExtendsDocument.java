@@ -22,6 +22,8 @@ import com.lyncode.jtwig.exception.ResourceException;
 import com.lyncode.jtwig.parser.JtwigParser;
 import com.lyncode.jtwig.resource.JtwigResource;
 import com.lyncode.jtwig.tree.api.Content;
+import com.lyncode.jtwig.tree.content.JtwigContent;
+import com.lyncode.jtwig.tree.content.SetVariable;
 import com.lyncode.jtwig.tree.structural.Block;
 import com.lyncode.jtwig.tree.structural.Extends;
 
@@ -30,14 +32,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JtwigExtendsDocument implements JtwigDocument {
+
     private Extends anExtends;
-    private List<Block> blocks = new ArrayList<Block>();
+
+    private List<Block> blocks = new ArrayList<>();
+    private List<SetVariable> setVariables = new ArrayList<>();
 
     public JtwigExtendsDocument(Extends anExtends) {
         this.anExtends = anExtends;
     }
 
-    public boolean add (Block block) {
+    public boolean addSetVariable(SetVariable setVariable){
+        setVariables.add(setVariable);
+        return true;
+    }
+
+    public boolean addBlock(Block block) {
         blocks.add(block);
         return true;
     }
@@ -49,32 +59,42 @@ public class JtwigExtendsDocument implements JtwigDocument {
 
     @Override
     public Content compile(JtwigParser parser, JtwigResource resource) throws CompileException {
+
         try {
-            for (int i = 0; i < blocks.size(); i++)
-                blocks.set(i, blocks.get(i).compile(parser, resource));
 
-            JtwigResource jtwigResource = resource.resolve(anExtends.getPath());
+            // load the extended template
+            JtwigResource extendedResource = resource.resolve(anExtends.getPath());
+            JtwigContent extendedContent = (JtwigContent) JtwigParser.parse(parser, extendedResource)
+                    .compile(parser, extendedResource);
 
-            Content content = JtwigParser.parse(parser, jtwigResource)
-                    .compile(parser, jtwigResource);
-            for (Block expression : blocks) {
-                content.replace(expression);
+            // replace/add variables defined in the extending template
+            for (SetVariable setVariable : setVariables) {
+                if(!extendedContent.replace(setVariable)){
+                    extendedContent.addToTop(setVariable);
+                }
             }
 
-            return content;
-        } catch (ResourceException e) {
-            throw new CompileException(e);
-        } catch (ParseException e) {
+            // compile and replace parent blocks
+            for (Block block : blocks) {
+                block.compile(parser, resource);
+                extendedContent.replace(block);
+            }
+
+            return extendedContent;
+
+        } catch (ResourceException | ParseException e) {
             throw new CompileException(e);
         }
+
     }
 
     @Override
-    public boolean replace(Block expression) throws CompileException {
+    public boolean replace(Content expression) throws CompileException {
         boolean replaced = false;
         for (Block container : blocks)
             replaced = replaced || container.replace(expression);
 
         return replaced;
     }
+
 }

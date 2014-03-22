@@ -25,11 +25,11 @@ import com.lyncode.jtwig.tree.api.Expression;
 import com.lyncode.jtwig.tree.api.Tag;
 import com.lyncode.jtwig.tree.api.TagInformation;
 import com.lyncode.jtwig.tree.expressions.Variable;
-import com.lyncode.jtwig.tree.structural.Block;
 
 import java.io.OutputStream;
 
 public class SetVariable implements Content, Tag {
+
     private Variable name;
     private Expression assignment;
     private TagInformation begin = new TagInformation();
@@ -48,7 +48,7 @@ public class SetVariable implements Content, Tag {
         return name;
     }
 
-    public Object getAssignment() {
+    public Expression getAssignment() {
         return assignment;
     }
 
@@ -68,7 +68,7 @@ public class SetVariable implements Content, Tag {
     }
 
     @Override
-    public boolean replace(Block expression) throws CompileException {
+    public boolean replace(Content expression) throws CompileException {
         return false;
     }
 

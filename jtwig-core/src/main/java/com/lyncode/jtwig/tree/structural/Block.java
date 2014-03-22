@@ -67,7 +67,7 @@ public class Block implements Content, Tag {
     }
 
     @Override
-    public boolean replace(Block expression) throws CompileException {
+    public boolean replace(Content expression) throws CompileException {
         return content.replace(expression);
     }
 
