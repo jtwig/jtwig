@@ -14,6 +14,7 @@
 
 package com.lyncode.jtwig.parser;
 
+import com.lyncode.jtwig.parser.config.ParserConfiguration;
 import org.parboiled.BaseParser;
 import org.parboiled.Rule;
 import org.parboiled.annotations.DontLabel;
@@ -23,22 +24,51 @@ import org.parboiled.annotations.SuppressNode;
 import static com.lyncode.jtwig.parser.JtwigSymbol.QUOTE;
 
 public class JtwigBasicParser extends BaseParser<String> {
+    final ParserConfiguration parserConfiguration;
+
+    public JtwigBasicParser() {
+        this.parserConfiguration = new ParserConfiguration();
+    }
+    public JtwigBasicParser(ParserConfiguration parserConfiguration) {
+        this.parserConfiguration = parserConfiguration;
+    }
+
     @SuppressNode
     public Rule spacing() {
         return ZeroOrMore(FirstOf(
                 // whitespace
                 OneOrMore(AnyOf(" \t\r\n\f").label("Whitespace")),
                 // traditional comment
-                Sequence(symbol(JtwigSymbol.OPEN_COMMENT), ZeroOrMore(TestNot(symbol(JtwigSymbol.CLOSE_COMMENT)), ANY), symbol(JtwigSymbol.CLOSE_COMMENT)).label("Comment")
+                Sequence(
+                        openComment(),
+                        ZeroOrMore(TestNot(closeComment()), ANY),
+                        closeComment()
+                ).label("Comment")
         ));
     }
 
     public Rule closeCode() {
-        return symbol(JtwigSymbol.CLOSE_CODE);
+        return String(parserConfiguration.getEndCode());
     }
 
     public Rule openCode() {
-        return symbol(JtwigSymbol.OPEN_CODE);
+        return String(parserConfiguration.getBeginCode());
+    }
+
+    public Rule openOutput () {
+        return String(parserConfiguration.getBeginOutput());
+    }
+
+    public Rule closeOutput () {
+        return String(parserConfiguration.getEndOutput());
+    }
+
+    public Rule openComment () {
+        return String(parserConfiguration.getBeginComment());
+    }
+
+    public Rule closeComment () {
+        return String(parserConfiguration.getEndComment());
     }
 
     @MemoMismatches

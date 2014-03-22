@@ -22,9 +22,15 @@ import org.parboiled.Parboiled;
 import org.parboiled.Rule;
 
 public abstract class JtwigContentAddonParser extends BaseParser<JtwigContentAddon> {
-    JtwigBasicParser basicParser = Parboiled.createParser(JtwigBasicParser.class);
-    JtwigExpressionParser expressionParser = Parboiled.createParser(JtwigExpressionParser.class);
-    JtwigTagPropertyParser tagPropertyParser = Parboiled.createParser(JtwigTagPropertyParser.class);
+    final JtwigBasicParser basicParser;
+    final JtwigExpressionParser expressionParser;
+    final JtwigTagPropertyParser tagPropertyParser;
+
+    public JtwigContentAddonParser () {
+        basicParser = Parboiled.createParser(JtwigBasicParser.class);
+        expressionParser = Parboiled.createParser(JtwigExpressionParser.class);
+        tagPropertyParser = Parboiled.createParser(JtwigTagPropertyParser.class);
+    }
 
     public JtwigBasicParser basicParser() {
         return basicParser;

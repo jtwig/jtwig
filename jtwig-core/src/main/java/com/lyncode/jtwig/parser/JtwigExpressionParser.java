@@ -16,6 +16,7 @@ package com.lyncode.jtwig.parser;
 
 import com.lyncode.jtwig.exception.ParseBypassException;
 import com.lyncode.jtwig.exception.ParseException;
+import com.lyncode.jtwig.parser.config.ParserConfiguration;
 import com.lyncode.jtwig.tree.api.Expression;
 import com.lyncode.jtwig.tree.expressions.*;
 import org.parboiled.BaseParser;
@@ -26,13 +27,21 @@ import static com.lyncode.jtwig.parser.JtwigKeyword.NULL;
 import static com.lyncode.jtwig.parser.JtwigSymbol.*;
 import static com.lyncode.jtwig.parser.JtwigSymbol.DIV;
 import static com.lyncode.jtwig.tree.expressions.Operator.*;
-import static com.lyncode.jtwig.tree.expressions.Operator.NOT;
 import static com.lyncode.jtwig.util.Simplifier.simplify;
 import static org.parboiled.Parboiled.createParser;
 
 public class JtwigExpressionParser extends BaseParser<Expression> {
-    JtwigBasicParser basic = createParser(JtwigBasicParser.class);
-    JtwigConstantParser constants = createParser(JtwigConstantParser.class);
+    final JtwigBasicParser basic;
+    final JtwigConstantParser constants;
+
+    public JtwigExpressionParser(ParserConfiguration parserConfiguration) {
+        basic = createParser(JtwigBasicParser.class, parserConfiguration);
+        constants = createParser(JtwigConstantParser.class, parserConfiguration);
+    }
+
+    public JtwigExpressionParser () {
+        this(new ParserConfiguration());
+    }
 
     public Rule expression() {
         return Sequence(
@@ -395,27 +404,25 @@ public class JtwigExpressionParser extends BaseParser<Expression> {
     }
 
     Rule operator(Operator operator) {
-        if (operator == SUB) {
-            return Sequence(
-                    basic.terminal(operator.toString()),
-                    TestNot(FirstOf(basic.symbol(CLOSE_CODE), basic.symbol(CLOSE_OUTPUT))),
-                    push(new Constant<>(operator)),
-                    basic.spacing()
-            );
-        } else if (operator == MOD) {
-            return Sequence(
-                    basic.terminal(operator.toString()),
-                    TestNot(basic.symbol(CLOSE_CURLY_BRACKET)),
-                    push(new Constant<>(operator)),
-                    basic.spacing()
-            );
-        } else {
-            return Sequence(
-                    basic.terminal(operator.toString()),
-                    push(new Constant<>(operator)),
-                    basic.spacing()
-            );
-        }
+        return Sequence(
+                TestNot(
+                        FirstOf(
+                                basic.closeCode(),
+                                basic.closeOutput(),
+                                Sequence(
+                                        basic.symbol(MINUS),
+                                        basic.closeCode()
+                                ),
+                                Sequence(
+                                        basic.symbol(MINUS),
+                                        basic.closeOutput()
+                                )
+                        )
+                ),
+                basic.terminal(operator.toString()),
+                push(new Constant<>(operator)),
+                basic.spacing()
+        );
     }
 
     Rule binary(Rule first, Rule rest, Operator... operators) {

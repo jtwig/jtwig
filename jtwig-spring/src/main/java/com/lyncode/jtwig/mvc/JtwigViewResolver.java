@@ -18,6 +18,7 @@ import com.lyncode.jtwig.functions.JtwigFunction;
 import com.lyncode.jtwig.functions.builders.FunctionRepositoryBuilder;
 import com.lyncode.jtwig.functions.repository.AbstractFunctionRepository;
 import com.lyncode.jtwig.functions.repository.WebFunctionRepository;
+import com.lyncode.jtwig.parser.config.ParserConfiguration;
 import com.lyncode.jtwig.services.api.theme.ThemePrefixResolver;
 import org.reflections.Reflections;
 import org.springframework.web.servlet.view.AbstractTemplateViewResolver;
@@ -43,6 +44,7 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
     private String theme;
     private boolean cached;
     private ThemePrefixResolver prefixResolver;
+    private ParserConfiguration parserConfiguration = new ParserConfiguration();
     private AbstractFunctionRepository functionRepository = new WebFunctionRepository();
     private List<String> loadedFunctions = new ArrayList<>();
 
@@ -99,10 +101,14 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
     public void setEncoding(String encoding) {
         this.encoding = encoding;
     }
-
+    public void setParserConfiguration (ParserConfiguration parserConfiguration) { this.parserConfiguration = parserConfiguration; }
+    public ParserConfiguration getParserConfiguration() {
+        return parserConfiguration;
+    }
     public void setFunctionRepository(AbstractFunctionRepository abstractFunctionRepository) {
         this.functionRepository = abstractFunctionRepository;
     }
+
     public void setFunctionRepository(FunctionRepositoryBuilder functionRepository) {
         this.functionRepository = functionRepository.build();
     }

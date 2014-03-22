@@ -24,40 +24,7 @@ public enum JtwigSymbol {
     CLOSE_CURLY_BRACKET("}"),
     OPEN_PARENT("("),
     CLOSE_PARENT(")"),
-    DIVISION("/"),
-    PLUS("+"),
     MINUS("-"),
-    TIMES("*"),
-    PERCENTAGE("%"),
-
-    AND("and"),
-    OR("or"),
-
-    AND_WORD("and"),
-    OR_WORD("or"),
-
-    EQUALITY("=="),
-    DIFFERENT("!="),
-
-    GREAT(">"),
-    LESS("<"),
-
-    GREAT_OR_EQUAL(">="),
-    LESS_OR_EQUAL("<="),
-
-    NOT("!"),
-    NOT_WORD("not"),
-
-    OPEN_OUTPUT("{{"),
-    CLOSE_OUTPUT("}}"),
-
-    PIPE("|"),
-
-    CLOSE_CODE("%}"),
-    OPEN_CODE("{%"),
-
-    OPEN_COMMENT("{#"),
-    CLOSE_COMMENT("#}"),
 
     ATTR("="),
 
