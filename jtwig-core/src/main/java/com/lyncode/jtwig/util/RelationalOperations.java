@@ -34,12 +34,13 @@ public class RelationalOperations {
         else return toInt(a) <= toInt(b);
     }
 
-    public static Object eq (Object a, Object b) {
+    public static boolean eq (Object a, Object b) {
+        if (a == null) return b == null || b.equals(a);
         return a.equals(b);
     }
 
-    public static Object neq (Object a, Object b) {
-        return !a.equals(b);
+    public static boolean neq (Object a, Object b) {
+        return !eq(a, b);
     }
 
 }
