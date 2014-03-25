@@ -126,7 +126,7 @@ public class JtwigExpressionParser extends BaseParser<Expression> {
 
     Rule composition() {
         return binary(
-                selection(),
+                isOperation(),
                 FirstOf(
                         functionWithBrackets(),
                         variable()
@@ -135,21 +135,10 @@ public class JtwigExpressionParser extends BaseParser<Expression> {
         );
     }
 
-    Rule selection() {
-        return binary(
-                isOperation(),
-                FirstOf(
-                        functionWithBrackets(),
-                        mapEntry(),
-                        variable()
-                ),
-                SELECTION
-        );
-    }
 
     Rule isOperation() {
         return Sequence(
-                primary(),
+                selection(),
                 push(new OperationBinary(simplify(pop()))),
                 ZeroOrMore(
                         operator(IS),
@@ -176,6 +165,19 @@ public class JtwigExpressionParser extends BaseParser<Expression> {
                         )
 
                 )
+        );
+    }
+
+
+    Rule selection() {
+        return binary(
+                primary(),
+                FirstOf(
+                        functionWithBrackets(),
+                        mapEntry(),
+                        variable()
+                ),
+                SELECTION
         );
     }
 

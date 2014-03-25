@@ -21,14 +21,6 @@ import static com.lyncode.jtwig.SyntacticSugar.*;
 import static org.hamcrest.core.StringContains.containsString;
 
 public class Issue75Test extends AbstractJtwigTest {
-
-    @Test
-    public void issue75IsDefined() throws Exception {
-        given(theContext().withModelAttribute("a", new NullPointer()));
-        when(jtwigRenders(template("{% if b.a is defined %}A{% else %}B{% endif %}")));
-        then(theRenderedTemplate(), containsString("B"));
-    }
-
     @Test
     public void issue75IsNull() throws Exception {
         given(theContext().withModelAttribute("a", new NullPointer()));
@@ -44,7 +36,7 @@ public class Issue75Test extends AbstractJtwigTest {
         then(theRenderedTemplate(), containsString("A"));
     }
 
-    private class NullPointer {
+    public class NullPointer {
         public String getValue () {
             return null;
         }
