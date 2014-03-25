@@ -21,6 +21,7 @@ import com.lyncode.jtwig.parser.addons.JtwigContentAddon;
 import com.lyncode.jtwig.parser.addons.JtwigContentAddonParser;
 import com.lyncode.jtwig.parser.addons.JtwigEmptyContentAddon;
 import com.lyncode.jtwig.parser.addons.JtwigEmptyContentAddonParser;
+import com.lyncode.jtwig.parser.config.ParserConfiguration;
 import com.lyncode.jtwig.resource.JtwigResource;
 import com.lyncode.jtwig.test.addons.spaceless.SpacelessParser;
 import com.lyncode.jtwig.tree.api.Content;
@@ -45,7 +46,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.lyncode.jtwig.parser.JtwigKeyword.*;
-import static com.lyncode.jtwig.parser.JtwigSymbol.*;
+import static com.lyncode.jtwig.parser.JtwigSymbol.ATTR;
+import static com.lyncode.jtwig.parser.JtwigSymbol.COMMA;
 import static com.lyncode.jtwig.tree.content.IfExpression.ElseExpression;
 import static com.lyncode.jtwig.tree.content.IfExpression.ElseIfExpression;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -53,6 +55,7 @@ import static org.parboiled.Parboiled.createParser;
 
 public class JtwigParser extends BaseParser<Content> {
     public static class Builder {
+        private ParserConfiguration configuration = new ParserConfiguration();
         private List<Class<? extends JtwigEmptyContentAddonParser>> emptyAddons = new ArrayList<>();
         private List<Class<? extends JtwigContentAddonParser>> contentAddons = new ArrayList<>();
 
@@ -70,18 +73,24 @@ public class JtwigParser extends BaseParser<Content> {
             return this;
         }
 
+        public Builder withConfiguration (ParserConfiguration configuration) {
+            this.configuration = configuration;
+            return this;
+        }
+
         public JtwigParser build () {
-            return newParser(emptyAddons, contentAddons);
+            return newParser(configuration, emptyAddons, contentAddons);
         }
     }
 
     private static JtwigParser newParser(
+            ParserConfiguration configuration,
             List<Class<? extends JtwigEmptyContentAddonParser>> emptyAddons,
             List<Class<? extends JtwigContentAddonParser>> contentAddons
 
     ) {
 
-        return createParser(JtwigParser.class, emptyAddons, contentAddons);
+        return createParser(JtwigParser.class, configuration, emptyAddons, contentAddons);
     }
 
     public static JtwigDocument parse (Builder builder, JtwigResource input) throws ParseException {
@@ -105,14 +114,19 @@ public class JtwigParser extends BaseParser<Content> {
         }
     }
 
-    JtwigBasicParser basicParser = createParser(JtwigBasicParser.class);
-    JtwigExpressionParser expressionParser = createParser(JtwigExpressionParser.class);
-    JtwigTagPropertyParser tagPropertyParser = createParser(JtwigTagPropertyParser.class);
+
+    final JtwigBasicParser basicParser;
+    final JtwigExpressionParser expressionParser;
+    final JtwigTagPropertyParser tagPropertyParser;
 
     JtwigEmptyContentAddonParser[] noContentAddonParsers;
     JtwigContentAddonParser[] contentAddonParsers;
 
-    public JtwigParser(List<Class<? extends BaseParser>> emptyAddons, List<Class<? extends BaseParser>> contentAddons) {
+    public JtwigParser(ParserConfiguration configuration, List<Class<? extends BaseParser>> emptyAddons, List<Class<? extends BaseParser>> contentAddons) {
+        basicParser = createParser(JtwigBasicParser.class, configuration);
+        tagPropertyParser = createParser(JtwigTagPropertyParser.class);
+        expressionParser = createParser(JtwigExpressionParser.class, configuration);
+
         noContentAddonParsers = new JtwigEmptyContentAddonParser[emptyAddons.size()];
         contentAddonParsers = new JtwigContentAddonParser[contentAddons.size()];
         for (int i = 0;i<emptyAddons.size();i++)
@@ -373,9 +387,9 @@ public class JtwigParser extends BaseParser<Content> {
                                 Sequence(
                                         TestNot(
                                                 FirstOf(
-                                                        basicParser.symbol(OPEN_OUTPUT),
-                                                        basicParser.symbol(OPEN_CODE),
-                                                        basicParser.symbol(OPEN_COMMENT)
+                                                        basicParser.openCode(),
+                                                        basicParser.openOutput(),
+                                                        basicParser.openComment()
                                                 )
                                         ),
                                         ANY,
@@ -545,7 +559,7 @@ public class JtwigParser extends BaseParser<Content> {
 
     Rule output() {
         return Sequence(
-                basicParser.symbol(OPEN_OUTPUT),
+                basicParser.openOutput(),
                 tagPropertyParser.property(),
                 basicParser.spacing(),
                 mandatory(
@@ -555,7 +569,7 @@ public class JtwigParser extends BaseParser<Content> {
                                 doIt(peek(Output.class).begin().addToLeft(tagPropertyParser.getCurrentProperty())),
                                 tagPropertyParser.property(),
                                 doIt(peek(Output.class).end().addToRight(tagPropertyParser.getCurrentProperty())),
-                                basicParser.symbol(JtwigSymbol.CLOSE_OUTPUT)
+                                basicParser.closeOutput()
                         ),
                         new ParseException("Wrong output syntax")
                 )
@@ -579,13 +593,24 @@ public class JtwigParser extends BaseParser<Content> {
     Rule comment() {
         return Sequence(
                 push(new Comment()),
-                basicParser.symbol(JtwigSymbol.OPEN_COMMENT),
+                basicParser.openComment(),
                 tagPropertyParser.property(),
                 doIt(peek(Comment.class).begin().addToLeft(tagPropertyParser.getCurrentProperty())),
-                ZeroOrMore(TestNot(Sequence(symbolWithSpacing(JtwigSymbol.MINUS), symbolWithSpacing(JtwigSymbol.CLOSE_COMMENT))), TestNot(symbolWithSpacing(JtwigSymbol.CLOSE_COMMENT)), ANY),
+                ZeroOrMore(
+                        TestNot(
+                                Sequence(
+                                        basicParser.symbol(JtwigSymbol.MINUS),
+                                        basicParser.closeComment()
+                                )
+                        ),
+                        TestNot(
+                                basicParser.closeComment()
+                        ),
+                        ANY
+                ),
                 tagPropertyParser.property(),
                 doIt(peek(Comment.class).end().addToRight(tagPropertyParser.getCurrentProperty())),
-                basicParser.symbol(JtwigSymbol.CLOSE_COMMENT)
+                basicParser.closeComment()
         );
     }
 

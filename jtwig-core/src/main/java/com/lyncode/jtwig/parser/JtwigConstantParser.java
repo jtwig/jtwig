@@ -14,6 +14,7 @@
 
 package com.lyncode.jtwig.parser;
 
+import com.lyncode.jtwig.parser.config.ParserConfiguration;
 import com.lyncode.jtwig.tree.expressions.Constant;
 import org.parboiled.BaseParser;
 import org.parboiled.Rule;
@@ -24,7 +25,15 @@ import static com.lyncode.jtwig.parser.JtwigSymbol.MINUS;
 import static org.parboiled.Parboiled.createParser;
 
 public class JtwigConstantParser extends BaseParser<Constant> {
-    JtwigBasicParser basic = createParser(JtwigBasicParser.class);
+    final JtwigBasicParser basic;
+
+    public JtwigConstantParser(ParserConfiguration parserConfiguration) {
+        this.basic  = createParser(JtwigBasicParser.class, parserConfiguration);
+    }
+
+    public JtwigConstantParser() {
+        this(new ParserConfiguration());
+    }
 
     public Rule anyConstant () {
         return FirstOf(

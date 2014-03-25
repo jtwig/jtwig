@@ -61,4 +61,11 @@ public class JtwigTemplate {
         return JtwigParser.parse(parser, resource)
                 .compile(parser, resource);
     }
+
+
+    public Content compile(JtwigParser.Builder builder) throws ParseException, CompileException {
+        JtwigParser parser = builder.build();
+        return JtwigParser.parse(parser, resource)
+                .compile(parser, resource);
+    }
 }

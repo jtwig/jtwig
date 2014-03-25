@@ -20,6 +20,8 @@ import com.lyncode.jtwig.JtwigTemplate;
 import com.lyncode.jtwig.beans.BeanResolver;
 import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.ParseException;
+import com.lyncode.jtwig.parser.JtwigParser;
+import com.lyncode.jtwig.parser.config.ParserConfiguration;
 import com.lyncode.jtwig.resource.WebJtwigResource;
 import com.lyncode.jtwig.tree.api.Content;
 import org.apache.log4j.LogManager;
@@ -47,6 +49,10 @@ public class JtwigView extends AbstractTemplateView {
 
     protected String getTheme() {
         return getViewResolver().getTheme();
+    }
+
+    protected ParserConfiguration getParserConfiguration() {
+        return getViewResolver().getParserConfiguration();
     }
 
     private JtwigViewResolver getViewResolver() {
@@ -97,7 +103,11 @@ public class JtwigView extends AbstractTemplateView {
     }
 
     private Content getCompiledJtwigTemplate(HttpServletRequest request) throws ParseException, CompileException {
-        return new JtwigTemplate(new WebJtwigResource(request.getSession().getServletContext(), getUrl())).compile();
+        return new JtwigTemplate(new WebJtwigResource(request.getSession().getServletContext(), getUrl())).compile(jtwigParserBuilder());
+    }
+
+    private JtwigParser.Builder jtwigParserBuilder() {
+        return new JtwigParser.Builder().withConfiguration(getParserConfiguration());
     }
 
     @SuppressWarnings("serial")
