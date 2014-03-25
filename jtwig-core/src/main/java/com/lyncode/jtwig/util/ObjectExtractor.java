@@ -51,7 +51,7 @@ public class ObjectExtractor {
             if (result.hasResult()) return result.getResult();
         }
 
-        throw new ExtractException("Unable to find field or method "+name+" in "+context);
+        throw new ExtractException("Unable to find field or method '"+name+"' in "+context);
     }
 
     private Callable tryKnownType() {

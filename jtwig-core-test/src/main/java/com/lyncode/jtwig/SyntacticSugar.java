@@ -14,6 +14,11 @@
 
 package com.lyncode.jtwig;
 
+import org.hamcrest.Matcher;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.AllOf.allOf;
+
 public class SyntacticSugar {
     public static <T> T when (T value) {
         return value;
@@ -23,5 +28,9 @@ public class SyntacticSugar {
     }
     public static <T> T after (T value) {
         return value;
+    }
+
+    public static <T> void then (T actual, Matcher<? super T>... matchers) {
+        assertThat(actual, allOf(matchers));
     }
 }
