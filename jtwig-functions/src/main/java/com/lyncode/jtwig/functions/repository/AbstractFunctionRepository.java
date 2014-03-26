@@ -33,6 +33,8 @@ import com.lyncode.jtwig.functions.internal.string.*;
 import java.util.HashMap;
 import java.util.Map;
 
+import static java.lang.String.format;
+
 public abstract class AbstractFunctionRepository {
     private Map<String, JtwigFunction> functionMap = new HashMap<String, JtwigFunction>();
 
@@ -135,7 +137,8 @@ public abstract class AbstractFunctionRepository {
     }
 
     public JtwigFunction retrieve (String functionName) throws FunctionNotFoundException {
-        if (!functionMap.containsKey(functionName)) throw new FunctionNotFoundException();
+        if (!functionMap.containsKey(functionName))
+            throw new FunctionNotFoundException(format("Function with name %s not found", functionName));
         return functionMap.get(functionName);
     }
 }
