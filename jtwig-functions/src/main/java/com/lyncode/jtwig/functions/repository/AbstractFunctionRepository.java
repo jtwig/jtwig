@@ -82,6 +82,7 @@ public abstract class AbstractFunctionRepository {
                 new Last(),
                 new JsonEncode(),
                 new Reverse(),
+                new Range(),
 
                 // Boolean functions
                 new Empty(),
