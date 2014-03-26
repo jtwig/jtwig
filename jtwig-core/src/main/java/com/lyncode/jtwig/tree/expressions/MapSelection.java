@@ -16,9 +16,12 @@ package com.lyncode.jtwig.tree.expressions;
 
 import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.exception.CalculateException;
+import com.lyncode.jtwig.functions.types.Undefined;
 import com.lyncode.jtwig.tree.api.Expression;
 
 import java.util.Map;
+
+import static com.lyncode.jtwig.functions.types.Undefined.UNDEFINED;
 
 public class MapSelection implements Expression {
     private Variable variable;
@@ -32,8 +35,17 @@ public class MapSelection implements Expression {
     @Override
     public Object calculate(JtwigContext context) throws CalculateException {
         Object resolved = variable.calculate(context);
-        if (resolved instanceof Map)
-            return ((Map) resolved).get(key.calculate(context));
+        Object keyValue = this.key.calculate(context);
+
+        if (keyValue instanceof Undefined)
+            throw new CalculateException("Given key is undefined");
+
+        if (resolved instanceof Map) {
+            Map map = (Map) resolved;
+            if (map.containsKey(keyValue))
+                return map.get(keyValue);
+            else return UNDEFINED;
+        }
         else
             throw new CalculateException("Invalid input. Should be given a Map but a "+resolved.getClass().getName()+" was given.");
     }

@@ -22,11 +22,11 @@ import com.lyncode.jtwig.tree.expressions.Composition;
 import com.lyncode.jtwig.tree.expressions.OperationBinary;
 import com.lyncode.jtwig.tree.expressions.Operator;
 import com.lyncode.jtwig.tree.expressions.Selection;
-import com.lyncode.jtwig.util.BooleanOperations;
 import com.lyncode.jtwig.util.MathOperations;
 import com.lyncode.jtwig.util.RelationalOperations;
 
-import static com.lyncode.jtwig.util.BooleanOperations.isTrue;
+import static com.lyncode.jtwig.util.BooleanOperations.*;
+import static com.lyncode.jtwig.util.RelationalOperations.*;
 
 public class StrictBinaryOperation implements Expression {
     private Operator operator;
@@ -72,13 +72,13 @@ public class StrictBinaryOperation implements Expression {
         Object rightResolved = right.calculate(resolver);
         switch (operator) {
             case GT:
-                return RelationalOperations.gt(leftResolved, rightResolved);
+                return gt(leftResolved, rightResolved);
             case GTE:
-                return RelationalOperations.gte(leftResolved, rightResolved);
+                return gte(leftResolved, rightResolved);
             case LT:
-                return RelationalOperations.lt(leftResolved, rightResolved);
+                return lt(leftResolved, rightResolved);
             case LTE:
-                return RelationalOperations.lte(leftResolved, rightResolved);
+                return lte(leftResolved, rightResolved);
             case EQUAL:
                 return RelationalOperations.eq(leftResolved, rightResolved);
             case DIFF:
@@ -107,9 +107,9 @@ public class StrictBinaryOperation implements Expression {
     private Object booleanExecute(JtwigContext resolver) throws CalculateException {
         switch (operator) {
             case AND:
-                return BooleanOperations.and(left.calculate(resolver), right.calculate(resolver));
+                return and(left.calculate(resolver), right.calculate(resolver));
             case OR:
-                return BooleanOperations.or(left.calculate(resolver), right.calculate(resolver));
+                return or(left.calculate(resolver), right.calculate(resolver));
         }
         throw new CalculateException("Unknown operator " + operator.toString());
     }

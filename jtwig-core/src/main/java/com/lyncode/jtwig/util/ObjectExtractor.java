@@ -22,6 +22,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
 
+import static com.lyncode.jtwig.functions.types.Undefined.UNDEFINED;
 import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.getAllMethods;
@@ -50,7 +51,7 @@ public class ObjectExtractor {
             if (result.hasResult()) return result.getResult();
         }
 
-        throw new ExtractException("Unable to find field or method '"+name+"' in "+context);
+        return UNDEFINED;
     }
 
     private Callable tryKnownType() {
@@ -99,6 +100,8 @@ public class ObjectExtractor {
         return new Predicate<Field>() {
             @Override
             public boolean apply(@Nullable Field field) {
+
+
                 if (field == null) return false;
                 return equalToIgnoringCase(name).matches(field.getName());
             }
