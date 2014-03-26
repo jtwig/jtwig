@@ -20,6 +20,7 @@ import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.exception.CalculateException;
 import com.lyncode.jtwig.tree.api.Expression;
 import com.lyncode.jtwig.util.BooleanOperations;
+import com.lyncode.jtwig.util.MathOperations;
 
 public class OperationUnary implements Expression {
     private Operator operator;
@@ -51,6 +52,8 @@ public class OperationUnary implements Expression {
         switch (operator) {
             case NOT:
                 return BooleanOperations.not(operand.calculate(context));
+            case SUB:
+                return MathOperations.mul(-1, operand.calculate(context));
         }
         throw new CalculateException("Unknown operator "+operator);
     }
