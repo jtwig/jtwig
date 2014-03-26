@@ -23,6 +23,7 @@ import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.ParseException;
 import com.lyncode.jtwig.exception.RenderException;
 import com.lyncode.jtwig.resource.ClasspathJtwigResource;
+import com.lyncode.jtwig.resource.JtwigResource;
 
 import java.io.ByteArrayOutputStream;
 
@@ -62,7 +63,7 @@ public class AbstractJtwigTest {
         return new ClasspathJtwigResource(resource);
     }
 
-    protected String jtwigRenders(ClasspathJtwigResource resource) throws ParseException, CompileException, RenderException {
+    protected String jtwigRenders(JtwigResource resource) throws ParseException, CompileException, RenderException {
         this.output = new JtwigTemplate(resource).output(theContext());
         return output;
     }

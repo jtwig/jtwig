@@ -397,20 +397,24 @@ public class JtwigExpressionParser extends BaseParser<Expression> {
     }
 
     Rule operator(Operator operator) {
-        if (operator == MOD) {
-            return Sequence(
-                    basic.terminal(operator.toString()),
-                    TestNot(basic.symbol(CLOSE_CURLY_BRACKET)),
-                    push(new Constant<Operator>(operator)),
-                    basic.spacing()
-            );
-        } else {
-            return Sequence(
-                    basic.terminal(operator.toString()),
-                    push(new Constant<Operator>(operator)),
-                    basic.spacing()
-            );
-        }
+        return Sequence(
+                TestNot(
+                        FirstOf(
+                                basic.closeCode(),
+                                basic.symbol(CLOSE_OUTPUT)
+                        )
+                ),
+                basic.terminal(operator.toString()),
+                conditionalSpace(operator.toString()),
+                push(new Constant<>(operator)),
+                basic.spacing()
+        );
+    }
+
+    Rule conditionalSpace(String string) {
+        if (string.matches("[a-zA-Z_$][a-zA-Z0-9_$]*"))
+            return AnyOf(" \t\r\n\f");
+        return Test(true);
     }
 
     Rule binary(Rule first, Rule rest, Operator... operators) {
