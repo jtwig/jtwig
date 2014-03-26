@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-package com.lyncode.jtwig.test.inheritance;
+package com.lyncode.jtwig.test.bugs;
 
 import com.lyncode.jtwig.test.AbstractJtwigTest;
 import org.junit.Test;

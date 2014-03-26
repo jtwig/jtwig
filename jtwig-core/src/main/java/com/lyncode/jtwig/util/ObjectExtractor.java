@@ -19,7 +19,6 @@ import org.hamcrest.Matcher;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 
@@ -51,7 +50,7 @@ public class ObjectExtractor {
             if (result.hasResult()) return result.getResult();
         }
 
-        throw new ExtractException("Unable to find field or method "+name+" in "+context);
+        throw new ExtractException("Unable to find field or method '"+name+"' in "+context);
     }
 
     private Callable tryKnownType() {
@@ -125,15 +124,17 @@ public class ObjectExtractor {
                 if (methods.isEmpty()) return new Result<Object>();
                 else {
                     Iterator<Method> iterator = methods.iterator();
+                    Exception thrown = null;
                     while (iterator.hasNext()) {
                         try {
                             return new Result<Object>(iterator.next().invoke(context, args));
-                        } catch (InvocationTargetException e) {
-                            throw new ExtractException(e);
-                        } catch (IllegalAccessException e) {
-                            // do nothing
+                        } catch (Exception e) {
+                            thrown = e;
                         }
                     }
+
+                    if (thrown != null)
+                        throw new ExtractException(thrown);
                 }
 
                 return new Result<Object>();
