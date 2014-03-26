@@ -22,7 +22,6 @@ import org.parboiled.Rule;
 
 import static com.lyncode.jtwig.parser.JtwigKeyword.*;
 import static com.lyncode.jtwig.parser.JtwigSymbol.DOT;
-import static com.lyncode.jtwig.parser.JtwigSymbol.MINUS;
 import static org.parboiled.Parboiled.createParser;
 
 public class JtwigConstantParser extends BaseParser<Constant> {
@@ -68,10 +67,7 @@ public class JtwigConstantParser extends BaseParser<Constant> {
 
     public Rule integerValue() {
         return Sequence(
-                Sequence(
-                        Optional(basic.symbol(MINUS)),
-                        OneOrMore(basic.digit())
-                ),
+                OneOrMore(basic.digit()),
                 push(new Constant<>(Integer.parseInt(match())))
         );
     }
@@ -79,7 +75,6 @@ public class JtwigConstantParser extends BaseParser<Constant> {
     public Rule doubleValue() {
         return Sequence(
                 Sequence(
-                        Optional(basic.symbol(MINUS)),
                         OneOrMore(basic.digit()),
                         basic.symbol(DOT),
                         OneOrMore(basic.digit())
