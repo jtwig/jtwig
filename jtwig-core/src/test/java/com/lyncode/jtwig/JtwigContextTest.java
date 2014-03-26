@@ -31,13 +31,18 @@ public class JtwigContextTest {
 
     @Test
     public void shouldResolveVariable() throws Exception {
-        when(modelMap.get("name")).thenReturn("joao");
+        addItem("name", "joao");
         assertThat(new Variable("name").calculate(context), is((Object) "joao"));
+    }
+
+    private void addItem(String key, Object value) {
+        when(modelMap.get(key)).thenReturn(value);
+        when(modelMap.containsKey(key)).thenReturn(true);
     }
 
     @Test
     public void shouldResolveComposition() throws Exception {
-        when(modelMap.get("name")).thenReturn(new ArrayList<Object>());
+        addItem("name", new ArrayList<Object>());
         Selection selection = new Selection(
                 new Variable("name"),
                 new Variable("size")
