@@ -19,6 +19,8 @@ import com.lyncode.jtwig.functions.exceptions.FunctionNotFoundException;
 import com.lyncode.jtwig.functions.repository.AbstractFunctionRepository;
 import com.lyncode.jtwig.functions.repository.DefaultFunctionRepository;
 
+import static com.lyncode.jtwig.functions.types.Undefined.UNDEFINED;
+
 public class JtwigContext {
 
     private static final String MODEL = "model";
@@ -62,8 +64,12 @@ public class JtwigContext {
     public Object map(String key) {
         if (MODEL.equals(key))
             return modelMap;
-        else
-            return modelMap.get(key);
+        else {
+            if (modelMap.containsKey(key))
+                return modelMap.get(key);
+            else
+                return UNDEFINED;
+        }
     }
 
     public void set(String key, Object value) {

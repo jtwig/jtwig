@@ -17,19 +17,19 @@ package com.lyncode.jtwig.util;
 import static com.lyncode.jtwig.util.MathOperations.*;
 
 public class RelationalOperations {
-    public static Object gt (Object a, Object b) {
+    public static boolean gt (Object a, Object b) {
         if (areDouble(a, b)) return toDouble(a) > toDouble(b);
         else return toInt(a) > toInt(b);
     }
-    public static Object gte (Object a, Object b) {
+    public static boolean gte (Object a, Object b) {
         if (areDouble(a, b)) return toDouble(a) >= toDouble(b);
         else return toInt(a) >= toInt(b);
     }
-    public static Object lt (Object a, Object b) {
+    public static boolean lt (Object a, Object b) {
         if (areDouble(a, b)) return toDouble(a) < toDouble(b);
         else return toInt(a) < toInt(b);
     }
-    public static Object lte (Object a, Object b) {
+    public static boolean lte (Object a, Object b) {
         if (areDouble(a, b)) return toDouble(a) <= toDouble(b);
         else return toInt(a) <= toInt(b);
     }

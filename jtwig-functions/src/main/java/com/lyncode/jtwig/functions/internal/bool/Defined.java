@@ -17,6 +17,7 @@ package com.lyncode.jtwig.functions.internal.bool;
 import com.lyncode.jtwig.functions.JtwigFunction;
 import com.lyncode.jtwig.functions.annotations.JtwigFunctionDeclaration;
 import com.lyncode.jtwig.functions.exceptions.FunctionException;
+import com.lyncode.jtwig.functions.types.Undefined;
 
 import static com.lyncode.jtwig.functions.util.Requirements.requires;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -28,6 +29,6 @@ public class Defined implements JtwigFunction {
         requires(arguments)
                 .withNumberOfArguments(equalTo(1));
 
-        return arguments[0] != null;
+        return arguments[0] != null && !(arguments[0] instanceof Undefined);
     }
 }

@@ -14,18 +14,20 @@
 
 package com.lyncode.jtwig.util;
 
+import com.lyncode.jtwig.functions.types.Undefined;
+
 import java.util.Map;
 
 public class BooleanOperations {
-    public static Object and (Object a, Object b) {
+    public static boolean and (Object a, Object b) {
         return isTrue(a) && isTrue(b);
     }
 
-    public static Object or (Object a, Object b) {
+    public static boolean or (Object a, Object b) {
         return isTrue(a) || isTrue(b);
     }
 
-    public static Object not (Object a) {
+    public static boolean not (Object a) {
         return !isTrue(a);
     }
 
@@ -33,6 +35,7 @@ public class BooleanOperations {
 
     public static boolean isTrue(Object obj) {
         if (obj != null) {
+            if (obj instanceof Undefined) return false;
             if (obj instanceof Boolean) return (Boolean) obj;
             if (obj instanceof Integer) return ((Integer) obj) != 0;
             if (obj instanceof Double) return ((Double) obj) != 0;
