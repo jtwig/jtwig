@@ -3,7 +3,7 @@
     <parent>
         <artifactId>jtwig</artifactId>
         <groupId>com.lyncode</groupId>
-        <version>2.1.4-SNAPSHOT</version>
+        <version>2.1.4</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
