@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-package com.lyncode.jtwig.test.bugs;
+package com.lyncode.jtwig.test.issues;
 
 import com.lyncode.jtwig.test.AbstractJtwigTest;
 import org.junit.Test;

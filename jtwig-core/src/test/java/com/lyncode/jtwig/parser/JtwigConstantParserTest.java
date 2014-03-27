@@ -34,8 +34,8 @@ public class JtwigConstantParserTest {
 
     @Test
     public void integerValue() throws Exception {
-        Integer integer = theResult("-1", underTest.integerValue(), Integer.class);
-        assertThat(integer, is(equalTo(-1)));
+        Integer integer = theResult("1", underTest.integerValue(), Integer.class);
+        assertThat(integer, is(equalTo(1)));
     }
 
     @Test

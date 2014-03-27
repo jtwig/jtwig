@@ -88,7 +88,8 @@ public class JtwigExpressionParser extends BaseParser<Expression> {
         return binary(
                 FirstOf(
                         negation(),
-                        addition()
+                        addition(),
+                        negative()
                 ),
                 Operator.LTE,
                 Operator.GTE,
@@ -102,6 +103,13 @@ public class JtwigExpressionParser extends BaseParser<Expression> {
         return unary(
                 addition(),
                 Operator.NOT
+        );
+    }
+
+    Rule negative() {
+        return unary(
+                addition(),
+                Operator.SUB
         );
     }
 
@@ -249,7 +257,7 @@ public class JtwigExpressionParser extends BaseParser<Expression> {
         return Sequence(
                 variable(),
                 variable(),
-                push(new FunctionElement(popVariableName(1)+" "+popVariableName())),
+                push(new FunctionElement(popVariableName(1) + " " + popVariableName())),
                 mandatory(
                         Sequence(
                                 expression(),
@@ -263,6 +271,10 @@ public class JtwigExpressionParser extends BaseParser<Expression> {
     Rule functionWithoutBrackets() {
         return Sequence(
                 variable(),
+                TestNot(
+                        basic.spacing(),
+                        basic.terminal(SUB.toString())
+                ),
                 expression(),
                 push(new FunctionElement(popVariableName(1), pop()))
         );
