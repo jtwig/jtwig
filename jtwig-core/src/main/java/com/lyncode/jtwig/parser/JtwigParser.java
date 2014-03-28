@@ -396,7 +396,7 @@ public class JtwigParser extends BaseParser<Content> {
                                 keyword(ENDEMBED),
                                 closeCode()
                         ),
-                        new ParseException("Wrong include Syntax")
+                        new ParseException("Wrong embed syntax")
                 )
         );
     }
