@@ -1,0 +1,6 @@
+{% embed 'fraction.twig' %}
+    {% block denominator %}{% embed 'fraction.twig' %}
+            {% block numerator %}(4{% endblock %}
+            {% block denominator %}2){% endblock %}
+        {% endembed %}{% endblock %}
+{% endembed %}
