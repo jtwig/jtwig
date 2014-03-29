@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.lyncode.jtwig.tree.structural;
+package com.lyncode.jtwig.tree.content;
 
 import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.exception.CompileException;
@@ -22,58 +22,40 @@ import com.lyncode.jtwig.exception.RenderException;
 import com.lyncode.jtwig.parser.JtwigParser;
 import com.lyncode.jtwig.resource.JtwigResource;
 import com.lyncode.jtwig.tree.api.Content;
-import com.lyncode.jtwig.tree.api.Tag;
-import com.lyncode.jtwig.tree.api.TagInformation;
-import com.lyncode.jtwig.tree.content.JtwigContent;
 import com.lyncode.jtwig.tree.helper.RenderStream;
+import com.lyncode.jtwig.tree.structural.Block;
 
-import java.io.OutputStream;
+import java.io.IOException;
 
-public class Concurrent implements Content, Tag {
+public class JtwigRootContent implements Content {
 
-    private JtwigContent content;
-    private TagInformation begin = new TagInformation();
-    private TagInformation end = new TagInformation();
+    private Content content;
 
-    public Concurrent() {
-    }
-
-    public Content getContent() {
-        return content;
-    }
-
-    public boolean setContent(JtwigContent content) {
+    public JtwigRootContent(Content content) {
         this.content = content;
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "Concurrent";
     }
 
     @Override
     public boolean render(RenderStream renderStream, JtwigContext context) throws RenderException {
+        content.render(renderStream, context);
+        renderStream.waitForExecutorCompletion();
+        try {
+            renderStream.close();
+            renderStream.merge();
+        } catch (IOException e) {
+            throw new RenderException(e);
+        }
         return true;
     }
 
     @Override
-    public Concurrent compile(JtwigParser parser, JtwigResource resource) throws CompileException {
+    public Content compile(JtwigParser parser, JtwigResource resource) throws CompileException {
+        content = content.compile(parser, resource);
         return this;
     }
 
     @Override
     public boolean replace(Block expression) throws CompileException {
-        return false;
-    }
-
-    @Override
-    public TagInformation begin() {
-        return begin;
-    }
-
-    @Override
-    public TagInformation end() {
-        return end;
+        return content.replace(expression);
     }
 }

@@ -27,6 +27,7 @@ import com.lyncode.jtwig.tree.api.TagInformation;
 import com.lyncode.jtwig.tree.helper.RenderStream;
 import com.lyncode.jtwig.tree.structural.Block;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,6 +41,11 @@ public class JtwigContent implements Content {
         for (Content content : contents) {
             content.render(renderStream, context);
         }
+//        try {
+//            renderStream.merge();
+//        } catch (IOException e) {
+//            throw new RenderException(e);
+//        }
         return true;
     }
 
@@ -53,11 +59,13 @@ public class JtwigContent implements Content {
             Content content = contents.get(i);
             if (content instanceof Text) {
                 Text text = (Text) content;
-                if (mustTrimLeft(i, begin))
-                        text.trimLeft();
+                if (mustTrimLeft(i, begin)) {
+                    text.trimLeft();
+                }
 
-                if (mustTrimRight(i, end))
+                if (mustTrimRight(i, end)) {
                     text.trimRight();
+                }
             }
             contents.set(i, content.compile(parser, resource));
         }
@@ -65,19 +73,32 @@ public class JtwigContent implements Content {
     }
 
     private boolean mustTrimLeft(int position, TagInformation value) {
-        if (value.hasRight(Trim)) return true;
-        if (position <= 0) return false;
+        if (value.hasRight(Trim)) {
+            return true;
+        }
+        if (position <= 0) {
+            return false;
+        }
         Content before = contents.get(position - 1);
-        if (!(before instanceof Tag)) return false;
+        if (!(before instanceof Tag)) {
+            return false;
+        }
 
         Tag tag = (Tag) before;
         return tag.end().hasRight(Trim);
     }
+
     private boolean mustTrimRight(int position, TagInformation value) {
-        if (value.hasLeft(Trim)) return true;
-        if (position >= contents.size() - 1) return false;
+        if (value.hasLeft(Trim)) {
+            return true;
+        }
+        if (position >= contents.size() - 1) {
+            return false;
+        }
         Content after = contents.get(position + 1);
-        if (!(after instanceof Tag)) return false;
+        if (!(after instanceof Tag)) {
+            return false;
+        }
 
         Tag tag = (Tag) after;
         return tag.begin().hasLeft(Trim);
@@ -93,8 +114,9 @@ public class JtwigContent implements Content {
                     contents.set(i, expression.getContent());
                     replaced = true;
                 }
-            } else
+            } else {
                 replaced = replaced || contents.get(i).replace(expression);
+            }
         }
         return replaced;
     }
@@ -102,5 +124,9 @@ public class JtwigContent implements Content {
     public JtwigContent add(Content content) {
         contents.add(content);
         return this;
+    }
+
+    protected List<Content> getContents() {
+        return contents;
     }
 }
