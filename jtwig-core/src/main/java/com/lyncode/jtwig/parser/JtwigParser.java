@@ -14,8 +14,6 @@
 
 package com.lyncode.jtwig.parser;
 
-<<<<<<< HEAD
-=======
 import com.lyncode.jtwig.addons.concurrent.ConcurrentParser;
 import com.lyncode.jtwig.addons.spaceless.SpacelessParser;
 >>>>>>> working concurrent feature
@@ -79,18 +77,13 @@ public class JtwigParser extends BaseParser<Content> {
             return this;
         }
 
-<<<<<<< HEAD
         public Builder withConfiguration (ParserConfiguration configuration) {
             this.configuration = configuration;
             return this;
         }
 
         public JtwigParser build () {
-            return newParser(configuration, emptyAddons, contentAddons);
-=======
-        public JtwigParser build() {
-            return newParser(emptyAddons, contentAddons);
->>>>>>> working concurrent feature
+            return newParser(configuration, emptyAddons, contentAddons);Addons, contentAddons);
         }
     }
 
