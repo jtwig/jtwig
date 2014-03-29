@@ -18,6 +18,7 @@ package com.lyncode.jtwig.addons.spaceless;
 
 import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.JtwigTemplate;
+import com.lyncode.jtwig.test.addons.spaceless.AbstractAddonTest;
 import org.junit.Test;
 
 import java.util.ArrayList;

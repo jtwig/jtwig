@@ -15,8 +15,6 @@
 package com.lyncode.jtwig.parser;
 
 import com.lyncode.jtwig.addons.concurrent.ConcurrentParser;
-import com.lyncode.jtwig.addons.spaceless.SpacelessParser;
->>>>>>> working concurrent feature
 import com.lyncode.jtwig.exception.ParseBypassException;
 import com.lyncode.jtwig.exception.ParseException;
 import com.lyncode.jtwig.exception.ResourceException;
@@ -83,7 +81,7 @@ public class JtwigParser extends BaseParser<Content> {
         }
 
         public JtwigParser build () {
-            return newParser(configuration, emptyAddons, contentAddons);Addons, contentAddons);
+            return newParser(configuration, emptyAddons, contentAddons);
         }
     }
 

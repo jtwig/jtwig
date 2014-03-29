@@ -117,8 +117,8 @@ public class RenderStream {
 
     public RenderStream merge() throws IOException {
         lockOutputChange();
-        RenderIndex index = renderStreamIndex.clone();
-        if (multiOuputStream.isClosed(index)) {
+        if (renderStreamIndex != null && multiOuputStream.isClosed(renderStreamIndex)) {
+            RenderIndex index = renderStreamIndex.clone();
             RenderIndex previous = index.previous();
             RenderIndex toMerge = index;
             while (!index.isRoot()) {

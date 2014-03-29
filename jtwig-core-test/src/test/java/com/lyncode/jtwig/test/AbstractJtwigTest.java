@@ -24,23 +24,25 @@ import com.lyncode.jtwig.parser.JtwigParser;
 import com.lyncode.jtwig.resource.ClasspathJtwigResource;
 import com.lyncode.jtwig.resource.JtwigResource;
 import com.lyncode.jtwig.resource.StringJtwigResource;
+import com.lyncode.jtwig.tree.helper.RenderStream;
 
 import java.io.ByteArrayOutputStream;
 
 public class AbstractJtwigTest {
+
     private JtwigParser.Builder parserBuilder = new JtwigParser.Builder();
     private JtwigContext context = new JtwigContext();
     private String output;
 
     protected String theResultOfRendering(JtwigTemplate template, JtwigContext context) throws Exception {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        template.compile(parserBuilder).render(outputStream, context);
+        template.compile(parserBuilder).render(new RenderStream(outputStream), context);
         return outputStream.toString();
     }
 
     protected String theResultOfRendering(JtwigTemplate template) throws Exception {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        template.compile(parserBuilder).render(outputStream, context);
+        template.compile(parserBuilder).render(new RenderStream(outputStream), context);
         return outputStream.toString();
     }
 
@@ -48,15 +50,15 @@ public class AbstractJtwigTest {
         return new JtwigTemplate(content);
     }
 
-    protected JtwigParser.Builder theParser () {
+    protected JtwigParser.Builder theParser() {
         return this.parserBuilder;
     }
 
-    protected JtwigResourceBuilder resource () {
+    protected JtwigResourceBuilder resource() {
         return new JtwigResourceBuilder();
     }
 
-    protected JtwigContext theContext () {
+    protected JtwigContext theContext() {
         return context;
     }
 
@@ -68,13 +70,13 @@ public class AbstractJtwigTest {
         return new ClasspathJtwigResource(resource);
     }
 
-    protected JtwigResource template (String template) {
+    protected JtwigResource template(String template) {
         return new StringJtwigResource(template);
     }
 
     protected String jtwigRenders(JtwigResource resource) throws ParseException, CompileException, RenderException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        new JtwigTemplate(resource).compile(parserBuilder).render(outputStream, theContext());
+        new JtwigTemplate(resource).compile(parserBuilder).render(new RenderStream(outputStream), theContext());
         this.output = outputStream.toString();
         return output;
     }
