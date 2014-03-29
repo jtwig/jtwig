@@ -14,6 +14,11 @@
 
 package com.lyncode.jtwig.parser;
 
+<<<<<<< HEAD
+=======
+import com.lyncode.jtwig.addons.concurrent.ConcurrentParser;
+import com.lyncode.jtwig.addons.spaceless.SpacelessParser;
+>>>>>>> working concurrent feature
 import com.lyncode.jtwig.exception.ParseBypassException;
 import com.lyncode.jtwig.exception.ParseException;
 import com.lyncode.jtwig.exception.ResourceException;
@@ -60,19 +65,21 @@ public class JtwigParser extends BaseParser<Content> {
         private List<Class<? extends JtwigContentAddonParser>> contentAddons = new ArrayList<>();
 
         public Builder() {
-            contentAddons
-                    .add(SpacelessParser.class);
+            this.withContentAddon(SpacelessParser.class)
+                    .withContentAddon(ConcurrentParser.class);
         }
 
-        public Builder withEmptyAddon (Class<? extends JtwigEmptyContentAddonParser> parserType) {
+        public Builder withEmptyAddon(Class<? extends JtwigEmptyContentAddonParser> parserType) {
             emptyAddons.add(parserType);
             return this;
         }
-        public Builder withContentAddon (Class<? extends JtwigContentAddonParser> parserType) {
+
+        public Builder withContentAddon(Class<? extends JtwigContentAddonParser> parserType) {
             contentAddons.add(parserType);
             return this;
         }
 
+<<<<<<< HEAD
         public Builder withConfiguration (ParserConfiguration configuration) {
             this.configuration = configuration;
             return this;
@@ -80,6 +87,10 @@ public class JtwigParser extends BaseParser<Content> {
 
         public JtwigParser build () {
             return newParser(configuration, emptyAddons, contentAddons);
+=======
+        public JtwigParser build() {
+            return newParser(emptyAddons, contentAddons);
+>>>>>>> working concurrent feature
         }
     }
 
@@ -93,7 +104,7 @@ public class JtwigParser extends BaseParser<Content> {
         return createParser(JtwigParser.class, configuration, emptyAddons, contentAddons);
     }
 
-    public static JtwigDocument parse (Builder builder, JtwigResource input) throws ParseException {
+    public static JtwigDocument parse(Builder builder, JtwigResource input) throws ParseException {
         return parse(builder.build(), input);
     }
 
@@ -107,8 +118,9 @@ public class JtwigParser extends BaseParser<Content> {
                 ParseException innerException = ((ParseBypassException) e.getCause()).getInnerException();
                 innerException.setExpression(e.getMessage());
                 throw innerException;
-            } else
+            } else {
                 throw new ParseException(e);
+            }
         } catch (ResourceException e) {
             throw new ParseException(e);
         }
@@ -129,11 +141,13 @@ public class JtwigParser extends BaseParser<Content> {
 
         noContentAddonParsers = new JtwigEmptyContentAddonParser[emptyAddons.size()];
         contentAddonParsers = new JtwigContentAddonParser[contentAddons.size()];
-        for (int i = 0;i<emptyAddons.size();i++)
+        for (int i = 0; i < emptyAddons.size(); i++) {
             noContentAddonParsers[i] = (JtwigEmptyContentAddonParser) createParser(emptyAddons.get(i));
+        }
 
-        for (int i = 0;i<contentAddons.size();i++)
+        for (int i = 0; i < contentAddons.size(); i++) {
             contentAddonParsers[i] = (JtwigContentAddonParser) createParser(contentAddons.get(i));
+        }
     }
 
     public Rule start() {
@@ -169,7 +183,6 @@ public class JtwigParser extends BaseParser<Content> {
                 )
         );
     }
-
 
     Rule normalTemplate() {
         return Sequence(
@@ -222,10 +235,11 @@ public class JtwigParser extends BaseParser<Content> {
     }
 
     Rule keywordsContent() {
-        if (contentAddonParsers.length == 0)
+        if (contentAddonParsers.length == 0) {
             return Test(false);
+        }
         Rule[] rules = new Rule[contentAddonParsers.length];
-        for (int i=0;i<contentAddonParsers.length;i++) {
+        for (int i = 0; i < contentAddonParsers.length; i++) {
             rules[i] = FirstOf(
                     basicParser.terminal(contentAddonParsers[i].beginKeyword()),
                     basicParser.terminal(contentAddonParsers[i].endKeyword())
@@ -235,11 +249,13 @@ public class JtwigParser extends BaseParser<Content> {
     }
 
     Rule contentParsers() {
-        if (contentAddonParsers.length == 0)
+        if (contentAddonParsers.length == 0) {
             return Test(false);
+        }
         Rule[] rules = new Rule[contentAddonParsers.length];
-        for (int i=0;i<contentAddonParsers.length;i++)
+        for (int i = 0; i < contentAddonParsers.length; i++) {
             rules[i] = contentAddon(contentAddonParsers[i]);
+        }
         return FirstOf(rules);
     }
 
@@ -267,24 +283,26 @@ public class JtwigParser extends BaseParser<Content> {
                                 closeCode(),
                                 doIt(peek(JtwigContentAddon.class).end().addToRight(tagPropertyParser.getCurrentProperty()))
                         ),
-                        new ParseException("Wrong syntax for "+parser.beginKeyword())
+                        new ParseException("Wrong syntax for " + parser.beginKeyword())
                 )
         );
     }
 
     Rule keywordEmptyContent() {
-        if (noContentAddonParsers.length == 0)
+        if (noContentAddonParsers.length == 0) {
             return Test(false);
+        }
         Rule[] rules = new Rule[noContentAddonParsers.length];
-        for (int i = 0;i<noContentAddonParsers.length;i++)
+        for (int i = 0; i < noContentAddonParsers.length; i++) {
             rules[i] = basicParser.terminal(noContentAddonParsers[i].keyword());
+        }
         return FirstOf(rules);
     }
 
     Rule emptyContentParsers() {
         List<Rule> rules = new ArrayList<>();
 //        if (noContentAddonParsers.isEmpty())
-            return Test(false);
+        return Test(false);
 //        for (JtwigEmptyContentAddonParser parser : noContentAddonParsers)
 //            rules.add(noContentAddon(parser));
 //        return FirstOf(rules.toArray(new Rule[rules.size()]));

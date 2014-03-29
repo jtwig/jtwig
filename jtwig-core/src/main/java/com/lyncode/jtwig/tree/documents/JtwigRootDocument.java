@@ -20,10 +20,9 @@ import com.lyncode.jtwig.exception.RenderException;
 import com.lyncode.jtwig.parser.JtwigParser;
 import com.lyncode.jtwig.resource.JtwigResource;
 import com.lyncode.jtwig.tree.api.Content;
+import com.lyncode.jtwig.tree.content.JtwigRootContent;
 import com.lyncode.jtwig.tree.helper.RenderStream;
 import com.lyncode.jtwig.tree.structural.Block;
-
-import java.io.OutputStream;
 
 public class JtwigRootDocument implements JtwigDocument {
     private Content content;
@@ -43,7 +42,7 @@ public class JtwigRootDocument implements JtwigDocument {
 
     @Override
     public Content compile(JtwigParser parser, JtwigResource resource) throws CompileException {
-        return content.compile(parser, resource);
+        return new JtwigRootContent(content.compile(parser, resource));
     }
 
     @Override

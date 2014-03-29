@@ -22,11 +22,11 @@ import com.lyncode.jtwig.exception.ResourceException;
 import com.lyncode.jtwig.parser.JtwigParser;
 import com.lyncode.jtwig.resource.JtwigResource;
 import com.lyncode.jtwig.tree.api.Content;
+import com.lyncode.jtwig.tree.content.JtwigRootContent;
 import com.lyncode.jtwig.tree.helper.RenderStream;
 import com.lyncode.jtwig.tree.structural.Block;
 import com.lyncode.jtwig.tree.structural.Extends;
 
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,7 +62,7 @@ public class JtwigExtendsDocument implements JtwigDocument {
                 content.replace(expression);
             }
 
-            return content;
+            return new JtwigRootContent(content);
         } catch (ResourceException e) {
             throw new CompileException(e);
         } catch (ParseException e) {
