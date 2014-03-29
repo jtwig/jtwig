@@ -187,6 +187,7 @@ public class JtwigParser extends BaseParser<Content> {
                                 addToContent(output()),
                                 addToContent(block()),
                                 addToContent(include()),
+                                addToContent(embed()),
                                 addToContent(forEach()),
                                 addToContent(ifCondition()),
                                 addToContent(set()),
@@ -371,6 +372,31 @@ public class JtwigParser extends BaseParser<Content> {
                                 doIt(peek(Include.class).end().addToRight(tagPropertyParser.getCurrentProperty()))
                         ),
                         new ParseException("Wrong include syntax")
+                )
+        );
+    }
+
+    Rule embed() {
+        return Sequence(
+                openCode(),
+                keyword(EMBED),
+                mandatory(
+                        Sequence(
+                                basicParser.stringLiteral(),
+                                basicParser.spacing(),
+                                closeCode(),
+                                push(new JtwigExtendsDocument(new Extends(basicParser.pop()))),
+                                ZeroOrMore(
+                                        basicParser.spacing(),
+                                        block(),
+                                        ((JtwigExtendsDocument) peek(1)).add((Block) pop())
+                                ),
+                                basicParser.spacing(),
+                                openCode(),
+                                keyword(ENDEMBED),
+                                closeCode()
+                        ),
+                        new ParseException("Wrong embed syntax")
                 )
         );
     }

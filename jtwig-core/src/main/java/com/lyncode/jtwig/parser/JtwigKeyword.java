@@ -37,6 +37,9 @@ public enum JtwigKeyword {
     EXTENDS("extends"),
     IMPORT("import"),
 
+    EMBED("embed"),
+    ENDEMBED("endembed"),
+
     AND("and"),
     OR("or"),
     NULL("null"),
