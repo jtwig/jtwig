@@ -1,4 +1,6 @@
 /**
+ * Copyright 2012 Lyncode
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.lyncode.jtwig.tree.structural;
+package com.lyncode.jtwig.tree.content;
 
 import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.exception.CompileException;
@@ -20,63 +22,40 @@ import com.lyncode.jtwig.exception.RenderException;
 import com.lyncode.jtwig.parser.JtwigParser;
 import com.lyncode.jtwig.resource.JtwigResource;
 import com.lyncode.jtwig.tree.api.Content;
-import com.lyncode.jtwig.tree.api.Tag;
-import com.lyncode.jtwig.tree.api.TagInformation;
-import com.lyncode.jtwig.tree.content.JtwigContent;
 import com.lyncode.jtwig.tree.helper.RenderStream;
+import com.lyncode.jtwig.tree.structural.Block;
 
-public class Block implements Content, Tag {
-    private String name;
+import java.io.IOException;
 
-    private JtwigContent content;
-    private TagInformation begin = new TagInformation();
-    private TagInformation end = new TagInformation();
+public class JtwigRootContent implements Content {
 
-    public Block(String name) {
-        this.name = name;
-    }
+    private Content content;
 
-    public String getName() {
-        return name;
-    }
-
-    public Content getContent() {
-        return content;
-    }
-
-    public boolean setContent(JtwigContent content) {
+    public JtwigRootContent(Content content) {
         this.content = content;
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "Block "+getName();
     }
 
     @Override
     public boolean render(RenderStream renderStream, JtwigContext context) throws RenderException {
-        return content.render(renderStream, context);
+        content.render(renderStream, context);
+        renderStream.waitForExecutorCompletion();
+        try {
+            renderStream.close();
+            renderStream.finish();
+        } catch (IOException e) {
+            throw new RenderException(e);
+        }
+        return true;
     }
 
     @Override
-    public Block compile(JtwigParser parser, JtwigResource resource) throws CompileException {
-        this.content = content.compile(parser, resource, begin(), end());
+    public Content compile(JtwigParser parser, JtwigResource resource) throws CompileException {
+        content = content.compile(parser, resource);
         return this;
     }
 
     @Override
     public boolean replace(Block expression) throws CompileException {
         return content.replace(expression);
-    }
-
-    @Override
-    public TagInformation begin() {
-        return begin;
-    }
-
-    @Override
-    public TagInformation end() {
-        return end;
     }
 }
