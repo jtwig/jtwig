@@ -26,6 +26,13 @@ public class RenderControl {
         mStackCounter.incrementAndGet();
     }
 
+    public void cancel() {
+        int value = mStackCounter.getAndSet(0);
+        if (value <= 0) {
+            mSemaphore.release();
+        }
+    }
+
     public void poll() {
         int value = mStackCounter.decrementAndGet();
         if (value <= 0) {

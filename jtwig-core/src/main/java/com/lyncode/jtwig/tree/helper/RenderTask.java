@@ -28,6 +28,8 @@ class RenderTask implements Runnable {
             renderStream.close();
             renderStream.merge();
             renderStream.notifyTaskFinished();
+        } catch (NullPointerException e) {
+            e.printStackTrace();
         } catch (RenderException e) {
             e.printStackTrace();
         } catch (IOException e) {

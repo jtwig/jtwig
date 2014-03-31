@@ -32,11 +32,10 @@ public class RenderStream {
         this.executorService = executorService;
         this.mRenderControl = renderControl;
         this.rwl = rwl;
-
     }
 
     public RenderStream(OutputStream outputStream) {
-        this(new MultiOuputStream(), outputStream, null, Executors.newCachedThreadPool(),
+        this(new MultiOuputStream(), outputStream, null, Executors.newFixedThreadPool(7),
              new ReentrantReadWriteLock(),
              new RenderControl());
     }
@@ -47,6 +46,9 @@ public class RenderStream {
             executorService.execute(new RenderTask(fork(), content, context));
         } catch (IOException e) {
             throw new RenderException(e);
+        } catch (OutOfMemoryError e) {
+            executorService.shutdownNow();
+            mRenderControl.cancel();
         }
         return this;
     }
@@ -75,7 +77,6 @@ public class RenderStream {
 
     public RenderStream write(byte[] bytes) throws IOException {
         getOuputStream().write(bytes);
-        close();
         return this;
     }
 
@@ -102,13 +103,12 @@ public class RenderStream {
         if (renderStreamIndex == null) {
             renderStreamIndex = RenderIndex.newIndex();
         }
-
         multiOuputStream.waitOrder(renderStreamIndex); // this index will wait for his left children
 
         RenderIndex forkedIndex = renderStreamIndex.left();
         renderStreamIndex = renderStreamIndex.right();
 
-        multiOuputStream.newStream(renderStreamIndex, new SingleOuputStream());
+        multiOuputStream.newStream(renderStreamIndex);
         RenderStream forkedRendersStream = new RenderStream(multiOuputStream, getDefaultOutputStream(), forkedIndex,
                                                             executorService, rwl, mRenderControl);
         unlockOutputChange();
@@ -154,6 +154,11 @@ public class RenderStream {
         }
         unlockOutputChange();
         return this;
+    }
+
+    public void finish() throws IOException {
+        merge();
+        executorService.shutdown();
     }
 
     private OutputStream getDefaultOutputStream() {

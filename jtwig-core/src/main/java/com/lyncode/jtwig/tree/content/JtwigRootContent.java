@@ -41,7 +41,7 @@ public class JtwigRootContent implements Content {
         renderStream.waitForExecutorCompletion();
         try {
             renderStream.close();
-            renderStream.merge();
+            renderStream.finish();
         } catch (IOException e) {
             throw new RenderException(e);
         }
