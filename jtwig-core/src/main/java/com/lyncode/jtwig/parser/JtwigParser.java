@@ -14,6 +14,7 @@
 
 package com.lyncode.jtwig.parser;
 
+import com.google.common.collect.Lists;
 import com.lyncode.jtwig.exception.ParseBypassException;
 import com.lyncode.jtwig.exception.ParseException;
 import com.lyncode.jtwig.exception.ResourceException;
@@ -29,10 +30,12 @@ import com.lyncode.jtwig.tree.content.*;
 import com.lyncode.jtwig.tree.documents.JtwigDocument;
 import com.lyncode.jtwig.tree.documents.JtwigExtendsDocument;
 import com.lyncode.jtwig.tree.documents.JtwigRootDocument;
+import com.lyncode.jtwig.tree.expressions.FunctionElement;
 import com.lyncode.jtwig.tree.expressions.Variable;
 import com.lyncode.jtwig.tree.structural.Block;
 import com.lyncode.jtwig.tree.structural.Extends;
 import com.lyncode.jtwig.tree.structural.Include;
+import com.lyncode.jtwig.tree.tags.Filter;
 import com.lyncode.jtwig.tree.tags.Verbatim;
 import org.parboiled.BaseParser;
 import org.parboiled.Rule;
@@ -46,10 +49,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.lyncode.jtwig.parser.JtwigKeyword.*;
-import static com.lyncode.jtwig.parser.JtwigSymbol.ATTR;
-import static com.lyncode.jtwig.parser.JtwigSymbol.COMMA;
+import static com.lyncode.jtwig.parser.JtwigSymbol.*;
 import static com.lyncode.jtwig.tree.content.IfExpression.ElseExpression;
 import static com.lyncode.jtwig.tree.content.IfExpression.ElseIfExpression;
+import static com.lyncode.jtwig.tree.expressions.Operator.COMPOSITION;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.parboiled.Parboiled.createParser;
 
@@ -188,6 +191,7 @@ public class JtwigParser extends BaseParser<Content> {
                                 addToContent(block()),
                                 addToContent(include()),
                                 addToContent(embed()),
+                                addToContent(filter()),
                                 addToContent(forEach()),
                                 addToContent(ifCondition()),
                                 addToContent(set()),
@@ -209,6 +213,7 @@ public class JtwigParser extends BaseParser<Content> {
                                                         keyword(ELSEIF),
                                                         keyword(ELSE),
                                                         keyword(VERBATIM),
+                                                        keyword(ENDFILTER),
                                                         keywordEmptyContent(),
                                                         keywordsContent()
                                                 )
@@ -579,6 +584,42 @@ public class JtwigParser extends BaseParser<Content> {
                                 doIt(peek(SetVariable.class).end().addToRight(tagPropertyParser.getCurrentProperty()))
                         ),
                         new ParseException("Wrong set syntax")
+                )
+        );
+    }
+
+    Rule filter() {
+        return Sequence(
+                openCode(),
+                keyword(FILTER),
+                mandatory(
+                        Sequence(
+                                expressionParser.nonExpressionFunction(),
+                                push(new Filter((FunctionElement)expressionParser.peek())),
+                                swap(),
+                                ZeroOrMore(
+                                        Sequence(
+                                                expressionParser.operator(COMPOSITION),
+                                                doIt(expressionParser.pop()),
+                                                expressionParser.nonExpressionFunction(),
+                                                doIt(peek(FunctionElement.class).getArguments().set(0, expressionParser.pop(1))),
+                                                doIt(peek(1, Filter.class).addExpression((FunctionElement)expressionParser.peek()))
+                                        )
+                                ),
+                                doIt(expressionParser.pop()),
+                                doIt(peek(Filter.class).begin().addToLeft(tagPropertyParser.getCurrentProperty())),
+                                closeCode(),
+                                doIt(peek(Filter.class).begin().addToRight(tagPropertyParser.getCurrentProperty())),
+                                content(),
+                                doIt(peek(1, Filter.class).setContent(pop(JtwigContent.class))),
+                                openCode(),
+                                doIt(peek(Filter.class).end().addToLeft(tagPropertyParser.getCurrentProperty())),
+                                keyword(JtwigKeyword.ENDFILTER),
+                                closeCode(),
+                                doIt(peek(Filter.class).end().addToRight(tagPropertyParser.getCurrentProperty()))
+
+                        ),
+                        new ParseException("Wrong filter syntax")
                 )
         );
     }

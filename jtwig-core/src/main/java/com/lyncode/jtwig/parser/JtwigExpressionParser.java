@@ -253,6 +253,13 @@ public class JtwigExpressionParser extends BaseParser<Expression> {
         );
     }
 
+    Rule nonExpressionFunction() {
+        return FirstOf(
+                functionWithBrackets(),
+                nonExpressionFunctionWithoutBrackets()
+        );
+    }
+
     Rule functionWithTwoWordsAsName() {
         return Sequence(
                 variable(),
@@ -277,6 +284,23 @@ public class JtwigExpressionParser extends BaseParser<Expression> {
                 ),
                 expression(),
                 push(new FunctionElement(popVariableName(1), pop()))
+        );
+    }
+
+    Rule nonExpressionFunctionWithoutBrackets() {
+        return Sequence(
+                variable(),
+                TestNot(
+                        basic.spacing(),
+                        basic.terminal(SUB.toString())
+                ),
+                FirstOf(
+                        Sequence(
+                                expression(),
+                                push(new FunctionElement(popVariableName(1), pop()))
+                        ),
+                        push(new FunctionElement(popVariableName()))
+                )
         );
     }
 
