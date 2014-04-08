@@ -89,7 +89,7 @@ public class JtwigView extends AbstractTemplateView {
             response.setCharacterEncoding(this.getEncoding());
         }
 
-        getContent(request).render(response.getOutputStream(), new JtwigContext(modelMap, getViewResolver().getFunctionRepository()));
+        getContent(request).render(response.getOutputStream(), new JtwigContext(modelMap, getViewResolver().getFunctionResolver()));
     }
 
     public Content getContent(HttpServletRequest request) throws CompileException, ParseException {

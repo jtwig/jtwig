@@ -16,12 +16,12 @@ package com.lyncode.jtwig.tree.expressions;
 
 import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.exception.CalculateException;
-import com.lyncode.jtwig.functions.types.Undefined;
 import com.lyncode.jtwig.tree.api.Expression;
+import com.lyncode.jtwig.types.Undefined;
 
 import java.util.Map;
 
-import static com.lyncode.jtwig.functions.types.Undefined.UNDEFINED;
+import static com.lyncode.jtwig.types.Undefined.UNDEFINED;
 
 public class MapSelection implements Expression {
     private Variable variable;
