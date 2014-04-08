@@ -50,6 +50,7 @@ public enum JtwigKeyword {
     IN("in"),
     IS("is"),
     FILTER("filter"),
+    ENDFILTER("endfilter"),
 
     VERBATIM("verbatim"),
     ENDVERBATIM("endverbatim");

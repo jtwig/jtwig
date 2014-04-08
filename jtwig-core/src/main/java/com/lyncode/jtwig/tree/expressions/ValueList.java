@@ -84,6 +84,11 @@ public class ValueList implements Expression {
         return values.get(index);
     }
 
+    public Expression set(int index, Expression element) {
+        values.add(index, element);
+        return element;
+    }
+
     public boolean isEmpty() {
         return values.isEmpty();
     }
