@@ -14,7 +14,7 @@
 
 package com.lyncode.jtwig.util;
 
-import com.lyncode.jtwig.functions.types.Undefined;
+import com.lyncode.jtwig.types.Undefined;
 
 import java.util.Map;
 

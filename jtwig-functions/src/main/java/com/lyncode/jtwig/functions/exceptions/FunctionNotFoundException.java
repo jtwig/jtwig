@@ -14,7 +14,7 @@
 
 package com.lyncode.jtwig.functions.exceptions;
 
-public class FunctionNotFoundException extends Exception {
+public class FunctionNotFoundException extends FunctionException {
     public FunctionNotFoundException() {
     }
 
