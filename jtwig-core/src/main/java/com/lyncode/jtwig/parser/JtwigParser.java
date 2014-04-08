@@ -14,7 +14,6 @@
 
 package com.lyncode.jtwig.parser;
 
-import com.google.common.collect.Lists;
 import com.lyncode.jtwig.addons.spaceless.SpacelessParser;
 import com.lyncode.jtwig.exception.ParseBypassException;
 import com.lyncode.jtwig.exception.ParseException;
@@ -49,7 +48,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.lyncode.jtwig.parser.JtwigKeyword.*;
-import static com.lyncode.jtwig.parser.JtwigSymbol.*;
+import static com.lyncode.jtwig.parser.JtwigSymbol.ATTR;
+import static com.lyncode.jtwig.parser.JtwigSymbol.COMMA;
 import static com.lyncode.jtwig.tree.content.IfExpression.ElseExpression;
 import static com.lyncode.jtwig.tree.content.IfExpression.ElseIfExpression;
 import static com.lyncode.jtwig.tree.expressions.Operator.COMPOSITION;
@@ -272,7 +272,7 @@ public class JtwigParser extends BaseParser<Content> {
                                 closeCode(),
                                 doIt(peek(JtwigContentAddon.class).end().addToRight(tagPropertyParser.getCurrentProperty()))
                         ),
-                        new ParseException("Wrong syntax for "+parser.beginKeyword())
+                        new ParseException("Wrong syntax for " + parser.beginKeyword())
                 )
         );
     }
@@ -542,14 +542,14 @@ public class JtwigParser extends BaseParser<Content> {
                                                 keyword(IN),
                                                 expressionParser.expression(),
                                                 push(new ForPairLoop(expressionParser.pop(2, Variable.class),
-                                                                     expressionParser.pop(1, Variable.class),
-                                                                     expressionParser.pop()))
+                                                        expressionParser.pop(1, Variable.class),
+                                                        expressionParser.pop()))
                                         ),
                                         Sequence(
                                                 keyword(IN),
                                                 expressionParser.expression(),
                                                 push(new ForLoop(expressionParser.pop(1, Variable.class),
-                                                                 expressionParser.pop()))
+                                                        expressionParser.pop()))
                                         )
                                 ),
                                 doIt(peek(ForLoop.class).begin().addToLeft(tagPropertyParser.getCurrentProperty())),
