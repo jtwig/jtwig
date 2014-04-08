@@ -12,24 +12,20 @@
  * limitations under the License.
  */
 
-package com.lyncode.jtwig.test.addons.spaceless;
+package com.lyncode.jtwig.test.issues;
 
-import com.lyncode.jtwig.parser.addons.JtwigContentAddon;
-import com.lyncode.jtwig.parser.addons.JtwigContentAddonParser;
+import com.lyncode.jtwig.test.AbstractJtwigTest;
+import org.junit.Test;
 
-public class SpacelessParser extends JtwigContentAddonParser {
-    @Override
-    public JtwigContentAddon instance() {
-        return new Spaceless();
-    }
+import static com.lyncode.jtwig.SyntacticSugar.then;
+import static com.lyncode.jtwig.SyntacticSugar.when;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 
-    @Override
-    public String beginKeyword() {
-        return "spaceless";
-    }
-
-    @Override
-    public String endKeyword() {
-        return "endspaceless";
+public class Issue82Test extends AbstractJtwigTest {
+    @Test
+    public void issue82() throws Exception {
+        when(jtwigRenders(template("{{ notice }}")));
+        then(theRenderedTemplate(), is(equalTo("undefined")));
     }
 }

@@ -37,7 +37,7 @@ public class MathOperations {
 
     public static Object div (Object a, Object b) {
         if (areDouble(a, b)) return toDouble(a) / toDouble(b);
-        else return toInt(a) - toInt(b);
+        else return toInt(a) / toInt(b);
     }
 
     public static double toDouble (Object obj) {
