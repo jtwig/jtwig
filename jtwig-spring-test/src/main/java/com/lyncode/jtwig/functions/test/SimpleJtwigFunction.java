@@ -14,14 +14,14 @@
 
 package com.lyncode.jtwig.functions.test;
 
-import com.lyncode.jtwig.functions.JtwigFunction;
-import com.lyncode.jtwig.functions.annotations.JtwigFunctionDeclaration;
-import com.lyncode.jtwig.functions.exceptions.FunctionException;
+import com.lyncode.jtwig.functions.annotations.JtwigFunction;
+import com.lyncode.jtwig.functions.annotations.Parameter;
+import org.springframework.stereotype.Service;
 
-@JtwigFunctionDeclaration(name = "other")
-public class SimpleJtwigFunction implements JtwigFunction {
-    @Override
-    public Object execute(Object... arguments) throws FunctionException {
-        return arguments[0];
+@Service
+public class SimpleJtwigFunction {
+    @JtwigFunction(name = "other")
+    public String execute(@Parameter String input) {
+        return input;
     }
 }

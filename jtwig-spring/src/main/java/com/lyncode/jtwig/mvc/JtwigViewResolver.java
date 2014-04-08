@@ -14,22 +14,23 @@
 
 package com.lyncode.jtwig.mvc;
 
-import com.lyncode.jtwig.functions.JtwigFunction;
-import com.lyncode.jtwig.functions.builders.FunctionRepositoryBuilder;
-import com.lyncode.jtwig.functions.repository.AbstractFunctionRepository;
-import com.lyncode.jtwig.functions.repository.WebFunctionRepository;
+import com.lyncode.jtwig.functions.SpringFunctions;
+import com.lyncode.jtwig.functions.parameters.resolve.HttpRequestParameterResolver;
+import com.lyncode.jtwig.functions.parameters.resolve.api.AnnotatedMethodParameterResolver;
+import com.lyncode.jtwig.functions.parameters.resolve.api.TypeMethodParameterResolver;
+import com.lyncode.jtwig.functions.repository.FunctionRepositoryBuilder;
+import com.lyncode.jtwig.functions.repository.FunctionResolver;
 import com.lyncode.jtwig.parser.config.ParserConfiguration;
 import com.lyncode.jtwig.services.api.theme.ThemePrefixResolver;
-import org.reflections.Reflections;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.view.AbstractTemplateViewResolver;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
+@Service
 public class JtwigViewResolver extends AbstractTemplateViewResolver {
     private static ThemePrefixResolver defaultPrefixResolver() {
         return new ThemePrefixResolver() {
@@ -40,18 +41,22 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
         };
     }
 
+    @Autowired(required = false)
+    private ThemePrefixResolver prefixResolver ;
+
     private String encoding;
     private String theme;
     private boolean cached;
-    private ThemePrefixResolver prefixResolver;
+
     private ParserConfiguration parserConfiguration = new ParserConfiguration();
-    private AbstractFunctionRepository functionRepository = new WebFunctionRepository();
-    private List<String> loadedFunctions = new ArrayList<>();
+    private FunctionRepositoryBuilder functionRepository = new FunctionRepositoryBuilder();
+    private FunctionResolver functionResolver = null;
 
     public JtwigViewResolver() {
-        this.prefixResolver = defaultPrefixResolver();
         setViewClass(requiredViewClass());
         setContentType("text/html; charset=UTF-8");
+
+        functionRepository.add(new HttpRequestParameterResolver());
     }
 
     @Override
@@ -68,6 +73,7 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
     }
 
     private String getPrefixWithTheme() {
+        if (prefixResolver == null) prefixResolver = defaultPrefixResolver();
         String prefix = prefixResolver.getPrefix(super.getPrefix(), getTheme());
         if (super.getPrefix().endsWith(File.separator))
             prefix += File.separator;
@@ -102,41 +108,31 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
         this.encoding = encoding;
     }
     public void setParserConfiguration (ParserConfiguration parserConfiguration) { this.parserConfiguration = parserConfiguration; }
-    public ParserConfiguration getParserConfiguration() {
+
+    ParserConfiguration getParserConfiguration() {
         return parserConfiguration;
     }
-    public void setFunctionRepository(AbstractFunctionRepository abstractFunctionRepository) {
-        this.functionRepository = abstractFunctionRepository;
-    }
-
-    public void setFunctionRepository(FunctionRepositoryBuilder functionRepository) {
-        this.functionRepository = functionRepository.build();
-    }
-
-    public AbstractFunctionRepository getFunctionRepository() {
-        return functionRepository;
-    }
-
-    public void addFunctions (Class<? extends JtwigFunction>... functionClasses) {
-        for (Class<? extends JtwigFunction> functionClass : functionClasses) {
-            try {
-                if (!loadedFunctions.contains(functionClass.getName())) {
-                    functionRepository.add(functionClass.newInstance());
-                    loadedFunctions.add(functionClass.getName());
-                }
-            } catch (InstantiationException e) {
-                throw new RuntimeException("Unable to create instance of jtwig function "+functionClass.getName());
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException("Unable to create instance of jtwig function "+functionClass.getName());
-            }
+    FunctionResolver getFunctionResolver() {
+        if (functionResolver == null) {
+            SpringFunctions springFunctions = new SpringFunctions();
+            getApplicationContext().getAutowireCapableBeanFactory().autowireBean(springFunctions);
+            functionRepository.store(springFunctions);
         }
+        return functionRepository.build();
     }
 
-    public void addFunctionPackages (String... packages) {
-        for (String pack : packages) {
-            Reflections reflections = new Reflections(pack);
-            Set<Class<? extends JtwigFunction>> functions = reflections.getSubTypesOf(JtwigFunction.class);
-            addFunctions(functions.toArray(new Class[functions.size()]));;
-        }
+    public JtwigViewResolver include (TypeMethodParameterResolver resolver) {
+        functionRepository.add(resolver);
+        return this;
+    }
+
+    public JtwigViewResolver include (AnnotatedMethodParameterResolver resolver) {
+        functionRepository.add(resolver);
+        return this;
+    }
+
+    public JtwigViewResolver includeFunctions (Object functionBean) {
+        functionRepository.store(functionBean);
+        return this;
     }
 }

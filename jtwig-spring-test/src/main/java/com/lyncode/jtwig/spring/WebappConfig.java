@@ -77,14 +77,17 @@ public class WebappConfig extends WebMvcConfigurerAdapter {
     }
 
     @Bean
+    public SimpleJtwigFunction jtwigFunctions () {
+        return new SimpleJtwigFunction();
+    }
+
+    @Bean
     public ViewResolver viewResolver() {
         JtwigViewResolver jtwigViewResolver = new JtwigViewResolver();
         jtwigViewResolver.setPrefix("/WEB-INF/views/");
         jtwigViewResolver.setSuffix(".twig.html");
         jtwigViewResolver.setTheme("default");
-        jtwigViewResolver.addFunctionPackages(
-                SimpleJtwigFunction.class.getPackage().getName()
-        );
+        jtwigViewResolver.includeFunctions(jtwigFunctions());
         return jtwigViewResolver;
     }
 }
