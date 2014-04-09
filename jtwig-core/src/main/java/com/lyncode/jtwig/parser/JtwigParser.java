@@ -272,7 +272,7 @@ public class JtwigParser extends BaseParser<Content> {
                                 closeCode(),
                                 doIt(peek(JtwigContentAddon.class).end().addToRight(tagPropertyParser.getCurrentProperty()))
                         ),
-                        new ParseException("Wrong syntax for "+parser.beginKeyword())
+                        new ParseException("Wrong syntax for " + parser.beginKeyword())
                 )
         );
     }
@@ -542,14 +542,14 @@ public class JtwigParser extends BaseParser<Content> {
                                                 keyword(IN),
                                                 expressionParser.expression(),
                                                 push(new ForPairLoop(expressionParser.pop(2, Variable.class),
-                                                                     expressionParser.pop(1, Variable.class),
-                                                                     expressionParser.pop()))
+                                                        expressionParser.pop(1, Variable.class),
+                                                        expressionParser.pop()))
                                         ),
                                         Sequence(
                                                 keyword(IN),
                                                 expressionParser.expression(),
                                                 push(new ForLoop(expressionParser.pop(1, Variable.class),
-                                                                 expressionParser.pop()))
+                                                        expressionParser.pop()))
                                         )
                                 ),
                                 doIt(peek(ForLoop.class).begin().addToLeft(tagPropertyParser.getCurrentProperty())),

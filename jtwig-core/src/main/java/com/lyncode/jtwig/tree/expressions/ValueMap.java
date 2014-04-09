@@ -20,14 +20,14 @@ import com.lyncode.jtwig.tree.api.Element;
 import com.lyncode.jtwig.tree.api.Expression;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.apache.commons.lang3.StringUtils.join;
 
 public class ValueMap implements Element, Expression {
-    private Map<String, Object> map = new HashMap<String, Object>();
+    private Map<String, Object> map = new LinkedHashMap<>();
 
     public ValueMap() {}
 
@@ -50,7 +50,7 @@ public class ValueMap implements Element, Expression {
 
     @Override
     public Object calculate(JtwigContext context) throws CalculateException {
-        Map<String, Object> result = new HashMap<String, Object>();
+        Map<String, Object> result = new LinkedHashMap<>();
         for (String key : map.keySet()) {
             if (map.get(key) instanceof Expression)
                 result.put(key, ((Expression) map.get(key)).calculate(context));

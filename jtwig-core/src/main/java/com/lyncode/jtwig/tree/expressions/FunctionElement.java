@@ -17,11 +17,9 @@ package com.lyncode.jtwig.tree.expressions;
 import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.exception.CalculateException;
 import com.lyncode.jtwig.functions.exceptions.FunctionException;
-import com.lyncode.jtwig.functions.exceptions.FunctionNotFoundException;
+import com.lyncode.jtwig.functions.parameters.GivenParameters;
 import com.lyncode.jtwig.tree.api.Element;
 import com.lyncode.jtwig.tree.api.Expression;
-
-import java.util.List;
 
 public class FunctionElement implements Element, Expression {
     private String name;
@@ -57,15 +55,16 @@ public class FunctionElement implements Element, Expression {
     @Override
     public Object calculate(JtwigContext context) throws CalculateException {
         try {
-            return context.function(getName()).execute(arguments(context));
+            GivenParameters parameters = new GivenParameters();
+            for (Object obj : arguments(context))
+                parameters.addObject(obj);
+            return context.executeFunction(getName(), parameters);
         } catch (FunctionException e) {
-            throw new CalculateException(e);
-        } catch (FunctionNotFoundException e) {
             throw new CalculateException(e);
         }
     }
 
     private Object[] arguments(JtwigContext context) throws CalculateException {
-        return ((List<?>) arguments.calculate(context)).toArray();
+        return arguments.calculate(context).toArray();
     }
 }
