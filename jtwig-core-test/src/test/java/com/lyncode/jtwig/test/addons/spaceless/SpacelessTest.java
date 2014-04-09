@@ -18,6 +18,7 @@ import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.parser.JtwigParser;
 import com.lyncode.jtwig.resource.StringJtwigResource;
 import com.lyncode.jtwig.tree.documents.JtwigDocument;
+import com.lyncode.jtwig.tree.helper.RenderStream;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
@@ -29,9 +30,9 @@ public class SpacelessTest extends AbstractAddonTest {
 
         StringJtwigResource resource = new StringJtwigResource("{% spaceless %}  <div>   <two>   </two>   </div>{% endspaceless %}");
         JtwigDocument document = JtwigParser.parse(jtwigParser, resource);
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        document.compile(jtwigParser, resource).render(outputStream, new JtwigContext());
+        RenderStream renderStream = new RenderStream(new ByteArrayOutputStream());
+        document.compile(jtwigParser, resource).render(renderStream, new JtwigContext());
 
-        System.out.println(outputStream.toString());
+        System.out.println(renderStream.toString());
     }
 }

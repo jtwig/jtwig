@@ -26,8 +26,10 @@ import com.lyncode.jtwig.tree.api.Content;
 import com.lyncode.jtwig.tree.api.Expression;
 import com.lyncode.jtwig.tree.api.Tag;
 import com.lyncode.jtwig.tree.api.TagInformation;
-import com.lyncode.jtwig.tree.content.Text;
-import com.lyncode.jtwig.tree.expressions.*;
+import com.lyncode.jtwig.tree.content.JtwigRootContent;
+import com.lyncode.jtwig.tree.expressions.Constant;
+import com.lyncode.jtwig.tree.expressions.FunctionElement;
+import com.lyncode.jtwig.tree.helper.RenderStream;
 import com.lyncode.jtwig.tree.structural.Block;
 
 import java.io.ByteArrayOutputStream;
@@ -36,6 +38,7 @@ import java.io.OutputStream;
 import java.util.List;
 
 public class Filter implements Content, Tag {
+
     private Content content;
     private TagInformation begin = new TagInformation();
     private TagInformation end = new TagInformation();
@@ -59,15 +62,15 @@ public class Filter implements Content, Tag {
     }
 
     @Override
-    public boolean render(OutputStream outputStream, JtwigContext context) throws RenderException {
-        OutputStream contentStream = new ByteArrayOutputStream();
-        this.content.render(contentStream, context);
-        Expression constant = new Constant<>(contentStream.toString());
+    public boolean render(RenderStream renderStream, JtwigContext context) throws RenderException {
+        RenderStream renderStream1 = new RenderStream(new ByteArrayOutputStream());
+        content.render(renderStream1, context);
+        Expression constant = new Constant<>(renderStream1.getOuputStream().toString());
 
         this.expressions.get(0).getArguments().set(0, constant);
 
         try {
-            outputStream.write(Iterables.getLast(this.expressions).calculate(context).toString().getBytes());
+            renderStream.write(Iterables.getLast(this.expressions).calculate(context).toString().getBytes());
             return true;
         } catch (IOException | CalculateException e) {
             throw new RenderException(e);
@@ -76,7 +79,7 @@ public class Filter implements Content, Tag {
 
     @Override
     public Content compile(JtwigParser parser, JtwigResource resource) throws CompileException {
-        return this;
+        return new JtwigRootContent(this);
     }
 
     @Override
@@ -86,7 +89,7 @@ public class Filter implements Content, Tag {
 
     @Override
     public String toString() {
-        return "Render the result of "+content;
+        return "Render the result of " + content;
     }
 
     @Override
