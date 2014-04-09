@@ -14,7 +14,7 @@
 
 package com.lyncode.jtwig.parser;
 
-import com.google.common.collect.Lists;
+import com.lyncode.jtwig.addons.spaceless.SpacelessParser;
 import com.lyncode.jtwig.exception.ParseBypassException;
 import com.lyncode.jtwig.exception.ParseException;
 import com.lyncode.jtwig.exception.ResourceException;
@@ -24,7 +24,6 @@ import com.lyncode.jtwig.parser.addons.JtwigEmptyContentAddon;
 import com.lyncode.jtwig.parser.addons.JtwigEmptyContentAddonParser;
 import com.lyncode.jtwig.parser.config.ParserConfiguration;
 import com.lyncode.jtwig.resource.JtwigResource;
-import com.lyncode.jtwig.test.addons.spaceless.SpacelessParser;
 import com.lyncode.jtwig.tree.api.Content;
 import com.lyncode.jtwig.tree.content.*;
 import com.lyncode.jtwig.tree.documents.JtwigDocument;
@@ -49,7 +48,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.lyncode.jtwig.parser.JtwigKeyword.*;
-import static com.lyncode.jtwig.parser.JtwigSymbol.*;
+import static com.lyncode.jtwig.parser.JtwigSymbol.ATTR;
+import static com.lyncode.jtwig.parser.JtwigSymbol.COMMA;
 import static com.lyncode.jtwig.tree.content.IfExpression.ElseExpression;
 import static com.lyncode.jtwig.tree.content.IfExpression.ElseIfExpression;
 import static com.lyncode.jtwig.tree.expressions.Operator.COMPOSITION;
