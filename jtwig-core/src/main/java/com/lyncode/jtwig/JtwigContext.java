@@ -26,10 +26,9 @@ import static com.lyncode.jtwig.types.Undefined.UNDEFINED;
 
 public class JtwigContext {
 
-    //context
     private static final String MODEL = "model";
 
-    public static JtwigContext context () {
+    public static JtwigContext context() {
         return new JtwigContext();
     }
 
@@ -40,6 +39,7 @@ public class JtwigContext {
         this.functionRepository = functionRepository;
         this.modelMap = modelMap;
     }
+
     public JtwigContext(JtwigModelMap modelMap, FunctionRepositoryBuilder functionRepository) {
         this.functionRepository = functionRepository.build();
         this.modelMap = modelMap;
@@ -61,13 +61,14 @@ public class JtwigContext {
     }
 
     public Object map(String key) {
-        if (MODEL.equals(key))
+        if (MODEL.equals(key)) {
             return modelMap;
-        else {
-            if (modelMap.containsKey(key))
+        } else {
+            if (modelMap.containsKey(key)) {
                 return modelMap.get(key);
-            else
+            } else {
                 return UNDEFINED;
+            }
         }
     }
 
