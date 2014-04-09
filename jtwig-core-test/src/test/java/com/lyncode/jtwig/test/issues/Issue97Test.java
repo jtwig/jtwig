@@ -1,6 +1,4 @@
 /**
- * Copyright 2012 Lyncode
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,26 +12,20 @@
  * limitations under the License.
  */
 
-package com.lyncode.jtwig;
+package com.lyncode.jtwig.test.issues;
 
-import org.hamcrest.Matcher;
+import com.lyncode.jtwig.test.AbstractJtwigTest;
+import org.junit.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.AllOf.allOf;
+import static com.lyncode.jtwig.SyntacticSugar.then;
+import static com.lyncode.jtwig.SyntacticSugar.when;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 
-public class SyntacticSugar {
-    public static <T> T when (T value) {
-        return value;
-    }
-    public static <T> T given (T value) {
-        return value;
-    }
-    public static <T> T after (T value) {
-        return value;
-    }
-
-    public static <T> T then (T value, Matcher<T>... matcher) {
-        assertThat(value, allOf(matcher));
-        return value;
+public class Issue97Test extends AbstractJtwigTest {
+    @Test
+    public void issue97() throws Exception {
+        when(jtwigRenders(template("{{ 1 / 10 }}")));
+        then(theRenderedTemplate(), is(equalTo("0")));
     }
 }
