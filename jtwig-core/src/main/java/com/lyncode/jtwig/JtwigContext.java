@@ -14,51 +14,50 @@
 
 package com.lyncode.jtwig;
 
-import com.lyncode.jtwig.functions.JtwigFunction;
-import com.lyncode.jtwig.functions.exceptions.FunctionNotFoundException;
-import com.lyncode.jtwig.functions.repository.AbstractFunctionRepository;
-import com.lyncode.jtwig.functions.repository.DefaultFunctionRepository;
+import com.lyncode.jtwig.functions.exceptions.FunctionException;
+import com.lyncode.jtwig.functions.parameters.GivenParameters;
+import com.lyncode.jtwig.functions.parameters.resolve.exceptions.ResolveException;
+import com.lyncode.jtwig.functions.repository.FunctionRepositoryBuilder;
+import com.lyncode.jtwig.functions.repository.FunctionResolver;
 
-import static com.lyncode.jtwig.functions.types.Undefined.UNDEFINED;
+import java.lang.reflect.InvocationTargetException;
+
+import static com.lyncode.jtwig.types.Undefined.UNDEFINED;
 
 public class JtwigContext {
 
+    //context
     private static final String MODEL = "model";
 
     public static JtwigContext context () {
         return new JtwigContext();
     }
 
-    private AbstractFunctionRepository functionRepository;
+    private FunctionResolver functionRepository;
     private JtwigModelMap modelMap;
 
-    public JtwigContext(JtwigModelMap modelMap, AbstractFunctionRepository functionRepository) {
+    public JtwigContext(JtwigModelMap modelMap, FunctionResolver functionRepository) {
         this.functionRepository = functionRepository;
+        this.modelMap = modelMap;
+    }
+    public JtwigContext(JtwigModelMap modelMap, FunctionRepositoryBuilder functionRepository) {
+        this.functionRepository = functionRepository.build();
         this.modelMap = modelMap;
     }
 
     public JtwigContext(JtwigModelMap modelMap) {
-        this.functionRepository = new DefaultFunctionRepository();
+        this.functionRepository = new FunctionRepositoryBuilder().build();
         this.modelMap = modelMap;
     }
 
     public JtwigContext() {
-        this.functionRepository = new DefaultFunctionRepository();
+        this.functionRepository = new FunctionRepositoryBuilder().build();
         this.modelMap = new JtwigModelMap();
-    }
-
-    public JtwigContext withFunction(String name, JtwigFunction function) {
-        this.functionRepository.add(function, name);
-        return this;
     }
 
     public JtwigContext withModelAttribute(String key, Object value) {
         this.modelMap.add(key, value);
         return this;
-    }
-
-    public JtwigFunction function(String name) throws FunctionNotFoundException {
-        return functionRepository.retrieve(name);
     }
 
     public Object map(String key) {
@@ -74,5 +73,13 @@ public class JtwigContext {
 
     public void set(String key, Object value) {
         modelMap.add(key, value);
+    }
+
+    public Object executeFunction(String name, GivenParameters parameters) throws FunctionException {
+        try {
+            return functionRepository.get(name, parameters).execute();
+        } catch (InvocationTargetException | IllegalAccessException | ResolveException e) {
+            throw new FunctionException(e);
+        }
     }
 }

@@ -19,9 +19,6 @@ import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.exception.CalculateException;
 import com.lyncode.jtwig.exception.ParseBypassException;
 import com.lyncode.jtwig.exception.ParseException;
-import com.lyncode.jtwig.functions.JtwigFunction;
-import com.lyncode.jtwig.functions.exceptions.FunctionException;
-import com.lyncode.jtwig.functions.internal.list.Join;
 import com.lyncode.jtwig.tree.api.Expression;
 import org.junit.Test;
 import org.parboiled.Rule;
@@ -94,22 +91,6 @@ public class JtwigExpressionParserTest {
         theResult("hello (abc", underTest.expression(), Map.class);
     }
 
-    @Test
-    public void completeFunctionTest() throws Exception {
-        context.withModelAttribute("abc", "1");
-        context.withFunction("hello", identityFunction());
-        String value = theResult("hello (abc)", underTest.expression(), String.class);
-        assertThat(value, is(equalTo("1")));
-    }
-
-    @Test
-    public void completeFunctionWithoutBracketsTest() throws Exception {
-        context.withModelAttribute("abc", "1");
-        context.withFunction("hello", identityFunction());
-        String value = theResult("hello abc", underTest.expression(), String.class);
-        assertThat(value, is(equalTo("1")));
-    }
-
 
     @Test(expected = ParseException.class)
     public void incompleteMapEntry() throws Exception {
@@ -135,13 +116,6 @@ public class JtwigExpressionParserTest {
         assertThat(value, is(equalTo(0)));
     }
 
-    @Test
-    public void compositionTest() throws Exception {
-        context.withFunction("join", new Join());
-        String value = theResult("1..5 | join(',')", underTest.expression(), String.class);
-        assertThat(value, is(equalTo("1,2,3,4,5")));
-    }
-
     public <T> T theResult (String input, Rule rule, Class<T> returnClass) throws ParseException {
         ReportingParseRunner<Expression> runner = new ReportingParseRunner<Expression>(rule);
         try {
@@ -155,12 +129,4 @@ public class JtwigExpressionParserTest {
         }
     }
 
-    private JtwigFunction identityFunction() {
-        return new JtwigFunction() {
-            @Override
-            public Object execute(Object... arguments) throws FunctionException {
-                return arguments[0];
-            }
-        };
-    }
 }

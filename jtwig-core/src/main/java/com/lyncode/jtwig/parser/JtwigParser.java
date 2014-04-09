@@ -15,6 +15,7 @@
 package com.lyncode.jtwig.parser;
 
 import com.lyncode.jtwig.addons.concurrent.ConcurrentParser;
+import com.lyncode.jtwig.addons.spaceless.SpacelessParser;
 import com.lyncode.jtwig.exception.ParseBypassException;
 import com.lyncode.jtwig.exception.ParseException;
 import com.lyncode.jtwig.exception.ResourceException;
@@ -24,7 +25,6 @@ import com.lyncode.jtwig.parser.addons.JtwigEmptyContentAddon;
 import com.lyncode.jtwig.parser.addons.JtwigEmptyContentAddonParser;
 import com.lyncode.jtwig.parser.config.ParserConfiguration;
 import com.lyncode.jtwig.resource.JtwigResource;
-import com.lyncode.jtwig.test.addons.spaceless.SpacelessParser;
 import com.lyncode.jtwig.tree.api.Content;
 import com.lyncode.jtwig.tree.content.*;
 import com.lyncode.jtwig.tree.documents.JtwigDocument;
@@ -568,14 +568,14 @@ public class JtwigParser extends BaseParser<Content> {
                                                 keyword(IN),
                                                 expressionParser.expression(),
                                                 push(new ForPairLoop(expressionParser.pop(2, Variable.class),
-                                                                     expressionParser.pop(1, Variable.class),
-                                                                     expressionParser.pop()))
+                                                        expressionParser.pop(1, Variable.class),
+                                                        expressionParser.pop()))
                                         ),
                                         Sequence(
                                                 keyword(IN),
                                                 expressionParser.expression(),
                                                 push(new ForLoop(expressionParser.pop(1, Variable.class),
-                                                                 expressionParser.pop()))
+                                                        expressionParser.pop()))
                                         )
                                 ),
                                 doIt(peek(ForLoop.class).begin().addToLeft(tagPropertyParser.getCurrentProperty())),

@@ -18,8 +18,6 @@ import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.exception.ParseBypassException;
 import com.lyncode.jtwig.exception.ParseException;
 import com.lyncode.jtwig.exception.RenderException;
-import com.lyncode.jtwig.functions.JtwigFunction;
-import com.lyncode.jtwig.functions.exceptions.FunctionException;
 import com.lyncode.jtwig.tree.api.Content;
 import com.lyncode.jtwig.tree.helper.RenderStream;
 import org.junit.Test;
@@ -63,12 +61,4 @@ public class JtwigContentParserTest {
         }
     }
 
-    private JtwigFunction identityFunction() {
-        return new JtwigFunction() {
-            @Override
-            public Object execute(Object... arguments) throws FunctionException {
-                return arguments[0];
-            }
-        };
-    }
 }

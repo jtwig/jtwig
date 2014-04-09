@@ -14,6 +14,11 @@
     <dependencies>
         <dependency>
             <groupId>com.lyncode</groupId>
+            <artifactId>jtwig-types</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.lyncode</groupId>
             <artifactId>jtwig-functions</artifactId>
             <version>${project.version}</version>
         </dependency>

@@ -14,11 +14,10 @@
 
 package com.lyncode.jtwig.tree.expressions;
 
-import com.lyncode.builder.ListBuilder;
 import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.exception.CalculateException;
 import com.lyncode.jtwig.functions.exceptions.FunctionException;
-import com.lyncode.jtwig.functions.exceptions.FunctionNotFoundException;
+import com.lyncode.jtwig.functions.parameters.GivenParameters;
 import com.lyncode.jtwig.tree.api.Expression;
 
 import java.util.ArrayList;
@@ -47,16 +46,14 @@ public class Composition implements Expression {
         try {
             Object resolved = expression.calculate(context);
             for (FunctionElement functionElement : filters) {
-                List<Object> arguments = new ListBuilder<Object>()
-                        .add(resolved)
-                        .add(functionElement.getArguments().calculate(context).toArray())
-                        .build();
-                resolved = context.function(functionElement.getName()).execute(arguments.toArray());
+                GivenParameters parameters = new GivenParameters()
+                        .addObject(resolved)
+                        .addArray(functionElement.getArguments().calculate(context).toArray());
+
+                resolved = context.executeFunction(functionElement.getName(), parameters);
             }
             return resolved;
         } catch (FunctionException e) {
-            throw new CalculateException(e);
-        } catch (FunctionNotFoundException e) {
             throw new CalculateException(e);
         }
 

@@ -24,6 +24,7 @@ import com.lyncode.jtwig.parser.JtwigParser;
 import com.lyncode.jtwig.parser.config.ParserConfiguration;
 import com.lyncode.jtwig.resource.WebJtwigResource;
 import com.lyncode.jtwig.tree.api.Content;
+import com.lyncode.jtwig.tree.helper.RenderStream;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.BeansException;
@@ -39,6 +40,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class JtwigView extends AbstractTemplateView {
+
     private static Logger log = LogManager.getLogger(JtwigView.class);
 
     private Map<String, Content> compiledTemplates = new HashMap<>();
@@ -70,7 +72,8 @@ public class JtwigView extends AbstractTemplateView {
     }
 
     @Override
-    protected void renderMergedTemplateModel(Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    protected void renderMergedTemplateModel(Map<String, Object> model, HttpServletRequest request,
+                                             HttpServletResponse response) throws Exception {
 
         // Adding model information
         JtwigModelMap modelMap = new JtwigModelMap()
@@ -85,11 +88,12 @@ public class JtwigView extends AbstractTemplateView {
         }
 
         response.setContentType(this.getContentType());
-        if (this.getEncoding() != null){
+        if (this.getEncoding() != null) {
             response.setCharacterEncoding(this.getEncoding());
         }
 
-        getContent(request).render(response.getOutputStream(), new JtwigContext(modelMap, getViewResolver().getFunctionRepository()));
+        getContent(request).render(new RenderStream(response.getOutputStream()),
+                                   new JtwigContext(modelMap, getViewResolver().getFunctionResolver()));
     }
 
     public Content getContent(HttpServletRequest request) throws CompileException, ParseException {
@@ -103,7 +107,8 @@ public class JtwigView extends AbstractTemplateView {
     }
 
     private Content getCompiledJtwigTemplate(HttpServletRequest request) throws ParseException, CompileException {
-        return new JtwigTemplate(new WebJtwigResource(request.getSession().getServletContext(), getUrl())).compile(jtwigParserBuilder());
+        return new JtwigTemplate(new WebJtwigResource(request.getSession().getServletContext(), getUrl())).compile(
+                jtwigParserBuilder());
     }
 
     private JtwigParser.Builder jtwigParserBuilder() {
@@ -112,12 +117,14 @@ public class JtwigView extends AbstractTemplateView {
 
     @SuppressWarnings("serial")
     private static class GenericServletAdapter extends GenericServlet {
+
         public void service(ServletRequest servletRequest, ServletResponse servletResponse) {
             // no-op
         }
     }
 
     private class DelegatingServletConfig implements ServletConfig {
+
         public String getServletName() {
             return JtwigView.this.getBeanName();
         }
