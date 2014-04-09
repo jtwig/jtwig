@@ -165,10 +165,6 @@ public class RenderStream {
         mMultiStream.get(originIndex).writeTo(singleOuputStream.getStream());
     }
 
-    public void finish() throws IOException {
-        merge();
-    }
-
     private OutputStream getStream() {
         return mStream;
     }
