@@ -20,6 +20,10 @@ Jtwig uses [Semantic Versioning](http://semver.org/)
 
 ## Changes
 
+2.1.4 - 2.1.5 (09-Apr-2014)
+
+- FIX (blocker): [#97](https://github.com/lyncode/jtwig/issues/97)
+
 2.1.3 - 2.1.4 (26-Mar-2014)
 
 - FIX (blocker): [#86](https://github.com/lyncode/jtwig/issues/86)
