@@ -26,6 +26,7 @@ import static com.lyncode.jtwig.types.Undefined.UNDEFINED;
 
 public class JtwigContext {
 
+    //context
     private static final String MODEL = "model";
 
     public static JtwigContext context () {
