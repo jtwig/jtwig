@@ -25,14 +25,6 @@ public class SingleOuputStream extends ByteArrayOutputStream {
         mByteStream = byteStream;
     }
 
-    public SingleOuputStream(FastByteArrayOutputStream outputStream, boolean inheritedStream) {
-        this(outputStream, inheritedStream, true);
-    }
-
-    public SingleOuputStream(ByteArrayOutputStream outputStream, boolean inheritedStream) {
-        this(outputStream, inheritedStream, true);
-    }
-
     @Override
     public void writeTo(OutputStream out) throws IOException {
         if (mByteStream) {

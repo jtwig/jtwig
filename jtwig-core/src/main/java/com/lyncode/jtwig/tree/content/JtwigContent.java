@@ -25,13 +25,13 @@ import com.lyncode.jtwig.tree.api.TagInformation;
 import com.lyncode.jtwig.tree.helper.RenderStream;
 import com.lyncode.jtwig.tree.structural.Block;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.lyncode.jtwig.tree.api.TagProperty.Trim;
 
 public class JtwigContent implements Content {
+
     private List<Content> contents = new ArrayList<>();
 
     @Override
@@ -39,11 +39,6 @@ public class JtwigContent implements Content {
         for (Content content : contents) {
             content.render(renderStream, context);
         }
-//        try {
-//            renderStream.merge();
-//        } catch (IOException e) {
-//            throw new RenderException(e);
-//        }
         return true;
     }
 
@@ -52,7 +47,8 @@ public class JtwigContent implements Content {
         return compile(parser, resource, new TagInformation(), new TagInformation());
     }
 
-    public JtwigContent compile(JtwigParser parser, JtwigResource resource, TagInformation begin, TagInformation end) throws CompileException {
+    public JtwigContent compile(JtwigParser parser, JtwigResource resource, TagInformation begin,
+                                TagInformation end) throws CompileException {
         for (int i = 0; i < contents.size(); i++) {
             Content content = contents.get(i);
             if (content instanceof Text) {
@@ -111,8 +107,9 @@ public class JtwigContent implements Content {
                 if (expression.getName().equals(tmp.getName())) {
                     contents.set(i, expression.getContent());
                     replaced = true;
-                } else
+                } else {
                     replaced = replaced || tmp.replace(expression);
+                }
             } else {
                 replaced = replaced || contents.get(i).replace(expression);
             }

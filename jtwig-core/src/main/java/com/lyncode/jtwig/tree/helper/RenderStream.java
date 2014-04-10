@@ -15,7 +15,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public class RenderStream {
 
     private final static ExecutorService sExecutor;
-    private final OutputStream mStream;
+    private final OutputStream mRootOutputStream;
     private final MultiOuputStream mMultiStream;
     private RenderIndex mIndex;
     private final ReentrantReadWriteLock mLock;
@@ -30,7 +30,7 @@ public class RenderStream {
     private RenderStream(MultiOuputStream multiStream, OutputStream stream, RenderIndex dIndex,
                          ReentrantReadWriteLock rwl, RenderControl renderControl) {
         this.mMultiStream = multiStream;
-        this.mStream = stream;
+        this.mRootOutputStream = stream;
         this.mIndex = dIndex;
         this.mControl = renderControl;
         this.mLock = rwl;
@@ -84,7 +84,7 @@ public class RenderStream {
         if (mIndex != null) {
             return mMultiStream.get(mIndex);
         } else {
-            return getStream();
+            return getRootOutputStream();
         }
     }
 
@@ -115,7 +115,7 @@ public class RenderStream {
         mIndex = mIndex.right(); // this will continue with the right children
         mMultiStream.newStream(mIndex);
 
-        RenderStream forkedStream = new RenderStream(mMultiStream, getStream(), forkedIndex,
+        RenderStream forkedStream = new RenderStream(mMultiStream, getRootOutputStream(), forkedIndex,
                                                      mLock, mControl);
         unlockChange();
         return forkedStream;
@@ -153,7 +153,7 @@ public class RenderStream {
                 index = previous;
                 previous = index.previous();
             }
-            getStream().write(mMultiStream.get(toMerge).toByteArray());
+            getRootOutputStream().write(mMultiStream.get(toMerge).toByteArray());
             mMultiStream.merged(toMerge);
         }
         unlockChange();
@@ -165,8 +165,8 @@ public class RenderStream {
         mMultiStream.get(originIndex).writeTo(singleOuputStream.getStream());
     }
 
-    private OutputStream getStream() {
-        return mStream;
+    private OutputStream getRootOutputStream() {
+        return mRootOutputStream;
     }
 
     private void lockWrite() {
@@ -187,7 +187,7 @@ public class RenderStream {
 
     @Override
     public String toString() {
-        return getStream().toString();
+        return getRootOutputStream().toString();
     }
 
 }
