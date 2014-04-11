@@ -21,6 +21,7 @@ import com.lyncode.jtwig.functions.exceptions.FunctionException;
 import com.lyncode.jtwig.services.api.assets.AssetResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
+import org.springframework.core.env.Environment;
 import org.springframework.web.servlet.LocaleResolver;
 
 import javax.servlet.http.HttpServletRequest;
@@ -35,6 +36,9 @@ public class SpringFunctions {
 
     @Autowired(required = false)
     private LocaleResolver localeResolver;
+
+    @Autowired(required = false)
+    private Environment environment;
 
     @JtwigFunction(name = "asset")
     public String asset (HttpServletRequest request, @Parameter String input) throws AssetResolveException, FunctionException {
@@ -55,5 +59,11 @@ public class SpringFunctions {
             throw new FunctionException("In order to use the translate function, a bean of type "+LocaleResolver.class.getName()+" must be configured");
 
         return messageSource.getMessage(input, rest, localeResolver.resolveLocale(request));
+    }
+
+    @JtwigFunction(name = "property")
+    public Object property (@Parameter String name) throws FunctionException {
+        if (environment == null) throw new FunctionException("Unable to retrieve Environment bean");
+        else return environment.getProperty(name);
     }
 }
