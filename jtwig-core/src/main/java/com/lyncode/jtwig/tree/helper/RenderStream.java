@@ -13,19 +13,30 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class RenderStream {
+    private static int minThreads = 20;
+    private static int maxThreads = 100;
+    private static ExecutorService sExecutor = null;
 
-    private final static ExecutorService sExecutor;
+    private static ExecutorService executorService() {
+        if (sExecutor == null)
+            sExecutor = new ThreadPoolExecutor(minThreads, maxThreads, 60L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>());
+        return sExecutor;
+    }
+
+    public static void withMinThreads (int value) {
+        // Should run this method before do any parsing (initialization)
+        minThreads = value;
+    }
+    public static void withMaxThreads (int value) {
+        // Should run this method before do any parsing (initialization)
+        maxThreads = value;
+    }
+
     private final OutputStream mRootOutputStream;
     private final MultiOuputStream mMultiStream;
     private RenderIndex mIndex;
     private final ReentrantReadWriteLock mLock;
     private final RenderControl mControl;
-
-    static {
-        sExecutor = new ThreadPoolExecutor(20, Integer.MAX_VALUE,
-                                           60L, TimeUnit.SECONDS,
-                                           new SynchronousQueue<Runnable>());
-    }
 
     private RenderStream(MultiOuputStream multiStream, OutputStream stream, RenderIndex dIndex,
                          ReentrantReadWriteLock rwl, RenderControl renderControl) {
@@ -56,11 +67,11 @@ public class RenderStream {
     public RenderStream renderConcurrent(final Content content, final JtwigContext context) throws RenderException {
         try {
             mControl.push();
-            sExecutor.execute(new RenderTask(fork(), content, context));
+            executorService().execute(new RenderTask(fork(), content, context));
         } catch (IOException e) {
             throw new RenderException(e);
         } catch (OutOfMemoryError e) {
-            sExecutor.shutdownNow();
+            executorService().shutdownNow();
             mControl.cancel();
         }
         return this;
