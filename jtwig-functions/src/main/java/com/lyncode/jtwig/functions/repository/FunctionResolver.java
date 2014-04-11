@@ -14,30 +14,90 @@
 
 package com.lyncode.jtwig.functions.repository;
 
+import com.lyncode.jtwig.functions.annotations.JtwigFunction;
+import com.lyncode.jtwig.functions.builtin.*;
 import com.lyncode.jtwig.functions.exceptions.FunctionNotFoundException;
 import com.lyncode.jtwig.functions.parameters.GivenParameters;
+import com.lyncode.jtwig.functions.parameters.convert.CompositeParameterConverter;
 import com.lyncode.jtwig.functions.parameters.convert.api.ParameterConverter;
 import com.lyncode.jtwig.functions.parameters.convert.exceptions.ConvertException;
-import com.lyncode.jtwig.functions.parameters.resolve.BaseParameterResolver;
+import com.lyncode.jtwig.functions.parameters.resolve.CompositeParameterResolver;
+import com.lyncode.jtwig.functions.parameters.resolve.api.AnnotatedMethodParameterResolver;
+import com.lyncode.jtwig.functions.parameters.resolve.api.TypeMethodParameterResolver;
 import com.lyncode.jtwig.functions.parameters.resolve.exceptions.ResolveException;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class FunctionResolver {
+    private final Map<String, Map<Class[], Pair<FunctionReference,  Boolean>>> cachedFunctions = new HashMap<>();
+    private final Map<String, List<FunctionReference>> functions;
+    private final CompositeParameterResolver parameterResolver;
+    private final CompositeParameterConverter parameterConverter;
 
-    private Map<String, Map<Class[], Pair<FunctionReference,  Boolean>>> cachedFunctions = new HashMap<>();
-    private Map<String, List<FunctionReference>> functions;
-    private BaseParameterResolver parameterResolver;
-    private com.lyncode.jtwig.functions.parameters.convert.ParameterConverter parameterConverter;
+    public FunctionResolver() {
+        this.functions = new HashMap<>();
+        this.parameterResolver = new CompositeParameterResolver();
+        this.parameterConverter = new CompositeParameterConverter();
 
-    public FunctionResolver(Map<String, List<FunctionReference>> functions, BaseParameterResolver parameterResolver, com.lyncode.jtwig.functions.parameters.convert.ParameterConverter parameterConverter) {
-        this.functions = functions;
-        this.parameterResolver = parameterResolver;
-        this.parameterConverter = parameterConverter;
+        store(new StringFunctions());
+        store(new MathFunctions());
+        store(new NumberFunctions());
+        store(new MapFunctions());
+        store(new ListFunctions());
+        store(new ObjectFunctions());
+        store(new DateFunctions());
+        store(new BooleanFunctions());
+    }
+
+    public FunctionResolver add(Class<?> from, Class<?> to, ParameterConverter converter) {
+        parameterConverter.add(from, to, converter);
+        return this;
+    }
+
+    public FunctionResolver add(AnnotatedMethodParameterResolver resolver) {
+        parameterResolver.add(resolver);
+        return this;
+    }
+
+    public FunctionResolver add(TypeMethodParameterResolver resolver) {
+        parameterResolver.add(resolver);
+        return this;
+    }
+
+    public FunctionResolver store(Object instance) {
+        for (Method method : instance.getClass().getDeclaredMethods()) {
+            JtwigFunction annotation = method.getAnnotation(JtwigFunction.class);
+            if (annotation != null) {
+                addFunction(instance, method, annotation.name());
+                for (String name : annotation.aliases()) {
+                    addFunction(instance, method, name);
+                }
+            }
+
+        }
+        return this;
+    }
+
+    private void addFunction(Object instance, Method method, String name) {
+        if (!functions.containsKey(name))
+            functions.put(name, new ArrayList<FunctionReference>());
+        List<FunctionReference> functionReferences = functions.get(name);
+        FunctionReference newFunctionReference = new FunctionReference(method, instance);
+        // references are ordered
+        boolean added = false;
+        for (int i=0;i<functionReferences.size() && !added;i++) {
+            if (functionReferences.get(i).compareTo(newFunctionReference) > 0) {
+                functionReferences.add(i, newFunctionReference);
+                added = true;
+            }
+        }
+        if (!added) functionReferences.add(newFunctionReference);
     }
 
     public CallableFunction get(String name, GivenParameters givenParameters) throws FunctionNotFoundException, ResolveException {
