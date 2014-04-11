@@ -20,7 +20,7 @@ import com.lyncode.jtwig.builder.JtwigResourceBuilder;
 import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.ParseException;
 import com.lyncode.jtwig.exception.RenderException;
-import com.lyncode.jtwig.parser.JtwigParser;
+import com.lyncode.jtwig.parser.JtwigParserBuilder;
 import com.lyncode.jtwig.resource.ClasspathJtwigResource;
 import com.lyncode.jtwig.resource.JtwigResource;
 import com.lyncode.jtwig.resource.StringJtwigResource;
@@ -28,7 +28,7 @@ import com.lyncode.jtwig.resource.StringJtwigResource;
 import java.io.ByteArrayOutputStream;
 
 public class AbstractJtwigTest {
-    private JtwigParser.Builder parserBuilder = new JtwigParser.Builder();
+    private JtwigParserBuilder parserBuilder = new JtwigParserBuilder();
     private JtwigContext context = new JtwigContext();
     private String output;
 
@@ -48,7 +48,7 @@ public class AbstractJtwigTest {
         return new JtwigTemplate(content);
     }
 
-    protected JtwigParser.Builder theParser () {
+    protected JtwigParserBuilder theParser () {
         return this.parserBuilder;
     }
 

@@ -35,4 +35,9 @@ public class StringJtwigResource implements JtwigResource {
     public JtwigResource resolve(String relativePath) throws ResourceException {
         throw new ResourceException("Cannot resolve relative resources in a String resource");
     }
+
+    @Override
+    public String toString() {
+        return "String Source";
+    }
 }

@@ -16,15 +16,18 @@ package com.lyncode.jtwig.tree.expressions;
 
 import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.exception.CalculateException;
+import com.lyncode.jtwig.parser.positioning.Position;
+import com.lyncode.jtwig.tree.api.AbstractExpression;
 import com.lyncode.jtwig.tree.api.Expression;
 import com.lyncode.jtwig.util.BooleanOperations;
 import com.lyncode.jtwig.util.MathOperations;
 
-public class OperationUnary implements Expression {
-    private Operator operator;
+public class OperationUnary extends AbstractExpression {
+    private final Operator operator;
     private Expression operand;
 
-    public OperationUnary(Operator operator) {
+    public OperationUnary(Position position, Operator operator) {
+        super(position);
         this.operator = operator;
     }
 
@@ -53,6 +56,6 @@ public class OperationUnary implements Expression {
             case SUB:
                 return MathOperations.mul(-1, operand.calculate(context));
         }
-        throw new CalculateException("Unknown operator "+operator);
+        throw new CalculateException(getPosition()+": Expression with unknown operator " + operator.toString());
     }
 }

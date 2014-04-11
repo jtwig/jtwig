@@ -12,30 +12,35 @@
  * limitations under the License.
  */
 
-package com.lyncode.jtwig.addons.spaceless;
+package com.lyncode.jtwig.parser.positioning;
 
-import com.lyncode.jtwig.parser.addons.JtwigContentAddon;
-import com.lyncode.jtwig.parser.addons.JtwigContentAddonParser;
-import com.lyncode.jtwig.parser.config.ParserConfiguration;
 import com.lyncode.jtwig.resource.JtwigResource;
 
-public class SpacelessParser extends JtwigContentAddonParser {
-    public SpacelessParser(JtwigResource resource, ParserConfiguration configuration) {
-        super(resource, configuration);
+public class Position {
+    private JtwigResource resource;
+    private int row;
+    private int column;
+
+    public Position(JtwigResource resource, int row, int column) {
+        this.resource = resource;
+        this.row = row;
+        this.column = column;
+    }
+
+    public JtwigResource getResource() {
+        return resource;
+    }
+
+    public int getRow() {
+        return row;
+    }
+
+    public int getColumn() {
+        return column;
     }
 
     @Override
-    public JtwigContentAddon instance() {
-        return new Spaceless();
-    }
-
-    @Override
-    public String beginKeyword() {
-        return "spaceless";
-    }
-
-    @Override
-    public String endKeyword() {
-        return "endspaceless";
+    public String toString() {
+        return resource + " -> Line "+row+", column "+column;
     }
 }

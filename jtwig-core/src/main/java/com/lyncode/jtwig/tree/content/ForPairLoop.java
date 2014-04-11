@@ -17,6 +17,7 @@ package com.lyncode.jtwig.tree.content;
 import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.exception.CalculateException;
 import com.lyncode.jtwig.exception.RenderException;
+import com.lyncode.jtwig.parser.positioning.Position;
 import com.lyncode.jtwig.tree.api.Expression;
 import com.lyncode.jtwig.tree.expressions.Variable;
 
@@ -26,13 +27,13 @@ import java.util.Map;
 public class ForPairLoop extends ForLoop {
     private Variable value;
 
-    public ForPairLoop(Variable key, Variable value, Expression map) {
-        super(key, map);
+    public ForPairLoop(Position position, Variable key, Variable value, Expression map) {
+        super(position, key, map);
         this.value = value;
     }
 
     @Override
-    public boolean render(OutputStream outputStream, JtwigContext context) throws RenderException {
+    public void render(OutputStream outputStream, JtwigContext context) throws RenderException {
         try {
             Object resolved = expression.calculate(context);
 
@@ -49,7 +50,6 @@ public class ForPairLoop extends ForLoop {
                 context.set(value.getIdentifier(), map.get(key));
                 content.render(outputStream, context);
             }
-            return true;
         } catch (CalculateException e) {
             throw new RenderException(e);
         }

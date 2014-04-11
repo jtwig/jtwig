@@ -20,7 +20,7 @@ import com.lyncode.jtwig.JtwigTemplate;
 import com.lyncode.jtwig.beans.BeanResolver;
 import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.ParseException;
-import com.lyncode.jtwig.parser.JtwigParser;
+import com.lyncode.jtwig.parser.JtwigParserBuilder;
 import com.lyncode.jtwig.parser.config.ParserConfiguration;
 import com.lyncode.jtwig.resource.WebJtwigResource;
 import com.lyncode.jtwig.tree.api.Content;
@@ -106,8 +106,8 @@ public class JtwigView extends AbstractTemplateView {
         return new JtwigTemplate(new WebJtwigResource(request.getSession().getServletContext(), getUrl())).compile(jtwigParserBuilder());
     }
 
-    private JtwigParser.Builder jtwigParserBuilder() {
-        return new JtwigParser.Builder().withConfiguration(getParserConfiguration());
+    private JtwigParserBuilder jtwigParserBuilder() {
+        return new JtwigParserBuilder().withConfiguration(getParserConfiguration());
     }
 
     @SuppressWarnings("serial")

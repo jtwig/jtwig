@@ -12,33 +12,36 @@
  * limitations under the License.
  */
 
-package com.lyncode.jtwig.tree.tags;
+package com.lyncode.jtwig.tree.api;
 
-import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.exception.CompileException;
-import com.lyncode.jtwig.exception.RenderException;
+import com.lyncode.jtwig.parser.JtwigParser;
 import com.lyncode.jtwig.parser.positioning.Position;
-import com.lyncode.jtwig.tree.api.AbstractContent;
-import com.lyncode.jtwig.tree.content.Text;
+import com.lyncode.jtwig.resource.JtwigResource;
 import com.lyncode.jtwig.tree.structural.Block;
 
-import java.io.OutputStream;
+public abstract class AbstractContent implements Content, Tag {
+    private final TagInformation begin = new TagInformation();
+    private final TagInformation end = new TagInformation();
+    private final Position position;
 
-public class Verbatim extends AbstractContent {
-    private Text text;
-
-    public Verbatim(Position position) {
-        super(position);
+    protected AbstractContent(Position position) {
+        this.position = position;
     }
 
-    public Verbatim withText(Text text) {
-        this.text = text;
-        return this;
+    public TagInformation begin() {
+        return this.begin;
+    }
+    public TagInformation end() {
+        return this.end;
+    }
+    public Position getPosition() {
+        return position;
     }
 
     @Override
-    public void render(OutputStream outputStream, JtwigContext context) throws RenderException {
-        text.render(outputStream, context);
+    public Content compile(JtwigParser parser, JtwigResource resource) throws CompileException {
+        return this;
     }
 
     @Override

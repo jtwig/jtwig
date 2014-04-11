@@ -18,6 +18,7 @@ import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.ParseException;
 import com.lyncode.jtwig.exception.RenderException;
 import com.lyncode.jtwig.parser.JtwigParser;
+import com.lyncode.jtwig.parser.JtwigParserBuilder;
 import com.lyncode.jtwig.resource.FileJtwigResource;
 import com.lyncode.jtwig.resource.JtwigResource;
 import com.lyncode.jtwig.resource.StringJtwigResource;
@@ -43,7 +44,7 @@ public class JtwigTemplate {
     }
 
     public void output (OutputStream outputStream, JtwigContext context) throws ParseException, CompileException, RenderException {
-        JtwigParser parser = new JtwigParser.Builder().build();
+        JtwigParser parser = new JtwigParserBuilder().build(resource);
         JtwigParser.parse(parser, resource)
                 .compile(parser, resource)
                 .render(outputStream, context);
@@ -57,14 +58,14 @@ public class JtwigTemplate {
 
 
     public Content compile() throws ParseException, CompileException {
-        JtwigParser parser = new JtwigParser.Builder().build();
+        JtwigParser parser = new JtwigParserBuilder().build(resource);
         return JtwigParser.parse(parser, resource)
                 .compile(parser, resource);
     }
 
 
-    public Content compile(JtwigParser.Builder builder) throws ParseException, CompileException {
-        JtwigParser parser = builder.build();
+    public Content compile(JtwigParserBuilder builder) throws ParseException, CompileException {
+        JtwigParser parser = builder.build(resource);
         return JtwigParser.parse(parser, resource)
                 .compile(parser, resource);
     }
