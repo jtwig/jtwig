@@ -16,7 +16,7 @@ package com.lyncode.jtwig.functions;
 
 import com.lyncode.jtwig.exceptions.AssetResolveException;
 import com.lyncode.jtwig.functions.parameters.resolve.HttpRequestParameterResolver;
-import com.lyncode.jtwig.functions.repository.FunctionRepositoryBuilder;
+import com.lyncode.jtwig.functions.repository.FunctionResolver;
 import com.lyncode.jtwig.services.api.assets.AssetResolver;
 import org.junit.Before;
 import org.junit.Test;
@@ -50,7 +50,7 @@ public class SpringFunctionsTest {
     private ApplicationContext applicationContext;
 
     private SpringFunctions functions = new SpringFunctions();
-    private FunctionRepositoryBuilder builder = new FunctionRepositoryBuilder()
+    private FunctionResolver builder = new FunctionResolver()
             .add(new HttpRequestParameterResolver())
             .store(functions);
 

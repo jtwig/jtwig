@@ -17,7 +17,6 @@ package com.lyncode.jtwig;
 import com.lyncode.jtwig.functions.exceptions.FunctionException;
 import com.lyncode.jtwig.functions.parameters.GivenParameters;
 import com.lyncode.jtwig.functions.parameters.resolve.exceptions.ResolveException;
-import com.lyncode.jtwig.functions.repository.FunctionRepositoryBuilder;
 import com.lyncode.jtwig.functions.repository.FunctionResolver;
 
 import java.lang.reflect.InvocationTargetException;
@@ -39,18 +38,14 @@ public class JtwigContext {
         this.functionRepository = functionRepository;
         this.modelMap = modelMap;
     }
-    public JtwigContext(JtwigModelMap modelMap, FunctionRepositoryBuilder functionRepository) {
-        this.functionRepository = functionRepository.build();
-        this.modelMap = modelMap;
-    }
 
     public JtwigContext(JtwigModelMap modelMap) {
-        this.functionRepository = new FunctionRepositoryBuilder().build();
+        this.functionRepository = new FunctionResolver();
         this.modelMap = modelMap;
     }
 
     public JtwigContext() {
-        this.functionRepository = new FunctionRepositoryBuilder().build();
+        this.functionRepository = new FunctionResolver();
         this.modelMap = new JtwigModelMap();
     }
 
