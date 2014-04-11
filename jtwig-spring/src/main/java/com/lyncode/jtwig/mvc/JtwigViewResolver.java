@@ -46,7 +46,7 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
 
     private String encoding;
     private String theme;
-    private boolean cached;
+    private boolean cached = true;
 
     private ParserConfiguration parserConfiguration = new ParserConfiguration();
     private FunctionRepositoryBuilder functionRepository = new FunctionRepositoryBuilder();
