@@ -12,7 +12,9 @@
  * limitations under the License.
  */
 
-package com.lyncode.jtwig.tree.api;
+package com.lyncode.jtwig.test.addons;
 
-public interface Element {
+import com.lyncode.jtwig.test.AbstractJtwigTest;
+
+public abstract class AbstractAddonTest extends AbstractJtwigTest {
 }

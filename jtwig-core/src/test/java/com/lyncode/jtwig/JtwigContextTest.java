@@ -14,6 +14,7 @@
 
 package com.lyncode.jtwig;
 
+import com.lyncode.jtwig.parser.positioning.Position;
 import com.lyncode.jtwig.tree.expressions.Selection;
 import com.lyncode.jtwig.tree.expressions.Variable;
 import org.junit.Test;
@@ -27,12 +28,13 @@ import static org.mockito.Mockito.when;
 
 public class JtwigContextTest {
     private JtwigModelMap modelMap = mock(JtwigModelMap.class);
+    private Position position = mock(Position.class);
     private JtwigContext context = new JtwigContext(modelMap);
 
     @Test
     public void shouldResolveVariable() throws Exception {
         addItem("name", "joao");
-        assertThat(new Variable("name").calculate(context), is((Object) "joao"));
+        assertThat(new Variable(position, "name").calculate(context), is((Object) "joao"));
     }
 
     private void addItem(String key, Object value) {
@@ -43,10 +45,9 @@ public class JtwigContextTest {
     @Test
     public void shouldResolveComposition() throws Exception {
         addItem("name", new ArrayList<Object>());
-        Selection selection = new Selection(
-                new Variable("name"),
-                new Variable("size")
-        );
+        Selection selection = new Selection(position);
+        selection.add(new Variable(position, "name"));
+        selection.add(new Variable(position, "size"));
         assertThat(selection.calculate(context), is((Object) 0));
     }
 }

@@ -16,25 +16,19 @@ package com.lyncode.jtwig.tree.content;
 
 import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.exception.CalculateException;
-import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.RenderException;
-import com.lyncode.jtwig.parser.JtwigParser;
-import com.lyncode.jtwig.resource.JtwigResource;
-import com.lyncode.jtwig.tree.api.Content;
+import com.lyncode.jtwig.parser.positioning.Position;
+import com.lyncode.jtwig.tree.api.AbstractContent;
 import com.lyncode.jtwig.tree.api.Expression;
-import com.lyncode.jtwig.tree.api.Tag;
-import com.lyncode.jtwig.tree.api.TagInformation;
-import com.lyncode.jtwig.tree.structural.Block;
 
 import java.io.IOException;
 import java.io.OutputStream;
 
-public class Output implements Content, Tag {
-    private Expression expression;
-    private TagInformation begin = new TagInformation();
-    private TagInformation end = new TagInformation();
+public class Output extends AbstractContent {
+    private final Expression expression;
 
-    public Output(Expression expression) {
+    public Output(Position position, Expression expression) {
+        super(position);
         this.expression = expression;
     }
 
@@ -43,36 +37,15 @@ public class Output implements Content, Tag {
     }
 
     @Override
-    public boolean render(OutputStream outputStream, JtwigContext context) throws RenderException {
+    public void render(OutputStream outputStream, JtwigContext context) throws RenderException {
         try {
             outputStream.write(String.valueOf(expression.calculate(context)).getBytes());
-            return true;
         } catch (IOException | CalculateException e) {
             throw new RenderException(e);
         }
     }
 
-    @Override
-    public Output compile(JtwigParser parser, JtwigResource resource) throws CompileException {
-        return this;
-    }
-
-    @Override
-    public boolean replace(Block expression) throws CompileException {
-        return false;
-    }
-
     public String toString () {
         return "Render the result of "+expression;
-    }
-
-    @Override
-    public TagInformation begin() {
-        return this.begin;
-    }
-
-    @Override
-    public TagInformation end() {
-        return this.end;
     }
 }

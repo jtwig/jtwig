@@ -19,69 +19,47 @@ import com.lyncode.jtwig.exception.CalculateException;
 import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.RenderException;
 import com.lyncode.jtwig.parser.JtwigParser;
+import com.lyncode.jtwig.parser.positioning.Position;
 import com.lyncode.jtwig.resource.JtwigResource;
-import com.lyncode.jtwig.tree.api.Content;
+import com.lyncode.jtwig.tree.api.AbstractContent;
 import com.lyncode.jtwig.tree.api.Expression;
-import com.lyncode.jtwig.tree.api.Tag;
 import com.lyncode.jtwig.tree.api.TagInformation;
 import com.lyncode.jtwig.tree.structural.Block;
 
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import static com.lyncode.jtwig.util.BooleanOperations.isTrue;
 
-public class IfExpression implements Content, Tag {
-    private Expression conditionalExpression;
-    private JtwigContent content;
-    private ElseExpression elseExpression = null;
-    private List<ElseIfExpression> elseIfExpressions = new ArrayList<ElseIfExpression>();
+public class IfExpression extends AbstractContent {
+    private final List<Case> cases = new ArrayList<>();
 
-    private TagInformation begin = new TagInformation();
-    private TagInformation end = new TagInformation();
-
-    public TagInformation begin() {
-        return begin;
+    public IfExpression(Position position, Case aCase) {
+        super(position);
+        cases.add(aCase);
     }
 
-    public TagInformation end() {
-        return end;
+    public IfExpression add (Case newCase) {
+        this.cases.add(newCase);
+        return this;
     }
 
-    public IfExpression(Expression conditionalExpression) {
-        this.conditionalExpression = conditionalExpression;
-    }
-
-    public boolean setElseExpression(ElseExpression elseExpression) {
-        this.elseExpression = elseExpression;
-        return true;
-    }
-
-    public boolean addElseIf (ElseIfExpression expression) {
-        this.elseIfExpressions.add(expression);
-        return true;
-    }
-
-    public boolean setContent(JtwigContent content) {
-        this.content = content;
-        return true;
+    public Case current () {
+        return cases.get(cases.size() - 1);
     }
 
     @Override
-    public boolean render(OutputStream outputStream, JtwigContext context) throws RenderException {
+    public void render(OutputStream outputStream, JtwigContext context) throws RenderException {
         try {
-            if (isTrue(conditionalExpression.calculate(context))) {
-                return content.render(outputStream, context);
-            } else {
-                for (ElseIfExpression exp : elseIfExpressions) {
-                    if (exp.render(outputStream, context))
-                        return true;
+            Iterator<Case> iterator = cases.iterator();
+            while (iterator.hasNext()) {
+                Case next = iterator.next();
+                if (next.conditionIsTrue(context)) {
+                    next.render(outputStream, context);
+                    break;
                 }
-                if (hasElse()) {
-                    return elseExpression.render(outputStream, context);
-                }
-                return true;
             }
         } catch (CalculateException e) {
             throw new RenderException(e);
@@ -90,134 +68,62 @@ public class IfExpression implements Content, Tag {
 
     @Override
     public IfExpression compile(JtwigParser parser, JtwigResource resource) throws CompileException {
-        TagInformation end = end();
-        if (!elseIfExpressions.isEmpty())
-            end = elseIfExpressions.get(0).tag();
-        else if (hasElse())
-            end = elseExpression.tag();
-
-        this.content = content.compile(parser, resource, begin(), end);
-
-        int size = this.elseIfExpressions.size();
-        for (int i = 0;i < size;i++) {
-            end = end();
-            if (i < size - 1)
-                end = elseIfExpressions.get(i+1).tag();
-            else if (hasElse())
-                end = elseExpression.tag();
-            ElseIfExpression elseIfExpression = elseIfExpressions.get(i);
-            elseIfExpressions.set(i, elseIfExpression.compile(parser, resource, elseIfExpression.tag(), end));
-        }
-
-        if (hasElse()) {
-            elseExpression = elseExpression.compile(parser, resource, elseExpression.tag(), end());
-        }
-
+        for (int i = 0;i<cases.size();i++)
+            cases.set(i, cases.get(i).compile(parser, resource));
         return this;
-    }
-
-    private boolean hasElse() {
-        return elseExpression != null;
     }
 
     @Override
     public boolean replace(Block expression) throws CompileException {
-        boolean replaced = this.content.replace(expression);
-
-        for (int i = 0;i<this.elseIfExpressions.size();i++)
-            replaced = replaced || elseIfExpressions.get(i).replace(expression);
-
-        if (hasElse())
-            replaced =  replaced || elseExpression.replace(expression);
-
+        boolean replaced = false;
+        for (Case aCase : cases) {
+            replaced |= aCase.replace(expression);
+        }
         return replaced;
     }
 
-    public static class ElseIfExpression implements Content {
-        private Expression condition;
-        private JtwigContent content;
-        private TagInformation tag = new TagInformation();
-
-        public ElseIfExpression(Expression condition) {
-            this.condition = condition;
-        }
-
-        public boolean setContent(JtwigContent abstractContent) {
-            this.content = abstractContent;
-            return true;
-        }
-
-        public Content getContent() {
-            return content;
-        }
-
-        @Override
-        public boolean render(OutputStream outputStream, JtwigContext context) throws RenderException {
-            try {
-                if (isTrue(condition.calculate(context))) {
-                    return content.render(outputStream, context);
-                }
-                return false;
-            } catch (CalculateException e) {
-                throw new RenderException(e);
-            }
-        }
-
-        @Override
-        public ElseIfExpression compile(JtwigParser parser, JtwigResource resource) throws CompileException {
-            content = content.compile(parser, resource);
-            return this;
-        }
-
-
-        public ElseIfExpression compile(JtwigParser parser, JtwigResource resource, TagInformation begin, TagInformation end) throws CompileException {
-            content = content.compile(parser, resource, begin, end);
-            return this;
-        }
-
-        @Override
-        public boolean replace(Block expression) throws CompileException {
-            return content.replace(expression);
-        }
-
-        public TagInformation tag() {
-            return this.tag;
-        }
+    @Override
+    public TagInformation begin() {
+        return cases.get(0).begin();
     }
 
-    public static class ElseExpression implements Content {
+    @Override
+    public TagInformation end() {
+        return cases.get(cases.size() - 1).end();
+    }
+
+    public static class Case extends AbstractContent {
+        private Expression expression;
         private JtwigContent content;
-        private TagInformation tag = new TagInformation();
 
-        public boolean setContent(JtwigContent content) {
+        public Case(Position position, Expression condition) {
+            super(position);
+            this.expression = condition;
+        }
+
+        public Case setContent(JtwigContent content) {
             this.content = content;
-            return true;
-        }
-
-        @Override
-        public boolean render(OutputStream outputStream, JtwigContext context) throws RenderException {
-            content.render(outputStream, context);
-            return true;
-        }
-
-        @Override
-        public ElseExpression compile(JtwigParser parser, JtwigResource resource) throws CompileException {
-            content = content.compile(parser, resource);
             return this;
         }
 
-        public ElseExpression compile(JtwigParser parser, JtwigResource resource, TagInformation begin, TagInformation end) throws CompileException {
-            content = content.compile(parser, resource, begin, end);
+        public boolean conditionIsTrue (JtwigContext context) throws CalculateException {
+            return isTrue(expression.calculate(context));
+        }
+
+        @Override
+        public void render(OutputStream outputStream, JtwigContext context) throws RenderException {
+            content.render(outputStream, context);
+        }
+
+        @Override
+        public Case compile(JtwigParser parser, JtwigResource resource) throws CompileException {
+            content = content.compile(parser, resource, begin(), end());
             return this;
         }
 
         @Override
         public boolean replace(Block expression) throws CompileException {
             return content.replace(expression);
-        }
-
-        public TagInformation tag() {
-            return this.tag;
         }
     }
 }

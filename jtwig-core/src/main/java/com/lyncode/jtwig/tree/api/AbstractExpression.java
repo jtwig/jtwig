@@ -12,7 +12,20 @@
  * limitations under the License.
  */
 
-package com.lyncode.jtwig.test.addons.spaceless;
+package com.lyncode.jtwig.tree.api;
 
-public abstract class AbstractAddonTest {
+import com.lyncode.jtwig.parser.positioning.Position;
+
+public abstract class AbstractExpression implements Expression {
+    private final Position position;
+
+    protected AbstractExpression(Position position) {
+        this.position = position;
+    }
+
+    public Position getPosition() {
+        return position;
+    }
+
+
 }

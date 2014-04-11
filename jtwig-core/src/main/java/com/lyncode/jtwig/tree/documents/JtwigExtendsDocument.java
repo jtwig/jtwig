@@ -43,8 +43,8 @@ public class JtwigExtendsDocument implements JtwigDocument {
     }
 
     @Override
-    public boolean render(OutputStream outputStream, JtwigContext context) throws RenderException {
-        return false;
+    public void render(OutputStream outputStream, JtwigContext context) throws RenderException {
+
     }
 
     @Override
@@ -55,16 +55,15 @@ public class JtwigExtendsDocument implements JtwigDocument {
 
             JtwigResource jtwigResource = resource.resolve(anExtends.getPath());
 
-            Content content = JtwigParser.parse(parser, jtwigResource)
-                    .compile(parser, jtwigResource);
+            JtwigParser nestedParser = parser.clone(jtwigResource);
+            Content content = JtwigParser.parse(nestedParser, jtwigResource)
+                    .compile(nestedParser, jtwigResource);
             for (Block expression : blocks) {
                 content.replace(expression);
             }
 
             return content;
-        } catch (ResourceException e) {
-            throw new CompileException(e);
-        } catch (ParseException e) {
+        } catch (ResourceException | ParseException e) {
             throw new CompileException(e);
         }
     }

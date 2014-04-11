@@ -18,22 +18,20 @@ import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.RenderException;
 import com.lyncode.jtwig.parser.JtwigParser;
+import com.lyncode.jtwig.parser.positioning.Position;
 import com.lyncode.jtwig.resource.JtwigResource;
+import com.lyncode.jtwig.tree.api.AbstractContent;
 import com.lyncode.jtwig.tree.api.Content;
-import com.lyncode.jtwig.tree.api.Tag;
-import com.lyncode.jtwig.tree.api.TagInformation;
 import com.lyncode.jtwig.tree.content.JtwigContent;
 
 import java.io.OutputStream;
 
-public class Block implements Content, Tag {
+public class Block extends AbstractContent {
     private String name;
-
     private JtwigContent content;
-    private TagInformation begin = new TagInformation();
-    private TagInformation end = new TagInformation();
 
-    public Block(String name) {
+    public Block(Position position, String name) {
+        super(position);
         this.name = name;
     }
 
@@ -45,9 +43,9 @@ public class Block implements Content, Tag {
         return content;
     }
 
-    public boolean setContent(JtwigContent content) {
+    public Block setContent(JtwigContent content) {
         this.content = content;
-        return true;
+        return this;
     }
 
     @Override
@@ -56,8 +54,8 @@ public class Block implements Content, Tag {
     }
 
     @Override
-    public boolean render(OutputStream outputStream, JtwigContext context) throws RenderException {
-        return content.render(outputStream, context);
+    public void render(OutputStream outputStream, JtwigContext context) throws RenderException {
+        content.render(outputStream, context);
     }
 
     @Override
@@ -69,15 +67,5 @@ public class Block implements Content, Tag {
     @Override
     public boolean replace(Block expression) throws CompileException {
         return content.replace(expression);
-    }
-
-    @Override
-    public TagInformation begin() {
-        return begin;
-    }
-
-    @Override
-    public TagInformation end() {
-        return end;
     }
 }

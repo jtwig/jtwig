@@ -36,4 +36,9 @@ public class ClasspathJtwigResource implements JtwigResource {
         File relativeFile = new File(new File(resource).getParent(), relativePath);
         return new ClasspathJtwigResource(relativeFile.getPath());
     }
+
+    @Override
+    public String toString() {
+        return resource;
+    }
 }

@@ -16,7 +16,8 @@ package com.lyncode.jtwig.tree.expressions;
 
 import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.exception.CalculateException;
-import com.lyncode.jtwig.tree.api.Element;
+import com.lyncode.jtwig.parser.positioning.Position;
+import com.lyncode.jtwig.tree.api.AbstractExpression;
 import com.lyncode.jtwig.tree.api.Expression;
 
 import java.util.ArrayList;
@@ -26,10 +27,12 @@ import java.util.Map;
 
 import static org.apache.commons.lang3.StringUtils.join;
 
-public class ValueMap implements Element, Expression {
+public class ValueMap extends AbstractExpression {
     private Map<String, Object> map = new LinkedHashMap<>();
 
-    public ValueMap() {}
+    public ValueMap(Position position) {
+        super(position);
+    }
 
     public boolean add (String key, Object element) {
         map.put(key, element);

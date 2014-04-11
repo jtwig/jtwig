@@ -16,27 +16,30 @@ package com.lyncode.jtwig.tree.expressions;
 
 import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.exception.CalculateException;
+import com.lyncode.jtwig.parser.positioning.Position;
+import com.lyncode.jtwig.tree.api.AbstractExpression;
 import com.lyncode.jtwig.tree.api.Expression;
 
 import static com.lyncode.jtwig.util.BooleanOperations.isTrue;
 
-public class OperationTernary implements Expression {
-    private Expression booleanExpression;
+public class OperationTernary extends AbstractExpression {
+    private final Expression booleanExpression;
     private Expression ifTrueExpression;
     private Expression ifFalseExpression;
 
-    public OperationTernary(Expression booleanExpression) {
+    public OperationTernary(Position position, Expression booleanExpression) {
+        super(position);
         this.booleanExpression = booleanExpression;
     }
 
-    public boolean setIfTrueExpression(Expression ifTrueExpression) {
+    public OperationTernary setIfTrueExpression(Expression ifTrueExpression) {
         this.ifTrueExpression = ifTrueExpression;
-        return true;
+        return this;
     }
 
-    public boolean setIfFalseExpression(Expression ifFalseExpression) {
+    public OperationTernary setIfFalseExpression(Expression ifFalseExpression) {
         this.ifFalseExpression = ifFalseExpression;
-        return true;
+        return this;
     }
 
     @Override

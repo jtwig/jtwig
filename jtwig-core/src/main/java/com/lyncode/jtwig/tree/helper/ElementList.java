@@ -14,15 +14,13 @@
 
 package com.lyncode.jtwig.tree.helper;
 
-import com.lyncode.jtwig.tree.api.Element;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Arrays.asList;
 import static org.apache.commons.lang3.StringUtils.join;
 
-public class ElementList implements Element {
+public class ElementList {
     private List<Object> list;
 
     public ElementList(Object... list) {

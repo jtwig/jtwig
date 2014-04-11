@@ -16,26 +16,20 @@ package com.lyncode.jtwig.tree.content;
 
 import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.exception.CalculateException;
-import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.RenderException;
-import com.lyncode.jtwig.parser.JtwigParser;
-import com.lyncode.jtwig.resource.JtwigResource;
-import com.lyncode.jtwig.tree.api.Content;
+import com.lyncode.jtwig.parser.positioning.Position;
+import com.lyncode.jtwig.tree.api.AbstractContent;
 import com.lyncode.jtwig.tree.api.Expression;
-import com.lyncode.jtwig.tree.api.Tag;
-import com.lyncode.jtwig.tree.api.TagInformation;
 import com.lyncode.jtwig.tree.expressions.Variable;
-import com.lyncode.jtwig.tree.structural.Block;
 
 import java.io.OutputStream;
 
-public class SetVariable implements Content, Tag {
+public class SetVariable extends AbstractContent {
     private Variable name;
     private Expression assignment;
-    private TagInformation begin = new TagInformation();
-    private TagInformation end = new TagInformation();
 
-    public SetVariable(Variable name) {
+    public SetVariable(Position position, Variable name) {
+        super(position);
         this.name = name;
     }
 
@@ -48,37 +42,12 @@ public class SetVariable implements Content, Tag {
         return name;
     }
 
-    public Object getAssignment() {
-        return assignment;
-    }
-
     @Override
-    public boolean render(OutputStream outputStream, JtwigContext context) throws RenderException {
+    public void render(OutputStream outputStream, JtwigContext context) throws RenderException {
         try {
             context.set(name.getIdentifier(), assignment.calculate(context));
-            return true;
         } catch (CalculateException e) {
             throw new RenderException(e);
         }
-    }
-
-    @Override
-    public SetVariable compile(JtwigParser parser, JtwigResource resource) throws CompileException {
-        return this;
-    }
-
-    @Override
-    public boolean replace(Block expression) throws CompileException {
-        return false;
-    }
-
-    @Override
-    public TagInformation begin() {
-        return begin;
-    }
-
-    @Override
-    public TagInformation end() {
-        return end;
     }
 }

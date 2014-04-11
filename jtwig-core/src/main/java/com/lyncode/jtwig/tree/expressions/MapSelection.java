@@ -16,6 +16,8 @@ package com.lyncode.jtwig.tree.expressions;
 
 import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.exception.CalculateException;
+import com.lyncode.jtwig.parser.positioning.Position;
+import com.lyncode.jtwig.tree.api.AbstractExpression;
 import com.lyncode.jtwig.tree.api.Expression;
 import com.lyncode.jtwig.types.Undefined;
 
@@ -23,11 +25,12 @@ import java.util.Map;
 
 import static com.lyncode.jtwig.types.Undefined.UNDEFINED;
 
-public class MapSelection implements Expression {
+public class MapSelection extends AbstractExpression {
     private Variable variable;
     private Expression key;
 
-    public MapSelection(Variable variable, Expression key) {
+    public MapSelection(Position position, Variable variable, Expression key) {
+        super(position);
         this.variable = variable;
         this.key = key;
     }
@@ -47,6 +50,6 @@ public class MapSelection implements Expression {
             else return UNDEFINED;
         }
         else
-            throw new CalculateException("Invalid input. Should be given a Map but a "+resolved.getClass().getName()+" was given.");
+            throw new CalculateException(getPosition()+": Unable to retrieve "+keyValue+" from "+resolved);
     }
 }

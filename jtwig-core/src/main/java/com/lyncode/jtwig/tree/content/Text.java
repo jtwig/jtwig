@@ -48,10 +48,9 @@ public class Text implements Content {
     }
 
     @Override
-    public boolean render(OutputStream outputStream, JtwigContext context) throws RenderException {
+    public void render(OutputStream outputStream, JtwigContext context) throws RenderException {
         try {
             outputStream.write(builder.toString().getBytes());
-            return true;
         } catch (IOException e) {
             throw new RenderException(e);
         }

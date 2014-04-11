@@ -15,13 +15,14 @@
 package com.lyncode.jtwig.tree.expressions;
 
 import com.lyncode.jtwig.JtwigContext;
-import com.lyncode.jtwig.tree.api.Element;
-import com.lyncode.jtwig.tree.api.Expression;
+import com.lyncode.jtwig.parser.positioning.Position;
+import com.lyncode.jtwig.tree.api.AbstractExpression;
 
-public class Variable implements Element, Expression {
+public class Variable extends AbstractExpression {
     private String identifier;
 
-    public Variable(String identifier) {
+    public Variable(Position position, String identifier) {
+        super(position);
         this.identifier = identifier;
     }
 

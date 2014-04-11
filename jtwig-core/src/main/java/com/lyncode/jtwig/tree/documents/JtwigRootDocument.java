@@ -36,8 +36,8 @@ public class JtwigRootDocument implements JtwigDocument {
     }
 
     @Override
-    public boolean render(OutputStream outputStream, JtwigContext context) throws RenderException {
-        return false;
+    public void render(OutputStream outputStream, JtwigContext context) throws RenderException {
+
     }
 
     @Override

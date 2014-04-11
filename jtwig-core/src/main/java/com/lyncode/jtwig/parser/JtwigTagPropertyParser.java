@@ -14,6 +14,7 @@
 
 package com.lyncode.jtwig.parser;
 
+import com.lyncode.jtwig.parser.config.ParserConfiguration;
 import com.lyncode.jtwig.tree.api.TagProperty;
 import org.parboiled.BaseParser;
 import org.parboiled.Rule;
@@ -22,7 +23,11 @@ import static org.parboiled.Parboiled.createParser;
 
 public class JtwigTagPropertyParser extends BaseParser<TagProperty> {
     TagProperty property = TagProperty.None;
-    JtwigBasicParser basicParser = createParser(JtwigBasicParser.class);
+    final JtwigBasicParser basicParser;
+
+    public JtwigTagPropertyParser(ParserConfiguration configuration) {
+        basicParser = createParser(JtwigBasicParser.class, configuration);
+    }
 
     Rule property() {
         return FirstOf(

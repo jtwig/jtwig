@@ -14,22 +14,25 @@
 
 package com.lyncode.jtwig.parser.addons;
 
+import com.lyncode.jtwig.parser.JtwigBaseParser;
 import com.lyncode.jtwig.parser.JtwigBasicParser;
 import com.lyncode.jtwig.parser.JtwigExpressionParser;
 import com.lyncode.jtwig.parser.JtwigTagPropertyParser;
-import org.parboiled.BaseParser;
+import com.lyncode.jtwig.parser.config.ParserConfiguration;
+import com.lyncode.jtwig.resource.JtwigResource;
 import org.parboiled.Parboiled;
 import org.parboiled.Rule;
 
-public abstract class JtwigEmptyContentAddonParser extends BaseParser<JtwigEmptyContentAddon> {
+public abstract class JtwigEmptyContentAddonParser extends JtwigBaseParser<JtwigEmptyContentAddon> {
     final JtwigBasicParser basicParser;
     final JtwigExpressionParser expressionParser;
     final JtwigTagPropertyParser tagPropertyParser;
 
-    public JtwigEmptyContentAddonParser () {
-        basicParser = Parboiled.createParser(JtwigBasicParser.class);
-        expressionParser = Parboiled.createParser(JtwigExpressionParser.class);
-        tagPropertyParser = Parboiled.createParser(JtwigTagPropertyParser.class);
+    public JtwigEmptyContentAddonParser (JtwigResource resource, ParserConfiguration configuration) {
+        super(resource);
+        basicParser = Parboiled.createParser(JtwigBasicParser.class, configuration);
+        expressionParser = Parboiled.createParser(JtwigExpressionParser.class, resource, configuration);
+        tagPropertyParser = Parboiled.createParser(JtwigTagPropertyParser.class, configuration);
     }
 
 
