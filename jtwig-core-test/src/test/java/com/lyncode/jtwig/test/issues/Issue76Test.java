@@ -21,7 +21,9 @@ import org.junit.Test;
 
 import static com.lyncode.jtwig.SyntacticSugar.then;
 import static com.lyncode.jtwig.SyntacticSugar.when;
-import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.fail;
 
 public class Issue76Test extends AbstractJtwigTest {
