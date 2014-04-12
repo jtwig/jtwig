@@ -1,5 +1,4 @@
 /**
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,18 +12,9 @@
  * limitations under the License.
  */
 
-package com.lyncode.jtwig.addons.concurrent;
+package com.lyncode.jtwig.test.addons;
 
-import com.lyncode.jtwig.JtwigContext;
-import com.lyncode.jtwig.exception.RenderException;
-import com.lyncode.jtwig.parser.addons.JtwigContentAddon;
-import com.lyncode.jtwig.tree.helper.RenderStream;
+import com.lyncode.jtwig.test.AbstractJtwigTest;
 
-public class Concurrent extends JtwigContentAddon {
-
-    @Override
-    public void render(RenderStream renderStream, JtwigContext context) throws RenderException {
-        renderStream.renderConcurrent(getContent(), context);
-    }
-
+public abstract class AbstractAddonTest extends AbstractJtwigTest {
 }

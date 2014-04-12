@@ -22,7 +22,6 @@ import com.lyncode.jtwig.exception.ResourceException;
 import com.lyncode.jtwig.parser.JtwigParser;
 import com.lyncode.jtwig.resource.JtwigResource;
 import com.lyncode.jtwig.tree.api.Content;
-import com.lyncode.jtwig.tree.content.JtwigRootContent;
 import com.lyncode.jtwig.tree.helper.RenderStream;
 import com.lyncode.jtwig.tree.structural.Block;
 import com.lyncode.jtwig.tree.structural.Extends;
@@ -44,8 +43,7 @@ public class JtwigExtendsDocument implements JtwigDocument {
     }
 
     @Override
-    public boolean render(RenderStream renderStream, JtwigContext context) throws RenderException {
-        return false;
+    public void render(RenderStream renderStream, JtwigContext context) throws RenderException {
     }
 
     @Override
@@ -56,16 +54,14 @@ public class JtwigExtendsDocument implements JtwigDocument {
 
             JtwigResource jtwigResource = resource.resolve(anExtends.getPath());
 
-            Content content = JtwigParser.parse(parser, jtwigResource)
-                    .compile(parser, jtwigResource);
+            JtwigParser nestedParser = parser.clone(jtwigResource);
+            Content content = JtwigParser.parse(nestedParser, jtwigResource)
+                    .compile(nestedParser, jtwigResource);
             for (Block expression : blocks) {
                 content.replace(expression);
             }
-
-            return new JtwigRootContent(content);
-        } catch (ResourceException e) {
-            throw new CompileException(e);
-        } catch (ParseException e) {
+            return content;
+        } catch (ResourceException | ParseException e) {
             throw new CompileException(e);
         }
     }

@@ -41,4 +41,9 @@ public class FileJtwigResource implements JtwigResource {
     public JtwigResource resolve(String relativePath) {
         return new FileJtwigResource(new File(file.getParentFile(), relativePath));
     }
+
+    @Override
+    public String toString() {
+        return file.getPath();
+    }
 }

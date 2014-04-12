@@ -31,6 +31,6 @@ public class Simplifier {
     }
 
     public static Expression getOperationArgument (OperationBinary binary) {
-        return binary.getOperands().first();
+        return binary.getOperands().get(0);
     }
 }

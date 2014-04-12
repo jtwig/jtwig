@@ -18,18 +18,19 @@ import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.exception.CalculateException;
 import com.lyncode.jtwig.exception.ParseBypassException;
 import com.lyncode.jtwig.exception.ParseException;
+import com.lyncode.jtwig.parser.positioning.Position;
+import com.lyncode.jtwig.tree.api.AbstractExpression;
 import com.lyncode.jtwig.tree.api.Expression;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ValueList implements Expression {
-
-    public static ValueList create(Constant init, Constant end) {
-        ValueList valueList = new ValueList();
+public class ValueList extends AbstractExpression {
+    public static ValueList create(Position position, Constant init, Constant end) {
+        ValueList valueList = new ValueList(position);
         if (init.isInstanceOf(Integer.class)) {
             if (!end.isInstanceOf(Integer.class))
-                throw new ParseBypassException(new ParseException("Expected an integer for the end of the comprehension list"));
+                throw new ParseBypassException(new ParseException(position+": Expected an integer for the end of the comprehension list"));
             int initValue = (int) init.as(Integer.class);
             int endValue = (int) end.as(Integer.class);
 
@@ -43,7 +44,7 @@ public class ValueList implements Expression {
 
         } else if (init.isInstanceOf(Character.class)) {
             if (!end.isInstanceOf(Character.class))
-                throw new ParseBypassException(new ParseException("Expected a character for the end of the comprehension list"));
+                throw new ParseBypassException(new ParseException(position+": Expected a character for the end of the comprehension list"));
 
             char initValue = (char) init.as(Character.class);
             char endValue = (char) end.as(Character.class);
@@ -56,15 +57,21 @@ public class ValueList implements Expression {
                     valueList.add(new Constant<>(i));
             }
         } else
-            throw new ParseBypassException(new ParseException("Only integers and characters are allowed in comprehension lists"));
+            throw new ParseBypassException(new ParseException(position+": Only integers and characters are allowed in comprehension lists"));
         return valueList;
     }
 
     private List<Expression> values = new ArrayList<>();
 
-    public boolean add(Expression element) {
+
+    public ValueList(Position position) {
+        super(position);
+    }
+
+
+    public ValueList add(Expression element) {
         this.values.add(element);
-        return true;
+        return this;
     }
 
 
@@ -76,10 +83,6 @@ public class ValueList implements Expression {
         return result;
     }
 
-    public Expression first() {
-        return values.get(0);
-    }
-
     public Expression get(int index) {
         return values.get(index);
     }
@@ -87,10 +90,6 @@ public class ValueList implements Expression {
     public Expression set(int index, Expression element) {
         values.add(index, element);
         return element;
-    }
-
-    public boolean isEmpty() {
-        return values.isEmpty();
     }
 
     public int size() {

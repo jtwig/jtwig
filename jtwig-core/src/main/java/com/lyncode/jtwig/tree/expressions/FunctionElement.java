@@ -17,39 +17,41 @@ package com.lyncode.jtwig.tree.expressions;
 import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.exception.CalculateException;
 import com.lyncode.jtwig.functions.exceptions.FunctionException;
+import com.lyncode.jtwig.functions.exceptions.FunctionNotFoundException;
 import com.lyncode.jtwig.functions.parameters.GivenParameters;
-import com.lyncode.jtwig.tree.api.Element;
+import com.lyncode.jtwig.parser.positioning.Position;
+import com.lyncode.jtwig.tree.api.AbstractExpression;
 import com.lyncode.jtwig.tree.api.Expression;
 
-public class FunctionElement implements Element, Expression {
-    private String name;
-    private ValueList arguments;
+import java.util.ArrayList;
+import java.util.List;
 
-    public FunctionElement(String name, Expression argument) {
+public class FunctionElement extends AbstractExpression {
+    private String name;
+    private List<Expression> arguments = new ArrayList<>();
+
+    public FunctionElement(Position position, String name, Expression argument) {
+        super(position);
         this.name = name;
-        arguments = new ValueList();
         arguments.add(argument);
     }
 
-    public FunctionElement(String name) {
+    public FunctionElement(Position position, String name) {
+        super(position);
         this.name = name;
-        arguments = new ValueList();
     }
 
-    public boolean add(Expression argument) {
-        return arguments.add(argument);
+    public FunctionElement add(Expression argument) {
+        arguments.add(argument);
+        return this;
     }
 
     public String getName() {
         return name;
     }
 
-    public ValueList getArguments() {
+    public List<Expression> getArguments() {
         return arguments;
-    }
-
-    public String toString () {
-        return name+arguments;
     }
 
     @Override
@@ -58,13 +60,35 @@ public class FunctionElement implements Element, Expression {
             GivenParameters parameters = new GivenParameters();
             for (Object obj : arguments(context))
                 parameters.addObject(obj);
-            return context.executeFunction(getName(), parameters);
+            try {
+                return context.executeFunction(getName(), parameters);
+            } catch (FunctionNotFoundException e) {
+                throw new CalculateException(getPosition()+": "+e.getMessage(), e);
+            }
         } catch (FunctionException e) {
             throw new CalculateException(e);
         }
     }
 
-    private Object[] arguments(JtwigContext context) throws CalculateException {
-        return arguments.calculate(context).toArray();
+    public Object[] arguments(JtwigContext context) throws CalculateException {
+        return calculateArguments(context);
+    }
+
+    private Object[] calculateArguments(JtwigContext context) throws CalculateException {
+        List<Object> result = new ArrayList<>();
+        for (Expression argument : arguments) {
+            result.add(argument.calculate(context));
+        }
+        return result.toArray();
+    }
+
+    public FunctionElement addArgument(int position, Expression expression) {
+        arguments.add(position, expression);
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return "Method or Field with name '" + name + "'";
     }
 }

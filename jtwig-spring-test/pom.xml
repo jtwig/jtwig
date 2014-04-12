@@ -27,7 +27,6 @@
             <version>3.1</version>
         </dependency>
 
-
         <dependency>
             <groupId>com.lyncode</groupId>
             <artifactId>jtwig-spring</artifactId>

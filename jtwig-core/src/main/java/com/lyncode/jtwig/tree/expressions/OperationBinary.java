@@ -16,6 +16,8 @@ package com.lyncode.jtwig.tree.expressions;
 
 import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.exception.CalculateException;
+import com.lyncode.jtwig.parser.positioning.Position;
+import com.lyncode.jtwig.tree.api.AbstractExpression;
 import com.lyncode.jtwig.tree.api.Expression;
 import com.lyncode.jtwig.tree.helper.StrictBinaryOperation;
 import org.apache.commons.lang3.StringUtils;
@@ -23,16 +25,17 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OperationBinary implements Expression {
-    private ValueList operands = new ValueList();
+public class OperationBinary extends AbstractExpression {
+    private List<Expression> operands = new ArrayList<>();
     private List<Operator> operators = new ArrayList<Operator>();
 
 
-    public OperationBinary(Expression operand) {
+    public OperationBinary(Position position, Expression operand) {
+        super(position);
         operands.add(operand);
     }
 
-    public ValueList getOperands() {
+    public List<Expression> getOperands() {
         return operands;
     }
 

@@ -23,7 +23,33 @@ import com.lyncode.jtwig.tree.helper.RenderStream;
 import com.lyncode.jtwig.tree.structural.Block;
 
 public interface Content {
-    boolean render(RenderStream renderStream, JtwigContext context) throws RenderException;
+    /**
+     * Render the content to the output stream
+     *
+     * @param outputStream
+     * @param context
+     * @throws RenderException If something goes wrong
+     */
+    void render (RenderStream outputStream, JtwigContext context) throws RenderException;
+
+    /**
+     * This method must return a compiled version of the current content.
+     * It should be used for optimization purposes.
+     *
+     * @param parser
+     * @param resource
+     * @return
+     * @throws CompileException
+     */
     Content compile(JtwigParser parser, JtwigResource resource) throws CompileException;
+
+    /**
+     * Should replace the given block.
+     * Returns true if it was replaced, false otherwise.
+     *
+     * @param expression
+     * @return
+     * @throws CompileException
+     */
     boolean replace (Block expression) throws CompileException;
 }

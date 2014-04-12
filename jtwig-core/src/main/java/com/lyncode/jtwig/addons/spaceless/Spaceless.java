@@ -25,16 +25,16 @@ import java.io.IOException;
 public class Spaceless extends JtwigContentAddon {
 
     @Override
-    public boolean render(RenderStream renderStream, JtwigContext context) throws RenderException {
+    public void render(RenderStream renderStream, JtwigContext context) throws RenderException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        getContent().render(renderStream, context);
+        RenderStream local = new RenderStream(output);
+        getContent().render(local, context);
         String result = removeSpaces(output.toString());
         try {
             renderStream.write(result.getBytes());
         } catch (IOException e) {
             throw new RenderException(e);
         }
-        return true;
     }
 
     private String removeSpaces(String input) {

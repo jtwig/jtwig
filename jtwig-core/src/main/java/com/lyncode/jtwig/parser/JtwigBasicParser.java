@@ -26,9 +26,6 @@ import static com.lyncode.jtwig.parser.JtwigSymbol.QUOTE;
 public class JtwigBasicParser extends BaseParser<String> {
     final ParserConfiguration parserConfiguration;
 
-    public JtwigBasicParser() {
-        this.parserConfiguration = new ParserConfiguration();
-    }
     public JtwigBasicParser(ParserConfiguration parserConfiguration) {
         this.parserConfiguration = parserConfiguration;
     }
