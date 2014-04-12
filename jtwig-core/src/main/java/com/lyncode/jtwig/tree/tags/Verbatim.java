@@ -23,9 +23,8 @@ import com.lyncode.jtwig.tree.api.Content;
 import com.lyncode.jtwig.tree.api.Tag;
 import com.lyncode.jtwig.tree.api.TagInformation;
 import com.lyncode.jtwig.tree.content.Text;
+import com.lyncode.jtwig.tree.helper.RenderStream;
 import com.lyncode.jtwig.tree.structural.Block;
-
-import java.io.OutputStream;
 
 public class Verbatim implements Content, Tag {
     private Text text;
@@ -38,8 +37,8 @@ public class Verbatim implements Content, Tag {
     }
 
     @Override
-    public boolean render(OutputStream outputStream, JtwigContext context) throws RenderException {
-        return text.render(outputStream, context);
+    public boolean render(RenderStream renderStream, JtwigContext context) throws RenderException {
+        return text.render(renderStream, context);
     }
 
     @Override

@@ -28,6 +28,8 @@ import org.springframework.web.servlet.view.AbstractTemplateViewResolver;
 
 import java.io.File;
 
+import static com.lyncode.jtwig.tree.helper.RenderStream.withMaxThreads;
+import static com.lyncode.jtwig.tree.helper.RenderStream.withMinThreads;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @Service
@@ -102,6 +104,13 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
 
     public String getEncoding() {
         return encoding;
+    }
+
+    public void setConcurrentMaxThreads (int value) {
+        withMaxThreads(value);
+    }
+    public void setConcurrentMinThreads (int value) {
+        withMinThreads(value);
     }
 
     public void setEncoding(String encoding) {

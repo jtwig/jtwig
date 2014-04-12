@@ -24,10 +24,10 @@ import com.lyncode.jtwig.tree.api.Content;
 import com.lyncode.jtwig.tree.api.Expression;
 import com.lyncode.jtwig.tree.api.Tag;
 import com.lyncode.jtwig.tree.api.TagInformation;
+import com.lyncode.jtwig.tree.helper.RenderStream;
 import com.lyncode.jtwig.tree.structural.Block;
 
 import java.io.IOException;
-import java.io.OutputStream;
 
 public class Output implements Content, Tag {
     private Expression expression;
@@ -43,9 +43,9 @@ public class Output implements Content, Tag {
     }
 
     @Override
-    public boolean render(OutputStream outputStream, JtwigContext context) throws RenderException {
+    public boolean render(RenderStream renderStream, JtwigContext context) throws RenderException {
         try {
-            outputStream.write(String.valueOf(expression.calculate(context)).getBytes());
+            renderStream.write(String.valueOf(expression.calculate(context)).getBytes());
             return true;
         } catch (IOException | CalculateException e) {
             throw new RenderException(e);

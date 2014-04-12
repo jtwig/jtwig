@@ -25,9 +25,8 @@ import com.lyncode.jtwig.tree.api.Expression;
 import com.lyncode.jtwig.tree.api.Tag;
 import com.lyncode.jtwig.tree.api.TagInformation;
 import com.lyncode.jtwig.tree.expressions.Variable;
+import com.lyncode.jtwig.tree.helper.RenderStream;
 import com.lyncode.jtwig.tree.structural.Block;
-
-import java.io.OutputStream;
 
 public class SetVariable implements Content, Tag {
     private Variable name;
@@ -53,7 +52,7 @@ public class SetVariable implements Content, Tag {
     }
 
     @Override
-    public boolean render(OutputStream outputStream, JtwigContext context) throws RenderException {
+    public boolean render(RenderStream renderStream, JtwigContext context) throws RenderException {
         try {
             context.set(name.getIdentifier(), assignment.calculate(context));
             return true;

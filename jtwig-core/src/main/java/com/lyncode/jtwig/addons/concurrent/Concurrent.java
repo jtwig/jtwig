@@ -1,4 +1,5 @@
 /**
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,18 +13,19 @@
  * limitations under the License.
  */
 
-package com.lyncode.jtwig.tree.api;
+package com.lyncode.jtwig.addons.concurrent;
 
 import com.lyncode.jtwig.JtwigContext;
-import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.RenderException;
-import com.lyncode.jtwig.parser.JtwigParser;
-import com.lyncode.jtwig.resource.JtwigResource;
+import com.lyncode.jtwig.parser.addons.JtwigContentAddon;
 import com.lyncode.jtwig.tree.helper.RenderStream;
-import com.lyncode.jtwig.tree.structural.Block;
 
-public interface Content {
-    boolean render(RenderStream renderStream, JtwigContext context) throws RenderException;
-    Content compile(JtwigParser parser, JtwigResource resource) throws CompileException;
-    boolean replace (Block expression) throws CompileException;
+public class Concurrent extends JtwigContentAddon {
+
+    @Override
+    public boolean render(RenderStream renderStream, JtwigContext context) throws RenderException {
+        renderStream.renderConcurrent(getContent(), context);
+        return true;
+    }
+
 }

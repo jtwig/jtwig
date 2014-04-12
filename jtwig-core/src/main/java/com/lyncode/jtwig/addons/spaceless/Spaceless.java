@@ -17,20 +17,20 @@ package com.lyncode.jtwig.addons.spaceless;
 import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.exception.RenderException;
 import com.lyncode.jtwig.parser.addons.JtwigContentAddon;
+import com.lyncode.jtwig.tree.helper.RenderStream;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 
 public class Spaceless extends JtwigContentAddon {
 
     @Override
-    public boolean render(OutputStream outputStream, JtwigContext context) throws RenderException {
+    public boolean render(RenderStream renderStream, JtwigContext context) throws RenderException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        getContent().render(output, context);
+        getContent().render(renderStream, context);
         String result = removeSpaces(output.toString());
         try {
-            outputStream.write(result.getBytes());
+            renderStream.write(result.getBytes());
         } catch (IOException e) {
             throw new RenderException(e);
         }

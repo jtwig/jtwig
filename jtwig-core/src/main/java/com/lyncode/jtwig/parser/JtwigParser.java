@@ -14,6 +14,7 @@
 
 package com.lyncode.jtwig.parser;
 
+import com.lyncode.jtwig.addons.concurrent.ConcurrentParser;
 import com.lyncode.jtwig.addons.spaceless.SpacelessParser;
 import com.lyncode.jtwig.exception.ParseBypassException;
 import com.lyncode.jtwig.exception.ParseException;
@@ -57,31 +58,34 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.parboiled.Parboiled.createParser;
 
 public class JtwigParser extends BaseParser<Content> {
+
     public static class Builder {
+
         private ParserConfiguration configuration = new ParserConfiguration();
         private List<Class<? extends JtwigEmptyContentAddonParser>> emptyAddons = new ArrayList<>();
         private List<Class<? extends JtwigContentAddonParser>> contentAddons = new ArrayList<>();
 
         public Builder() {
-            contentAddons
-                    .add(SpacelessParser.class);
+            this.withContentAddon(SpacelessParser.class)
+                    .withContentAddon(ConcurrentParser.class);
         }
 
-        public Builder withEmptyAddon (Class<? extends JtwigEmptyContentAddonParser> parserType) {
+        public Builder withEmptyAddon(Class<? extends JtwigEmptyContentAddonParser> parserType) {
             emptyAddons.add(parserType);
             return this;
         }
-        public Builder withContentAddon (Class<? extends JtwigContentAddonParser> parserType) {
+
+        public Builder withContentAddon(Class<? extends JtwigContentAddonParser> parserType) {
             contentAddons.add(parserType);
             return this;
         }
 
-        public Builder withConfiguration (ParserConfiguration configuration) {
+        public Builder withConfiguration(ParserConfiguration configuration) {
             this.configuration = configuration;
             return this;
         }
 
-        public JtwigParser build () {
+        public JtwigParser build() {
             return newParser(configuration, emptyAddons, contentAddons);
         }
     }
@@ -96,27 +100,28 @@ public class JtwigParser extends BaseParser<Content> {
         return createParser(JtwigParser.class, configuration, emptyAddons, contentAddons);
     }
 
-    public static JtwigDocument parse (Builder builder, JtwigResource input) throws ParseException {
+    public static JtwigDocument parse(Builder builder, JtwigResource input) throws ParseException {
         return parse(builder.build(), input);
     }
 
     public static JtwigDocument parse(JtwigParser parser, JtwigResource input) throws ParseException {
         try {
             ReportingParseRunner<Object> runner = new ReportingParseRunner<Object>(parser.start());
-            ParsingResult<Object> result = runner.run(FileUtils.readAllText(input.retrieve(), Charset.defaultCharset()));
+            ParsingResult<Object> result = runner.run(
+                    FileUtils.readAllText(input.retrieve(), Charset.defaultCharset()));
             return (JtwigDocument) result.resultValue;
         } catch (ParserRuntimeException e) {
             if (e.getCause() instanceof ParseBypassException) {
                 ParseException innerException = ((ParseBypassException) e.getCause()).getInnerException();
                 innerException.setExpression(e.getMessage());
                 throw innerException;
-            } else
+            } else {
                 throw new ParseException(e);
+            }
         } catch (ResourceException e) {
             throw new ParseException(e);
         }
     }
-
 
     final JtwigBasicParser basicParser;
     final JtwigExpressionParser expressionParser;
@@ -125,18 +130,21 @@ public class JtwigParser extends BaseParser<Content> {
     JtwigEmptyContentAddonParser[] noContentAddonParsers;
     JtwigContentAddonParser[] contentAddonParsers;
 
-    public JtwigParser(ParserConfiguration configuration, List<Class<? extends BaseParser>> emptyAddons, List<Class<? extends BaseParser>> contentAddons) {
+    public JtwigParser(ParserConfiguration configuration, List<Class<? extends BaseParser>> emptyAddons,
+                       List<Class<? extends BaseParser>> contentAddons) {
         basicParser = createParser(JtwigBasicParser.class, configuration);
         tagPropertyParser = createParser(JtwigTagPropertyParser.class);
         expressionParser = createParser(JtwigExpressionParser.class, configuration);
 
         noContentAddonParsers = new JtwigEmptyContentAddonParser[emptyAddons.size()];
         contentAddonParsers = new JtwigContentAddonParser[contentAddons.size()];
-        for (int i = 0;i<emptyAddons.size();i++)
+        for (int i = 0; i < emptyAddons.size(); i++) {
             noContentAddonParsers[i] = (JtwigEmptyContentAddonParser) createParser(emptyAddons.get(i));
+        }
 
-        for (int i = 0;i<contentAddons.size();i++)
+        for (int i = 0; i < contentAddons.size(); i++) {
             contentAddonParsers[i] = (JtwigContentAddonParser) createParser(contentAddons.get(i));
+        }
     }
 
     public Rule start() {
@@ -172,7 +180,6 @@ public class JtwigParser extends BaseParser<Content> {
                 )
         );
     }
-
 
     Rule normalTemplate() {
         return Sequence(
@@ -227,10 +234,11 @@ public class JtwigParser extends BaseParser<Content> {
     }
 
     Rule keywordsContent() {
-        if (contentAddonParsers.length == 0)
+        if (contentAddonParsers.length == 0) {
             return Test(false);
+        }
         Rule[] rules = new Rule[contentAddonParsers.length];
-        for (int i=0;i<contentAddonParsers.length;i++) {
+        for (int i = 0; i < contentAddonParsers.length; i++) {
             rules[i] = FirstOf(
                     basicParser.terminal(contentAddonParsers[i].beginKeyword()),
                     basicParser.terminal(contentAddonParsers[i].endKeyword())
@@ -240,11 +248,13 @@ public class JtwigParser extends BaseParser<Content> {
     }
 
     Rule contentParsers() {
-        if (contentAddonParsers.length == 0)
+        if (contentAddonParsers.length == 0) {
             return Test(false);
+        }
         Rule[] rules = new Rule[contentAddonParsers.length];
-        for (int i=0;i<contentAddonParsers.length;i++)
+        for (int i = 0; i < contentAddonParsers.length; i++) {
             rules[i] = contentAddon(contentAddonParsers[i]);
+        }
         return FirstOf(rules);
     }
 
@@ -256,21 +266,26 @@ public class JtwigParser extends BaseParser<Content> {
                 parser.startRule(),
                 mandatory(
                         Test(instanceOf(JtwigContentAddon.class).matches(peek())),
-                        new ParseException("Addon parser not pushing a JtwigContentAddon object to the top of the stack")
+                        new ParseException(
+                                "Addon parser not pushing a JtwigContentAddon object to the top of the stack")
                 ),
                 mandatory(
                         Sequence(
-                                doIt(peek(JtwigContentAddon.class).begin().addToLeft(tagPropertyParser.getCurrentProperty())),
+                                doIt(peek(JtwigContentAddon.class).begin().addToLeft(
+                                        tagPropertyParser.getCurrentProperty())),
                                 closeCode(),
-                                doIt(peek(JtwigContentAddon.class).begin().addToRight(tagPropertyParser.getCurrentProperty())),
+                                doIt(peek(JtwigContentAddon.class).begin().addToRight(
+                                        tagPropertyParser.getCurrentProperty())),
                                 content(),
                                 peek(1, JtwigContentAddon.class).setContent(pop(JtwigContent.class)),
                                 openCode(),
                                 basicParser.terminal(parser.endKeyword()),
                                 basicParser.spacing(),
-                                doIt(peek(JtwigContentAddon.class).end().addToLeft(tagPropertyParser.getCurrentProperty())),
+                                doIt(peek(JtwigContentAddon.class).end().addToLeft(
+                                        tagPropertyParser.getCurrentProperty())),
                                 closeCode(),
-                                doIt(peek(JtwigContentAddon.class).end().addToRight(tagPropertyParser.getCurrentProperty()))
+                                doIt(peek(JtwigContentAddon.class).end().addToRight(
+                                        tagPropertyParser.getCurrentProperty()))
                         ),
                         new ParseException("Wrong syntax for " + parser.beginKeyword())
                 )
@@ -278,18 +293,20 @@ public class JtwigParser extends BaseParser<Content> {
     }
 
     Rule keywordEmptyContent() {
-        if (noContentAddonParsers.length == 0)
+        if (noContentAddonParsers.length == 0) {
             return Test(false);
+        }
         Rule[] rules = new Rule[noContentAddonParsers.length];
-        for (int i = 0;i<noContentAddonParsers.length;i++)
+        for (int i = 0; i < noContentAddonParsers.length; i++) {
             rules[i] = basicParser.terminal(noContentAddonParsers[i].keyword());
+        }
         return FirstOf(rules);
     }
 
     Rule emptyContentParsers() {
         List<Rule> rules = new ArrayList<>();
 //        if (noContentAddonParsers.isEmpty())
-            return Test(false);
+        return Test(false);
 //        for (JtwigEmptyContentAddonParser parser : noContentAddonParsers)
 //            rules.add(noContentAddon(parser));
 //        return FirstOf(rules.toArray(new Rule[rules.size()]));
@@ -303,13 +320,16 @@ public class JtwigParser extends BaseParser<Content> {
                 parser.rule(),
                 mandatory(
                         Test(instanceOf(JtwigEmptyContentAddon.class).matches(peek())),
-                        new ParseException("Addon parser not pushing a JtwigEmptyContent object to the top of the stack")
+                        new ParseException(
+                                "Addon parser not pushing a JtwigEmptyContent object to the top of the stack")
                 ),
                 mandatory(
                         Sequence(
-                                doIt(peek(JtwigEmptyContentAddon.class).begin().addToLeft(tagPropertyParser.getCurrentProperty())),
+                                doIt(peek(JtwigEmptyContentAddon.class).begin().addToLeft(
+                                        tagPropertyParser.getCurrentProperty())),
                                 closeCode(),
-                                doIt(peek(JtwigEmptyContentAddon.class).end().addToLeft(tagPropertyParser.getCurrentProperty())
+                                doIt(peek(JtwigEmptyContentAddon.class).end().addToLeft(
+                                        tagPropertyParser.getCurrentProperty())
                                 )
                         ),
                         new ParseException("Wrong syntax for " + parser.keyword())
@@ -485,9 +505,11 @@ public class JtwigParser extends BaseParser<Content> {
                         Sequence(
                                 expressionParser.expression(),
                                 push(new IfExpression(expressionParser.pop())),
-                                doIt(peek(IfExpression.class).begin().addToLeft(tagPropertyParser.getCurrentProperty())),
+                                doIt(peek(IfExpression.class).begin().addToLeft(
+                                        tagPropertyParser.getCurrentProperty())),
                                 closeCode(),
-                                doIt(peek(IfExpression.class).begin().addToRight(tagPropertyParser.getCurrentProperty())),
+                                doIt(peek(IfExpression.class).begin().addToRight(
+                                        tagPropertyParser.getCurrentProperty())),
                                 content(),
                                 peek(1, IfExpression.class).setContent(pop(JtwigContent.class)),
                                 ZeroOrMore(
@@ -496,9 +518,11 @@ public class JtwigParser extends BaseParser<Content> {
                                                 keyword(ELSEIF),
                                                 expressionParser.expression(),
                                                 push(new ElseIfExpression(expressionParser.pop())),
-                                                doIt(peek(ElseIfExpression.class).tag().addToLeft(tagPropertyParser.getCurrentProperty())),
+                                                doIt(peek(ElseIfExpression.class).tag().addToLeft(
+                                                        tagPropertyParser.getCurrentProperty())),
                                                 closeCode(),
-                                                doIt(peek(ElseIfExpression.class).tag().addToRight(tagPropertyParser.getCurrentProperty())),
+                                                doIt(peek(ElseIfExpression.class).tag().addToRight(
+                                                        tagPropertyParser.getCurrentProperty())),
                                                 content(),
                                                 peek(1, ElseIfExpression.class).setContent(pop(JtwigContent.class)),
                                                 peek(1, IfExpression.class).addElseIf(pop(ElseIfExpression.class))
@@ -509,9 +533,11 @@ public class JtwigParser extends BaseParser<Content> {
                                                 openCode(),
                                                 keyword(ELSE),
                                                 push(new ElseExpression()),
-                                                doIt(peek(ElseExpression.class).tag().addToLeft(tagPropertyParser.getCurrentProperty())),
+                                                doIt(peek(ElseExpression.class).tag().addToLeft(
+                                                        tagPropertyParser.getCurrentProperty())),
                                                 closeCode(),
-                                                doIt(peek(ElseExpression.class).tag().addToRight(tagPropertyParser.getCurrentProperty())),
+                                                doIt(peek(ElseExpression.class).tag().addToRight(
+                                                        tagPropertyParser.getCurrentProperty())),
                                                 content(),
                                                 peek(1, ElseExpression.class).setContent(pop(JtwigContent.class)),
                                                 peek(1, IfExpression.class).setElseExpression(pop(ElseExpression.class))
@@ -595,15 +621,18 @@ public class JtwigParser extends BaseParser<Content> {
                 mandatory(
                         Sequence(
                                 expressionParser.nonExpressionFunction(),
-                                push(new Filter((FunctionElement)expressionParser.peek())),
+                                push(new Filter((FunctionElement) expressionParser.peek())),
                                 swap(),
                                 ZeroOrMore(
                                         Sequence(
                                                 expressionParser.operator(COMPOSITION),
                                                 doIt(expressionParser.pop()),
                                                 expressionParser.nonExpressionFunction(),
-                                                doIt(peek(FunctionElement.class).getArguments().set(0, expressionParser.pop(1))),
-                                                doIt(peek(1, Filter.class).addExpression((FunctionElement)expressionParser.peek()))
+                                                doIt(peek(FunctionElement.class).getArguments().set(0,
+                                                                                                    expressionParser.pop(
+                                                                                                            1))),
+                                                doIt(peek(1, Filter.class).addExpression(
+                                                        (FunctionElement) expressionParser.peek()))
                                         )
                                 ),
                                 doIt(expressionParser.pop()),
@@ -617,7 +646,6 @@ public class JtwigParser extends BaseParser<Content> {
                                 keyword(JtwigKeyword.ENDFILTER),
                                 closeCode(),
                                 doIt(peek(Filter.class).end().addToRight(tagPropertyParser.getCurrentProperty()))
-
                         ),
                         new ParseException("Wrong filter syntax")
                 )
