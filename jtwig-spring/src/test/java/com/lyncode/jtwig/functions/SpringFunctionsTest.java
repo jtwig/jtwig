@@ -15,6 +15,7 @@
 package com.lyncode.jtwig.functions;
 
 import com.lyncode.jtwig.exceptions.AssetResolveException;
+import com.lyncode.jtwig.functions.exceptions.FunctionException;
 import com.lyncode.jtwig.functions.parameters.resolve.HttpRequestParameterResolver;
 import com.lyncode.jtwig.functions.repository.FunctionRepositoryBuilder;
 import com.lyncode.jtwig.services.api.assets.AssetResolver;
@@ -30,6 +31,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import javax.servlet.http.HttpServletRequest;
 
 import static junit.framework.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -64,5 +68,10 @@ public class SpringFunctionsTest {
     public void assetTest() throws Exception {
         HttpServletRequest mock = mock(HttpServletRequest.class);
         assertEquals("One", functions.asset(mock, "One"));
+    }
+
+    @Test
+    public void propertyTest () throws FunctionException {
+        assertThat(functions.property("user.home"), is(notNullValue()));
     }
 }
