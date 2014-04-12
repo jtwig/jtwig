@@ -94,6 +94,9 @@ public class JtwigView extends AbstractTemplateView {
 
         getContent(request).render(new RenderStream(response.getOutputStream()),
                                    new JtwigContext(modelMap, getViewResolver().getFunctionResolver()));
+
+        response.getOutputStream().flush();
+        response.getOutputStream().close();
     }
 
     public Content getContent(HttpServletRequest request) throws CompileException, ParseException {
