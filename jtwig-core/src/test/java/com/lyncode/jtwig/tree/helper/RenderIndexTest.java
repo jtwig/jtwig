@@ -1,20 +1,22 @@
 package com.lyncode.jtwig.tree.helper;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 import java.util.HashMap;
 
 import static com.lyncode.jtwig.tree.helper.RenderIndex.newIndex;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 /**
  * Created by rsilva on 3/26/14.
  */
-public class RenderIndexTest extends TestCase {
+public class RenderIndexTest {
 
     HashMap<RenderIndex, String> underTest = new HashMap<>();
 
+    @Test
     public void testName() throws Exception {
         underTest.put(newIndex(), "a");
         underTest.put(newIndex(), "b");
