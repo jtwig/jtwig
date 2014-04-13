@@ -5,6 +5,7 @@
 ### Build Status
 
 [![Build Status](https://travis-ci.org/lyncode/jtwig.png)](https://travis-ci.org/lyncode/jtwig)
+[![Coverage Status](https://coveralls.io/repos/lyncode/jtwig/badge.png)](https://coveralls.io/r/lyncode/jtwig)
 
 ### Official Website
 
