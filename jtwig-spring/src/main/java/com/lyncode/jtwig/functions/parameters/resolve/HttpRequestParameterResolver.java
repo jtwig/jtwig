@@ -19,7 +19,7 @@ import com.lyncode.jtwig.functions.parameters.convert.api.ParameterConverter;
 import com.lyncode.jtwig.functions.parameters.resolve.api.TypeMethodParameterResolver;
 import com.lyncode.jtwig.functions.parameters.resolve.exceptions.ResolveException;
 import com.lyncode.jtwig.functions.parameters.resolve.model.MethodParameter;
-import com.lyncode.jtwig.util.LocalThreadHolder;
+import com.lyncode.jtwig.unit.util.LocalThreadHolder;
 
 import javax.servlet.http.HttpServletRequest;
 

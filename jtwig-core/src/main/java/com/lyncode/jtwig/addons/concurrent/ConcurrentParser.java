@@ -18,7 +18,7 @@ package com.lyncode.jtwig.addons.concurrent;
 import com.lyncode.jtwig.parser.addons.JtwigContentAddon;
 import com.lyncode.jtwig.parser.addons.JtwigContentAddonParser;
 import com.lyncode.jtwig.parser.config.ParserConfiguration;
-import com.lyncode.jtwig.resource.JtwigResource;
+import com.lyncode.jtwig.unit.resource.JtwigResource;
 
 public class ConcurrentParser extends JtwigContentAddonParser {
 

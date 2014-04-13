@@ -14,7 +14,7 @@
 
 package com.lyncode.jtwig.parser.positioning;
 
-import com.lyncode.jtwig.resource.JtwigResource;
+import com.lyncode.jtwig.unit.resource.JtwigResource;
 
 public class Position {
     private JtwigResource resource;

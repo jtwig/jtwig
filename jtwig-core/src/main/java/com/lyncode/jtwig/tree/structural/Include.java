@@ -21,10 +21,10 @@ import com.lyncode.jtwig.exception.RenderException;
 import com.lyncode.jtwig.exception.ResourceException;
 import com.lyncode.jtwig.parser.JtwigParser;
 import com.lyncode.jtwig.parser.positioning.Position;
-import com.lyncode.jtwig.resource.JtwigResource;
 import com.lyncode.jtwig.tree.api.AbstractContent;
 import com.lyncode.jtwig.tree.api.Content;
 import com.lyncode.jtwig.tree.helper.RenderStream;
+import com.lyncode.jtwig.unit.resource.JtwigResource;
 
 public class Include extends AbstractContent {
     private String path;

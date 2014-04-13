@@ -17,7 +17,7 @@ package com.lyncode.jtwig.parser;
 import com.lyncode.jtwig.exception.ParseBypassException;
 import com.lyncode.jtwig.exception.ParseException;
 import com.lyncode.jtwig.parser.positioning.Position;
-import com.lyncode.jtwig.resource.JtwigResource;
+import com.lyncode.jtwig.unit.resource.JtwigResource;
 import org.parboiled.BaseParser;
 
 public class JtwigBaseParser<V> extends BaseParser<V> {

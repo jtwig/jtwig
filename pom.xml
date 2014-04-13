@@ -53,10 +53,7 @@
     <modules>
         <module>jtwig-core</module>
         <module>jtwig-functions</module>
-        <module>jtwig-core-test</module>
         <module>jtwig-spring</module>
-        <module>jtwig-spring-test</module>
-        <module>jtwig-examples</module>
         <module>jtwig-types</module>
     </modules>
 

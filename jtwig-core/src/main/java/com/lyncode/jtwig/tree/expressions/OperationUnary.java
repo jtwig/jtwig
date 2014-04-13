@@ -19,8 +19,8 @@ import com.lyncode.jtwig.exception.CalculateException;
 import com.lyncode.jtwig.parser.positioning.Position;
 import com.lyncode.jtwig.tree.api.AbstractExpression;
 import com.lyncode.jtwig.tree.api.Expression;
-import com.lyncode.jtwig.util.BooleanOperations;
-import com.lyncode.jtwig.util.MathOperations;
+import com.lyncode.jtwig.unit.util.BooleanOperations;
+import com.lyncode.jtwig.unit.util.MathOperations;
 
 public class OperationUnary extends AbstractExpression {
     private final Operator operator;
