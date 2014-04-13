@@ -21,8 +21,6 @@ import org.junit.Test;
 
 import static com.lyncode.jtwig.util.SyntacticSugar.then;
 import static com.lyncode.jtwig.util.SyntacticSugar.when;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.fail;
 
@@ -33,7 +31,7 @@ public class Issue76Test extends AbstractJtwigTest {
             when(jtwigRenders(templateResource("templates/issue76/test1.twig")));
             fail();
         } catch (RenderException e) {
-            then(e.getCause().getMessage(), is(equalTo("templates/issue76/test1.twig -> Line 1, column 24: Function with name 'nonExistingFunction' not found")));
+            then(e.getCause().getMessage(), containsString("templates/issue76/test1.twig -> Line 1, column 24: Function with name 'nonExistingFunction' not found"));
         }
     }
 
@@ -43,7 +41,7 @@ public class Issue76Test extends AbstractJtwigTest {
             when(jtwigRenders(templateResource("templates/issue76/test2.twig")));
             fail();
         } catch (RenderException e) {
-            then(e.getCause().getMessage(), is(equalTo("templates/issue76/test2.twig -> Line 1, column 23: Value of nonExistingVariable is null or undefined")));
+            then(e.getCause().getMessage(), containsString("templates/issue76/test2.twig -> Line 1, column 23: Value of nonExistingVariable is null or undefined"));
         }
     }
 
