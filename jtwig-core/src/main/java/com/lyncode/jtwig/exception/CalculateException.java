@@ -15,18 +15,10 @@
 package com.lyncode.jtwig.exception;
 
 public class CalculateException extends Exception {
-    public CalculateException() {
-    }
-
     public CalculateException(String message) {
         super(message);
     }
-
     public CalculateException(String message, Throwable cause) {
         super(message, cause);
-    }
-
-    public CalculateException(Throwable cause) {
-        super(cause);
     }
 }

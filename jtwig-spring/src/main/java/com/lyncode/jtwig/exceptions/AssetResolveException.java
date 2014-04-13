@@ -15,18 +15,7 @@
 package com.lyncode.jtwig.exceptions;
 
 public class AssetResolveException  extends Exception {
-    public AssetResolveException() {
-    }
-
     public AssetResolveException(String message) {
         super(message);
-    }
-
-    public AssetResolveException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public AssetResolveException(Throwable cause) {
-        super(cause);
     }
 }

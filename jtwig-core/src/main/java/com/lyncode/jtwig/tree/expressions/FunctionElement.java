@@ -66,7 +66,7 @@ public class FunctionElement extends AbstractExpression {
                 throw new CalculateException(getPosition()+": "+e.getMessage(), e);
             }
         } catch (FunctionException e) {
-            throw new CalculateException(e);
+            throw new CalculateException(getPosition()+": "+e.getMessage(), e);
         }
     }
 
