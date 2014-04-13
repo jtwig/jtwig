@@ -48,8 +48,6 @@
         <commons.lang3.version>3.1</commons.lang3.version>
         <jackson.version>1.9.13</jackson.version>
         <yatspec.version>209</yatspec.version>
-
-        <maven.jacoco.version>0.7.0.201403182114</maven.jacoco.version>
     </properties>
 
     <modules>
@@ -102,16 +100,6 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.1</version>
                 </plugin>
-                <plugin>
-                    <groupId>org.jacoco</groupId>
-                    <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>${maven.jacoco.version}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.eluder.coveralls</groupId>
-                    <artifactId>coveralls-maven-plugin</artifactId>
-                    <version>2.0.1</version>
-                </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
@@ -162,33 +150,24 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>cobertura-maven-plugin</artifactId>
+                <version>2.6</version>
+                <configuration>
+                    <format>xml</format>
+                    <maxmem>256m</maxmem>
+                    <!-- aggregated reports for multi-module projects -->
+                    <aggregate>true</aggregate>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.eluder.coveralls</groupId>
+                <artifactId>coveralls-maven-plugin</artifactId>
+                <version>2.0.1</version>
+            </plugin>
         </plugins>
     </build>
-
-
-    <profiles>
-        <profile>
-            <id>travis</id>
-            <activation>
-                <property>
-                    <name>env.TRAVIS</name>
-                    <value>true</value>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.jacoco</groupId>
-                        <artifactId>jacoco-maven-plugin</artifactId>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.eluder.coveralls</groupId>
-                        <artifactId>coveralls-maven-plugin</artifactId>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 
     <developers>
         <developer>
