@@ -29,20 +29,20 @@ import com.lyncode.jtwig.types.Optional;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BaseParameterResolver {
+public class CompiledParameterResolver {
     private List<AnnotatedMethodParameterResolver> annotatedMethodParameterResolvers = new ArrayList<>();
     private List<TypeMethodParameterResolver> typeMethodParameterResolvers = new ArrayList<>();
 
-    public BaseParameterResolver() {
+    public CompiledParameterResolver() {
         add(new ParameterAnnotationResolver());
     }
 
-    public BaseParameterResolver add(AnnotatedMethodParameterResolver resolver) {
+    public CompiledParameterResolver add(AnnotatedMethodParameterResolver resolver) {
         annotatedMethodParameterResolvers.add(resolver);
         return this;
     }
 
-    public BaseParameterResolver add(TypeMethodParameterResolver resolver) {
+    public CompiledParameterResolver add(TypeMethodParameterResolver resolver) {
         typeMethodParameterResolvers.add(resolver);
         return this;
     }

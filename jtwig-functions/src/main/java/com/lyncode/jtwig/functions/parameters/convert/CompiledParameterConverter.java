@@ -24,10 +24,10 @@ import java.util.Map;
 
 import static com.lyncode.jtwig.functions.parameters.convert.impl.NativeConversions.toNativeInteger;
 
-public class ParameterConverter implements com.lyncode.jtwig.functions.parameters.convert.api.ParameterConverter {
+public class CompiledParameterConverter implements com.lyncode.jtwig.functions.parameters.convert.api.ParameterConverter {
     private Map<Class<?>, Map<Class<?>, com.lyncode.jtwig.functions.parameters.convert.api.ParameterConverter>> converters = new HashMap<>();
 
-    public ParameterConverter() {
+    public CompiledParameterConverter() {
         add(String.class, Integer.TYPE, new StringToIntegerConverter());
         add(String.class, Integer.class, new StringToIntegerConverter());
         add(String.class, Long.TYPE, new StringToLongConverter());
@@ -36,7 +36,7 @@ public class ParameterConverter implements com.lyncode.jtwig.functions.parameter
         add(Integer.class, Integer.TYPE, toNativeInteger());
     }
 
-    public ParameterConverter add(Class<?> from, Class<?> to, com.lyncode.jtwig.functions.parameters.convert.api.ParameterConverter converter) {
+    public CompiledParameterConverter add(Class<?> from, Class<?> to, com.lyncode.jtwig.functions.parameters.convert.api.ParameterConverter converter) {
         if (!converters.containsKey(from))
             converters.put(from, new HashMap<Class<?>, com.lyncode.jtwig.functions.parameters.convert.api.ParameterConverter>());
 
