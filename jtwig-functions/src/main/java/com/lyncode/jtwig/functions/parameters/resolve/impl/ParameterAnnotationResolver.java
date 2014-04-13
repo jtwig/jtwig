@@ -38,50 +38,32 @@ public class ParameterAnnotationResolver implements AnnotatedMethodParameterReso
         Parameter parameter = javaParameter.annotation(Parameter.class);
         int position = javaParameter.positionOf(Parameter.class);
         if (javaParameter.isVarArg()) {
-            if (templateGivenParameters.namesGiven())
-                return false;
-            else {
-                List<Object> parameters = new ArrayList<>();
-                boolean stop = false;
-                for (int i = 0; !stop; i++) {
-                    Optional<Object> result = templateGivenParameters.byPosition(position + i);
-                    if (result.hasValue()) parameters.add(result.get());
-                    else stop = true;
-                }
-
-                if (parameters.isEmpty()) return true;
-
-                for (int i = 0; i < parameters.size(); i++)
-                    if (!canResolveParameterByPosition(javaParameter.type().getComponentType(), templateGivenParameters, position + i, parameterConverter))
-                        return false;
-
-                return true;
+            List<Object> parameters = new ArrayList<>();
+            boolean stop = false;
+            for (int i = 0; !stop; i++) {
+                Optional<Object> result = templateGivenParameters.get(position + i);
+                if (result.hasValue()) parameters.add(result.get());
+                else stop = true;
             }
+
+            if (parameters.isEmpty()) return true;
+
+            for (int i = 0; i < parameters.size(); i++)
+                if (!canResolveParameterByPosition(javaParameter.type().getComponentType(), templateGivenParameters, position + i, parameterConverter))
+                    return false;
+
+            return true;
         }
-        if (templateGivenParameters.namesGiven()) {
-            // Use name strategy
-            Optional<Object> resolvedParameter = templateGivenParameters.byName(parameter.name());
-            if (!resolvedParameter.hasValue()) return false;
-            else {
-                if (resolvedParameter.get() == null && javaParameter.isNullable()) return true;
-                if (javaParameter.type().isAssignableFrom(resolvedParameter.get().getClass()))
-                    return true;
-                if (parameterConverter.canConvert(resolvedParameter.get(), javaParameter.type()))
-                    return true;
-                return false;
-            }
-        } else {
-            // Use position strategy
-            Optional<Object> resolvedParameter = templateGivenParameters.byPosition(position);
-            if (!resolvedParameter.hasValue()) return false;
-            else {
-                if (resolvedParameter.get() == null && javaParameter.isNullable()) return true;
-                if (javaParameter.type().isAssignableFrom(resolvedParameter.get().getClass()))
-                    return true;
-                if (parameterConverter.canConvert(resolvedParameter.get(), javaParameter.type()))
-                    return true;
-                return false;
-            }
+        // Use position strategy
+        Optional<Object> resolvedParameter = templateGivenParameters.get(position);
+        if (!resolvedParameter.hasValue()) return false;
+        else {
+            if (resolvedParameter.get() == null && javaParameter.isNullable()) return true;
+            if (javaParameter.type().isAssignableFrom(resolvedParameter.get().getClass()))
+                return true;
+            if (parameterConverter.canConvert(resolvedParameter.get(), javaParameter.type()))
+                return true;
+            return false;
         }
     }
 
@@ -95,7 +77,7 @@ public class ParameterAnnotationResolver implements AnnotatedMethodParameterReso
             List<Object> parameters = new ArrayList<>();
             boolean stop = false;
             for (int i = 0; !stop; i++) {
-                Optional<Object> result = templateGivenParameters.byPosition(position + i);
+                Optional<Object> result = templateGivenParameters.get(position + i);
                 if (result.hasValue()) parameters.add(result.get());
                 else stop = true;
             }
@@ -110,29 +92,11 @@ public class ParameterAnnotationResolver implements AnnotatedMethodParameterReso
 
             return array;
         }
-        if (templateGivenParameters.namesGiven()) {
-            // Use name strategy
-            return getParameterByName(javaParameter.type(), templateGivenParameters, parameter, parameterConverter);
-        } else {
-            // Use position strategy
-            return getParameterByPosition(javaParameter.type(), templateGivenParameters, position, parameterConverter);
-        }
-    }
-
-    private Object getParameterByName(Class<?> type, GivenParameters templateGivenParameters, Parameter parameter, ParameterConverter parameterConverter) throws ResolveException {
-        Object resolvedParameter = templateGivenParameters.byName(parameter.name()).get();
-        try {
-            if (resolvedParameter == null) return null;
-            if (type.isAssignableFrom(resolvedParameter.getClass()))
-                return resolvedParameter;
-            return parameterConverter.convert(resolvedParameter, type);
-        } catch (ConvertException e) {
-            throw new ResolveException("Unable to resolve parameter " + parameter.name(), e);
-        }
+        return getParameterByPosition(javaParameter.type(), templateGivenParameters, position, parameterConverter);
     }
 
     private Object getParameterByPosition(Class<?> type, GivenParameters templateGivenParameters, int position, ParameterConverter parameterConverter) throws ResolveException {
-        Object resolvedParameter = templateGivenParameters.byPosition(position).get();
+        Object resolvedParameter = templateGivenParameters.get(position).get();
         try {
             if (resolvedParameter == null) return null;
             if (type.isAssignableFrom(resolvedParameter.getClass()))
@@ -145,7 +109,7 @@ public class ParameterAnnotationResolver implements AnnotatedMethodParameterReso
 
 
     private boolean canResolveParameterByPosition(Class<?> type, GivenParameters templateGivenParameters, int position, ParameterConverter parameterConverter) {
-        Optional<Object> resolvedParameter = templateGivenParameters.byPosition(position);
+        Optional<Object> resolvedParameter = templateGivenParameters.get(position);
         if (!resolvedParameter.hasValue()) return true;
         else {
             Object parameterObject = resolvedParameter.get();

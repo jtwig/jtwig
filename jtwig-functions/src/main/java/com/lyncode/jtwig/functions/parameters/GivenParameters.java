@@ -22,14 +22,6 @@ import java.util.List;
 import static java.util.Arrays.asList;
 
 public class GivenParameters {
-    public static GivenParameters parameters(Object... parameters) {
-        List<GivenParameter> givenParameters = new ArrayList<>();
-        for (Object parameter : parameters) {
-            givenParameters.add(new GivenParameter(parameter));
-        }
-        return new GivenParameters(givenParameters);
-    }
-
     private final List<GivenParameter> givenParameters;
 
     public GivenParameters(List<GivenParameter> givenParameters) {
@@ -42,21 +34,9 @@ public class GivenParameters {
         this.givenParameters = new ArrayList<>();
     }
 
-    public Optional<Object> byName(String name) {
-        for (GivenParameter givenParameter : givenParameters) {
-            if (givenParameter.hasName() && name.equals(givenParameter.getName()))
-                return new Optional<>(givenParameter.getValue());
-        }
-        return new Optional<>();
-    }
-
-    public Optional<Object> byPosition(int position) {
+    public Optional<Object> get(int position) {
         if (position >= givenParameters.size()) return new Optional<>();
         return new Optional<>(givenParameters.get(position).getValue());
-    }
-
-    public boolean namesGiven () {
-        return (!givenParameters.isEmpty()) && givenParameters.get(0).hasName();
     }
 
     public int size () {
