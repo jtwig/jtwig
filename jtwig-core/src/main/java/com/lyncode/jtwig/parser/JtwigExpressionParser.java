@@ -17,9 +17,9 @@ package com.lyncode.jtwig.parser;
 import com.lyncode.jtwig.exception.ParseBypassException;
 import com.lyncode.jtwig.exception.ParseException;
 import com.lyncode.jtwig.parser.config.ParserConfiguration;
-import com.lyncode.jtwig.resource.JtwigResource;
 import com.lyncode.jtwig.tree.api.Expression;
 import com.lyncode.jtwig.tree.expressions.*;
+import com.lyncode.jtwig.unit.resource.JtwigResource;
 import org.parboiled.Rule;
 import org.parboiled.annotations.SuppressNode;
 
@@ -27,7 +27,7 @@ import static com.lyncode.jtwig.parser.JtwigKeyword.NULL;
 import static com.lyncode.jtwig.parser.JtwigSymbol.*;
 import static com.lyncode.jtwig.parser.JtwigSymbol.DIV;
 import static com.lyncode.jtwig.tree.expressions.Operator.*;
-import static com.lyncode.jtwig.util.Simplifier.simplify;
+import static com.lyncode.jtwig.unit.util.Simplifier.simplify;
 import static org.parboiled.Parboiled.createParser;
 
 public class JtwigExpressionParser extends JtwigBaseParser<Expression> {

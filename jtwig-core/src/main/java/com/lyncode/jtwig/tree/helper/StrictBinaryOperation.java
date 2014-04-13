@@ -23,11 +23,11 @@ import com.lyncode.jtwig.tree.expressions.Composition;
 import com.lyncode.jtwig.tree.expressions.OperationBinary;
 import com.lyncode.jtwig.tree.expressions.Operator;
 import com.lyncode.jtwig.tree.expressions.Selection;
-import com.lyncode.jtwig.util.MathOperations;
-import com.lyncode.jtwig.util.RelationalOperations;
+import com.lyncode.jtwig.unit.util.MathOperations;
+import com.lyncode.jtwig.unit.util.RelationalOperations;
 
-import static com.lyncode.jtwig.util.BooleanOperations.*;
-import static com.lyncode.jtwig.util.RelationalOperations.*;
+import static com.lyncode.jtwig.unit.util.BooleanOperations.*;
+import static com.lyncode.jtwig.unit.util.RelationalOperations.*;
 
 public class StrictBinaryOperation implements Expression {
     private Operator operator;

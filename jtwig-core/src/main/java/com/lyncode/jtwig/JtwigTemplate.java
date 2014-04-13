@@ -19,11 +19,11 @@ import com.lyncode.jtwig.exception.ParseException;
 import com.lyncode.jtwig.exception.RenderException;
 import com.lyncode.jtwig.parser.JtwigParser;
 import com.lyncode.jtwig.parser.JtwigParserBuilder;
-import com.lyncode.jtwig.resource.FileJtwigResource;
-import com.lyncode.jtwig.resource.JtwigResource;
-import com.lyncode.jtwig.resource.StringJtwigResource;
 import com.lyncode.jtwig.tree.api.Content;
 import com.lyncode.jtwig.tree.helper.RenderStream;
+import com.lyncode.jtwig.unit.resource.FileJtwigResource;
+import com.lyncode.jtwig.unit.resource.JtwigResource;
+import com.lyncode.jtwig.unit.resource.StringJtwigResource;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;

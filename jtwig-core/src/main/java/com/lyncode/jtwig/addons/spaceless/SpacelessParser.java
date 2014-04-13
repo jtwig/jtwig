@@ -17,7 +17,7 @@ package com.lyncode.jtwig.addons.spaceless;
 import com.lyncode.jtwig.parser.addons.JtwigContentAddon;
 import com.lyncode.jtwig.parser.addons.JtwigContentAddonParser;
 import com.lyncode.jtwig.parser.config.ParserConfiguration;
-import com.lyncode.jtwig.resource.JtwigResource;
+import com.lyncode.jtwig.unit.resource.JtwigResource;
 
 public class SpacelessParser extends JtwigContentAddonParser {
     public SpacelessParser(JtwigResource resource, ParserConfiguration configuration) {

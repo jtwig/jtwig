@@ -18,9 +18,9 @@ import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.RenderException;
 import com.lyncode.jtwig.parser.JtwigParser;
-import com.lyncode.jtwig.resource.JtwigResource;
 import com.lyncode.jtwig.tree.helper.RenderStream;
 import com.lyncode.jtwig.tree.structural.Block;
+import com.lyncode.jtwig.unit.resource.JtwigResource;
 
 public interface Content {
     /**

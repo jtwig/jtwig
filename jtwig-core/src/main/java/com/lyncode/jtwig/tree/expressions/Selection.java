@@ -19,7 +19,7 @@ import com.lyncode.jtwig.exception.CalculateException;
 import com.lyncode.jtwig.parser.positioning.Position;
 import com.lyncode.jtwig.tree.api.AbstractExpression;
 import com.lyncode.jtwig.tree.api.Expression;
-import com.lyncode.jtwig.util.ObjectExtractor;
+import com.lyncode.jtwig.unit.util.ObjectExtractor;
 
 import java.util.ArrayList;
 import java.util.Iterator;

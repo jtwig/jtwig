@@ -18,12 +18,12 @@ import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.RenderException;
 import com.lyncode.jtwig.parser.JtwigParser;
-import com.lyncode.jtwig.resource.JtwigResource;
 import com.lyncode.jtwig.tree.api.Content;
 import com.lyncode.jtwig.tree.api.Tag;
 import com.lyncode.jtwig.tree.api.TagInformation;
 import com.lyncode.jtwig.tree.helper.RenderStream;
 import com.lyncode.jtwig.tree.structural.Block;
+import com.lyncode.jtwig.unit.resource.JtwigResource;
 
 import java.util.ArrayList;
 import java.util.List;

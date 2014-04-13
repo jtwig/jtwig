@@ -20,7 +20,7 @@ import com.lyncode.jtwig.parser.positioning.Position;
 import com.lyncode.jtwig.tree.api.AbstractExpression;
 import com.lyncode.jtwig.tree.api.Expression;
 
-import static com.lyncode.jtwig.util.BooleanOperations.isTrue;
+import static com.lyncode.jtwig.unit.util.BooleanOperations.isTrue;
 
 public class OperationTernary extends AbstractExpression {
     private final Expression booleanExpression;

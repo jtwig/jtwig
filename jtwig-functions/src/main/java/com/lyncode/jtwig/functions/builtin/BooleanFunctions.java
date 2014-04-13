@@ -16,6 +16,7 @@ package com.lyncode.jtwig.functions.builtin;
 
 import com.lyncode.jtwig.functions.annotations.JtwigFunction;
 import com.lyncode.jtwig.functions.annotations.Parameter;
+import com.lyncode.jtwig.functions.exceptions.FunctionException;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -30,12 +31,16 @@ import static org.hamcrest.collection.IsEmptyCollection.empty;
 
 public class BooleanFunctions { // Or Predicates
     @JtwigFunction(name = "constant")
-    public boolean isConstant (@Parameter Object value, @Parameter String constant) throws ClassNotFoundException, NoSuchFieldException, IllegalAccessException {
+    public boolean isConstant (@Parameter Object value, @Parameter String constant) throws FunctionException {
         int constantNamePosition = constant.lastIndexOf(".");
         String className = constant.substring(0, constantNamePosition);
         String constantName = constant.substring(constantNamePosition+1);
 
-        return value.equals(forName(className).getDeclaredField(constantName).get(null));
+        try {
+            return value.equals(forName(className).getDeclaredField(constantName).get(null));
+        } catch (Exception e) {
+            throw new FunctionException("Constant "+constant+" not found");
+        }
     }
 
     @JtwigFunction(name = "defined")

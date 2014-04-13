@@ -20,18 +20,18 @@ import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.RenderException;
 import com.lyncode.jtwig.parser.JtwigParser;
 import com.lyncode.jtwig.parser.positioning.Position;
-import com.lyncode.jtwig.resource.JtwigResource;
 import com.lyncode.jtwig.tree.api.AbstractContent;
 import com.lyncode.jtwig.tree.api.Expression;
 import com.lyncode.jtwig.tree.api.TagInformation;
 import com.lyncode.jtwig.tree.helper.RenderStream;
 import com.lyncode.jtwig.tree.structural.Block;
+import com.lyncode.jtwig.unit.resource.JtwigResource;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import static com.lyncode.jtwig.util.BooleanOperations.isTrue;
+import static com.lyncode.jtwig.unit.util.BooleanOperations.isTrue;
 
 public class IfExpression extends AbstractContent {
     private final List<Case> cases = new ArrayList<>();

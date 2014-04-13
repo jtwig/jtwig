@@ -17,8 +17,8 @@ package com.lyncode.jtwig.tree.api;
 import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.parser.JtwigParser;
 import com.lyncode.jtwig.parser.positioning.Position;
-import com.lyncode.jtwig.resource.JtwigResource;
 import com.lyncode.jtwig.tree.structural.Block;
+import com.lyncode.jtwig.unit.resource.JtwigResource;
 
 public abstract class AbstractContent implements Content, Tag {
     private final TagInformation begin = new TagInformation();

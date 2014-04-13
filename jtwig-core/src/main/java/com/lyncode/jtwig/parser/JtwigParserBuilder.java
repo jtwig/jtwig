@@ -20,7 +20,7 @@ import com.lyncode.jtwig.exception.ParseException;
 import com.lyncode.jtwig.parser.addons.JtwigContentAddonParser;
 import com.lyncode.jtwig.parser.addons.JtwigEmptyContentAddonParser;
 import com.lyncode.jtwig.parser.config.ParserConfiguration;
-import com.lyncode.jtwig.resource.JtwigResource;
+import com.lyncode.jtwig.unit.resource.JtwigResource;
 
 import java.util.ArrayList;
 import java.util.List;

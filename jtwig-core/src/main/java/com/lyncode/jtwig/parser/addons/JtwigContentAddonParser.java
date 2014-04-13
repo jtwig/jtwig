@@ -19,7 +19,7 @@ import com.lyncode.jtwig.parser.JtwigBasicParser;
 import com.lyncode.jtwig.parser.JtwigExpressionParser;
 import com.lyncode.jtwig.parser.JtwigTagPropertyParser;
 import com.lyncode.jtwig.parser.config.ParserConfiguration;
-import com.lyncode.jtwig.resource.JtwigResource;
+import com.lyncode.jtwig.unit.resource.JtwigResource;
 import org.parboiled.Parboiled;
 import org.parboiled.Rule;
 

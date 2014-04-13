@@ -16,12 +16,12 @@ package com.lyncode.jtwig.parser.addons;
 
 import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.parser.JtwigParser;
-import com.lyncode.jtwig.resource.JtwigResource;
 import com.lyncode.jtwig.tree.api.Content;
 import com.lyncode.jtwig.tree.api.Tag;
 import com.lyncode.jtwig.tree.api.TagInformation;
 import com.lyncode.jtwig.tree.content.JtwigContent;
 import com.lyncode.jtwig.tree.structural.Block;
+import com.lyncode.jtwig.unit.resource.JtwigResource;
 
 public abstract class JtwigContentAddon implements Content, Tag {
     private JtwigContent content;
