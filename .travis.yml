@@ -5,4 +5,4 @@ env:
 
 after_success:
   - mvn compile -Pmerge-reports -N
-  - mvn coveralls:jacoco -N
+  - mvn coveralls:jacoco
