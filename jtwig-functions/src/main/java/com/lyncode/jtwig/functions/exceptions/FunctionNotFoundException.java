@@ -15,18 +15,7 @@
 package com.lyncode.jtwig.functions.exceptions;
 
 public class FunctionNotFoundException extends FunctionException {
-    public FunctionNotFoundException() {
-    }
-
     public FunctionNotFoundException(String message) {
         super(message);
-    }
-
-    public FunctionNotFoundException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public FunctionNotFoundException(Throwable cause) {
-        super(cause);
     }
 }
