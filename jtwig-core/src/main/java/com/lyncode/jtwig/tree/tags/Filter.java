@@ -21,11 +21,11 @@ import com.lyncode.jtwig.exception.CalculateException;
 import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.RenderException;
 import com.lyncode.jtwig.parser.JtwigParser;
+import com.lyncode.jtwig.parser.positioning.Position;
 import com.lyncode.jtwig.resource.JtwigResource;
+import com.lyncode.jtwig.tree.api.AbstractContent;
 import com.lyncode.jtwig.tree.api.Content;
 import com.lyncode.jtwig.tree.api.Expression;
-import com.lyncode.jtwig.tree.api.Tag;
-import com.lyncode.jtwig.tree.api.TagInformation;
 import com.lyncode.jtwig.tree.content.JtwigRootContent;
 import com.lyncode.jtwig.tree.expressions.Constant;
 import com.lyncode.jtwig.tree.expressions.FunctionElement;
@@ -34,20 +34,14 @@ import com.lyncode.jtwig.tree.structural.Block;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.List;
 
-public class Filter implements Content, Tag {
-
+public class Filter extends AbstractContent {
     private Content content;
-    private TagInformation begin = new TagInformation();
-    private TagInformation end = new TagInformation();
     private List<FunctionElement> expressions = Lists.newArrayList();
 
-    public Filter() {
-    }
-
-    public Filter(FunctionElement expression) {
+    public Filter(Position position, FunctionElement expression) {
+        super(position);
         this.expressions.add(expression);
     }
 
@@ -62,16 +56,15 @@ public class Filter implements Content, Tag {
     }
 
     @Override
-    public boolean render(RenderStream renderStream, JtwigContext context) throws RenderException {
-        RenderStream renderStream1 = new RenderStream(new ByteArrayOutputStream());
-        content.render(renderStream1, context);
-        Expression constant = new Constant<>(renderStream1.getOuputStream().toString());
+    public void render(RenderStream renderStream, JtwigContext context) throws RenderException {
+        RenderStream local = new RenderStream(new ByteArrayOutputStream());
+        content.render(local, context);
+        Expression constant = new Constant<>(local.getOuputStream().toString());
 
-        this.expressions.get(0).getArguments().set(0, constant);
+        this.expressions.get(0).addArgument(0, constant);
 
         try {
             renderStream.write(Iterables.getLast(this.expressions).calculate(context).toString().getBytes());
-            return true;
         } catch (IOException | CalculateException e) {
             throw new RenderException(e);
         }
@@ -90,15 +83,5 @@ public class Filter implements Content, Tag {
     @Override
     public String toString() {
         return "Render the result of " + content;
-    }
-
-    @Override
-    public TagInformation begin() {
-        return this.begin;
-    }
-
-    @Override
-    public TagInformation end() {
-        return this.end;
     }
 }

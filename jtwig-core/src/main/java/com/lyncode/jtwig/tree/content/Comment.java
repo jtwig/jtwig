@@ -15,49 +15,25 @@
 package com.lyncode.jtwig.tree.content;
 
 import com.lyncode.jtwig.JtwigContext;
-import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.RenderException;
-import com.lyncode.jtwig.parser.JtwigParser;
-import com.lyncode.jtwig.resource.JtwigResource;
-import com.lyncode.jtwig.tree.api.Content;
-import com.lyncode.jtwig.tree.api.Tag;
+import com.lyncode.jtwig.parser.positioning.Position;
+import com.lyncode.jtwig.tree.api.AbstractContent;
 import com.lyncode.jtwig.tree.api.TagInformation;
 import com.lyncode.jtwig.tree.helper.RenderStream;
-import com.lyncode.jtwig.tree.structural.Block;
 
-public class Comment implements Content, Tag {
+public class Comment extends AbstractContent {
     protected TagInformation begin = new TagInformation();
     protected TagInformation end = new TagInformation();
 
-    public Comment() {
+    public Comment(Position position) {
+        super(position);
     }
 
     @Override
-    public boolean render(RenderStream renderStream, JtwigContext context) throws RenderException {
-        return true;
-    }
-
-    @Override
-    public Content compile(JtwigParser parser, JtwigResource resource) throws CompileException {
-        return this;
-    }
-
-    @Override
-    public boolean replace(Block expression) throws CompileException {
-        return false;
+    public void render(RenderStream renderStream, JtwigContext context) throws RenderException {
     }
 
     public String toString() {
         return "Comment";
-    }
-
-    @Override
-    public TagInformation begin() {
-        return this.begin;
-    }
-
-    @Override
-    public TagInformation end() {
-        return this.end;
     }
 }

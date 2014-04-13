@@ -20,36 +20,35 @@ import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.RenderException;
 import com.lyncode.jtwig.functions.util.ObjectIterator;
 import com.lyncode.jtwig.parser.JtwigParser;
+import com.lyncode.jtwig.parser.positioning.Position;
 import com.lyncode.jtwig.resource.JtwigResource;
+import com.lyncode.jtwig.tree.api.AbstractContent;
 import com.lyncode.jtwig.tree.api.Content;
 import com.lyncode.jtwig.tree.api.Expression;
-import com.lyncode.jtwig.tree.api.Tag;
-import com.lyncode.jtwig.tree.api.TagInformation;
 import com.lyncode.jtwig.tree.expressions.Variable;
 import com.lyncode.jtwig.tree.helper.RenderStream;
 import com.lyncode.jtwig.tree.structural.Block;
 
-public class ForLoop implements Content, Tag {
+public class ForLoop extends AbstractContent {
     protected Variable variable;
     protected JtwigContent content;
     protected Expression expression;
-    protected TagInformation begin = new TagInformation();
-    protected TagInformation end = new TagInformation();
 
-    public ForLoop(Variable variable, Expression list) {
+    public ForLoop(Position position, Variable variable, Expression list) {
+        super(position);
         this.variable = variable;
         this.expression = list;
     }
 
 
-    public boolean setContent(JtwigContent content) {
+    public ForLoop setContent(JtwigContent content) {
         this.content = content;
-        return true;
+        return this;
     }
 
 
     @Override
-    public boolean render(RenderStream renderStream, JtwigContext context) throws RenderException {
+    public void render(RenderStream renderStream, JtwigContext context) throws RenderException {
         try {
             ObjectIterator iterator = new ObjectIterator(expression.calculate(context));
             Loop loop = new Loop(iterator.size());
@@ -61,7 +60,6 @@ public class ForLoop implements Content, Tag {
                 context.set(variable.getIdentifier(), object);
                 content.render(renderStream, context);
             }
-            return true;
         } catch (CalculateException e) {
             throw new RenderException(e);
         }
@@ -80,16 +78,6 @@ public class ForLoop implements Content, Tag {
 
     public String toString() {
         return "For each element of " + expression + " render " + content;
-    }
-
-    @Override
-    public TagInformation begin() {
-        return this.begin;
-    }
-
-    @Override
-    public TagInformation end() {
-        return this.end;
     }
 
     public static class Loop {

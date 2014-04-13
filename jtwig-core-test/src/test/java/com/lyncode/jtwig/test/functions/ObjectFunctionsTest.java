@@ -30,7 +30,14 @@ public class ObjectFunctionsTest extends AbstractJtwigTest {
     }
 
     @Test
-    public void defaultUndefinedFunctionTest() throws Exception {
+    public void defaultUndefinedVariableTest() throws Exception {
+        when(jtwigRenders(template("{{ default(a, 1) }}")));
+        then(theRenderedTemplate(), is(equalTo("1")));
+    }
+
+    @Test
+    public void defaultUndefinedMethodOrFieldTest() throws Exception {
+        given(theContext().withModelAttribute("a", new Object()));
         when(jtwigRenders(template("{{ default(a.call, 1) }}")));
         then(theRenderedTemplate(), is(equalTo("1")));
     }

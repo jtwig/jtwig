@@ -20,31 +20,31 @@ import com.lyncode.jtwig.exception.RenderException;
 import org.junit.Test;
 
 import static com.lyncode.jtwig.SyntacticSugar.after;
-import static org.hamcrest.core.StringContains.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.StringContains.containsString;
 
 public class EmbedTest extends AbstractJtwigTest {
     @Test
     public void emptyEmbed() throws ParseException, CompileException, RenderException {
-        after(jtwigRenders(templateResource("embed/empty.twig")));
+        after(jtwigRenders(templateResource("templates/embed/empty.twig")));
         assertThat(theRenderedTemplate(), containsString("1/1"));
     }
 
     @Test
     public void partialOverrideEmbed() throws ParseException, CompileException, RenderException {
-        after(jtwigRenders(templateResource("embed/partialOverride.twig")));
+        after(jtwigRenders(templateResource("templates/embed/partialOverride.twig")));
         assertThat(theRenderedTemplate(), containsString("1/2"));
     }
 
     @Test
     public void fullOverrideEmbed() throws ParseException, CompileException, RenderException {
-        after(jtwigRenders(templateResource("embed/fullOverride.twig")));
+        after(jtwigRenders(templateResource("templates/embed/fullOverride.twig")));
         assertThat(theRenderedTemplate(), containsString("2/2"));
     }
 
     @Test
     public void nestedOverrideEmbed() throws ParseException, CompileException, RenderException {
-        after(jtwigRenders(templateResource("embed/nestedOverride.twig")));
+        after(jtwigRenders(templateResource("templates/embed/nestedOverride.twig")));
         assertThat(theRenderedTemplate(), containsString("1/(4/2)"));
     }
 }

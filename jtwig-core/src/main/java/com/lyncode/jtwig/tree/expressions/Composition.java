@@ -17,25 +17,31 @@ package com.lyncode.jtwig.tree.expressions;
 import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.exception.CalculateException;
 import com.lyncode.jtwig.functions.exceptions.FunctionException;
+import com.lyncode.jtwig.functions.exceptions.FunctionNotFoundException;
 import com.lyncode.jtwig.functions.parameters.GivenParameters;
+import com.lyncode.jtwig.parser.positioning.Position;
+import com.lyncode.jtwig.tree.api.AbstractExpression;
 import com.lyncode.jtwig.tree.api.Expression;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Composition implements Expression {
-    private Expression expression;
+public class Composition extends AbstractExpression {
+    private final Expression expression;
     private List<FunctionElement> filters = new ArrayList<FunctionElement>();
 
-    public Composition(Expression expression) {
+    public Composition(Position position, Expression expression) {
+        super(position);
         this.expression = expression;
     }
 
     public boolean add (Object functionElement) {
         if (functionElement instanceof FunctionElement)
             this.filters.add((FunctionElement) functionElement);
-        else if (functionElement instanceof Variable)
-            filters.add(new FunctionElement(((Variable) functionElement).getIdentifier()));
+        else if (functionElement instanceof Variable) {
+            Variable variable = (Variable) functionElement;
+            filters.add(new FunctionElement(variable.getPosition(), variable.getIdentifier()));
+        }
         else
             return false;
         return true;
@@ -48,14 +54,17 @@ public class Composition implements Expression {
             for (FunctionElement functionElement : filters) {
                 GivenParameters parameters = new GivenParameters()
                         .addObject(resolved)
-                        .addArray(functionElement.getArguments().calculate(context).toArray());
+                        .addArray(functionElement.arguments(context));
 
-                resolved = context.executeFunction(functionElement.getName(), parameters);
+                try {
+                    resolved = context.executeFunction(functionElement.getName(), parameters);
+                } catch (FunctionNotFoundException e) {
+                    throw new CalculateException(functionElement.getPosition()+": "+e.getMessage(), e);
+                }
             }
             return resolved;
         } catch (FunctionException e) {
-            throw new CalculateException(e);
+            throw new CalculateException(getPosition()+": "+e.getMessage(), e);
         }
-
     }
 }

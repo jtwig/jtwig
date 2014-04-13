@@ -17,7 +17,7 @@ package com.lyncode.jtwig.test.addons.concurrent;
 
 import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.JtwigTemplate;
-import com.lyncode.jtwig.test.addons.spaceless.AbstractAddonTest;
+import com.lyncode.jtwig.test.addons.AbstractAddonTest;
 import org.junit.Test;
 
 import java.util.ArrayList;

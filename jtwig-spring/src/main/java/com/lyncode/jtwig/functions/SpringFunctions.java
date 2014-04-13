@@ -26,8 +26,6 @@ import org.springframework.context.MessageSource;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import org.springframework.web.servlet.LocaleResolver;
 
 import javax.servlet.RequestDispatcher;
@@ -79,6 +77,7 @@ public class SpringFunctions {
         if (environment == null) throw new FunctionException("Unable to retrieve Environment bean");
         else return environment.getProperty(name);
     }
+
 
     @JtwigFunction(name = "render")
     public String render (HttpServletRequest request, @Parameter String url) throws FunctionException {

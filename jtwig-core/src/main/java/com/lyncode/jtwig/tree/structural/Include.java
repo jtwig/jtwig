@@ -20,50 +20,33 @@ import com.lyncode.jtwig.exception.ParseException;
 import com.lyncode.jtwig.exception.RenderException;
 import com.lyncode.jtwig.exception.ResourceException;
 import com.lyncode.jtwig.parser.JtwigParser;
+import com.lyncode.jtwig.parser.positioning.Position;
 import com.lyncode.jtwig.resource.JtwigResource;
+import com.lyncode.jtwig.tree.api.AbstractContent;
 import com.lyncode.jtwig.tree.api.Content;
-import com.lyncode.jtwig.tree.api.Tag;
-import com.lyncode.jtwig.tree.api.TagInformation;
 import com.lyncode.jtwig.tree.helper.RenderStream;
 
-import java.io.OutputStream;
-
-public class Include implements Content, Tag {
+public class Include extends AbstractContent {
     private String path;
-    private TagInformation begin = new TagInformation();
-    private TagInformation end = new TagInformation();
 
-    public Include(String path) {
+    public Include(Position position, String path) {
+        super(position);
         this.path = path;
     }
 
     @Override
-    public boolean render(RenderStream renderStream, JtwigContext context) throws RenderException {
-        return false;
+    public void render(RenderStream outputStream, JtwigContext context) throws RenderException {
+
     }
 
     @Override
     public Content compile(JtwigParser parser, JtwigResource resource) throws CompileException {
         try {
             JtwigResource jtwigResource = resource.resolve(path);
-            return JtwigParser.parse(parser, jtwigResource).compile(parser, jtwigResource);
+            JtwigParser jtwigParser = parser.clone(jtwigResource);
+            return JtwigParser.parse(jtwigParser, jtwigResource).compile(jtwigParser, jtwigResource);
         } catch (ParseException | ResourceException e) {
             throw new CompileException(e);
         }
-    }
-
-    @Override
-    public boolean replace(Block expression) throws CompileException {
-        return false;
-    }
-
-    @Override
-    public TagInformation begin() {
-        return begin;
-    }
-
-    @Override
-    public TagInformation end() {
-        return end;
     }
 }

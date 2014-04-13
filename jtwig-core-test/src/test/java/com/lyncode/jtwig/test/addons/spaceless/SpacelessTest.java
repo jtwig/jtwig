@@ -14,25 +14,18 @@
 
 package com.lyncode.jtwig.test.addons.spaceless;
 
-import com.lyncode.jtwig.JtwigContext;
-import com.lyncode.jtwig.parser.JtwigParser;
-import com.lyncode.jtwig.resource.StringJtwigResource;
-import com.lyncode.jtwig.tree.documents.JtwigDocument;
-import com.lyncode.jtwig.tree.helper.RenderStream;
+import com.lyncode.jtwig.test.addons.AbstractAddonTest;
 import org.junit.Test;
 
-import java.io.ByteArrayOutputStream;
+import static com.lyncode.jtwig.SyntacticSugar.then;
+import static com.lyncode.jtwig.SyntacticSugar.when;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 
 public class SpacelessTest extends AbstractAddonTest {
     @Test
-    public void testName() throws Exception {
-        JtwigParser jtwigParser = new JtwigParser.Builder().build();
-
-        StringJtwigResource resource = new StringJtwigResource("{% spaceless %}  <div>   <two>   </two>   </div>{% endspaceless %}");
-        JtwigDocument document = JtwigParser.parse(jtwigParser, resource);
-        RenderStream renderStream = new RenderStream(new ByteArrayOutputStream());
-        document.compile(jtwigParser, resource).render(renderStream, new JtwigContext());
-
-        System.out.println(renderStream.toString());
+    public void testSpaceTag() throws Exception {
+        when(jtwigRenders(template("{% spaceless %}  <div>   <two>   </two>   </div>{% endspaceless %}")));
+        then(theRenderedTemplate(), is(equalTo("<div><two></two></div>")));
     }
 }

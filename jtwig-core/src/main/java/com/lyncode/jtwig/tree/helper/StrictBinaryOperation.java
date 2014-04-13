@@ -17,6 +17,7 @@ package com.lyncode.jtwig.tree.helper;
 import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.exception.CalculateException;
 import com.lyncode.jtwig.functions.util.ObjectIterator;
+import com.lyncode.jtwig.parser.positioning.Position;
 import com.lyncode.jtwig.tree.api.Expression;
 import com.lyncode.jtwig.tree.expressions.Composition;
 import com.lyncode.jtwig.tree.expressions.OperationBinary;
@@ -32,6 +33,7 @@ public class StrictBinaryOperation implements Expression {
     private Operator operator;
     private Expression left;
     private Expression right;
+    private Position position;
 
 
     public static StrictBinaryOperation create(OperationBinary binary) {
@@ -49,6 +51,7 @@ public class StrictBinaryOperation implements Expression {
             last = operation;
             index++;
         }
+        last.position = binary.getPosition();
         return last;
     }
     private Object numericExecute(JtwigContext resolver) throws CalculateException {
@@ -64,7 +67,7 @@ public class StrictBinaryOperation implements Expression {
             case MOD:
                 return MathOperations.mod(left.calculate(resolver), right.calculate(resolver));
         }
-        throw new CalculateException("Unknown operator " + operator.toString());
+        throw new CalculateException(position+": Expression with unknown operator " + operator.toString());
     }
 
     private Object relationalExecute(JtwigContext resolver) throws CalculateException {
@@ -101,7 +104,7 @@ public class StrictBinaryOperation implements Expression {
                 else
                     return false;
         }
-        throw new CalculateException("Unknown operator " + operator.toString());
+        throw new CalculateException(position+": Expression with unknown operator " + operator.toString());
     }
 
     private Object booleanExecute(JtwigContext resolver) throws CalculateException {
@@ -111,7 +114,7 @@ public class StrictBinaryOperation implements Expression {
             case OR:
                 return or(left.calculate(resolver), right.calculate(resolver));
         }
-        throw new CalculateException("Unknown operator " + operator.toString());
+        throw new CalculateException(position+": Expression with unknown operator " + operator.toString());
     }
 
 
@@ -119,19 +122,20 @@ public class StrictBinaryOperation implements Expression {
     public Object calculate(JtwigContext context) throws CalculateException {
         switch (operator) {
             case COMPOSITION:
-                Composition composition = new Composition(left);
+                Composition composition = new Composition(position, left);
                 composition.add(right);
                 return composition.calculate(context);
             case SELECTION:
-                Selection selection = new Selection(left);
+                Selection selection = new Selection(position);
+                selection.add(left);
                 selection.add(right);
                 return selection.calculate(context);
             case IS:
-                composition = new Composition(left);
+                composition = new Composition(position, left);
                 composition.add(right);
                 return isTrue(composition.calculate(context));
             case IS_NOT:
-                composition = new Composition(left);
+                composition = new Composition(position, left);
                 composition.add(right);
                 return !isTrue(composition.calculate(context));
             case ADD:

@@ -35,11 +35,10 @@ public class JtwigContent implements Content {
     private List<Content> contents = new ArrayList<>();
 
     @Override
-    public boolean render(RenderStream renderStream, JtwigContext context) throws RenderException {
+    public void render(RenderStream renderStream, JtwigContext context) throws RenderException {
         for (Content content : contents) {
             content.render(renderStream, context);
         }
-        return true;
     }
 
     @Override
@@ -53,17 +52,35 @@ public class JtwigContent implements Content {
             Content content = contents.get(i);
             if (content instanceof Text) {
                 Text text = (Text) content;
-                if (mustTrimLeft(i, begin)) {
+                if (getBefore(i, begin).hasRight(Trim))
                     text.trimLeft();
-                }
-
-                if (mustTrimRight(i, end)) {
+                if (getAfter(i, end).hasLeft(Trim))
                     text.trimRight();
-                }
             }
-            contents.set(i, content.compile(parser, resource));
+            contents.set(i, contents.get(i).compile(parser, resource));
         }
         return this;
+    }
+
+    private TagInformation getAfter(int position, TagInformation end) {
+        if (position >= contents.size() - 1) return end;
+        else {
+            Content content = contents.get(position + 1);
+            if (content instanceof Tag)
+                return ((Tag) content).begin();
+            return end;
+        }
+    }
+
+    private TagInformation getBefore(int position, TagInformation defaultBegin) {
+        if (position <= 0) return defaultBegin;
+        else {
+            Content content = contents.get(position - 1);
+            if (content instanceof Tag) {
+                return ((Tag) content).end();
+            }
+            return defaultBegin;
+        }
     }
 
     private boolean mustTrimLeft(int position, TagInformation value) {

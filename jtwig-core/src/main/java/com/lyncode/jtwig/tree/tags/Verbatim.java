@@ -17,47 +17,31 @@ package com.lyncode.jtwig.tree.tags;
 import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.RenderException;
-import com.lyncode.jtwig.parser.JtwigParser;
-import com.lyncode.jtwig.resource.JtwigResource;
-import com.lyncode.jtwig.tree.api.Content;
-import com.lyncode.jtwig.tree.api.Tag;
-import com.lyncode.jtwig.tree.api.TagInformation;
+import com.lyncode.jtwig.parser.positioning.Position;
+import com.lyncode.jtwig.tree.api.AbstractContent;
 import com.lyncode.jtwig.tree.content.Text;
 import com.lyncode.jtwig.tree.helper.RenderStream;
 import com.lyncode.jtwig.tree.structural.Block;
 
-public class Verbatim implements Content, Tag {
+public class Verbatim extends AbstractContent {
     private Text text;
-    private TagInformation end = new TagInformation();
-    private TagInformation begin = new TagInformation();
 
-    public boolean setText(Text text) {
+    public Verbatim(Position position) {
+        super(position);
+    }
+
+    public Verbatim withText(Text text) {
         this.text = text;
-        return true;
-    }
-
-    @Override
-    public boolean render(RenderStream renderStream, JtwigContext context) throws RenderException {
-        return text.render(renderStream, context);
-    }
-
-    @Override
-    public Content compile(JtwigParser parser, JtwigResource resource) throws CompileException {
         return this;
+    }
+
+    @Override
+    public void render(RenderStream outputStream, JtwigContext context) throws RenderException {
+        text.render(outputStream, context);
     }
 
     @Override
     public boolean replace(Block expression) throws CompileException {
         return false;
-    }
-
-    @Override
-    public TagInformation begin() {
-        return begin;
-    }
-
-    @Override
-    public TagInformation end() {
-        return end;
     }
 }

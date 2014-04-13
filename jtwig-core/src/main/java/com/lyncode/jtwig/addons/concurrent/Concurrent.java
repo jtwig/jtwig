@@ -23,9 +23,8 @@ import com.lyncode.jtwig.tree.helper.RenderStream;
 public class Concurrent extends JtwigContentAddon {
 
     @Override
-    public boolean render(RenderStream renderStream, JtwigContext context) throws RenderException {
+    public void render(RenderStream renderStream, JtwigContext context) throws RenderException {
         renderStream.renderConcurrent(getContent(), context);
-        return true;
     }
 
 }

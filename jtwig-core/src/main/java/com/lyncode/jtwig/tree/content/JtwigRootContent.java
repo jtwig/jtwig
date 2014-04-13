@@ -35,7 +35,7 @@ public class JtwigRootContent implements Content {
     }
 
     @Override
-    public boolean render(RenderStream renderStream, JtwigContext context) throws RenderException {
+    public void render(RenderStream renderStream, JtwigContext context) throws RenderException {
         content.render(renderStream, context);
         renderStream.waitForExecutorCompletion();
         try {
@@ -44,7 +44,6 @@ public class JtwigRootContent implements Content {
         } catch (IOException e) {
             throw new RenderException(e);
         }
-        return true;
     }
 
     @Override
