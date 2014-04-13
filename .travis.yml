@@ -4,4 +4,5 @@ env:
    secure: "OkFYNXvPgdRGL3juvdPyLWaDIwjxEgU7/aTxWC5DsSiTQVk8DyStZcfL8aquhlq6lcZpPReWgqQMyjHBK+hJ/FQ47+WqgbD5HLuFR5dWpaLWH7oSxjEtbER4JlhktMFJCGXyuCgnvdlEKAfBBjgm7jx9XhngkGv7yW3af23kU60="
 
 after_success:
-  - mvn clean cobertura:cobertura coveralls:cobertura
+  - mvn compile -Pmerge-reports -N
+  - mvn coveralls:jacoco
