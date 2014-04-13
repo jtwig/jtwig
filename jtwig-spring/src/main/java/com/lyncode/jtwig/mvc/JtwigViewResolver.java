@@ -18,7 +18,6 @@ import com.lyncode.jtwig.functions.SpringFunctions;
 import com.lyncode.jtwig.functions.parameters.resolve.HttpRequestParameterResolver;
 import com.lyncode.jtwig.functions.parameters.resolve.api.AnnotatedMethodParameterResolver;
 import com.lyncode.jtwig.functions.parameters.resolve.api.TypeMethodParameterResolver;
-import com.lyncode.jtwig.functions.repository.FunctionRepositoryBuilder;
 import com.lyncode.jtwig.functions.repository.FunctionResolver;
 import com.lyncode.jtwig.parser.config.ParserConfiguration;
 import com.lyncode.jtwig.services.api.theme.ThemePrefixResolver;
@@ -51,7 +50,7 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
     private boolean cached = true;
 
     private ParserConfiguration parserConfiguration = new ParserConfiguration();
-    private FunctionRepositoryBuilder functionRepository = new FunctionRepositoryBuilder();
+    private FunctionResolver functionRepository = new FunctionResolver();
     private FunctionResolver functionResolver = null;
 
     public JtwigViewResolver() {
@@ -127,7 +126,7 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
             getApplicationContext().getAutowireCapableBeanFactory().autowireBean(springFunctions);
             functionRepository.store(springFunctions);
         }
-        return functionRepository.build();
+        return functionRepository;
     }
 
     public JtwigViewResolver include (TypeMethodParameterResolver resolver) {
