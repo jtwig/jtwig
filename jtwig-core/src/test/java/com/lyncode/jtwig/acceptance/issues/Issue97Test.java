@@ -24,8 +24,13 @@ import static org.hamcrest.CoreMatchers.is;
 
 public class Issue97Test extends AbstractJtwigTest {
     @Test
-    public void issue97() throws Exception {
+    public void testDecimalResult() throws Exception {
         when(jtwigRenders(template("{{ 1 / 10 }}")));
+        then(theRenderedTemplate(), is(equalTo("0.1")));
+    }
+    @Test
+    public void testIntegerDivision() throws Exception {
+        when(jtwigRenders(template("{{ 1 // 10 }}")));
         then(theRenderedTemplate(), is(equalTo("0")));
     }
 }

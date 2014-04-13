@@ -61,6 +61,8 @@ public class StrictBinaryOperation implements Expression {
             case SUB:
                 return MathOperations.sub(left.calculate(resolver), right.calculate(resolver));
             case DIV:
+                return MathOperations.div(((Number)left.calculate(resolver)).doubleValue(), ((Number)right.calculate(resolver)).doubleValue());
+            case INT_DIV:
                 return MathOperations.div(left.calculate(resolver), right.calculate(resolver));
             case TIMES:
                 return MathOperations.mul(left.calculate(resolver), right.calculate(resolver));
