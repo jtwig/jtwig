@@ -25,6 +25,7 @@ public class ParserConfiguration {
     private String endOutput = "}}";
     private String beginComment = "{#";
     private String endComment = "#}";
+    private boolean useStrictEvaluation = true;
 
     public ParserConfiguration() {}
 
@@ -79,6 +80,15 @@ public class ParserConfiguration {
 
     public ParserConfiguration withEndComment(String endComment) {
         this.endComment = endComment;
+        return this;
+    }
+    
+    public boolean isUsingStrictEvaluation() {
+        return useStrictEvaluation;
+    }
+    
+    public ParserConfiguration useStrictEvaluation(boolean useStrictEvaluation) {
+        this.useStrictEvaluation = useStrictEvaluation;
         return this;
     }
 }
