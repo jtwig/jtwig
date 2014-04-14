@@ -17,13 +17,19 @@ package com.lyncode.jtwig.tree.expressions;
 import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.parser.positioning.Position;
 import com.lyncode.jtwig.tree.api.AbstractExpression;
+import com.lyncode.jtwig.types.Undefined;
 
 public class Variable extends AbstractExpression {
     private String identifier;
+    private boolean emptyOnUndefined = false;
 
     public Variable(Position position, String identifier) {
         super(position);
         this.identifier = identifier;
+    }
+    public Variable(Position position, String identifier, boolean emptyOnUndefined) {
+        this(position, identifier);
+        this.emptyOnUndefined = emptyOnUndefined;
     }
 
     public String getIdentifier() {
@@ -36,6 +42,11 @@ public class Variable extends AbstractExpression {
 
     @Override
     public Object calculate(JtwigContext context) {
-        return context.map(this.identifier);
+        Object obj = context.map(this.identifier);
+        if((obj == Undefined.UNDEFINED || obj == null)
+                && emptyOnUndefined) {
+            return "";
+        }
+        return obj;
     }
 }
