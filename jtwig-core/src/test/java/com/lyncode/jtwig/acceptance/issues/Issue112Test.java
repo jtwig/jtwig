@@ -27,13 +27,11 @@ public class Issue112Test extends AbstractJtwigTest {
     @Test(expected = ClassCastException.class)
     public void operationWithNonexistentVarThrowsException() throws Exception {
         when(jtwigRenders(template("{% set a = 5 %}{{ a - b  }}")));
-        then(theRenderedTemplate(), is(equalTo("0.1")));
     }
     
     @Test(expected = NullPointerException.class)
     public void operationWithNullVarThrowsException() throws Exception {
         when(jtwigRenders(template("{% set a = 5 %}{% set b = null %}{{ a - b }}")));
-        then(theRenderedTemplate(), is(equalTo("0.1")));
     }
     
     @Test
@@ -46,7 +44,7 @@ public class Issue112Test extends AbstractJtwigTest {
         then(theRenderedTemplate(), is(equalTo("")));
     }
     
-    @Test()
+    @Test
     public void outputNonexistentVarThrowsException() throws Exception {
         when(jtwigRenders(template("{{ nonexistent }}")));
         then(theRenderedTemplate(), is(equalTo("undefined")));
