@@ -23,7 +23,7 @@ public class GivenParametersTest {
 
     @Test
     public void parameterTypes() throws Exception {
-        parameters.addObject("test");
+        parameters.add("test");
 
         assertTrue(parameters.types()[0].equals(String.class));
     }

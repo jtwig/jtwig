@@ -22,21 +22,15 @@ import java.util.List;
 import static java.util.Arrays.asList;
 
 public class GivenParameters {
-    private final List<GivenParameter> givenParameters;
+    private final List<Object> givenParameters;
 
-    public GivenParameters(List<GivenParameter> givenParameters) {
-        this.givenParameters = givenParameters;
-    }
-    public GivenParameters(GivenParameter... givenParameters) {
-        this.givenParameters = asList(givenParameters);
-    }
     public GivenParameters () {
         this.givenParameters = new ArrayList<>();
     }
 
     public Optional<Object> get(int position) {
         if (position >= givenParameters.size()) return new Optional<>();
-        return new Optional<>(givenParameters.get(position).getValue());
+        return new Optional<>(givenParameters.get(position));
     }
 
     public int size () {
@@ -45,24 +39,17 @@ public class GivenParameters {
 
     public Class<?>[] types () {
         List<Class<?>> types = new ArrayList<>();
-        for (GivenParameter givenParameter : givenParameters)
-            types.add(givenParameter.type());
+        for (Object givenParameter : givenParameters) {
+            if (givenParameter != null)
+                types.add(givenParameter.getClass());
+            else
+                types.add(Object.class);
+        }
         return types.toArray(new Class[types.size()]);
     }
 
-    public GivenParameters add(GivenParameter givenParameter) {
-        givenParameters.add(givenParameter);
-        return this;
-    }
-
-    public GivenParameters addArray(Object[] resolved) {
-        for (int i=0;i<resolved.length;i++)
-            givenParameters.add(new GivenParameter(resolved[i]));
-        return this;
-    }
-
-    public GivenParameters addObject(Object resolved) {
-        givenParameters.add(new GivenParameter(resolved));
+    public GivenParameters add(Object... givenParameter) {
+        givenParameters.addAll(asList(givenParameter));
         return this;
     }
 }

@@ -245,23 +245,41 @@
                                                     <include name="jacoco.exec"/>
                                                 </fileset>
                                             </executiondata>
-                                            <structure name="jacoco-multi Coverage Project">
-                                                <group name="jacoco-multi">
+                                            <structure name="Jtwig Coverage">
+                                                <group name="jtwig-core">
                                                     <classfiles>
-                                                        <fileset dir="jtwig-functions/target/classes"/>
-                                                        <fileset dir="jtwig-core/target/classes"/>
-                                                        <fileset dir="jtwig-spring/target/classes"/>
+                                                        <fileset dir="jtwig-core/target/classes">
+                                                            <exclude name="**/*Parser*" />
+                                                            <exclude name="**/parboiled/**" />
+                                                        </fileset>
                                                     </classfiles>
                                                     <sourcefiles encoding="UTF-8">
-                                                        <fileset
-                                                                dir="jtwig-functions/target/generated-sources/annotations"/>
                                                         <fileset dir="jtwig-core/target/generated-sources/annotations"/>
-                                                        <fileset
-                                                                dir="jtwig-spring/target/generated-sources/annotations"/>
+                                                    </sourcefiles>
+                                                </group>
+                                                <group name="jtwig-functions">
+                                                    <classfiles>
+                                                        <fileset dir="jtwig-functions/target/classes"/>
+                                                    </classfiles>
+                                                    <sourcefiles encoding="UTF-8">
+                                                        <fileset dir="jtwig-functions/target/generated-sources/annotations"/>
+                                                    </sourcefiles>
+                                                </group>
+                                                <group name="jtwig-spring">
+                                                    <classfiles>
+                                                        <fileset dir="jtwig-spring/target/classes">
+                                                            <exclude name="**/render/**" />
+                                                            <exclude name="**/SpringFunctions*" />
+                                                            <exclude name="**/BeanResolver*" />
+                                                        </fileset>
+                                                    </classfiles>
+                                                    <sourcefiles encoding="UTF-8">
+                                                        <fileset dir="jtwig-spring/target/generated-sources/annotations"/>
                                                     </sourcefiles>
                                                 </group>
                                             </structure>
                                             <xml destfile="${basedir}/target/site/jacoco/jacoco.xml"/>
+                                            <html destdir="${basedir}/target/site/jacoco"/>
                                         </report>
                                     </target>
                                 </configuration>

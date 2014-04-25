@@ -15,16 +15,36 @@
 
 package com.lyncode.jtwig.addons.concurrent;
 
-import com.lyncode.jtwig.JtwigContext;
+import com.lyncode.jtwig.addons.Addon;
+import com.lyncode.jtwig.compile.CompileContext;
+import com.lyncode.jtwig.content.api.Renderable;
+import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.RenderException;
-import com.lyncode.jtwig.parser.addons.JtwigContentAddon;
-import com.lyncode.jtwig.tree.helper.RenderStream;
+import com.lyncode.jtwig.render.RenderContext;
 
-public class Concurrent extends JtwigContentAddon {
+import java.io.IOException;
+
+public class Concurrent extends Addon {
 
     @Override
-    public void render(RenderStream renderStream, JtwigContext context) throws RenderException {
-        renderStream.renderConcurrent(getContent(), context);
+    public Renderable compile(CompileContext context) throws CompileException {
+        return new Compiled(super.compile(context));
     }
 
+    private static class Compiled implements Renderable {
+        private final Renderable content;
+
+        private Compiled(Renderable content) {
+            this.content = content;
+        }
+
+        @Override
+        public void render(RenderContext context) throws RenderException {
+            try {
+                context.renderConcurrent(content);
+            } catch (IOException e) {
+                throw new RenderException(e);
+            }
+        }
+    }
 }

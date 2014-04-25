@@ -14,6 +14,7 @@
 
 package com.lyncode.jtwig.functions.builtin;
 
+import com.lyncode.jtwig.functions.exceptions.FunctionException;
 import org.junit.Test;
 
 import java.text.SimpleDateFormat;
@@ -26,9 +27,39 @@ public class DateFunctionsTest {
     private DateFunctions underTest = new DateFunctions();
 
     @Test
-    public void testExecute() throws Exception {
+    public void addDay() throws Exception {
         Date date = new Date();
         assertNotEquals(date, underTest.modifyDate(date, "+1 day"));
+    }
+    @Test
+    public void addMonth() throws Exception {
+        Date date = new Date();
+        assertNotEquals(date, underTest.modifyDate(date, "+1 month"));
+    }
+    @Test
+    public void addYear() throws Exception {
+        Date date = new Date();
+        assertNotEquals(date, underTest.modifyDate(date, "+1 year"));
+    }
+    @Test
+    public void addMinute() throws Exception {
+        Date date = new Date();
+        assertNotEquals(date, underTest.modifyDate(date, "+1 minute"));
+    }
+    @Test
+    public void addSecond() throws Exception {
+        Date date = new Date();
+        assertNotEquals(date, underTest.modifyDate(date, "+1 second"));
+    }
+    @Test
+    public void addHour() throws Exception {
+        Date date = new Date();
+        assertNotEquals(date, underTest.modifyDate(date, "+1 hour"));
+    }
+    @Test(expected = FunctionException.class)
+    public void addUnknown() throws Exception {
+        Date date = new Date();
+        assertNotEquals(date, underTest.modifyDate(date, "+1 unknown"));
     }
 
     @Test

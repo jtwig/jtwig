@@ -26,25 +26,25 @@ import static com.lyncode.jtwig.util.SyntacticSugar.when;
 public class DateFunctionsTest extends AbstractJtwigTest {
     @Test
     public void dateFormatWithDate() throws Exception {
-        given(theContext().withModelAttribute("time", new Date()));
+        given(aContext().withModelAttribute("time", new Date()));
         when(jtwigRenders(template("{{ date_format(time, 'yyyy') }}")));
     }
 
     @Test
     public void dateFormat() throws Exception {
-        given(theContext().withModelAttribute("time", new Date()));
+        given(aContext().withModelAttribute("time", new Date()));
         when(jtwigRenders(template("{{ date_format(time) }}")));
     }
 
     @Test
     public void dateModify() throws Exception {
-        given(theContext().withModelAttribute("time", new Date()));
+        given(aContext().withModelAttribute("time", new Date()));
         when(jtwigRenders(template("{{ date_format(time, '+1 day') }}")));
     }
 
     @Test(expected = RenderException.class)
     public void dateModifyWithWrongFormat() throws Exception {
-        given(theContext().withModelAttribute("time", new Date()));
+        given(aContext().withModelAttribute("time", new Date()));
         when(jtwigRenders(template("{{ date_modify(time, '+1 unknown') }}")));
     }
 }

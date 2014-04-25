@@ -23,7 +23,7 @@ import static org.hamcrest.core.StringContains.containsString;
 public class Issue75Test extends AbstractJtwigTest {
     @Test
     public void issue75IsNull() throws Exception {
-        given(theContext().withModelAttribute("a", new NullPointer()));
+        given(aContext().withModelAttribute("a", new NullPointer()));
         when(jtwigRenders(template("{% if a.value is null %}A{% else %}B{% endif %}")));
         then(theRenderedTemplate(), containsString("A"));
     }
@@ -31,7 +31,7 @@ public class Issue75Test extends AbstractJtwigTest {
 
     @Test
     public void issue75IsNullWithParentheses() throws Exception {
-        given(theContext().withModelAttribute("a", new NullPointer()));
+        given(aContext().withModelAttribute("a", new NullPointer()));
         when(jtwigRenders(template("{% if (a.value) is null %}A{% else %}B{% endif %}")));
         then(theRenderedTemplate(), containsString("A"));
     }

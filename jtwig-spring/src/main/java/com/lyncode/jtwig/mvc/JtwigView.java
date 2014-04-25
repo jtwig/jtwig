@@ -18,13 +18,13 @@ import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.JtwigModelMap;
 import com.lyncode.jtwig.JtwigTemplate;
 import com.lyncode.jtwig.beans.BeanResolver;
+import com.lyncode.jtwig.configuration.JtwigConfiguration;
+import com.lyncode.jtwig.content.api.Renderable;
 import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.ParseException;
-import com.lyncode.jtwig.parser.JtwigParserBuilder;
-import com.lyncode.jtwig.parser.config.ParserConfiguration;
-import com.lyncode.jtwig.tree.api.Content;
-import com.lyncode.jtwig.tree.helper.RenderStream;
-import com.lyncode.jtwig.unit.resource.WebJtwigResource;
+import com.lyncode.jtwig.parser.JtwigParser;
+import com.lyncode.jtwig.render.RenderContext;
+import com.lyncode.jtwig.resource.WebJtwigResource;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.BeansException;
@@ -43,7 +43,7 @@ public class JtwigView extends AbstractTemplateView {
 
     private static Logger log = LogManager.getLogger(JtwigView.class);
 
-    private Map<String, Content> compiledTemplates = new HashMap<>();
+    private Map<String, Renderable> compiledTemplates = new HashMap<>();
 
     protected String getEncoding() {
         return getViewResolver().getEncoding();
@@ -53,8 +53,8 @@ public class JtwigView extends AbstractTemplateView {
         return getViewResolver().getTheme();
     }
 
-    protected ParserConfiguration getParserConfiguration() {
-        return getViewResolver().getParserConfiguration();
+    protected JtwigConfiguration getConfiguration() {
+        return getViewResolver().configuration();
     }
 
     private JtwigViewResolver getViewResolver() {
@@ -92,14 +92,14 @@ public class JtwigView extends AbstractTemplateView {
             response.setCharacterEncoding(this.getEncoding());
         }
 
-        getContent(request).render(new RenderStream(response.getOutputStream()),
-                                   new JtwigContext(modelMap, getViewResolver().getFunctionResolver()));
+        JtwigContext jtwigContext = new JtwigContext(modelMap, getViewResolver().getFunctionResolver());
+        getContent(request).render(RenderContext.create(getConfiguration().render(), jtwigContext, response.getOutputStream()));
 
         response.getOutputStream().flush();
         response.getOutputStream().close();
     }
 
-    public Content getContent(HttpServletRequest request) throws CompileException, ParseException {
+    public Renderable getContent(HttpServletRequest request) throws CompileException, ParseException {
         if (getViewResolver().isCached()) {
             if (!compiledTemplates.containsKey(getUrl())) {
                 compiledTemplates.put(getUrl(), getCompiledJtwigTemplate(request));
@@ -109,13 +109,13 @@ public class JtwigView extends AbstractTemplateView {
         return getCompiledJtwigTemplate(request);
     }
 
-    private Content getCompiledJtwigTemplate(HttpServletRequest request) throws ParseException, CompileException {
-        return new JtwigTemplate(new WebJtwigResource(request.getSession().getServletContext(), getUrl())).compile(
-                jtwigParserBuilder());
+    private Renderable getCompiledJtwigTemplate(HttpServletRequest request) throws ParseException, CompileException {
+        return new JtwigTemplate(new WebJtwigResource(request.getSession().getServletContext(), getUrl()))
+                .compile(jtwigParser());
     }
 
-    private JtwigParserBuilder jtwigParserBuilder() {
-        return new JtwigParserBuilder().withConfiguration(getParserConfiguration());
+    private JtwigParser jtwigParser() {
+        return new JtwigParser(getConfiguration().parse());
     }
 
     @SuppressWarnings("serial")

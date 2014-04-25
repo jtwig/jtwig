@@ -19,8 +19,8 @@ import com.lyncode.jtwig.functions.annotations.JtwigFunction;
 import com.lyncode.jtwig.functions.annotations.Parameter;
 import com.lyncode.jtwig.functions.exceptions.FunctionException;
 import com.lyncode.jtwig.services.api.assets.AssetResolver;
-import com.lyncode.jtwig.unit.util.render.RenderHttpServletRequest;
-import com.lyncode.jtwig.unit.util.render.RenderHttpServletResponse;
+import com.lyncode.jtwig.util.render.RenderHttpServletRequest;
+import com.lyncode.jtwig.util.render.RenderHttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.core.env.Environment;
@@ -33,10 +33,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.springframework.http.HttpMethod.POST;
-import static org.springframework.http.MediaType.TEXT_PLAIN;
 
 public class SpringFunctions {
     @Autowired(required = false)
@@ -81,36 +81,12 @@ public class SpringFunctions {
 
     @JtwigFunction(name = "render")
     public String render (HttpServletRequest request, @Parameter String url) throws FunctionException {
-        RenderHttpServletRequest builder = new RenderHttpServletRequest(request);
-        RenderHttpServletResponse responseWrapper = new RenderHttpServletResponse();
-        builder.to(url);
-
-        try {
-            RequestDispatcher requestDispatcher = request.getRequestDispatcher(request.getServletPath());
-            requestDispatcher.include(builder, responseWrapper);
-
-            String result = responseWrapper.toString();
-            return result;
-        } catch (ServletException | IOException e) {
-            throw new FunctionException(e);
-        }
+        return render(request, url, "GET");
     }
 
     @JtwigFunction(name = "render")
     public String render (HttpServletRequest request, @Parameter String url, @Parameter String method) throws FunctionException {
-        RenderHttpServletRequest builder = new RenderHttpServletRequest(request);
-        RenderHttpServletResponse responseWrapper = new RenderHttpServletResponse();
-        builder.to(url);
-        builder.withMethod(HttpMethod.valueOf(method.toUpperCase()));
-
-        try {
-            RequestDispatcher requestDispatcher = request.getRequestDispatcher(request.getServletPath());
-            requestDispatcher.include(builder, responseWrapper);
-
-            return responseWrapper.toString();
-        } catch (ServletException | IOException e) {
-            throw new FunctionException(e);
-        }
+        return render(request, url, method, new HashMap<String, String>());
     }
 
     @JtwigFunction(name = "render")
@@ -144,26 +120,7 @@ public class SpringFunctions {
 
     @JtwigFunction(name = "render")
     public String render (HttpServletRequest request, @Parameter String url, @Parameter Map<String, String> parameters, @Parameter String postContent) throws FunctionException {
-        RenderHttpServletRequest builder = new RenderHttpServletRequest(request);
-        RenderHttpServletResponse responseWrapper = new RenderHttpServletResponse();
-        builder.to(url);
-        builder.withMethod(POST);
-
-        for (Map.Entry<String, String> entry : parameters.entrySet()) {
-            builder.withPostParameter(entry.getKey(), entry.getValue());
-        }
-
-        builder.withContent(postContent);
-        builder.withContentType(TEXT_PLAIN);
-
-        try {
-            RequestDispatcher requestDispatcher = request.getRequestDispatcher(request.getServletPath());
-            requestDispatcher.include(builder, responseWrapper);
-
-            return responseWrapper.toString();
-        } catch (ServletException | IOException e) {
-            throw new FunctionException(e);
-        }
+        return render(request, url, parameters, postContent, "plain/text");
     }
 
     @JtwigFunction(name = "render")

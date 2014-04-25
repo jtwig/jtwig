@@ -14,13 +14,11 @@
 
 package com.lyncode.jtwig.functions.repository;
 
-import com.lyncode.jtwig.functions.annotations.Parameter;
 import com.lyncode.jtwig.functions.parameters.resolve.model.MethodInformation;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.List;
 

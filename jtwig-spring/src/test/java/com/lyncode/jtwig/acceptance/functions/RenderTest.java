@@ -15,11 +15,14 @@
 package com.lyncode.jtwig.acceptance.functions;
 
 import com.lyncode.jtwig.acceptance.AbstractJtwigAcceptanceTest;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import static com.lyncode.jtwig.util.SyntacticSugar.then;
 import static com.lyncode.jtwig.util.SyntacticSugar.when;
@@ -34,14 +37,31 @@ public class RenderTest extends AbstractJtwigAcceptanceTest {
         return "render/test";
     }
 
+    @RequestMapping("/doPost")
+    public String doPost () {
+        return "render/post";
+    }
+
     @RequestMapping("/test")
     public ResponseEntity<String> test () {
         return new ResponseEntity<>("k", HttpStatus.OK);
     }
 
+    @RequestMapping(value = "/post", method = RequestMethod.POST)
+    public ResponseEntity<String> post (@RequestBody String value) {
+        return new ResponseEntity<>(value, HttpStatus.OK);
+    }
+
     @Test
     public void renderTest() throws Exception {
         when(serverReceivesGetRequest("/"));
+        then(theGetResult(), body(is(equalTo("ok"))));
+    }
+
+    @Ignore("Render not working for posts")
+    @Test
+    public void renderPostTest() throws Exception {
+        when(serverReceivesGetRequest("/doPost"));
         then(theGetResult(), body(is(equalTo("ok"))));
     }
 }

@@ -14,12 +14,13 @@
 
 package com.lyncode.jtwig.unit.resource;
 
+import com.lyncode.jtwig.resource.ClasspathJtwigResource;
 import org.junit.Test;
 
 import static junit.framework.TestCase.assertNotNull;
 
 public class ClasspathJtwigResourceTest {
-    private ClasspathJtwigResource underTest = new ClasspathJtwigResource("/sample.twig");
+    private ClasspathJtwigResource underTest = new ClasspathJtwigResource("/templates/unit/sample.twig");
 
     @Test
     public void testRetrieve() throws Exception {

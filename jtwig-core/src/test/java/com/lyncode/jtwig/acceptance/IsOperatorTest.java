@@ -82,7 +82,7 @@ public class IsOperatorTest extends AbstractJtwigTest {
 
     @Test
     public void isDivisableFunction () throws Exception {
-        JtwigTemplate template = new JtwigTemplate("{% if (3 is divisable by 1) %}Hi{% endif %}");
+        JtwigTemplate template = new JtwigTemplate("{% if (3 is divisable by 1) %}Hi{% else %}OH{% endif %}");
         assertThat(template.output(context), is(equalTo("Hi")));
     }
 }

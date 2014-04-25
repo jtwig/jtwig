@@ -15,9 +15,7 @@
 package com.lyncode.jtwig.functions.parameters.convert;
 
 import com.lyncode.jtwig.functions.parameters.convert.exceptions.ConvertException;
-import com.lyncode.jtwig.functions.parameters.convert.impl.ObjectToStringConverter;
-import com.lyncode.jtwig.functions.parameters.convert.impl.StringToIntegerConverter;
-import com.lyncode.jtwig.functions.parameters.convert.impl.StringToLongConverter;
+import com.lyncode.jtwig.functions.parameters.convert.impl.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,6 +31,10 @@ public class CompiledParameterConverter implements com.lyncode.jtwig.functions.p
         add(String.class, Long.TYPE, new StringToLongConverter());
         add(String.class, Long.class, new StringToLongConverter());
         add(Object.class, String.class, new ObjectToStringConverter());
+        add(String.class, Float.class, new StringToFloatConverter());
+        add(String.class, Float.TYPE, new StringToFloatConverter());
+        add(String.class, Double.class, new StringToDoubleConverter());
+        add(String.class, Double.TYPE, new StringToDoubleConverter());
         add(Integer.class, Integer.TYPE, toNativeInteger());
     }
 

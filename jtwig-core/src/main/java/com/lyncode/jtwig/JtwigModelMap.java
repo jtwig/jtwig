@@ -15,14 +15,9 @@
 package com.lyncode.jtwig;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 public class JtwigModelMap extends HashMap<String, Object> {
-    public boolean has (String key) {
-        return containsKey(key);
-    }
-
     public JtwigModelMap add (String key, Object object) {
         put(key, object);
         return this;
@@ -31,17 +26,5 @@ public class JtwigModelMap extends HashMap<String, Object> {
     public JtwigModelMap add(Map<String, Object> model) {
         putAll(model);
         return this;
-    }
-
-    public String toString () {
-        StringBuilder builder = new StringBuilder().append("{");
-        Iterator<String> keys = keySet().iterator();
-        while (keys.hasNext()) {
-            String key = keys.next();
-            builder.append(key).append(" = ").append(get(key));
-            if (keys.hasNext()) builder.append(", ");
-        }
-        builder.append("}");
-        return builder.toString();
     }
 }

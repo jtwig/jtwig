@@ -16,7 +16,6 @@ package com.lyncode.jtwig.acceptance;
 
 import org.junit.Test;
 
-import static com.lyncode.jtwig.parser.config.ParserConfiguration.configuration;
 import static com.lyncode.jtwig.util.SyntacticSugar.after;
 import static com.lyncode.jtwig.util.SyntacticSugar.given;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -26,11 +25,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class CustomTagsTest extends AbstractJtwigTest {
     @Test
     public void customOutputTag() throws Exception {
-        given(theParser().withConfiguration(
-                configuration()
+        given(theConfiguration().parse()
                 .withBeginOutput("(>")
-                .withEndOutput("<)")
-        ));
+                .withEndOutput("<)"));
 
         after(jtwigRenders(template("(> 1 <)")));
         assertThat(theRenderedTemplate(), is(equalTo("1")));
@@ -38,11 +35,9 @@ public class CustomTagsTest extends AbstractJtwigTest {
 
     @Test
     public void customCodeTag() throws Exception {
-        given(theParser().withConfiguration(
-                configuration()
-                        .withBeginCode("(&")
-                        .withEndCode("&)")
-        ));
+        given(theConfiguration().parse()
+                .withBeginCode("(&")
+                .withEndCode("&)"));
 
         after(jtwigRenders(template("(& if (true) &)Hello(& endif &)")));
         assertThat(theRenderedTemplate(), is(equalTo("Hello")));

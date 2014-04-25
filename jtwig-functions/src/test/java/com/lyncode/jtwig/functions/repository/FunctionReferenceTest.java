@@ -15,17 +15,13 @@
 package com.lyncode.jtwig.functions.repository;
 
 import com.lyncode.jtwig.functions.annotations.Parameter;
-import com.lyncode.jtwig.functions.exceptions.FunctionNotFoundException;
 import org.junit.Test;
 
 import java.lang.reflect.Method;
 import java.util.List;
 
 import static org.hamcrest.core.IsEqual.equalTo;
-import static org.hamcrest.core.IsInstanceOf.instanceOf;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class FunctionReferenceTest {
     private TestClass instance = new TestClass();

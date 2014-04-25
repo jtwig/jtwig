@@ -23,6 +23,29 @@ import static org.junit.Assert.assertEquals;
 public class ObjectFunctionsTest {
     private ObjectFunctions underTest = new ObjectFunctions();
 
+    @Test
+    public void toDouble() throws Exception {
+        assertEquals(underTest.toDouble(1), (Double) 1.0);
+    }
+
+    @Test
+    public void toInt() throws Exception {
+        assertEquals(underTest.toInt(2.0), (Integer) 2);
+    }
+
+    @Test
+    public void first() throws Exception {
+        assertEquals(underTest.first(new String[]{"a","b","c"}), "a");
+        assertEquals(underTest.first(null), null);
+        assertEquals(underTest.first(true), true);
+    }
+
+    @Test
+    public void last() throws Exception {
+        assertEquals(underTest.last(new String[]{"a","b","c"}), "c");
+        assertEquals(underTest.last(null), null);
+        assertEquals(underTest.last(true), true);
+    }
 
     @Test
     public void testDefault() throws Exception {
