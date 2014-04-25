@@ -404,7 +404,7 @@ public class JtwigExpressionParser extends JtwigBaseParser<CompilableExpression>
         );
     }
 
-    Rule variable() {
+    public Rule variable() {
         return Sequence(
                 basic.identifier(),
                 push(new Variable(currentPosition(), match())),

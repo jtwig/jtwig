@@ -267,7 +267,11 @@
                                                 </group>
                                                 <group name="jtwig-spring">
                                                     <classfiles>
-                                                        <fileset dir="jtwig-spring/target/classes"/>
+                                                        <fileset dir="jtwig-spring/target/classes">
+                                                            <exclude name="**/render/**" />
+                                                            <exclude name="**/SpringFunctions*" />
+                                                            <exclude name="**/BeanResolver*" />
+                                                        </fileset>
                                                     </classfiles>
                                                     <sourcefiles encoding="UTF-8">
                                                         <fileset dir="jtwig-spring/target/generated-sources/annotations"/>

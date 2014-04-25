@@ -84,9 +84,7 @@
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <configuration>
                     <excludes>
-                        <exclude>com/lyncode/jtwig/parser/parboiled/**</exclude>
-                        <exclude>com/lyncode/jtwig/addons/AddonParser*</exclude>
-                        <exclude>com/lyncode/jtwig/addons/**/*Parser*</exclude>
+                        <exclude>com/lyncode/jtwig/util/render/**</exclude>
                     </excludes>
                 </configuration>
             </plugin>

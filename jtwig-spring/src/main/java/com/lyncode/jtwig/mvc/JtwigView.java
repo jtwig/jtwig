@@ -24,7 +24,7 @@ import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.ParseException;
 import com.lyncode.jtwig.parser.JtwigParser;
 import com.lyncode.jtwig.render.RenderContext;
-import com.lyncode.jtwig.unit.resource.WebJtwigResource;
+import com.lyncode.jtwig.resource.WebJtwigResource;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.BeansException;
