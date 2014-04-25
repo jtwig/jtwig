@@ -22,41 +22,15 @@ import java.util.List;
 import static java.util.Arrays.asList;
 
 public class GivenParameters {
-    public static GivenParameters parameters(Object... parameters) {
-        List<GivenParameter> givenParameters = new ArrayList<>();
-        for (Object parameter : parameters) {
-            givenParameters.add(new GivenParameter(parameter));
-        }
-        return new GivenParameters(givenParameters);
-    }
+    private final List<Object> givenParameters;
 
-    private final List<GivenParameter> givenParameters;
-
-    public GivenParameters(List<GivenParameter> givenParameters) {
-        this.givenParameters = givenParameters;
-    }
-    public GivenParameters(GivenParameter... givenParameters) {
-        this.givenParameters = asList(givenParameters);
-    }
     public GivenParameters () {
         this.givenParameters = new ArrayList<>();
     }
 
-    public Optional<Object> byName(String name) {
-        for (GivenParameter givenParameter : givenParameters) {
-            if (givenParameter.hasName() && name.equals(givenParameter.getName()))
-                return new Optional<>(givenParameter.getValue());
-        }
-        return new Optional<>();
-    }
-
-    public Optional<Object> byPosition(int position) {
+    public Optional<Object> get(int position) {
         if (position >= givenParameters.size()) return new Optional<>();
-        return new Optional<>(givenParameters.get(position).getValue());
-    }
-
-    public boolean namesGiven () {
-        return (!givenParameters.isEmpty()) && givenParameters.get(0).hasName();
+        return new Optional<>(givenParameters.get(position));
     }
 
     public int size () {
@@ -65,24 +39,17 @@ public class GivenParameters {
 
     public Class<?>[] types () {
         List<Class<?>> types = new ArrayList<>();
-        for (GivenParameter givenParameter : givenParameters)
-            types.add(givenParameter.type());
+        for (Object givenParameter : givenParameters) {
+            if (givenParameter != null)
+                types.add(givenParameter.getClass());
+            else
+                types.add(Object.class);
+        }
         return types.toArray(new Class[types.size()]);
     }
 
-    public GivenParameters add(GivenParameter givenParameter) {
-        givenParameters.add(givenParameter);
-        return this;
-    }
-
-    public GivenParameters addArray(Object[] resolved) {
-        for (int i=0;i<resolved.length;i++)
-            givenParameters.add(new GivenParameter(resolved[i]));
-        return this;
-    }
-
-    public GivenParameters addObject(Object resolved) {
-        givenParameters.add(new GivenParameter(resolved));
+    public GivenParameters add(Object... givenParameter) {
+        givenParameters.addAll(asList(givenParameter));
         return this;
     }
 }

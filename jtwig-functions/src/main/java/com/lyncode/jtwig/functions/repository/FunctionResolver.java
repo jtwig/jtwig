@@ -15,6 +15,7 @@
 package com.lyncode.jtwig.functions.repository;
 
 import com.lyncode.jtwig.functions.annotations.JtwigFunction;
+import com.lyncode.jtwig.functions.annotations.Parameter;
 import com.lyncode.jtwig.functions.builtin.*;
 import com.lyncode.jtwig.functions.exceptions.FunctionNotFoundException;
 import com.lyncode.jtwig.functions.parameters.GivenParameters;
@@ -25,6 +26,7 @@ import com.lyncode.jtwig.functions.parameters.resolve.CompiledParameterResolver;
 import com.lyncode.jtwig.functions.parameters.resolve.api.AnnotatedMethodParameterResolver;
 import com.lyncode.jtwig.functions.parameters.resolve.api.TypeMethodParameterResolver;
 import com.lyncode.jtwig.functions.parameters.resolve.exceptions.ResolveException;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -53,7 +55,7 @@ public class FunctionResolver {
 
     public CallableFunction get(String name, GivenParameters givenParameters) throws FunctionNotFoundException, ResolveException {
         if (!functions.containsKey(name))
-            throw new FunctionNotFoundException("Function with name '"+name+"' not found");
+            throw new FunctionNotFoundException("Function with name '"+name+"' not found.");
         if (!cachedFunctions.containsKey(name))
             cachedFunctions.put(name, new HashMap<Class[], Pair<FunctionReference,  Boolean>>());
 
@@ -80,7 +82,21 @@ public class FunctionResolver {
             }
         }
 
-        throw new FunctionNotFoundException("Function with name '"+name+"' not found");
+
+        throw new FunctionNotFoundException("Function with name '"+name+"' and given parameters not found. Available:\n"+listAvailable(name, functions.get(name)));
+    }
+
+    private String listAvailable(String name, List<FunctionReference> functionReferences) {
+        List<String> list = new ArrayList<>();
+        for (FunctionReference functionReference : functionReferences) {
+            List<String> arguments = new ArrayList<>();
+            List<Class<?>> parametersWithAnnotation = functionReference.getParameterTypesWithAnnotation(Parameter.class);
+            for (Class<?> aClass : parametersWithAnnotation) {
+                arguments.add(aClass.getName());
+            }
+            list.add("- "+name+"("+StringUtils.join(arguments, ", ")+")");
+        }
+        return StringUtils.join(list, "\n");
     }
 
 

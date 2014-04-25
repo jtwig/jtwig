@@ -14,6 +14,7 @@
 
 package com.lyncode.jtwig.unit.util;
 
+import com.lyncode.jtwig.util.ObjectExtractor;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -24,6 +25,7 @@ import java.util.Map;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
 
 public class ObjectExtractorTest {
     @Test
@@ -49,15 +51,15 @@ public class ObjectExtractorTest {
         b.b = "b";
         ObjectExtractor underTest = new ObjectExtractor(b);
 
-        assertThat(underTest.extract("a"), is((Object) "a"));
-        assertThat(underTest.extract("b"), is((Object) "b"));
+        assertEquals("a", underTest.extract("a"));
+        assertEquals("b", underTest.extract("b"));
     }
 
-    private static class A {
+    public static class A {
         public String a;
     }
 
-    private static class B extends A {
+    public static class B extends A {
         public String b;
     }
 }

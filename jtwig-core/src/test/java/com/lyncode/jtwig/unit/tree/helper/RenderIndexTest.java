@@ -1,11 +1,11 @@
 package com.lyncode.jtwig.unit.tree.helper;
 
-import com.lyncode.jtwig.tree.helper.RenderIndex;
+import com.lyncode.jtwig.render.stream.RenderIndex;
 import org.junit.Test;
 
 import java.util.HashMap;
 
-import static com.lyncode.jtwig.tree.helper.RenderIndex.newIndex;
+import static com.lyncode.jtwig.render.stream.RenderIndex.newIndex;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -18,7 +18,7 @@ public class RenderIndexTest {
     HashMap<RenderIndex, String> underTest = new HashMap<>();
 
     @Test
-    public void testName() throws Exception {
+    public void indexesAreImmutable() throws Exception {
         underTest.put(newIndex(), "a");
         underTest.put(newIndex(), "b");
 

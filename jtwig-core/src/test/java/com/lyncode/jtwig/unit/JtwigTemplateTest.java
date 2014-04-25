@@ -16,7 +16,7 @@ package com.lyncode.jtwig.unit;
 
 import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.JtwigTemplate;
-import com.lyncode.jtwig.unit.resource.JtwigResource;
+import com.lyncode.jtwig.resource.JtwigResource;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;

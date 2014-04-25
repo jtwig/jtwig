@@ -45,6 +45,7 @@ public class ForExpressionTest {
         context.withModelAttribute("list", value);
         assertThat(template.output(context), is("Item a"));
     }
+
     @Test
     public void forLoopMustExposeTheLoopVariable () throws ParseException, CompileException, RenderException {
         JtwigTemplate template = new JtwigTemplate("{% for item in list %}" +

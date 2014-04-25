@@ -31,7 +31,7 @@ import static org.hamcrest.collection.IsEmptyCollection.empty;
 
 public class BooleanFunctions { // Or Predicates
     @JtwigFunction(name = "constant")
-    public boolean isConstant (@Parameter Object value, @Parameter String constant) throws FunctionException {
+    public boolean isEqualToConstant(@Parameter Object value, @Parameter String constant) throws FunctionException {
         int constantNamePosition = constant.lastIndexOf(".");
         String className = constant.substring(0, constantNamePosition);
         String constantName = constant.substring(constantNamePosition+1);

@@ -26,6 +26,6 @@ public class Issue97Test extends AbstractJtwigTest {
     @Test
     public void issue97() throws Exception {
         when(jtwigRenders(template("{{ 1 / 10 }}")));
-        then(theRenderedTemplate(), is(equalTo("0")));
+        then(theRenderedTemplate(), is(equalTo("0.1")));
     }
 }

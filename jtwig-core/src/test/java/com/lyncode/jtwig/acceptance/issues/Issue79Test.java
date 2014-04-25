@@ -32,7 +32,7 @@ public class Issue79Test extends AbstractJtwigTest {
 
     @Test
     public void notDefinedMethod() throws Exception {
-        given(theContext().withModelAttribute("a", "test"));
+        given(aContext().withModelAttribute("a", "test"));
         when(jtwigRenders(template("{% if (a.check) is not defined %}A{% endif %}")));
         assertThat(theRenderedTemplate(), is(equalTo("A")));
     }

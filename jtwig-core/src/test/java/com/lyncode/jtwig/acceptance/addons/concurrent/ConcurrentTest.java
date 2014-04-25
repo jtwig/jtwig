@@ -22,10 +22,42 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class ConcurrentTest extends AbstractAddonTest {
+
+    @Test
+    public void concurrentWithStaticContent() throws Exception {
+        JtwigTemplate template = new JtwigTemplate("{% concurrent %}a{% endconcurrent %}b");
+        JtwigContext context = new JtwigContext();
+        assertThat(template.output(context), is("ab"));
+    }
+
+    @Test
+    public void concurrentWithConditionalContent() throws Exception {
+        JtwigTemplate template = new JtwigTemplate("{% concurrent %}{% if true %}a{% endif %}{% endconcurrent %}b");
+        JtwigContext context = new JtwigContext();
+        assertThat(template.output(context), is("ab"));
+    }
+
+    @Test
+    public void doubleConcurrentWithStaticContent() throws Exception {
+        JtwigTemplate template = new JtwigTemplate("{% concurrent %}a{% endconcurrent %}"
+                +"{% concurrent %}b{% endconcurrent %}"
+                +"c");
+        JtwigContext context = new JtwigContext();
+        assertThat(template.output(context), is("abc"));
+    }
+
+    @Test
+    public void concurrentWithDynamicContent() throws Exception {
+        JtwigTemplate template = new JtwigTemplate("{% concurrent %}{% for item in list %}{{ item }}{% endfor %}{% endconcurrent %}");
+        JtwigContext context = new JtwigContext()
+                .withModelAttribute("list", asList("a", "b", "c", "d"));
+        assertThat(template.output(context), is("abcd"));
+    }
 
     @Test
     public void test_concurrent_1() throws Exception {

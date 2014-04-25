@@ -22,7 +22,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class BinaryExpressionCalculationsTest extends AbstractJtwigTest {
     @Test
     public void shouldResolveToInteger () throws Exception {
-        assertThat(theResultOfRendering(theTemplate("{{ 3 * 2 }}")), is("6"));
+        assertThat(theResultOfRendering(theTemplate("{{ 3 ** 2 }}")), is("6"));
     }
 
     @Test

@@ -14,32 +14,45 @@
 
 package com.lyncode.jtwig.addons.spaceless;
 
-import com.lyncode.jtwig.JtwigContext;
+import com.lyncode.jtwig.addons.Addon;
+import com.lyncode.jtwig.compile.CompileContext;
+import com.lyncode.jtwig.content.api.Renderable;
+import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.RenderException;
-import com.lyncode.jtwig.parser.addons.JtwigContentAddon;
-import com.lyncode.jtwig.tree.helper.RenderStream;
+import com.lyncode.jtwig.render.RenderContext;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-public class Spaceless extends JtwigContentAddon {
-
-    @Override
-    public void render(RenderStream renderStream, JtwigContext context) throws RenderException {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        RenderStream local = new RenderStream(output);
-        getContent().render(local, context);
-        String result = removeSpaces(output.toString());
-        try {
-            renderStream.write(result.getBytes());
-        } catch (IOException e) {
-            throw new RenderException(e);
-        }
-    }
-
-    private String removeSpaces(String input) {
+public class Spaceless extends Addon {
+    private static String removeSpaces(String input) {
         return input
                 .replaceAll("\\s+<", "<")
                 .replaceAll(">\\s+", ">");
+    }
+
+    @Override
+    public Renderable compile(CompileContext context) throws CompileException {
+        return new Compiled(super.compile(context));
+    }
+
+    private static class Compiled implements Renderable {
+        private final Renderable content;
+
+        private Compiled(Renderable content) {
+            this.content = content;
+        }
+
+        @Override
+        public void render(RenderContext context) throws RenderException {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            content.render(context.newRenderContext(outputStream));
+            String result = removeSpaces(outputStream.toString());
+            try {
+                context.write(result.getBytes());
+            } catch (IOException e) {
+                throw new RenderException(e);
+            }
+        }
     }
 }

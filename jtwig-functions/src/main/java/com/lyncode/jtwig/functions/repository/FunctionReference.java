@@ -16,8 +16,11 @@ package com.lyncode.jtwig.functions.repository;
 
 import com.lyncode.jtwig.functions.parameters.resolve.model.MethodInformation;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FunctionReference implements Comparable<FunctionReference> {
     private final Method method;
@@ -88,5 +91,20 @@ public class FunctionReference implements Comparable<FunctionReference> {
 
     public Object getInstance() {
         return instance;
+    }
+
+    public List<Class<?>> getParameterTypesWithAnnotation(Class<? extends Annotation> parameterClass) {
+        List<Class<?>> result = new ArrayList<>();
+        Annotation[][] parameterAnnotations = method.getParameterAnnotations();
+        for (int i = 0;i<parameterAnnotations.length;i++) {
+            Annotation[] parameterAnnotation = parameterAnnotations[i];
+            for (Annotation annotation : parameterAnnotation) {
+                if (annotation.annotationType().equals(parameterClass)) {
+                    result.add(method.getParameterTypes()[i]);
+                    break;
+                }
+            }
+        }
+        return result;
     }
 }

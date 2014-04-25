@@ -14,12 +14,12 @@
 
 package com.lyncode.jtwig.mvc;
 
+import com.lyncode.jtwig.configuration.JtwigConfiguration;
 import com.lyncode.jtwig.functions.SpringFunctions;
 import com.lyncode.jtwig.functions.parameters.resolve.HttpRequestParameterResolver;
 import com.lyncode.jtwig.functions.parameters.resolve.api.AnnotatedMethodParameterResolver;
 import com.lyncode.jtwig.functions.parameters.resolve.api.TypeMethodParameterResolver;
 import com.lyncode.jtwig.functions.repository.FunctionResolver;
-import com.lyncode.jtwig.parser.config.ParserConfiguration;
 import com.lyncode.jtwig.services.api.theme.ThemePrefixResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,8 +27,8 @@ import org.springframework.web.servlet.view.AbstractTemplateViewResolver;
 
 import java.io.File;
 
-import static com.lyncode.jtwig.tree.helper.RenderStream.withMaxThreads;
-import static com.lyncode.jtwig.tree.helper.RenderStream.withMinThreads;
+import static com.lyncode.jtwig.render.stream.RenderStream.withMaxThreads;
+import static com.lyncode.jtwig.render.stream.RenderStream.withMinThreads;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @Service
@@ -49,7 +49,7 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
     private String theme;
     private boolean cached = true;
 
-    private ParserConfiguration parserConfiguration = new ParserConfiguration();
+    private JtwigConfiguration configuration = new JtwigConfiguration();
     private FunctionResolver functionRepository = new FunctionResolver();
     private FunctionResolver functionResolver = null;
 
@@ -115,10 +115,9 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
     public void setEncoding(String encoding) {
         this.encoding = encoding;
     }
-    public void setParserConfiguration (ParserConfiguration parserConfiguration) { this.parserConfiguration = parserConfiguration; }
 
-    ParserConfiguration getParserConfiguration() {
-        return parserConfiguration;
+    JtwigConfiguration configuration() {
+        return configuration;
     }
     FunctionResolver getFunctionResolver() {
         if (functionResolver == null) {

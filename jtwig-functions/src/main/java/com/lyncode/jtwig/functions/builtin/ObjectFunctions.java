@@ -73,6 +73,8 @@ public class ObjectFunctions {
     }
     @JtwigFunction(name = "toInt")
     public Integer toInt (@Parameter Object input) {
-        return Integer.valueOf(input.toString());
+        if (input instanceof Number)
+            return ((Number) input).intValue();
+        return Integer.parseInt(input.toString());
     }
 }

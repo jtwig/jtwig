@@ -15,18 +15,7 @@
 package com.lyncode.jtwig.functions.parameters.resolve.exceptions;
 
 public class ResolveException extends Exception {
-    public ResolveException() {
-    }
-
-    public ResolveException(String message) {
-        super(message);
-    }
-
     public ResolveException(String message, Throwable cause) {
         super(message, cause);
-    }
-
-    public ResolveException(Throwable cause) {
-        super(cause);
     }
 }

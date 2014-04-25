@@ -17,7 +17,11 @@ package com.lyncode.jtwig.functions.builtin;
 import com.lyncode.jtwig.functions.exceptions.FunctionException;
 import org.junit.Test;
 
+import java.util.List;
+
+import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 public class NumberFunctionsTest {
     NumberFunctions underTest = new NumberFunctions();
@@ -26,5 +30,45 @@ public class NumberFunctionsTest {
     @Test
     public void numberFormat() throws FunctionException {
         assertEquals("1,234.57", underTest.numberFormat(1234.5678, 2, ".", ","));
+    }
+    @Test
+    public void numberFormatWithoutGrouping() throws FunctionException {
+        assertEquals("1234.57", underTest.numberFormat(1234.5678, 2, "."));
+    }
+
+    @Test
+    public void numberFormatWithoutDecimalSeparator() throws FunctionException {
+        assertEquals("1234.57", underTest.numberFormat(1234.5678, 2));
+    }
+    @Test
+    public void numberFormatDefault() throws FunctionException {
+        assertEquals("1234.568", underTest.numberFormat(1234.5678));
+    }
+
+
+    @Test
+    public void range() throws FunctionException {
+        List<Integer> list = underTest.range(1, 10, 2);
+        assertThat(list, contains(1, 3, 5, 7, 9));
+    }
+    @Test
+    public void rangeDefault() throws FunctionException {
+        List<Integer> list = underTest.range(1, 3);
+        assertThat(list, contains(1, 2, 3));
+    }
+
+    @Test(expected = FunctionException.class)
+    public void rangeInvalidStep() throws FunctionException {
+        underTest.range(1, 3, 0);
+    }
+
+    @Test(expected = FunctionException.class)
+    public void rangeInvalidLimits() throws FunctionException {
+        underTest.range(3, 1);
+    }
+
+    @Test(expected = FunctionException.class)
+    public void rangeTooBigStep() throws FunctionException {
+        underTest.range(3, 1, 5);
     }
 }

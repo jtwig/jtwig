@@ -83,6 +83,13 @@
             <version>${mockito.version}</version>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>com.jayway.jsonpath</groupId>
+            <artifactId>json-path</artifactId>
+            <version>0.9.1</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -93,7 +100,9 @@
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <configuration>
                     <excludes>
-                        <exclude>com/lyncode/jtwig/parser/*Parser*</exclude>
+                        <exclude>com/lyncode/jtwig/parser/parboiled/**</exclude>
+                        <exclude>com/lyncode/jtwig/addons/AddonParser*</exclude>
+                        <exclude>com/lyncode/jtwig/addons/**/*Parser*</exclude>
                     </excludes>
                 </configuration>
             </plugin>
