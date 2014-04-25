@@ -21,7 +21,13 @@ import com.lyncode.jtwig.functions.parameters.GivenParameters;
 import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;
+<<<<<<< HEAD
 import static org.mockito.Mockito.mock;
+=======
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+>>>>>>> master
 
 public class FunctionResolverTest {
     private FunctionResolver underTest = new FunctionResolver();
@@ -51,7 +57,11 @@ public class FunctionResolverTest {
     }
 
     private GivenParameters parameters(Object... parameters) {
+<<<<<<< HEAD
         return new GivenParameters().add(parameters);
+=======
+        return new GivenParameters().addArray(parameters);
+>>>>>>> master
     }
 
     public static class TestClass {

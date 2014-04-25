@@ -14,6 +14,7 @@
 
 package com.lyncode.jtwig.unit.util.render;
 
+import com.lyncode.jtwig.util.render.RenderHttpServletRequest;
 import org.junit.Test;
 
 import javax.servlet.http.HttpServletRequest;

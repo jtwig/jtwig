@@ -12,10 +12,9 @@
  * limitations under the License.
  */
 
-package com.lyncode.jtwig.unit.resource;
+package com.lyncode.jtwig.resource;
 
 import com.lyncode.jtwig.exception.ResourceException;
-import com.lyncode.jtwig.resource.JtwigResource;
 
 import javax.servlet.ServletContext;
 import java.io.File;

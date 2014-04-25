@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-package com.lyncode.jtwig.unit.util;
+package com.lyncode.jtwig.util;
 
 import com.google.common.reflect.AbstractInvocationHandler;
 import org.apache.log4j.Logger;

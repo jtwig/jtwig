@@ -34,11 +34,13 @@ import static org.parboiled.Parboiled.createParser;
 public class JtwigExpressionParser extends JtwigBaseParser<CompilableExpression> {
     final JtwigBasicParser basic;
     final JtwigConstantParser constants;
+    final ParserConfiguration config;
 
     public JtwigExpressionParser(JtwigResource resource, ParserConfiguration parserConfiguration) {
         super(resource);
         basic = createParser(JtwigBasicParser.class, parserConfiguration);
         constants = createParser(JtwigConstantParser.class, parserConfiguration);
+        config = parserConfiguration;
     }
 
     public Rule expression() {
@@ -402,7 +404,7 @@ public class JtwigExpressionParser extends JtwigBaseParser<CompilableExpression>
         );
     }
 
-    public Rule variable() {
+    Rule variable() {
         return Sequence(
                 basic.identifier(),
                 push(new Variable(currentPosition(), match())),

@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-package com.lyncode.jtwig.unit.util;
+package com.lyncode.jtwig.util;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.request.RequestAttributes;

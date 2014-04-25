@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-package com.lyncode.jtwig.unit.util.render;
+package com.lyncode.jtwig.util.render;
 
 import org.apache.log4j.Logger;
 

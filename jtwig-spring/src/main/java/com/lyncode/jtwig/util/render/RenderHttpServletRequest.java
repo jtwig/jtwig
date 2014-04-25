@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-package com.lyncode.jtwig.unit.util.render;
+package com.lyncode.jtwig.util.render;
 
 import org.apache.log4j.Logger;
 import org.parboiled.common.StringUtils;
@@ -30,7 +30,7 @@ import java.nio.charset.Charset;
 import java.security.Principal;
 import java.util.*;
 
-import static com.lyncode.jtwig.unit.util.ObjectSnapshot.snapshot;
+import static com.lyncode.jtwig.util.ObjectSnapshot.snapshot;
 
 public class RenderHttpServletRequest implements HttpServletRequest {
     private static Logger LOG = Logger.getLogger(RenderHttpServletRequest.class);

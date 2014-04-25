@@ -12,9 +12,8 @@
  * limitations under the License.
  */
 
-package com.lyncode.jtwig.unit.util;
+package com.lyncode.jtwig.util;
 
-import com.lyncode.jtwig.util.ObjectExtractor;
 import org.junit.Test;
 
 import java.util.ArrayList;
