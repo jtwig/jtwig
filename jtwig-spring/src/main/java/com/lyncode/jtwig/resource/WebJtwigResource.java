@@ -40,7 +40,7 @@ public class WebJtwigResource implements JtwigResource {
 
     @Override
     public JtwigResource resolve(String relativePath) throws ResourceException {
-        String relativeUrl = new File(new File(url).getParent(), relativePath).getPath();
+        String relativeUrl = new File(new File(url).getParent(), relativePath).getPath().replace( '\\', '/' );
         return new WebJtwigResource(servletContext, relativeUrl);
     }
 }
