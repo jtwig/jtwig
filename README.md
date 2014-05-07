@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/lyncode/jtwig.png?label=ready&title=Ready)](https://waffle.io/lyncode/jtwig)
 # JTwig
 
 *JTwig is a modern Java template engine designed for web development*
