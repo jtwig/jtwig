@@ -1,12 +1,10 @@
 # JTwig
 
-*JTwig is a modern Java template engine designed for web development*
-
-### Build Status
-
 [![Stories in Ready](https://badge.waffle.io/lyncode/jtwig.png?label=ready&title=Ready)](https://waffle.io/lyncode/jtwig)
 [![Build Status](https://travis-ci.org/lyncode/jtwig.png)](https://travis-ci.org/lyncode/jtwig)
 [![Coverage Status](https://coveralls.io/repos/lyncode/jtwig/badge.png)](https://coveralls.io/r/lyncode/jtwig)
+
+*JTwig is a modern Java template engine designed for web development*
 
 ### Official Website
 
