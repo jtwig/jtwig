@@ -19,76 +19,30 @@ public class ParserConfiguration {
         return new ParserConfiguration();
     }
 
-    private String beginCode = "{%";
-    private String endCode = "%}";
-    private String beginOutput = "{{";
-    private String endOutput = "}}";
-    private String beginComment = "{#";
-    private String endComment = "#}";
-    private boolean useStrictEvaluation = true;
+    private TagSymbols symbols = TagSymbols.DEFAULT;
 
-    public ParserConfiguration() {}
+    public ParserConfiguration withSymbols (TagSymbols symbols) {
+        this.symbols = symbols;
+        return this;
+    }
 
     public String getBeginCode() {
-        return beginCode;
+        return symbols.beginTag();
     }
-
-    public ParserConfiguration withBeginCode(String startCode) {
-        this.beginCode = startCode;
-        return this;
-    }
-
     public String getEndCode() {
-        return endCode;
+        return symbols.endTag();
     }
-
-    public ParserConfiguration withEndCode(String endCode) {
-        this.endCode = endCode;
-        return this;
-    }
-
     public String getBeginOutput() {
-        return beginOutput;
+        return symbols.beginOutput();
     }
-
-    public ParserConfiguration withBeginOutput(String startOutput) {
-        this.beginOutput = startOutput;
-        return this;
-    }
-
     public String getEndOutput() {
-        return endOutput;
+        return symbols.endOutput();
     }
-
-    public ParserConfiguration withEndOutput(String endOutput) {
-        this.endOutput = endOutput;
-        return this;
-    }
-
     public String getBeginComment() {
-        return beginComment;
+        return symbols.beginComment();
     }
-
-    public ParserConfiguration withBeginComment(String startComment) {
-        this.beginComment = startComment;
-        return this;
-    }
-
     public String getEndComment() {
-        return endComment;
+        return symbols.endComment();
     }
 
-    public ParserConfiguration withEndComment(String endComment) {
-        this.endComment = endComment;
-        return this;
-    }
-    
-    public boolean isUsingStrictEvaluation() {
-        return useStrictEvaluation;
-    }
-    
-    public ParserConfiguration useStrictEvaluation(boolean useStrictEvaluation) {
-        this.useStrictEvaluation = useStrictEvaluation;
-        return this;
-    }
 }
