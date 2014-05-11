@@ -15,57 +15,134 @@
 package com.lyncode.jtwig.acceptance.issues;
 
 import com.lyncode.jtwig.acceptance.AbstractJtwigTest;
-import org.junit.Ignore;
+import com.lyncode.jtwig.exception.CalculateException;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import static com.lyncode.jtwig.util.SyntacticSugar.*;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
+import static com.lyncode.jtwig.util.matchers.ExceptionMatcher.exception;
+import static org.hamcrest.CoreMatchers.*;
 
-
-@Ignore("Ignored because it creates a problem in the selection operation. This functionality should be addressed in another way.")
 public class Issue112Test extends AbstractJtwigTest {
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
+    // 1.A
     @Test
-    public void selectionExample() throws Exception {
-        when(jtwigRenders(template("{{ undefinedVar.length }}")));
-        // Basically, that way we would have access to the String api, as the returned value is a string
-        // which is wrong...
+    public void outputNonexistentVarReturnsEmpty() throws Exception {
+        given(theConfiguration().render().strictMode(false));
+        when(jtwigRenders(template("{{ nonexistent }}")));
+        then(theRenderedTemplate(), is(equalTo("")));
     }
 
-    @Test(expected = ClassCastException.class)
+    // 1.B
+    @Test
+    public void outputNonexistentVarThrowsException() throws Exception {
+        expectedException.expect(exception().withInnerException(exception().ofType(CalculateException.class).message(endsWith("Variable 'nonexistent' does not exist"))));
+
+        given(theConfiguration().render().strictMode(true));
+        when(jtwigRenders(template("{{ nonexistent }}")));
+    }
+
+    // 2.A
+    @Test
+    public void selectionExampleWithStrictValidation() throws Exception {
+        given(theConfiguration().render().strictMode(false));
+        when(jtwigRenders(template("{{ undefinedVar.length }}")));
+        then(theRenderedTemplate(), is(equalTo("")));
+    }
+
+    // 2.B
+    @Test
+    public void nestedSelectionExampleWithStrictValidation() throws Exception {
+        given(theConfiguration().render().strictMode(false));
+        when(jtwigRenders(template("{{ undefinedVar.length.another }}")));
+        then(theRenderedTemplate(), is(equalTo("")));
+    }
+
+    // 2.C
+    @Test
+    public void selectionExampleWithoutStrictValidation() throws Exception {
+        expectedException.expect(exception().withInnerException(exception().ofType(CalculateException.class).message(endsWith("Variable 'undefinedVar' does not exist"))));
+
+        given(theConfiguration().render().strictMode(true));
+        jtwigRenders(template("{{ undefinedVar.length }}"));
+    }
+
+    // 3.A
+    @Test
+    public void operationExampleWithoutStrictValidation () throws Exception {
+        given(theConfiguration().render().strictMode(false));
+        when(jtwigRenders(template("{{ undefinedVar + 3 }}")));
+        then(theRenderedTemplate(), is(equalTo("3")));
+    }
+
+    // 3.B
+    @Test
+    public void operationExampleWithStrictValidation () throws Exception {
+        expectedException.expect(exception().withInnerException(exception().ofType(CalculateException.class).message(endsWith("Variable 'undefinedVar' does not exist"))));
+
+        given(theConfiguration().render().strictMode(true));
+        when(jtwigRenders(template("{{ undefinedVar + 3 }}")));
+    }
+
+    // 3.C
+    @Test
     public void operationWithNonexistentVarThrowsException() throws Exception {
+        expectedException.expect(exception().withInnerException(exception().ofType(CalculateException.class).message(endsWith("Variable 'b' does not exist"))));
+
+        given(theConfiguration().render().strictMode(true));
         when(jtwigRenders(template("{% set a = 5 %}{{ a - b  }}")));
     }
 
-    @Test(expected = NullPointerException.class)
-    public void operationWithNullVarThrowsException() throws Exception {
+    // 3.D
+    @Test
+    public void subtractOperationWithNullVarInStrictMode() throws Exception {
+        given(theConfiguration().render().strictMode(true));
         when(jtwigRenders(template("{% set a = 5 %}{% set b = null %}{{ a - b }}")));
+        then(theRenderedTemplate(), is(equalTo("5")));
     }
 
+    // 3.E
     @Test
-    public void outputNonexistentVarReturnsEmpty() throws Exception {
-        given(theConfiguration().render().strictVariables(false));
-        when(jtwigRenders(template("{{ nonexistent }}")));
-        then(theRenderedTemplate(), is(equalTo("")));
+    public void subtractOperationWithNullVarInNonStrictMode() throws Exception {
+        given(theConfiguration().render().strictMode(false));
+        when(jtwigRenders(template("{% set a = 5 %}{% set b = null %}{{ a - b }}")));
+        then(theRenderedTemplate(), is(equalTo("5")));
     }
 
+    // 3.F
     @Test
-    public void outputNonexistentVarThrowsException() throws Exception {
-        when(jtwigRenders(template("{{ nonexistent }}")));
-        then(theRenderedTemplate(), is(equalTo("undefined")));
+    public void divOperationWithNullVarInStrictMode() throws Exception {
+        expectedException.expect(exception().withInnerException(exception().ofType(CalculateException.class).message(endsWith("Division by zero"))));
+
+        given(theConfiguration().render().strictMode(true));
+        when(jtwigRenders(template("{% set a = 5 %}{% set b = null %}{{ a / b }}")));
     }
-    
+
+    // 3.G
+    @Test
+    public void divOperationWithNullVarInNonStrictMode() throws Exception {
+        expectedException.expect(exception().withInnerException(exception().ofType(CalculateException.class).message(endsWith("Division by zero"))));
+
+        given(theConfiguration().render().strictMode(false));
+        when(jtwigRenders(template("{% set a = 5 %}{% set b = null %}{{ a / b }}")));
+    }
+
+    // 4.A
     @Test
     public void outputNullVarReturnsEmpty() throws Exception {
-        given(theConfiguration().render().strictVariables(false));
+        given(theConfiguration().render().strictMode(false));
         when(jtwigRenders(template("{% set nothing = null %}{{ nothing }}")));
         then(theRenderedTemplate(), is(equalTo("")));
     }
-    
+
+    // 4.B
     @Test
     public void outputNullVarThrowsException() throws Exception {
+        given(theConfiguration().render().strictMode(true));
         when(jtwigRenders(template("{% set nothing = null %}{{ nothing }}")));
-        then(theRenderedTemplate(), is(equalTo("null")));
+        then(theRenderedTemplate(), is(equalTo("")));
     }
 }

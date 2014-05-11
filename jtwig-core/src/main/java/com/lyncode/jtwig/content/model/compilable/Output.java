@@ -47,7 +47,9 @@ public class Output extends AbstractElement {
         @Override
         public void render(RenderContext context) throws RenderException {
             try {
-                context.write(String.valueOf(expression.calculate(context)).getBytes());
+                Object calculate = expression.calculate(context);
+                if (calculate != null)
+                    context.write(String.valueOf(calculate).getBytes());
             } catch (IOException | CalculateException e) {
                 throw new RenderException(e);
             }

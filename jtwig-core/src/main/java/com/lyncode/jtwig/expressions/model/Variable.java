@@ -20,9 +20,12 @@ import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.expressions.api.Expression;
 import com.lyncode.jtwig.parser.model.JtwigPosition;
 import com.lyncode.jtwig.render.RenderContext;
+import com.lyncode.jtwig.types.Undefined;
 import com.lyncode.jtwig.util.ObjectExtractor;
 
 import java.util.ArrayList;
+
+import static java.lang.String.format;
 
 public class Variable extends AbstractCompilableExpression {
     private String name;
@@ -53,13 +56,26 @@ public class Variable extends AbstractCompilableExpression {
 
         @Override
         public Object calculate(RenderContext context) throws CalculateException {
-            return context.model().map(name);
+            Object result = context.model().map(name);
+            if (result instanceof Undefined) {
+                if (context.configuration().strictMode())
+                    throw new CalculateException(position + format(": Variable '%s' does not exist", name));
+            }
+            return result;
         }
 
         public Object extract(RenderContext context, ObjectExtractor extractor) throws ObjectExtractor.ExtractException {
-            if (context.configuration().strictVariables() && extractor.contextIsEmpty())
+            if (context.configuration().strictMode() && extractor.contextIsEmpty())
                 throw new ObjectExtractor.ExtractException(position+": Unable to retrieve property/field "+name+" from "+extractor.context());
             return extractor.extract(name);
+        }
+
+        public JtwigPosition position() {
+            return position;
+        }
+
+        public String name () {
+            return name;
         }
     }
 }

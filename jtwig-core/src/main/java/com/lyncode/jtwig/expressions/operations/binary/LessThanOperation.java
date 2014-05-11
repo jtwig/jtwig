@@ -15,11 +15,12 @@
 package com.lyncode.jtwig.expressions.operations.binary;
 
 import com.lyncode.jtwig.exception.CalculateException;
+import com.lyncode.jtwig.parser.model.JtwigPosition;
 import com.lyncode.jtwig.util.RelationalOperations;
 
 public class LessThanOperation extends SimpleBinaryOperation {
     @Override
-    public Object apply(Object left, Object right) throws CalculateException {
+    public Object apply(JtwigPosition position, Object left, Object right) throws CalculateException {
         return RelationalOperations.lt(left, right);
     }
 }

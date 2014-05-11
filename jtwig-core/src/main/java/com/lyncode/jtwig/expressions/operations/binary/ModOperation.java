@@ -15,12 +15,13 @@
 package com.lyncode.jtwig.expressions.operations.binary;
 
 import com.lyncode.jtwig.exception.CalculateException;
+import com.lyncode.jtwig.parser.model.JtwigPosition;
 
 import static com.lyncode.jtwig.util.MathOperations.mod;
 
 public class ModOperation extends SimpleBinaryOperation {
     @Override
-    public Object apply(Object left, Object right) throws CalculateException {
+    public Object apply(JtwigPosition position, Object left, Object right) throws CalculateException {
         return mod(left, right);
     }
 }

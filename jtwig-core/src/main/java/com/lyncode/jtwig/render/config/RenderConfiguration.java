@@ -15,14 +15,14 @@
 package com.lyncode.jtwig.render.config;
 
 public class RenderConfiguration {
-    private boolean strictVariables = false;
+    private boolean strictMode = false;
 
-    public boolean strictVariables() {
-        return strictVariables;
+    public boolean strictMode() {
+        return strictMode;
     }
 
-    public RenderConfiguration strictVariables(boolean value) {
-        this.strictVariables = value;
+    public RenderConfiguration strictMode(boolean value) {
+        this.strictMode = value;
         return this;
     }
 }

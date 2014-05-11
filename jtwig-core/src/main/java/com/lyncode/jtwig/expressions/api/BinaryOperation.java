@@ -15,8 +15,9 @@
 package com.lyncode.jtwig.expressions.api;
 
 import com.lyncode.jtwig.exception.CalculateException;
+import com.lyncode.jtwig.parser.model.JtwigPosition;
 import com.lyncode.jtwig.render.RenderContext;
 
 public interface BinaryOperation {
-    Object apply (RenderContext context, Expression left, Expression right) throws CalculateException;
+    Object apply (RenderContext context, JtwigPosition position, Expression left, Expression right) throws CalculateException;
 }

@@ -37,7 +37,7 @@ public class Issue76Test extends AbstractJtwigTest {
     @Test
     public void shouldGiveNiceExplanationForNonExistingVariables() throws Exception {
         try {
-            given(theConfiguration().render().strictVariables(true));
+            given(theConfiguration().render().strictMode(true));
             when(jtwigRenders(templateResource("templates/issue76/test2.twig")));
             fail();
         } catch (RenderException e) {

@@ -17,14 +17,15 @@ package com.lyncode.jtwig.expressions.operations.binary;
 import com.lyncode.jtwig.exception.CalculateException;
 import com.lyncode.jtwig.expressions.api.BinaryOperation;
 import com.lyncode.jtwig.expressions.api.Expression;
+import com.lyncode.jtwig.parser.model.JtwigPosition;
 import com.lyncode.jtwig.render.RenderContext;
 
 import static com.lyncode.jtwig.util.BooleanOperations.isTrue;
 
 public class IsNotOperator implements BinaryOperation {
     @Override
-    public Object apply(RenderContext context, Expression left, Expression right) throws CalculateException {
+    public Object apply(RenderContext context, JtwigPosition position, Expression left, Expression right) throws CalculateException {
         CompositionOperation composition = new CompositionOperation();
-        return !isTrue(composition.apply(context, left, right));
+        return !isTrue(composition.apply(context, position, left, right));
     }
 }
