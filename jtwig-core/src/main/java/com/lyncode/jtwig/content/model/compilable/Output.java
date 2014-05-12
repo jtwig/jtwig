@@ -25,6 +25,8 @@ import com.lyncode.jtwig.render.RenderContext;
 
 import java.io.IOException;
 
+import static com.lyncode.jtwig.util.TwigTransformUtils.toTwig;
+
 public class Output extends AbstractElement {
     private final CompilableExpression expression;
 
@@ -49,7 +51,7 @@ public class Output extends AbstractElement {
             try {
                 Object calculate = expression.calculate(context);
                 if (calculate != null)
-                    context.write(String.valueOf(calculate).getBytes());
+                    context.write(toTwig(calculate).getBytes());
             } catch (IOException | CalculateException e) {
                 throw new RenderException(e);
             }

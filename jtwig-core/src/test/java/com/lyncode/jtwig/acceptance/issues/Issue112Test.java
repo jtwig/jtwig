@@ -145,4 +145,27 @@ public class Issue112Test extends AbstractJtwigTest {
         when(jtwigRenders(template("{% set nothing = null %}{{ nothing }}")));
         then(theRenderedTemplate(), is(equalTo("")));
     }
+
+
+    @Test
+    public void booleanValuesShouldBePrintItsIntegerRepresentation() throws Exception {
+        given(theConfiguration().render().strictMode(false));
+        when(jtwigRenders(template("{{ true }}")));
+        then(theRenderedTemplate(), is(equalTo("1")));
+        when(jtwigRenders(template("{{ false }}")));
+        then(theRenderedTemplate(), is(equalTo("0")));
+    }
+
+    @Test
+    public void comparisonBetweenUndefinedAndZero() throws Exception {
+        given(theConfiguration().render().strictMode(false));
+        when(jtwigRenders(template("{{ nothing == 0 }}")));
+        then(theRenderedTemplate(), is(equalTo("1")));
+    }
+    @Test
+    public void comparisonBetweenUndefinedAndNull() throws Exception {
+        given(theConfiguration().render().strictMode(false));
+        when(jtwigRenders(template("{{ nothing == null }}")));
+        then(theRenderedTemplate(), is(equalTo("1")));
+    }
 }

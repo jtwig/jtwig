@@ -95,4 +95,27 @@ public class RelationalOperationsTest {
     public void eqFalseTest() throws Exception {
         assertFalse(eq(2, 1));
     }
+
+    @Test
+    public void isZeroTest() throws Exception {
+        assertTrue(isZero(0));
+        assertTrue(isZero(0D));
+        assertTrue(isZero(0F));
+        assertTrue(isZero(0L));
+        assertTrue(isZero(0x0));
+    }
+
+    @Test
+    public void eqWithNull() throws Exception {
+        assertTrue(eq(0, null));
+        assertTrue(eq(0D, null));
+        assertTrue(eq(0L, null));
+        assertTrue(eq(0F, null));
+        assertTrue(eq(0x0, null));
+        assertTrue(eq(null, 0));
+        assertTrue(eq(null, 0L));
+        assertTrue(eq(null, 0F));
+        assertTrue(eq(null, 0D));
+        assertTrue(eq(null, 0x0));
+    }
 }
