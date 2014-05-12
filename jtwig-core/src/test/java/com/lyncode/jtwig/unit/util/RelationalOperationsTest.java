@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-package com.lyncode.jtwig.util;
+package com.lyncode.jtwig.unit.util;
 
 import org.junit.Test;
 
@@ -106,7 +106,8 @@ public class RelationalOperationsTest {
     }
 
     @Test
-    public void eqWithNull() throws Exception {
+    public void eqLooseTest() throws Exception {
+        assertTrue(eq(null, null));
         assertTrue(eq(0, null));
         assertTrue(eq(0D, null));
         assertTrue(eq(0L, null));
@@ -117,5 +118,6 @@ public class RelationalOperationsTest {
         assertTrue(eq(null, 0F));
         assertTrue(eq(null, 0D));
         assertTrue(eq(null, 0x0));
+        assertTrue(eq("", ""));
     }
 }
