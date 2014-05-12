@@ -39,8 +39,15 @@ public class RelationalOperations {
     }
 
     public static boolean eq (Object a, Object b) {
+        // Using the same behaviour for Jtwig as we get in twig
         if (a == null)
-            return b == null || b.equals(a);
+            return b == null || ((b instanceof Number) && isZero((Number) b));
+        if (b == null)
+            return (a instanceof Number) && isZero((Number) a);
         return a.equals(b);
+    }
+
+    public static boolean isZero(Number number) {
+        return number.doubleValue() == 0;
     }
 }

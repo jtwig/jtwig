@@ -12,16 +12,24 @@
  * limitations under the License.
  */
 
-package com.lyncode.jtwig.expressions.operations.binary;
+package com.lyncode.jtwig.unit.util;
 
-import com.lyncode.jtwig.exception.CalculateException;
-import com.lyncode.jtwig.parser.model.JtwigPosition;
+import org.junit.Test;
 
-import static com.lyncode.jtwig.util.MathOperations.intMul;
+import static com.lyncode.jtwig.util.MathOperations.*;
+import static org.junit.Assert.assertEquals;
 
-public class IntMultOperation extends SimpleBinaryOperation {
-    @Override
-    public Object apply(JtwigPosition position, Object left, Object right) throws CalculateException {
-        return intMul(left, right);
+public class MathOperationsTest {
+    @Test
+    public void sumDoubleTest() throws Exception {
+        assertEquals(3.0, sum(1.0, 2.0));
+    }
+    @Test
+    public void modDoubleTest() throws Exception {
+        assertEquals(0.0, mod(4.0, 2.0));
+    }
+    @Test
+    public void intDivDoubleTest() throws Exception {
+        assertEquals(1, intDiv(2.0, 2.0));
     }
 }

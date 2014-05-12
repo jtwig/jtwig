@@ -16,10 +16,11 @@ package com.lyncode.jtwig.expressions.operations.binary;
 
 import com.lyncode.jtwig.exception.CalculateException;
 import com.lyncode.jtwig.functions.util.ObjectIterator;
+import com.lyncode.jtwig.parser.model.JtwigPosition;
 
 public class InOperation extends SimpleBinaryOperation {
     @Override
-    protected Object apply(Object left, Object right) throws CalculateException {
+    protected Object apply(JtwigPosition position, Object left, Object right) throws CalculateException {
         if (right == null) return false;
         if ((right instanceof Iterable) || right.getClass().isArray())
             return new ObjectIterator(right).contains(left);
@@ -27,22 +28,4 @@ public class InOperation extends SimpleBinaryOperation {
             return ((String) right).contains(left.toString());
         else return false;
     }
-
-//            case STARTS_WITH:
-//                if (leftResolved == null) return false;
-//                return leftResolved.toString().startsWith(rightResolved.toString());
-//            case ENDS_WITH:
-//                if (leftResolved == null) return false;
-//                return leftResolved.toString().endsWith(rightResolved.toString());
-//            case MATCHES:
-//                if (leftResolved == null) return false;
-//                return leftResolved.toString().matches(rightResolved.toString());
-//            case IN:
-//                if (rightResolved == null) return false;
-//                if ((rightResolved instanceof Iterable) || rightResolved.getClass().isArray())
-//                    return new ObjectIterator(rightResolved).contains(leftResolved);
-//                else if (rightResolved instanceof String)
-//                    return ((String) rightResolved).contains(leftResolved.toString());
-//                else
-//                    return false;
 }

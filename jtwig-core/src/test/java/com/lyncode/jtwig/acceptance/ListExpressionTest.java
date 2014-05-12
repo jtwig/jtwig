@@ -31,11 +31,23 @@ public class ListExpressionTest extends AbstractJtwigTest {
         JtwigContext context = new JtwigContext();
         assertThat(template.output(context), is("1,2,3,4,5"));
     }
+    @Test
+    public void integerListByComprehensionReverse () throws ParseException, CompileException, RenderException {
+        JtwigTemplate template = new JtwigTemplate("{{ 5..1 | join(',') }}");
+        JtwigContext context = new JtwigContext();
+        assertThat(template.output(context), is("5,4,3,2,1"));
+    }
 
     @Test
     public void characterListByComprehension () throws ParseException, CompileException, RenderException {
         JtwigTemplate template = new JtwigTemplate("{{ 'a'..'c' | join }}");
         JtwigContext context = new JtwigContext();
         assertThat(template.output(context), is("abc"));
+    }
+    @Test
+    public void characterListByComprehensionReverse () throws ParseException, CompileException, RenderException {
+        JtwigTemplate template = new JtwigTemplate("{{ 'c'..'a' | join }}");
+        JtwigContext context = new JtwigContext();
+        assertThat(template.output(context), is("cba"));
     }
 }

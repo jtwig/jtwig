@@ -26,6 +26,6 @@ public class Issue82Test extends AbstractJtwigTest {
     @Test
     public void issue82() throws Exception {
         when(jtwigRenders(template("{{ notice }}")));
-        then(theRenderedTemplate(), is(equalTo("undefined")));
+        then(theRenderedTemplate(), is(equalTo("")));
     }
 }

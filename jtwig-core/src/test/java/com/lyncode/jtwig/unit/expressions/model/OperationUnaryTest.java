@@ -38,6 +38,11 @@ public class OperationUnaryTest {
         assertEquals(unary.compile(null).calculate(null), false);
     }
 
+    @Test(expected = CompileException.class)
+    public void operationNotFound() throws Exception {
+        new OperationUnary(null, Operator.UNKNOWN, mock(CompilableExpression.class)).compile(mock(CompileContext.class));
+    }
+
     private CompilableExpression expression(final Expression expression) {
         return new CompilableExpression() {
             @Override

@@ -21,6 +21,7 @@ import org.junit.Test;
 
 import static com.lyncode.jtwig.util.SyntacticSugar.*;
 import static org.hamcrest.core.StringContains.containsString;
+import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.Assert.fail;
 
 public class Issue76Test extends AbstractJtwigTest {
@@ -37,11 +38,11 @@ public class Issue76Test extends AbstractJtwigTest {
     @Test
     public void shouldGiveNiceExplanationForNonExistingVariables() throws Exception {
         try {
-            given(theConfiguration().render().strictVariables(true));
+            given(theConfiguration().render().strictMode(true));
             when(jtwigRenders(templateResource("templates/issue76/test2.twig")));
             fail();
         } catch (RenderException e) {
-            then(e.getCause().getMessage(), containsString("templates/issue76/test2.twig -> Line 1, column 28: Unable to retrieve property/field size from undefined"));
+            then(e.getCause().getMessage(), startsWith("templates/issue76/test2.twig -> Line 1, column 23:"));
         }
     }
 

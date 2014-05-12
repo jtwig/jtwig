@@ -27,10 +27,9 @@ public class VariableTest {
     private Variable underTest = new Variable(null, "variable");
 
     @Test
-    public void testName() throws Exception {
+    public void resolveValueTest() throws Exception {
         JtwigContext context = mock(JtwigContext.class);
         when(context.map("variable")).thenReturn("one");
-
         assertEquals("one", underTest.compile(null).calculate(RenderContext.create(null, context, null)));
     }
 }

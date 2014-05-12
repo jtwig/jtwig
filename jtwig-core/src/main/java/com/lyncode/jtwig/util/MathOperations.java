@@ -46,10 +46,12 @@ public class MathOperations {
     }
 
     public static double toDouble (Object obj) {
+        if (obj == null) return 0;
         return ((Number) obj).doubleValue();
     }
 
     public static int toInt (Object obj) {
+        if (obj == null) return 0;
         return ((Number) obj) .intValue();
     }
 

@@ -15,10 +15,11 @@
 package com.lyncode.jtwig.expressions.operations.binary;
 
 import com.lyncode.jtwig.exception.CalculateException;
+import com.lyncode.jtwig.parser.model.JtwigPosition;
 
 public class StartsWithOperation extends SimpleBinaryOperation {
     @Override
-    protected Object apply(Object left, Object right) throws CalculateException {
+    protected Object apply(JtwigPosition position, Object left, Object right) throws CalculateException {
         if (left == null) return false;
         return left.toString().startsWith(right.toString());
     }

@@ -16,27 +16,45 @@ package com.lyncode.jtwig.unit.expressions.model;
 
 import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.compile.CompileContext;
+import com.lyncode.jtwig.exception.ParseBypassException;
 import com.lyncode.jtwig.expressions.model.Constant;
 import com.lyncode.jtwig.expressions.model.ValueList;
+import com.lyncode.jtwig.parser.model.JtwigPosition;
 import com.lyncode.jtwig.render.RenderContext;
 import org.junit.Test;
 
 import java.util.List;
 
+import static com.lyncode.jtwig.expressions.model.ValueList.create;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.mockito.Mockito.mock;
 
 public class ValueListTest {
+    private static final JtwigPosition POSITION = new JtwigPosition(null, 1, 1);
+
     @Test
-    public void testName() throws Exception {
-        ValueList list = ValueList.create(null, new Constant(1), new Constant(2));
+    public void resultIsAList() throws Exception {
+        ValueList list = create(null, new Constant(1), new Constant(2));
         CompileContext context = mock(CompileContext.class);
         JtwigContext jtwigContext = mock(JtwigContext.class);
 
         Object result = list.compile(context).calculate(RenderContext.create(null, jtwigContext, null));
 
         assertThat(result, is(instanceOf(List.class)));
+    }
+
+    @Test(expected = ParseBypassException.class)
+    public void invalidLimitTypes() throws Exception {
+        create(POSITION, new Constant(1), new Constant('a'));
+    }
+    @Test(expected = ParseBypassException.class)
+    public void invalidLimitTypes2() throws Exception {
+        create(POSITION, new Constant('a'), new Constant(1));
+    }
+    @Test(expected = ParseBypassException.class)
+    public void invalidLimitTypes3() throws Exception {
+        create(POSITION, new Constant("a"), new Constant("b"));
     }
 }

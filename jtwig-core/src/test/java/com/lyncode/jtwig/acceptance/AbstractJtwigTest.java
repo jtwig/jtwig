@@ -17,6 +17,7 @@ package com.lyncode.jtwig.acceptance;
 import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.JtwigTemplate;
 import com.lyncode.jtwig.configuration.JtwigConfiguration;
+import com.lyncode.jtwig.content.api.Renderable;
 import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.ParseException;
 import com.lyncode.jtwig.exception.RenderException;
@@ -73,7 +74,8 @@ public class AbstractJtwigTest {
 
     protected String jtwigRenders(JtwigResource resource) throws ParseException, CompileException, RenderException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        new JtwigTemplate(resource, configuration).compile(parser).render(RenderContext.create(configuration.render(), context, outputStream));
+        Renderable compiled = new JtwigTemplate(resource, configuration).compile(parser);
+        compiled.render(RenderContext.create(configuration.render(), context, outputStream));
         this.output = outputStream.toString();
         return output;
     }

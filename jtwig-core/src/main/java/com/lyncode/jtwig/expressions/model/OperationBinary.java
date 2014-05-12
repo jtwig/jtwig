@@ -52,7 +52,6 @@ public class OperationBinary extends AbstractCompilableExpression {
     public Expression compile(CompileContext context) throws CompileException {
         assert operators.size() == operands.size() - 1;
 
-        if (operands.isEmpty()) throw new CompileException(position()+" empty binary expression");
         if (operands.size() == 1) return operands.get(0).compile(context);
         else {
             Expression left = operands.get(0).compile(context);
@@ -61,7 +60,7 @@ public class OperationBinary extends AbstractCompilableExpression {
                 Operator operator = operators.get(i - 1);
 
                 try {
-                    left = new Compiled(left, right, BinaryOperator.fromOperator(operator).operation());
+                    left = new Compiled(position(), left, right, BinaryOperator.fromOperator(operator).operation());
                 } catch (OperationNotFoundException e) {
                     throw new CompileException(position()+": "+ e.getMessage());
                 }
@@ -71,11 +70,13 @@ public class OperationBinary extends AbstractCompilableExpression {
     }
 
     public static class Compiled implements Expression {
+        private final JtwigPosition position;
         private Expression leftOperand;
         private Expression rightOperand;
         private BinaryOperation operation;
 
-        private Compiled(Expression leftOperand, Expression rightOperand, BinaryOperation operation) {
+        private Compiled(JtwigPosition position, Expression leftOperand, Expression rightOperand, BinaryOperation operation) {
+            this.position = position;
             this.leftOperand = leftOperand;
             this.rightOperand = rightOperand;
             this.operation = operation;
@@ -83,7 +84,7 @@ public class OperationBinary extends AbstractCompilableExpression {
 
         @Override
         public Object calculate(RenderContext context) throws CalculateException {
-            return operation.apply(context, leftOperand, rightOperand);
+            return operation.apply(context, position, leftOperand, rightOperand);
         }
 
         public Expression left () { return leftOperand; }

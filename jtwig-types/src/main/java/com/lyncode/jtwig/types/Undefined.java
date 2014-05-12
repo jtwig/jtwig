@@ -20,6 +20,6 @@ public class Undefined {
     private Undefined () {}
 
     public String toString () {
-        return "undefined";
+        return "";
     }
 }

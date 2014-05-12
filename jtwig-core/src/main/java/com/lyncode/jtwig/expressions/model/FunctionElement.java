@@ -95,5 +95,13 @@ public class FunctionElement extends AbstractCompilableExpression {
         public Object extract(RenderContext context, ObjectExtractor extractor) throws CalculateException, ObjectExtractor.ExtractException {
             return extractor.extract(name, calculateArguments(context));
         }
+
+        public JtwigPosition position() {
+            return position;
+        }
+
+        public String name() {
+            return name;
+        }
     }
 }

@@ -17,13 +17,24 @@ package com.lyncode.jtwig.expressions.operations.binary;
 import com.lyncode.jtwig.exception.CalculateException;
 import com.lyncode.jtwig.expressions.api.BinaryOperation;
 import com.lyncode.jtwig.expressions.api.Expression;
+import com.lyncode.jtwig.parser.model.JtwigPosition;
 import com.lyncode.jtwig.render.RenderContext;
+
+import static com.lyncode.jtwig.types.Undefined.UNDEFINED;
 
 public abstract class SimpleBinaryOperation implements BinaryOperation {
     @Override
-    public Object apply(RenderContext context, Expression left, Expression right) throws CalculateException {
-        return apply(left.calculate(context), right.calculate(context));
+    public Object apply(RenderContext context, JtwigPosition position, Expression left, Expression right) throws CalculateException {
+        Object calculatedLeft = left.calculate(context);
+        Object calculatedRight = right.calculate(context);
+
+        if (calculatedLeft == UNDEFINED)
+            calculatedLeft = null;
+        if (calculatedRight == UNDEFINED)
+            calculatedRight = null;
+
+        return apply(position, calculatedLeft, calculatedRight);
     }
 
-    protected abstract Object apply(Object left, Object right) throws CalculateException;
+    protected abstract Object apply(JtwigPosition position, Object left, Object right) throws CalculateException;
 }

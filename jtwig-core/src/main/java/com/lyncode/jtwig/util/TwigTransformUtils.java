@@ -14,22 +14,11 @@
 
 package com.lyncode.jtwig.util;
 
-import org.junit.Test;
+public class TwigTransformUtils {
+    public static String toTwig (Object object) {
+        if (object instanceof Boolean)
+            return ((boolean)object) ? "1" : "0";
 
-import static com.lyncode.jtwig.util.MathOperations.*;
-import static org.junit.Assert.assertEquals;
-
-public class MathOperationsTest {
-    @Test
-    public void sumDoubleTest() throws Exception {
-        assertEquals(3.0, sum(1.0, 2.0));
-    }
-    @Test
-    public void modDoubleTest() throws Exception {
-        assertEquals(0.0, mod(4.0, 2.0));
-    }
-    @Test
-    public void intDivDoubleTest() throws Exception {
-        assertEquals(1, intDiv(2.0, 2.0));
+        return String.valueOf(object);
     }
 }

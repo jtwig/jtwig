@@ -19,13 +19,37 @@ import com.lyncode.jtwig.expressions.api.BinaryOperation;
 import com.lyncode.jtwig.expressions.api.Expression;
 import com.lyncode.jtwig.expressions.model.FunctionElement;
 import com.lyncode.jtwig.expressions.model.Variable;
+import com.lyncode.jtwig.parser.model.JtwigPosition;
 import com.lyncode.jtwig.render.RenderContext;
+import com.lyncode.jtwig.types.Undefined;
 import com.lyncode.jtwig.util.ObjectExtractor;
 
 public class SelectionOperation implements BinaryOperation {
     @Override
-    public Object apply(RenderContext context, Expression left, Expression right) throws CalculateException {
-        ObjectExtractor extractor = new ObjectExtractor(left.calculate(context));
+    public Object apply(RenderContext context, JtwigPosition position, Expression left, Expression right) throws CalculateException {
+        Object calculate = left.calculate(context);
+        if (calculate == null) {
+            if (context.configuration().strictMode()) {
+                if (right instanceof Variable.Compiled) {
+                    String propertyName = ((Variable.Compiled) right).name();
+                    throw new CalculateException(String.format(position + ": Impossible to access attribute/method '%s' on null", propertyName));
+                } else if (right instanceof FunctionElement.Compiled) {
+                    String propertyName = ((FunctionElement.Compiled) right).name();
+                    throw new CalculateException(String.format(position + ": Impossible to access attribute/method '%s' on null", propertyName));
+                }
+            } else return Undefined.UNDEFINED;
+        } else if (calculate == Undefined.UNDEFINED) {
+            if (context.configuration().strictMode()) {
+                if (right instanceof Variable.Compiled) {
+                    String propertyName = ((Variable.Compiled) right).name();
+                    throw new CalculateException(String.format(position + ": Impossible to access attribute/method '%s' on undefined", propertyName));
+                } else if (right instanceof FunctionElement.Compiled) {
+                    String propertyName = ((FunctionElement.Compiled) right).name();
+                    throw new CalculateException(String.format(position + ": Impossible to access attribute/method '%s' on undefined", propertyName));
+                }
+            } else return Undefined.UNDEFINED;
+        }
+        ObjectExtractor extractor = new ObjectExtractor(calculate);
         try {
             if (right instanceof Variable.Compiled)
                 return ((Variable.Compiled) right).extract(context, extractor);
