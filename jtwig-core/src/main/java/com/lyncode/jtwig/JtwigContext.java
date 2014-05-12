@@ -20,6 +20,7 @@ import com.lyncode.jtwig.functions.parameters.resolve.exceptions.ResolveExceptio
 import com.lyncode.jtwig.functions.repository.FunctionResolver;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Map;
 
 import static com.lyncode.jtwig.types.Undefined.UNDEFINED;
 
@@ -76,5 +77,16 @@ public class JtwigContext {
         } catch (InvocationTargetException | IllegalAccessException | ResolveException e) {
             throw new FunctionException(e);
         }
+    }
+
+    public JtwigContext with(Map<Object, Object> calculate) {
+        for (Map.Entry entry : calculate.entrySet()) {
+            set(entry.getKey().toString(), entry.getValue());
+        }
+        return this;
+    }
+
+    public JtwigContext clone() {
+        return new JtwigContext(modelMap.clone(), functionRepository);
     }
 }
