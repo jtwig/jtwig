@@ -32,20 +32,20 @@ public class SelectionOperation implements BinaryOperation {
             if (context.configuration().strictMode()) {
                 if (right instanceof Variable.Compiled) {
                     String propertyName = ((Variable.Compiled) right).name();
-                    throw new CalculateException(String.format(position + "Impossible to access attribute/method '%s' on null", propertyName));
+                    throw new CalculateException(String.format(position + ": Impossible to access attribute/method '%s' on null", propertyName));
                 } else if (right instanceof FunctionElement.Compiled) {
-                    String propertyName = ((Variable.Compiled) right).name();
-                    throw new CalculateException(String.format(position + "Impossible to access attribute/method '%s' on null", propertyName));
+                    String propertyName = ((FunctionElement.Compiled) right).name();
+                    throw new CalculateException(String.format(position + ": Impossible to access attribute/method '%s' on null", propertyName));
                 }
             } else return Undefined.UNDEFINED;
         } else if (calculate == Undefined.UNDEFINED) {
             if (context.configuration().strictMode()) {
                 if (right instanceof Variable.Compiled) {
                     String propertyName = ((Variable.Compiled) right).name();
-                    throw new CalculateException(String.format(position + "Impossible to access attribute/method '%s' on undefined", propertyName));
+                    throw new CalculateException(String.format(position + ": Impossible to access attribute/method '%s' on undefined", propertyName));
                 } else if (right instanceof FunctionElement.Compiled) {
-                    String propertyName = ((Variable.Compiled) right).name();
-                    throw new CalculateException(String.format(position + "Impossible to access attribute/method '%s' on undefined", propertyName));
+                    String propertyName = ((FunctionElement.Compiled) right).name();
+                    throw new CalculateException(String.format(position + ": Impossible to access attribute/method '%s' on undefined", propertyName));
                 }
             } else return Undefined.UNDEFINED;
         }
