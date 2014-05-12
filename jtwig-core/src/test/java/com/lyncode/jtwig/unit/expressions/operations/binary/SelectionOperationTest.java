@@ -78,6 +78,66 @@ public class SelectionOperationTest {
         assertEquals(UNDEFINED, result);
     }
 
+
+
+    @Test(expected = CalculateException.class)
+    public void accessPropertyOfUndefinedWithStrictMode() throws Exception {
+        RenderContext renderContext = mock(RenderContext.class);
+        Expression left = mock(Expression.class);
+
+        JtwigPosition position = new JtwigPosition(null, 1, 1);
+        Expression right = new Variable.Compiled(position, "variable");
+
+        when(renderContext.configuration()).thenReturn(new RenderConfiguration().strictMode(true));
+        when(left.calculate(renderContext)).thenReturn(UNDEFINED);
+
+        operation.apply(renderContext, position, left, right);
+    }
+
+    @Test
+    public void accessPropertyOfUndefinedWithoutStrictMode() throws Exception {
+        RenderContext renderContext = mock(RenderContext.class);
+        Expression left = mock(Expression.class);
+
+        JtwigPosition position = new JtwigPosition(null, 1, 1);
+        Expression right = new Variable.Compiled(position, "variable");
+
+        when(renderContext.configuration()).thenReturn(new RenderConfiguration().strictMode(false));
+        when(left.calculate(renderContext)).thenReturn(UNDEFINED);
+
+        Object result = operation.apply(renderContext, position, left, right);
+        assertEquals(UNDEFINED, result);
+    }
+
+    @Test(expected = CalculateException.class)
+    public void accessMethodOfUndefinedWithStrictMode() throws Exception {
+        RenderContext renderContext = mock(RenderContext.class);
+        Expression left = mock(Expression.class);
+
+        JtwigPosition position = new JtwigPosition(null, 1, 1);
+        Expression right = new FunctionElement.Compiled(position, "variable", Arrays.<Expression>asList());
+
+        when(renderContext.configuration()).thenReturn(new RenderConfiguration().strictMode(true));
+        when(left.calculate(renderContext)).thenReturn(UNDEFINED);
+
+        operation.apply(renderContext, position, left, right);
+    }
+
+    @Test
+    public void accessMethodOfUndefinedWithoutStrictMode() throws Exception {
+        RenderContext renderContext = mock(RenderContext.class);
+        Expression left = mock(Expression.class);
+
+        JtwigPosition position = new JtwigPosition(null, 1, 1);
+        Expression right = new FunctionElement.Compiled(position, "variable", Arrays.<Expression>asList());
+
+        when(renderContext.configuration()).thenReturn(new RenderConfiguration().strictMode(false));
+        when(left.calculate(renderContext)).thenReturn(UNDEFINED);
+
+        Object result = operation.apply(renderContext, position, left, right);
+        assertEquals(UNDEFINED, result);
+    }
+
     @Test(expected = CalculateException.class)
     public void operationShouldFailIfRightHandSideIsNotAFunctionNeitherAVariable() throws Exception {
         RenderContext renderContext = mock(RenderContext.class);

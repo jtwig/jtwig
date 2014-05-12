@@ -65,13 +65,8 @@ public class Variable extends AbstractCompilableExpression {
         }
 
         public Object extract(RenderContext context, ObjectExtractor extractor) throws ObjectExtractor.ExtractException {
-            if (context.configuration().strictMode() && extractor.contextIsEmpty())
-                throw new ObjectExtractor.ExtractException(position+": Unable to retrieve property/field "+name+" from "+extractor.context());
+            // if we reach this we are already sure that the extractor content is not null/undefined
             return extractor.extract(name);
-        }
-
-        public JtwigPosition position() {
-            return position;
         }
 
         public String name () {

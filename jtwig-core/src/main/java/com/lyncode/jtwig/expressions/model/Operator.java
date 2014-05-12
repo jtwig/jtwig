@@ -43,8 +43,9 @@ public enum Operator {
     MATCHES("matches"),
     IN("in"),
     IS("is"),
-    IS_NOT("is not")
-    ;
+    IS_NOT("is not"),
+
+    UNKNOWN("unknown");
 
     private String representation;
 

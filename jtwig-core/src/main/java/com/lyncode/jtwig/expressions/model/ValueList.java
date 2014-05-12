@@ -40,7 +40,7 @@ public class ValueList extends AbstractCompilableExpression {
                 for (int i = initValue; i <= endValue; i++)
                     valueList.add(new Constant<>(i));
             } else {
-                for (int i = endValue; i >= initValue; i--)
+                for (int i = initValue; i >= endValue; i--)
                     valueList.add(new Constant<>(i));
             }
 
@@ -55,7 +55,7 @@ public class ValueList extends AbstractCompilableExpression {
                 for (char i = initValue; i <= endValue; i++)
                     valueList.add(new Constant<>(i));
             } else {
-                for (char i = endValue; i >= initValue; i--)
+                for (char i = initValue; i >= endValue; i--)
                     valueList.add(new Constant<>(i));
             }
         } else

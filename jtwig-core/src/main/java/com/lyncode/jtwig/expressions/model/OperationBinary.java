@@ -52,7 +52,6 @@ public class OperationBinary extends AbstractCompilableExpression {
     public Expression compile(CompileContext context) throws CompileException {
         assert operators.size() == operands.size() - 1;
 
-        if (operands.isEmpty()) throw new CompileException(position()+" empty binary expression");
         if (operands.size() == 1) return operands.get(0).compile(context);
         else {
             Expression left = operands.get(0).compile(context);

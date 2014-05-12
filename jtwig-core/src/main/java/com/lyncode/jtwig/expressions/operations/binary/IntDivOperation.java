@@ -17,13 +17,13 @@ package com.lyncode.jtwig.expressions.operations.binary;
 import com.lyncode.jtwig.exception.CalculateException;
 import com.lyncode.jtwig.parser.model.JtwigPosition;
 
-import static com.lyncode.jtwig.types.Undefined.UNDEFINED;
 import static com.lyncode.jtwig.util.MathOperations.intDiv;
+import static com.lyncode.jtwig.util.MathOperations.toInt;
 
 public class IntDivOperation extends SimpleBinaryOperation {
     @Override
     public Object apply(JtwigPosition position, Object left, Object right) throws CalculateException {
-        if (right == UNDEFINED || right == null || right == 0)
+        if (toInt(right) == 0)
             throw new CalculateException(position+": Division by zero");
         return intDiv(left, right);
     }

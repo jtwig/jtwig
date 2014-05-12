@@ -22,9 +22,11 @@ import com.lyncode.jtwig.expressions.api.Expression;
 import com.lyncode.jtwig.expressions.model.OperationBinary;
 import com.lyncode.jtwig.expressions.model.Operator;
 import com.lyncode.jtwig.expressions.model.Variable;
+import com.lyncode.jtwig.parser.model.JtwigPosition;
 import com.lyncode.jtwig.render.RenderContext;
 import org.junit.Test;
 
+import static com.lyncode.jtwig.expressions.model.Operator.UNKNOWN;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
@@ -62,6 +64,13 @@ public class OperationBinaryTest {
                 .calculate(RenderContext.create(null, context, null));
 
         assertEquals(true, result);
+    }
+
+    @Test(expected = CompileException.class)
+    public void unknownOperation() throws Exception {
+        new OperationBinary(new JtwigPosition(null, 1, 1), mock(CompilableExpression.class))
+                .add(UNKNOWN)
+                .add(mock(CompilableExpression.class)).compile(mock(CompileContext.class));
     }
 
     private CompilableExpression expression(final Expression expression) {
