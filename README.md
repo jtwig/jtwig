@@ -13,7 +13,9 @@
 ### Project Information
 
 **Website**: http://jtwig.org
+
 **News**: [@jtwigTemplates](https://twitter.com/jtwigTemplates)
+
 **Versioning**:  [Semantic Versioning](http://semver.org/)
 
 **Changes**: [wiki.jtwig.org](http://wiki.jtwig.org/#4-en)
