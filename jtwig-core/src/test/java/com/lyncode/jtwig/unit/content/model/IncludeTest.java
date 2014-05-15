@@ -44,7 +44,7 @@ public class IncludeTest {
     public void includeShouldCompileRelativePathResource() throws Exception {
         Renderable renderable = mock(Renderable.class);
 
-        Include include = new Include("test");
+        Include include = new Include(null, "test");
         when(context.retrieve("test")).thenReturn(jtwigResource);
         when(context.clone()).thenReturn(context);
         when(context.parse(jtwigResource)).thenReturn(toRender(renderable));

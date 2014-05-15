@@ -290,8 +290,13 @@ public class JtwigContentParser extends JtwigBaseParser<Compilable> {
                         Sequence(
                                 basicParser.stringLiteral(),
                                 basicParser.spacing(),
-                                push(new Include(basicParser.pop())),
+                                push(new Include(currentPosition(), basicParser.pop())),
                                 action(beforeBeginTrim()),
+                                Optional(
+                                        keyword(JtwigKeyword.WITH),
+                                        expressionParser.expression(),
+                                        action(peek(1, Include.class).with(expressionParser.pop()))
+                                ),
                                 closeCode(),
                                 action(afterEndTrim())
                         ),

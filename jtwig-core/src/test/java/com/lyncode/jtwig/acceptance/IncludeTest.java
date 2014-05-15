@@ -12,25 +12,19 @@
  * limitations under the License.
  */
 
-package com.lyncode.jtwig;
+package com.lyncode.jtwig.acceptance;
 
-import java.util.HashMap;
-import java.util.Map;
+import org.junit.Test;
 
-public class JtwigModelMap extends HashMap<String, Object> {
-    public JtwigModelMap add (String key, Object object) {
-        put(key, object);
-        return this;
-    }
+import static com.lyncode.jtwig.util.SyntacticSugar.then;
+import static com.lyncode.jtwig.util.SyntacticSugar.when;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsEqual.equalTo;
 
-    public JtwigModelMap add(Map<String, Object> model) {
-        putAll(model);
-        return this;
-    }
-
-    public JtwigModelMap clone() {
-        JtwigModelMap modelMap = new JtwigModelMap();
-        modelMap.putAll(this);
-        return modelMap;
+public class IncludeTest extends AbstractJtwigTest {
+    @Test
+    public void basicExample() throws Exception {
+        when(jtwigRenders(templateResource("templates/acceptance/include/main.twig")));
+        then(theRenderedTemplate(), is(equalTo("test")));
     }
 }

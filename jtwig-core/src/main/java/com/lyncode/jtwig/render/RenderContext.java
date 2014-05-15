@@ -22,6 +22,7 @@ import com.lyncode.jtwig.render.stream.RenderStream;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Map;
 
 public class RenderContext {
     /**
@@ -67,5 +68,14 @@ public class RenderContext {
 
     private RenderContext fork() throws IOException {
         return new RenderContext(configuration, context, renderStream.fork());
+    }
+
+    public RenderContext isolatedModel() {
+        return new RenderContext(configuration, context.clone(), renderStream);
+    }
+
+    public RenderContext with(Map calculate) {
+        context.with(calculate);
+        return this;
     }
 }
