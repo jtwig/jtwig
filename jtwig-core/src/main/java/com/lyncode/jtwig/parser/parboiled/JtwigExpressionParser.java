@@ -350,7 +350,7 @@ public class JtwigExpressionParser extends JtwigBaseParser<CompilableExpression>
                                         action(peek(2, ValueMap.class).add(popVariableName(1), pop())),
                                         ZeroOrMore(
                                                 symbol(COMMA),
-                                                basic.identifier(),
+                                                basic.optionallyQuoted(basic.identifier()),
                                                 push(new Constant<>(match())),
                                                 basic.spacing(),
                                                 symbol(DIV),

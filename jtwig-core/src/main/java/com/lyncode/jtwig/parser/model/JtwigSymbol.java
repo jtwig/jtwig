@@ -29,6 +29,7 @@ public enum JtwigSymbol {
     ATTR("="),
 
     QUOTE("'"),
+    DOUBLE_QUOTE("\""),
 
     TWO_DOTS(".."),
     QUESTION("?");

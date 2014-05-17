@@ -24,6 +24,7 @@ import org.parboiled.annotations.MemoMismatches;
 import org.parboiled.annotations.SuppressNode;
 
 import static com.lyncode.jtwig.parser.model.JtwigSymbol.QUOTE;
+import static com.lyncode.jtwig.parser.model.JtwigSymbol.DOUBLE_QUOTE;
 
 public class JtwigBasicParser extends BaseParser<String> {
     final ParserConfiguration parserConfiguration;
@@ -83,6 +84,22 @@ public class JtwigBasicParser extends BaseParser<String> {
                 TestNot(anyKeyword()),
                 letter(),
                 ZeroOrMore(letterOrDigit())
+        );
+    }
+    
+    public Rule optionallyQuoted(Object rule) {
+        return FirstOf(
+                Sequence(
+                        symbol(QUOTE),
+                        rule,
+                        symbol(QUOTE)
+                ),
+                Sequence(
+                        symbol(DOUBLE_QUOTE),
+                        rule,
+                        symbol(DOUBLE_QUOTE)
+                ),
+                rule
         );
     }
 
