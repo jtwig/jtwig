@@ -294,7 +294,7 @@ public class JtwigContentParser extends JtwigBaseParser<Compilable> {
                                 action(beforeBeginTrim()),
                                 Optional(
                                         keyword(JtwigKeyword.WITH),
-                                        expressionParser.expression(),
+                                        expressionParser.map(),
                                         action(peek(1, Include.class).with(expressionParser.pop()))
                                 ),
                                 closeCode(),

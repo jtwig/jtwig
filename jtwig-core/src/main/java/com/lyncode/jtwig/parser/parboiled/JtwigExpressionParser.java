@@ -342,20 +342,24 @@ public class JtwigExpressionParser extends JtwigBaseParser<CompilableExpression>
                 mandatory(
                         Sequence(
                                 Optional(
-                                        basic.identifier(),
-                                        push(new Constant<>(match())),
+                                        FirstOf(
+                                                constants.string(),
+                                                identifierAsString()
+                                        ),
                                         basic.spacing(),
                                         symbol(DIV),
                                         expression(),
-                                        action(peek(2, ValueMap.class).add(popVariableName(1), pop())),
+                                        action(peek(2, ValueMap.class).add(popIdentifierAsString(1), pop())),
                                         ZeroOrMore(
                                                 symbol(COMMA),
-                                                basic.optionallyQuoted(basic.identifier()),
-                                                push(new Constant<>(match())),
+                                                FirstOf(
+                                                        constants.string(),
+                                                        identifierAsString()
+                                                ),
                                                 basic.spacing(),
                                                 symbol(DIV),
                                                 expression(),
-                                                action(peek(2, ValueMap.class).add(popVariableName(1), pop()))
+                                                action(peek(2, ValueMap.class).add(popIdentifierAsString(1), pop()))
                                         )
                                 ),
                                 symbol(CLOSE_CURLY_BRACKET)

@@ -23,10 +23,19 @@ import org.junit.Test;
 
 import java.util.HashMap;
 
+import static com.lyncode.jtwig.util.SyntacticSugar.then;
+import static com.lyncode.jtwig.util.SyntacticSugar.when;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsEqual.equalTo;
 
 public class MapExpressionTest extends AbstractJtwigTest {
+    @Test
+    public void mapWithStringLiteralsAsKey () throws ParseException, CompileException, RenderException {
+        when(jtwigRenders(template("{% set a = { 'test two': 'details' } %}{{ a['test two'] }}")));
+        then(theRenderedTemplate(), is(equalTo("details")));
+    }
+
     @Test
     public void ifWithEmptyMapShouldBeTheSameAsFalse () throws ParseException, CompileException, RenderException {
         JtwigTemplate template = new JtwigTemplate("{% if (map) %}not empty{% else %}empty{% endif %}");
