@@ -16,11 +16,7 @@
 
 package com.lyncode.jtwig.resource;
 
-<<<<<<< HEAD:jtwig-core/src/test/java/com/lyncode/jtwig/resource/ClasspathJtwigResourceTest.java
-=======
-import com.lyncode.jtwig.resource.ClasspathJtwigResource;
 import junit.framework.Assert;
->>>>>>> 23e3054... Supporting different types of template location::jtwig-core/src/test/java/com/lyncode/jtwig/unit/resource/ClasspathJtwigResourceTest.java
 import org.junit.Test;
 
 import static junit.framework.TestCase.assertNotNull;
@@ -40,7 +36,7 @@ public class ClasspathJtwigResourceTest {
 
     @Test
     public void classpathPrefixRemoved() throws Exception {
-        ClasspathJtwigResource resource = new ClasspathJtwigResource("classpath:/templates/unit/sample.twig");
+        ClasspathJtwigResource resource = new ClasspathJtwigResource("classpath:/sample.twig");
         Assert.assertNotNull(resource.retrieve());
     }
 }

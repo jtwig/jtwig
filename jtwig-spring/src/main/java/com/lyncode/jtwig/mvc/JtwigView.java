@@ -21,7 +21,6 @@ import com.lyncode.jtwig.JtwigModelMap;
 import com.lyncode.jtwig.JtwigTemplate;
 import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.ParseException;
-import com.lyncode.jtwig.parser.JtwigParser;
 import com.lyncode.jtwig.resource.ClasspathJtwigResource;
 import com.lyncode.jtwig.resource.FileJtwigResource;
 import com.lyncode.jtwig.resource.JtwigResource;
@@ -102,13 +101,8 @@ public class JtwigView extends AbstractTemplateView {
         return getCompiledJtwigTemplate(request);
     }
 
-<<<<<<< HEAD
     private Content getCompiledJtwigTemplate(HttpServletRequest request) throws ParseException, CompileException {
-        return new JtwigTemplate(new WebJtwigResource(request.getSession().getServletContext(), getUrl())).compile();
-=======
-    private Renderable getCompiledJtwigTemplate(HttpServletRequest request) throws ParseException, CompileException {
-        return new JtwigTemplate(getResource(request))
-                .compile(jtwigParser());
+        return new JtwigTemplate(getResource(request)).compile();
     }
 
     private JtwigResource getResource(HttpServletRequest request) {
@@ -119,11 +113,6 @@ public class JtwigView extends AbstractTemplateView {
             return new FileJtwigResource(getUrl());
         else
             return new WebJtwigResource(request.getSession().getServletContext(), getUrl());
-    }
-
-    private JtwigParser jtwigParser() {
-        return new JtwigParser(getConfiguration().parse());
->>>>>>> 23e3054... Supporting different types of template location:
     }
 
     @SuppressWarnings("serial")
