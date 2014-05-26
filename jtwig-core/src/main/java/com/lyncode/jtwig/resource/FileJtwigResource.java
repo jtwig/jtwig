@@ -24,7 +24,14 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 
 public class FileJtwigResource implements JtwigResource {
+    private static final String PREFIX = "file://";
     private File file;
+
+    public FileJtwigResource (String file) {
+        if (file.startsWith(PREFIX))
+            file = file.substring(PREFIX.length());
+        this.file = new File(file);
+    }
 
     public FileJtwigResource (File file) {
         this.file = file;

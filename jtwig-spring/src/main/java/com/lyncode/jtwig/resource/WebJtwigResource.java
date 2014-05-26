@@ -19,8 +19,9 @@ package com.lyncode.jtwig.resource;
 import com.lyncode.jtwig.exception.ResourceException;
 
 import javax.servlet.ServletContext;
-import java.io.File;
 import java.io.InputStream;
+
+import static com.lyncode.jtwig.util.FilePath.parentOf;
 
 public class WebJtwigResource implements JtwigResource {
     private ServletContext servletContext;
@@ -40,7 +41,6 @@ public class WebJtwigResource implements JtwigResource {
 
     @Override
     public JtwigResource resolve(String relativePath) throws ResourceException {
-        String relativeUrl = new File(new File(url).getParent(), relativePath).getPath().replace( '\\', '/' );
-        return new WebJtwigResource(servletContext, relativeUrl);
+        return new WebJtwigResource(servletContext, parentOf(url).append(relativePath).toString());
     }
 }
