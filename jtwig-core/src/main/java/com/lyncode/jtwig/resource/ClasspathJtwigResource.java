@@ -21,21 +21,28 @@ import com.lyncode.jtwig.exception.ResourceException;
 import java.io.File;
 import java.io.InputStream;
 
+import static com.lyncode.jtwig.util.FilePath.parentOf;
+
 public class ClasspathJtwigResource implements JtwigResource {
+    private static final String PREFIX = "classpath:";
     private String resource;
 
     public ClasspathJtwigResource(String resource) {
+        if (resource.startsWith(PREFIX))
+            resource = resource.substring(PREFIX.length());
         this.resource = resource.startsWith(File.separator) ? resource.substring(1) : resource;
     }
 
     @Override
     public InputStream retrieve() throws ResourceException {
-        return this.getClass().getClassLoader().getResourceAsStream(this.resource);
+        InputStream resourceAsStream = this.getClass().getClassLoader().getResourceAsStream(this.resource);
+        if (resourceAsStream == null)
+            throw new ResourceException("Resource '"+ this.resource +"' not found");
+        return resourceAsStream;
     }
 
     @Override
     public JtwigResource resolve(String relativePath) throws ResourceException {
-        File relativeFile = new File(new File(resource).getParent(), relativePath);
-        return new ClasspathJtwigResource(relativeFile.getPath());
+        return new ClasspathJtwigResource(parentOf(resource).append(relativePath).toString());
     }
 }

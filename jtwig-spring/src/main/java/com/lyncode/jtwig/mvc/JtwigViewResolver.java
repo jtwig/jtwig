@@ -21,6 +21,7 @@ import com.lyncode.jtwig.functions.builders.FunctionRepositoryBuilder;
 import com.lyncode.jtwig.functions.repository.AbstractFunctionRepository;
 import com.lyncode.jtwig.functions.repository.WebFunctionRepository;
 import com.lyncode.jtwig.services.api.theme.ThemePrefixResolver;
+import com.lyncode.jtwig.util.FilePath;
 import org.reflections.Reflections;
 import org.springframework.web.servlet.view.AbstractTemplateViewResolver;
 
@@ -36,7 +37,7 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
         return new ThemePrefixResolver() {
             @Override
             public String getPrefix(String prefix, String theme) {
-                return new File(prefix, theme).getPath();
+                return new FilePath(prefix, theme).toString();
             }
         };
     }
