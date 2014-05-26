@@ -18,8 +18,9 @@ import java.io.File;
 
 public class FilePath {
     public static FilePath path (String path) { return new FilePath(path); }
+    public static FilePath path (String path, String child) { return new FilePath(path, child); }
     public static FilePath parentOf (String path) {
-        return new FilePath(new File(path).getParentFile());
+        return new FilePath(path).parent();
     }
 
     private File file;
