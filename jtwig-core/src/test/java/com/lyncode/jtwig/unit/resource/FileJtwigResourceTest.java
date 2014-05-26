@@ -14,6 +14,7 @@
 
 package com.lyncode.jtwig.unit.resource;
 
+import com.lyncode.jtwig.exception.ResourceException;
 import com.lyncode.jtwig.resource.FileJtwigResource;
 import org.junit.Test;
 import org.parboiled.common.FileUtils;
@@ -22,6 +23,7 @@ import java.io.File;
 import java.net.URI;
 import java.net.URL;
 
+import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.StringEndsWith.endsWith;
 import static org.junit.Assert.assertThat;
@@ -37,4 +39,12 @@ public class FileJtwigResourceTest {
         assertThat(resource.toString(), endsWith("/templates/unit/sample.twig"));
         assertThat(resource.resolve("other.jtwig"), notNullValue());
     }
+
+    @Test
+    public void whatHappensWhenFileProtocolGiven () throws ResourceException, NoSuchFieldException, IllegalAccessException {
+        FileJtwigResource resource = new FileJtwigResource("file:///tmp/test");
+        assertThat(resource.toString(), equalTo("/tmp/test"));
+    }
+
+
 }

@@ -24,6 +24,9 @@ import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.ParseException;
 import com.lyncode.jtwig.parser.JtwigParser;
 import com.lyncode.jtwig.render.RenderContext;
+import com.lyncode.jtwig.resource.ClasspathJtwigResource;
+import com.lyncode.jtwig.resource.FileJtwigResource;
+import com.lyncode.jtwig.resource.JtwigResource;
 import com.lyncode.jtwig.resource.WebJtwigResource;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -83,7 +86,7 @@ public class JtwigView extends AbstractTemplateView {
                 .add("request", request);
 
         if (log.isDebugEnabled()) {
-            log.debug("Rendering Jtwig template [" + getUrl() + "] in JtwigView '" + getBeanName() + "'");
+            log.debug("Rendering Jtwig templates [" + getUrl() + "] in JtwigView '" + getBeanName() + "'");
             log.debug("Model: " + modelMap);
         }
 
@@ -110,8 +113,18 @@ public class JtwigView extends AbstractTemplateView {
     }
 
     private Renderable getCompiledJtwigTemplate(HttpServletRequest request) throws ParseException, CompileException {
-        return new JtwigTemplate(new WebJtwigResource(request.getSession().getServletContext(), getUrl()))
+        return new JtwigTemplate(getResource(request))
                 .compile(jtwigParser());
+    }
+
+    private JtwigResource getResource(HttpServletRequest request) {
+        String prefix = getViewResolver().getPrefix();
+        if (prefix.startsWith("classpath:"))
+            return new ClasspathJtwigResource(getUrl());
+        else if (prefix.startsWith("file://"))
+            return new FileJtwigResource(getUrl());
+        else
+            return new WebJtwigResource(request.getSession().getServletContext(), getUrl());
     }
 
     private JtwigParser jtwigParser() {

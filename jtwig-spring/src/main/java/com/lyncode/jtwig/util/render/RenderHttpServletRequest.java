@@ -30,6 +30,7 @@ import java.nio.charset.Charset;
 import java.security.Principal;
 import java.util.*;
 
+import static com.lyncode.jtwig.util.FilePath.path;
 import static com.lyncode.jtwig.util.ObjectSnapshot.snapshot;
 
 public class RenderHttpServletRequest implements HttpServletRequest {
@@ -403,7 +404,7 @@ public class RenderHttpServletRequest implements HttpServletRequest {
 
     @Override
     public String getRealPath(String path) {
-        return new File(realPath, path).getPath();
+        return path(realPath).append(path).toString();
     }
 
     @Override

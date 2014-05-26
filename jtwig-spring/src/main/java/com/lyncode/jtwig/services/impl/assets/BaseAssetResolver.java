@@ -20,7 +20,7 @@ import com.lyncode.jtwig.services.api.assets.AssetResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.ViewResolver;
 
-import java.io.File;
+import static com.lyncode.jtwig.util.FilePath.path;
 
 public class BaseAssetResolver implements AssetResolver {
     private String prefix;
@@ -35,9 +35,9 @@ public class BaseAssetResolver implements AssetResolver {
             throw new AssetResolveException("The view resolver must be a JtwigViewResolver");
         else {
             if (((JtwigViewResolver) viewResolver).hasTheme()) {
-                return new File(new File(prefix, ((JtwigViewResolver) viewResolver).getTheme()), asset).getPath();
+                return path(prefix).append(((JtwigViewResolver) viewResolver).getTheme()).append(asset).toString();
             } else {
-                return new File(prefix, asset).getPath();
+                return path(prefix).append(asset).toString();
             }
         }
     }
