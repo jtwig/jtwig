@@ -19,6 +19,7 @@ import com.lyncode.jtwig.functions.annotations.JtwigFunction;
 import com.lyncode.jtwig.functions.annotations.Parameter;
 import com.lyncode.jtwig.functions.exceptions.FunctionException;
 import com.lyncode.jtwig.services.api.assets.AssetResolver;
+import com.lyncode.jtwig.util.FilePath;
 import com.lyncode.jtwig.util.render.RenderHttpServletRequest;
 import com.lyncode.jtwig.util.render.RenderHttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,6 @@ import org.springframework.web.servlet.LocaleResolver;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -54,12 +54,12 @@ public class SpringFunctions {
     @JtwigFunction(name = "asset")
     public String asset (HttpServletRequest request, @Parameter String input) throws AssetResolveException, FunctionException {
         if (assetResolver == null) throw new FunctionException("In order to use the asset function, a bean of type "+AssetResolver.class.getName()+" must be configured");
-        return new File(request.getContextPath(), assetResolver.resolve(input)).getPath();
+        return new FilePath(request.getContextPath(), assetResolver.resolve(input)).toString();
     }
 
     @JtwigFunction(name = "path")
     public String path(HttpServletRequest request, @Parameter String input) {
-        return new File(request.getContextPath(), input).getPath();
+        return new FilePath(request.getContextPath(), input).toString();
     }
 
     @JtwigFunction(name = "translate", aliases = {"message", "trans"})

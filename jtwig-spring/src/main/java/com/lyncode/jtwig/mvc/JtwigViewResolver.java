@@ -21,6 +21,7 @@ import com.lyncode.jtwig.functions.parameters.resolve.api.AnnotatedMethodParamet
 import com.lyncode.jtwig.functions.parameters.resolve.api.TypeMethodParameterResolver;
 import com.lyncode.jtwig.functions.repository.FunctionResolver;
 import com.lyncode.jtwig.services.api.theme.ThemePrefixResolver;
+import com.lyncode.jtwig.util.FilePath;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.view.AbstractTemplateViewResolver;
@@ -37,7 +38,7 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
         return new ThemePrefixResolver() {
             @Override
             public String getPrefix(String prefix, String theme) {
-                return new File(prefix, theme).getPath();
+                return new FilePath(prefix, theme).toString();
             }
         };
     }

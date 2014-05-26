@@ -15,6 +15,7 @@
 package com.lyncode.jtwig.unit.resource;
 
 import com.lyncode.jtwig.resource.ClasspathJtwigResource;
+import junit.framework.Assert;
 import org.junit.Test;
 
 import static junit.framework.TestCase.assertNotNull;
@@ -30,5 +31,11 @@ public class ClasspathJtwigResourceTest {
     @Test
     public void testResolve() throws Exception {
         assertNotNull(underTest.resolve("other.twig").retrieve());
+    }
+
+    @Test
+    public void classpathPrefixRemoved() throws Exception {
+        ClasspathJtwigResource resource = new ClasspathJtwigResource("classpath:/templates/unit/sample.twig");
+        Assert.assertNotNull(resource.retrieve());
     }
 }
