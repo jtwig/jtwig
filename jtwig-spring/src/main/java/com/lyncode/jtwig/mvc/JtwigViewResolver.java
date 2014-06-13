@@ -117,7 +117,7 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
         this.encoding = encoding;
     }
 
-    JtwigConfiguration configuration() {
+    public JtwigConfiguration configuration() {
         return configuration;
     }
     FunctionResolver getFunctionResolver() {
