@@ -113,7 +113,7 @@ public class ParameterAnnotationResolver implements AnnotatedMethodParameterReso
         if (!resolvedParameter.hasValue()) return true;
         else {
             Object parameterObject = resolvedParameter.get();
-            if (type.isAssignableFrom(parameterObject.getClass()))
+            if (parameterObject != null && type.isAssignableFrom(parameterObject.getClass()))
                 return true;
             return parameterConverter.canConvert(parameterObject, type);
         }
