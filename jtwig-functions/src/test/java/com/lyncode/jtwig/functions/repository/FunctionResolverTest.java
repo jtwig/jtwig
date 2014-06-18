@@ -20,6 +20,7 @@ import com.lyncode.jtwig.functions.exceptions.FunctionNotFoundException;
 import com.lyncode.jtwig.functions.parameters.GivenParameters;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 
@@ -50,6 +51,25 @@ public class FunctionResolverTest {
         underTest.get("test", parameters("one", "two")).execute();
     }
 
+	@Test
+	public void varArgsFunctionShouldWorkWithNullArg() throws Exception {
+		TestClass test = new TestClass();
+		underTest.store(test);
+		assertEquals(1, underTest.get("varargs_test", parameters(new Object[]{null})).execute());
+		assertEquals(2, underTest.get("varargs_test", parameters(new Object[]{"foo", null})).execute());
+		assertEquals(2, underTest.get("varargs_test", parameters(new Object[]{null, "bar"})).execute());
+	}
+
+	@Test
+	public void varArgsOverloadFunctionsShouldWorkWithNullArg() throws Exception {
+		TestClass test = new TestClass();
+		underTest.store(test);
+		assertEquals("strings: 2", underTest.get("varargs_overload", parameters(new Object[]{"foo", "bar"})).execute());
+		assertEquals("ints: 2", underTest.get("varargs_overload", parameters(new Object[]{1, 2})).execute());
+		assertEquals("strings: 2", underTest.get("varargs_overload", parameters(new Object[]{"foo", null})).execute());
+		assertEquals("ints: 2", underTest.get("varargs_overload", parameters(new Object[]{42, null})).execute());
+	}
+
     private GivenParameters parameters(Object... parameters) {
         return new GivenParameters().add(parameters);
     }
@@ -63,5 +83,20 @@ public class FunctionResolverTest {
         public String test (@Parameter Object input) {
             return input.toString();
         }
+
+	    @JtwigFunction(name = "varargs_test")
+	    public int varArgsTest(@Parameter Object... args) {
+		    return args.length;
+	    }
+
+	    @JtwigFunction(name = "varargs_overload")
+	    public String varArgsOverloadWithInts(@Parameter Integer... args) {
+		    return String.format("ints: %d", args.length);
+	    }
+
+	    @JtwigFunction(name = "varargs_overload")
+	    public String varArgsOverloadWithStrings(@Parameter String... args) {
+		    return String.format("strings: %d", args.length);
+	    }
     }
 }
