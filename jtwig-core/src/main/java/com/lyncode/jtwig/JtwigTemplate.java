@@ -70,7 +70,7 @@ public class JtwigTemplate {
     }
 
     public Renderable compile() throws ParseException, CompileException {
-        JtwigParser parser = new JtwigParser();
+        JtwigParser parser = new JtwigParser(configuration.parse());
         return parser.parse(resource)
                 .compile(new CompileContext(resource, parser, configuration.compile()));
     }
