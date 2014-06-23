@@ -30,6 +30,7 @@ import static org.hamcrest.core.IsEqual.equalTo;
 @Controller
 @ComponentScan(basePackageClasses = { TestService.class })
 public class BeanResolverTest extends AbstractJtwigAcceptanceTest {
+
     @RequestMapping("/")
     public String assetAction () {
         return "beans/beans";
@@ -38,6 +39,7 @@ public class BeanResolverTest extends AbstractJtwigAcceptanceTest {
     @Test
     public void beansTest() throws Exception {
         when(serverReceivesGetRequest("/"));
-        then(theGetResult(), body(is(equalTo("TEST-TEST2"))));
+        then(theGetResult(), body(is(equalTo("TEST-TEST2-"))));
     }
+
 }
