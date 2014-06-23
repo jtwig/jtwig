@@ -28,10 +28,12 @@ import com.lyncode.jtwig.resource.ClasspathJtwigResource;
 import com.lyncode.jtwig.resource.FileJtwigResource;
 import com.lyncode.jtwig.resource.JtwigResource;
 import com.lyncode.jtwig.resource.WebJtwigResource;
+import com.lyncode.jtwig.types.Undefined;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanInitializationException;
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.servlet.view.AbstractTemplateView;
 
 import javax.servlet.*;
@@ -84,6 +86,13 @@ public class JtwigView extends AbstractTemplateView {
                 .add("beans", new BeanResolver(getApplicationContext()))
                 .add("theme", getTheme())
                 .add("request", request);
+
+        CsrfToken token = (CsrfToken) request.getAttribute(CsrfToken.class.getName());
+        if(token != null){
+            modelMap.add("csrf", token);
+        }else{
+            modelMap.add("csrf", Undefined.UNDEFINED);
+        }
 
         if (log.isDebugEnabled()) {
             log.debug("Rendering Jtwig templates [" + getUrl() + "] in JtwigView '" + getBeanName() + "'");
