@@ -18,7 +18,7 @@ import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.compile.CompileContext;
 import com.lyncode.jtwig.content.api.Compilable;
 import com.lyncode.jtwig.content.api.Renderable;
-import com.lyncode.jtwig.content.model.compilable.LoopControl;
+import com.lyncode.jtwig.content.model.compilable.For;
 import com.lyncode.jtwig.content.model.compilable.Sequence;
 import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.expressions.api.CompilableExpression;
@@ -27,7 +27,6 @@ import com.lyncode.jtwig.render.RenderContext;
 import org.junit.Test;
 
 import static java.util.Arrays.asList;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
 public class LoopControlTest {
@@ -42,7 +41,7 @@ public class LoopControlTest {
 
         CompileContext compileContext = new CompileContext(null, null, null);
 
-        LoopControl loopControl = new LoopControl("variable", toCalculate(expression)).withContent(toRender(content));
+        For loopControl = new For("variable", toCalculate(expression)).withContent(toRender(content));
         loopControl.compile(compileContext).render(renderContext);
 
         verify(content, times(2)).render(renderContext);

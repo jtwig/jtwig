@@ -22,7 +22,9 @@ import com.lyncode.jtwig.exception.RenderException;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -81,5 +83,25 @@ public class ForExpressionTest {
         value.put("three", "3");
         context.withModelAttribute("map", value);
         assertThat(template.output(context), is("one = 1|two = 2|three = 3|"));
+    }
+    
+    @Test
+    public void avoidElseOnPopulatedList () throws ParseException, CompileException, RenderException {
+        JtwigTemplate template = new JtwigTemplate("{% for value in list %}{{ value }}{% else %}nothing{% endfor %}");
+        JtwigContext context = new JtwigContext();
+        List<String> list = new ArrayList<>();
+        list.add("a");
+        list.add("b");
+        context.withModelAttribute("list", list);
+        assertThat(template.output(context), is("ab"));
+    }
+    
+    @Test
+    public void outputElseOnEmptyList () throws ParseException, CompileException, RenderException {
+        JtwigTemplate template = new JtwigTemplate("{% for value in list %}item{% else %}nothing{% endfor %}");
+        JtwigContext context = new JtwigContext();
+        List list = Collections.EMPTY_LIST;
+        context.withModelAttribute("list", list);
+        assertThat(template.output(context), is("nothing"));
     }
 }
