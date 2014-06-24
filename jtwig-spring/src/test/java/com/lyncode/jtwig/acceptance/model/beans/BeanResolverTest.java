@@ -27,7 +27,7 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 
 @Controller
-@ComponentScan(basePackageClasses = { TestService.class })
+@ComponentScan(basePackageClasses = { BeanResolverTest.class })
 public class BeanResolverTest extends AbstractJtwigAcceptanceTest {
 
     @RequestMapping("/beans")

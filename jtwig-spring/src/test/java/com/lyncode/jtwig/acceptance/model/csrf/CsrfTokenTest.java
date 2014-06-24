@@ -2,8 +2,14 @@ package com.lyncode.jtwig.acceptance.model.csrf;
 
 import com.lyncode.jtwig.acceptance.AbstractJtwigAcceptanceTest;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.security.web.csrf.CsrfToken;
+import org.springframework.security.web.csrf.DefaultCsrfToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import javax.servlet.http.HttpServletRequest;
 
 import static com.lyncode.jtwig.util.SyntacticSugar.then;
 import static com.lyncode.jtwig.util.SyntacticSugar.when;
@@ -18,10 +24,15 @@ import static org.hamcrest.core.IsEqual.equalTo;
  * Time: 10:42
  */
 @Controller
+@ComponentScan(basePackageClasses = { CsrfTokenTest.class })
 public class CsrfTokenTest extends AbstractJtwigAcceptanceTest {
+
+    @Autowired
+    HttpServletRequest request;
 
     @RequestMapping("/csrf")
     public String csrfAction() {
+        request.setAttribute(CsrfToken.class.getName(), new DefaultCsrfToken("csrfHeader", "csrfParameter", "SOME-TOKEN"));
         return "csrf/csrf";
     }
 
@@ -29,15 +40,7 @@ public class CsrfTokenTest extends AbstractJtwigAcceptanceTest {
     public void csrfTest() throws Exception {
         // the csrf processing isn't triggered in this environment somewhat
         when(serverReceivesGetRequest("/csrf"));
-        then(theGetResult(), body(is(equalTo(""))));
+        then(theGetResult(), body(is(equalTo("SOME-TOKEN-csrfParameter-csrfHeader"))));
     }
-
-    protected Class<?>[] configurationClasses () {
-        return new Class[]{
-                JtwigViewResolverConfig.class,
-                CsrfSecurityConfig.class
-        };
-    }
-
 
 }
