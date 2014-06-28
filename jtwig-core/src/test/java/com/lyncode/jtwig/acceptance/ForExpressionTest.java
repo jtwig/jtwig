@@ -104,4 +104,32 @@ public class ForExpressionTest {
         context.withModelAttribute("list", list);
         assertThat(template.output(context), is("nothing"));
     }
+    
+    @Test
+    public void outputElseOnUndefined () throws ParseException, CompileException, RenderException {
+        JtwigTemplate template = new JtwigTemplate("{% for value in var %}{{ value }}{% else %}nothing{% endfor %}");
+        JtwigContext context = new JtwigContext();
+        assertThat(template.output(context), is("nothing"));
+    }
+    
+    @Test
+    public void iterateOnSelection () throws ParseException, CompileException, RenderException {
+        JtwigTemplate template = new JtwigTemplate("{% for value in obj.getList(name) %}{{ value }}{% endfor %}");
+        JtwigContext context = new JtwigContext();
+        context.withModelAttribute("obj", new Obj());
+        context.withModelAttribute("name", "Test");
+        assertThat(template.output(context), is("ab"));
+        
+    }
+    
+    public static class Obj {
+        private final List<String> list = new ArrayList<String>(){{
+            add("a");
+            add("b");
+        }};
+
+        public List<String> getList(String name) {
+            return list;
+        }
+    }
 }

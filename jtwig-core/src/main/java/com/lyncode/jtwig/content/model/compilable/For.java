@@ -22,6 +22,7 @@ import com.lyncode.jtwig.exception.RenderException;
 import com.lyncode.jtwig.expressions.api.CompilableExpression;
 import com.lyncode.jtwig.expressions.api.Expression;
 import com.lyncode.jtwig.render.RenderContext;
+import com.lyncode.jtwig.types.Undefined;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -76,6 +77,15 @@ public class For extends Content<For> {
             try {
                 Object resolved = collection.calculate(context);
                 if(resolved == null) {
+                    renderElse(context);
+                    return;
+                }
+                
+                while(resolved instanceof Expression) {
+                    resolved = ((Expression)resolved).calculate(context);
+                }
+                if(resolved instanceof Undefined) {
+                    renderElse(context);
                     return;
                 }
                 
@@ -97,10 +107,7 @@ public class For extends Content<For> {
         protected void handleMap(Map map, RenderContext context)
                 throws RenderException {
             if(map.isEmpty()) {
-                if(elseContent != null) {
-                    elseContent.render(context);
-                }
-                return;
+                renderElse(context);
             }
             
             Loop loop = new Loop(map.size());
@@ -123,9 +130,7 @@ public class For extends Content<For> {
                 RenderContext context)
                 throws RenderException {
             if(collection.isEmpty()) {
-                if(elseContent != null) {
-                    elseContent.render(context);
-                }
+                renderElse(context);
                 return;
             }
             
@@ -139,6 +144,12 @@ public class For extends Content<For> {
                 
                 iterationContent.render(context);
                 loop.index++;
+            }
+        }
+        
+        protected void renderElse(RenderContext context) throws RenderException {
+            if(elseContent != null) {
+                elseContent.render(context);
             }
         }
     }

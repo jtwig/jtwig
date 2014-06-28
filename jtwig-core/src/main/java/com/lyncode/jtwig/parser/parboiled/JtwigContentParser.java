@@ -491,7 +491,7 @@ public class JtwigContentParser extends JtwigBaseParser<Compilable> {
                                 closeCode(),
                                 action(afterBeginTrim()),
                                 content(),
-                                action(peek(1, For.class).withContent(pop(Sequence.class))),
+                                action(peek(1, Content.class).withContent(pop(Sequence.class))),
                                 Optional(
                                         Sequence(
                                                 openCode(),
