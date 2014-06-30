@@ -118,10 +118,19 @@ public class JtwigContentParser extends JtwigBaseParser<Compilable> {
                                         basicParser.spacing(),
                                         basicParser.closeCode(),
                                         push(new Extends(basicParser.pop())),
+                                        
                                         ZeroOrMore(
                                                 basicParser.spacing(),
-                                                block(),
-                                                action(peek(1, Extends.class).add(pop(Block.class)))
+                                                FirstOf(
+                                                        Sequence(
+                                                            block(),
+                                                            action(peek(1, Extends.class).add(pop(Block.class)))
+                                                        ),
+                                                        Sequence(
+                                                            set(),
+                                                            action(peek(1, Extends.class).addTag(pop(SetVariable.class)))
+                                                        )
+                                                )
                                         ),
                                         basicParser.spacing(),
                                         EOI
