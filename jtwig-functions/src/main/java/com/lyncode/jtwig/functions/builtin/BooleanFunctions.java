@@ -17,6 +17,7 @@ package com.lyncode.jtwig.functions.builtin;
 import com.lyncode.jtwig.functions.annotations.JtwigFunction;
 import com.lyncode.jtwig.functions.annotations.Parameter;
 import com.lyncode.jtwig.functions.exceptions.FunctionException;
+import com.lyncode.jtwig.types.Undefined;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -68,7 +69,7 @@ public class BooleanFunctions { // Or Predicates
 
     @JtwigFunction(name = "null")
     public boolean isNull (@Parameter Object input) {
-        return input == null;
+        return input == null || input instanceof Undefined;
     }
 
     @JtwigFunction(name = "iterable")
