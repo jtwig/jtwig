@@ -53,7 +53,7 @@ public class JtwigTemplate {
     }
 
     public void output (OutputStream outputStream, JtwigContext context) throws ParseException, CompileException, RenderException {
-        JtwigParser parser = new JtwigParser();
+        JtwigParser parser = new JtwigParser(configuration.parse());
         CompileContext compileContext = new CompileContext(resource, parser, configuration.compile());
         RenderContext renderContext = RenderContext.create(configuration.render(), context, outputStream);
 
@@ -70,7 +70,7 @@ public class JtwigTemplate {
     }
 
     public Renderable compile() throws ParseException, CompileException {
-        JtwigParser parser = new JtwigParser();
+        JtwigParser parser = new JtwigParser(configuration.parse());
         return parser.parse(resource)
                 .compile(new CompileContext(resource, parser, configuration.compile()));
     }
