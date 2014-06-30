@@ -14,8 +14,9 @@
 
 package com.lyncode.jtwig.beans;
 
+import com.lyncode.jtwig.types.Undefined;
+import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.Collection;
 import java.util.Map;
@@ -52,46 +53,50 @@ public class BeanResolver implements Map {
 
     @Override
     public Object get(Object key) {
-        return context.getBean((String) key);
+        try {
+            return context.getBean((String) key);
+        } catch (BeansException e) {
+            return Undefined.UNDEFINED;
+        }
     }
 
     @Override
     public boolean containsValue(Object value) {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Object put(Object key, Object value) {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Object remove(Object key) {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void putAll(Map m) {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void clear() {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Set keySet() {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Collection values() {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Set<Entry> entrySet() {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 }

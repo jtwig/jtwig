@@ -12,10 +12,9 @@
  * limitations under the License.
  */
 
-package com.lyncode.jtwig.acceptance.model;
+package com.lyncode.jtwig.acceptance.model.beans;
 
 import com.lyncode.jtwig.acceptance.AbstractJtwigAcceptanceTest;
-import com.lyncode.jtwig.acceptance.model.beans.TestService;
 import org.junit.Test;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Controller;
@@ -28,16 +27,18 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 
 @Controller
-@ComponentScan(basePackageClasses = { TestService.class })
+@ComponentScan(basePackageClasses = { BeanResolverTest.class })
 public class BeanResolverTest extends AbstractJtwigAcceptanceTest {
-    @RequestMapping("/")
-    public String assetAction () {
+
+    @RequestMapping("/beans")
+    public String beansAction () {
         return "beans/beans";
     }
 
     @Test
     public void beansTest() throws Exception {
-        when(serverReceivesGetRequest("/"));
-        then(theGetResult(), body(is(equalTo("TEST-TEST2"))));
+        when(serverReceivesGetRequest("/beans"));
+        then(theGetResult(), body(is(equalTo("TEST-TEST2-"))));
     }
+
 }
