@@ -476,14 +476,14 @@ public class JtwigContentParser extends JtwigBaseParser<Compilable> {
                                                 expressionParser.identifierAsString(),
                                                 keyword(IN),
                                                 expressionParser.expression(),
-                                                push(new MapLoopControl(expressionParser.popIdentifierAsString(2),
+                                                push(new For(expressionParser.popIdentifierAsString(2),
                                                         expressionParser.popIdentifierAsString(1),
                                                         expressionParser.pop()))
                                         ),
                                         Sequence(
                                                 keyword(IN),
                                                 expressionParser.expression(),
-                                                push(new LoopControl(expressionParser.popIdentifierAsString(1),
+                                                push(new For(expressionParser.popIdentifierAsString(1),
                                                         expressionParser.pop()))
                                         )
                                 ),
@@ -492,6 +492,18 @@ public class JtwigContentParser extends JtwigBaseParser<Compilable> {
                                 action(afterBeginTrim()),
                                 content(),
                                 action(peek(1, Content.class).withContent(pop(Sequence.class))),
+                                Optional(
+                                        Sequence(
+                                                openCode(),
+                                                action(beforeEndTrim()),
+                                                keyword(ELSE),
+                                                closeCode(),
+                                                action(afterBeginTrim()),
+                                                content(),
+                                                action(peek(1, For.class).withElse(pop(Sequence.class)))
+                                        )
+                                ),
+                                
                                 openCode(),
                                 action(beforeEndTrim()),
                                 keyword(ENDFOR),
