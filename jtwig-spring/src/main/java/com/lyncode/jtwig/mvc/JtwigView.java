@@ -17,6 +17,7 @@ package com.lyncode.jtwig.mvc;
 import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.JtwigModelMap;
 import com.lyncode.jtwig.JtwigTemplate;
+import com.lyncode.jtwig.addons.AddonParser;
 import com.lyncode.jtwig.beans.BeanResolver;
 import com.lyncode.jtwig.configuration.JtwigConfiguration;
 import com.lyncode.jtwig.content.api.Renderable;
@@ -122,8 +123,15 @@ public class JtwigView extends AbstractTemplateView {
     }
 
     private Renderable getCompiledJtwigTemplate(HttpServletRequest request) throws ParseException, CompileException {
+        JtwigParser parser = jtwigParser();
+        if (getViewResolver().getAddonParsers() != null) {
+            for (Class<? extends AddonParser> addonParser : getViewResolver().getAddonParsers()) {
+                parser.withAddonParser(addonParser);
+            }
+        }
+
         return new JtwigTemplate(getResource(request))
-                .compile(jtwigParser());
+                .compile(parser);
     }
 
     private JtwigResource getResource(HttpServletRequest request) {
