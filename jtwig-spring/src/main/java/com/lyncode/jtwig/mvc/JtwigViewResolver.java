@@ -14,6 +14,7 @@
 
 package com.lyncode.jtwig.mvc;
 
+import com.lyncode.jtwig.addons.AddonParser;
 import com.lyncode.jtwig.configuration.JtwigConfiguration;
 import com.lyncode.jtwig.functions.SpringFunctions;
 import com.lyncode.jtwig.functions.parameters.resolve.HttpRequestParameterResolver;
@@ -53,6 +54,7 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
     private JtwigConfiguration configuration = new JtwigConfiguration();
     private FunctionResolver functionRepository = new FunctionResolver();
     private FunctionResolver functionResolver = null;
+    private Class<? extends AddonParser>[] addonParsers = null;
 
     public JtwigViewResolver() {
         setViewClass(requiredViewClass());
@@ -142,5 +144,13 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
     public JtwigViewResolver includeFunctions (Object functionBean) {
         functionRepository.store(functionBean);
         return this;
+    }
+
+    public Class<? extends AddonParser>[] getAddonParsers() {
+        return addonParsers;
+    }
+
+    public void setAddonParsers(Class<? extends AddonParser>[] addonParsers) {
+        this.addonParsers = addonParsers;
     }
 }
