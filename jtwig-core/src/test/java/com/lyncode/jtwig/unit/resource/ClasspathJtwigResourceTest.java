@@ -35,7 +35,7 @@ public class ClasspathJtwigResourceTest {
 
     @Test
     public void classpathPrefixRemoved() throws Exception {
-        ClasspathJtwigResource resource = new ClasspathJtwigResource("classpath:/templates/unit/sample.twig");
+        ClasspathJtwigResource resource = new ClasspathJtwigResource("classpath:/templates/../templates/unit/sample.twig");
         Assert.assertNotNull(resource.retrieve());
     }
 }
