@@ -18,6 +18,7 @@ import com.lyncode.jtwig.functions.annotations.JtwigFunction;
 import com.lyncode.jtwig.functions.annotations.Parameter;
 import com.lyncode.jtwig.functions.exceptions.FunctionNotFoundException;
 import com.lyncode.jtwig.functions.parameters.GivenParameters;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -25,7 +26,12 @@ import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 
 public class FunctionResolverTest {
-    private FunctionResolver underTest = new FunctionResolver();
+    private FunctionResolver underTest;
+
+    @Before
+    public void setUp() throws Exception {
+        underTest = new FunctionResolver();
+    }
 
     @Test(expected = FunctionNotFoundException.class)
     public void throwExceptionIfNotFound() throws Exception {
