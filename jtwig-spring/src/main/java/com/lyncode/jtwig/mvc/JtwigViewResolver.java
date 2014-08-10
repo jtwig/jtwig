@@ -16,10 +16,20 @@ package com.lyncode.jtwig.mvc;
 
 import com.lyncode.jtwig.configuration.JtwigConfiguration;
 import com.lyncode.jtwig.functions.SpringFunctions;
+import com.lyncode.jtwig.functions.parameters.convert.DemultiplexerConverter;
+import com.lyncode.jtwig.functions.parameters.convert.impl.ObjectToStringConverter;
+import com.lyncode.jtwig.functions.parameters.input.InputParameters;
 import com.lyncode.jtwig.functions.parameters.resolve.HttpRequestParameterResolver;
-import com.lyncode.jtwig.functions.parameters.resolve.api.AnnotatedMethodParameterResolver;
-import com.lyncode.jtwig.functions.parameters.resolve.api.TypeMethodParameterResolver;
-import com.lyncode.jtwig.functions.repository.FunctionResolver;
+import com.lyncode.jtwig.functions.parameters.resolve.api.InputParameterResolverFactory;
+import com.lyncode.jtwig.functions.parameters.resolve.api.ParameterResolver;
+import com.lyncode.jtwig.functions.parameters.resolve.impl.CompoundParameterResolver;
+import com.lyncode.jtwig.functions.parameters.resolve.impl.InputDelegateMethodParametersResolver;
+import com.lyncode.jtwig.functions.parameters.resolve.impl.ParameterAnnotationParameterResolver;
+import com.lyncode.jtwig.functions.repository.api.FunctionRepository;
+import com.lyncode.jtwig.functions.repository.impl.MapFunctionRepository;
+import com.lyncode.jtwig.functions.resolver.api.FunctionResolver;
+import com.lyncode.jtwig.functions.resolver.impl.CompoundFunctionResolver;
+import com.lyncode.jtwig.functions.resolver.impl.DelegateFunctionResolver;
 import com.lyncode.jtwig.services.api.theme.ThemePrefixResolver;
 import com.lyncode.jtwig.util.FilePath;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,14 +61,19 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
     private boolean cached = true;
 
     private JtwigConfiguration configuration = new JtwigConfiguration();
-    private FunctionResolver functionRepository = new FunctionResolver();
-    private FunctionResolver functionResolver = null;
+    private FunctionRepository functionRepository = new MapFunctionRepository();
+    private SpringFunctions springFunctions = null;
+    private CompoundParameterResolver parameterResolver = new CompoundParameterResolver();
+    private CompoundFunctionResolver functionResolver = new CompoundFunctionResolver()
+            .withResolver(resolver(new DemultiplexerConverter()))
+            .withResolver(resolver(new DemultiplexerConverter().withConverter(String.class, new ObjectToStringConverter())));
 
     public JtwigViewResolver() {
         setViewClass(requiredViewClass());
         setContentType("text/html; charset=UTF-8");
 
-        functionRepository.add(new HttpRequestParameterResolver());
+        parameterResolver
+                .withResolver(new HttpRequestParameterResolver());
     }
 
     @Override
@@ -109,8 +124,18 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
     public void setConcurrentMaxThreads (int value) {
         withMaxThreads(value);
     }
+
     public void setConcurrentMinThreads (int value) {
         withMinThreads(value);
+    }
+
+    public FunctionResolver functionResolver() {
+        if (springFunctions == null) {
+            springFunctions = new SpringFunctions();
+            getApplicationContext().getAutowireCapableBeanFactory().autowireBean(springFunctions);
+            functionRepository.include(springFunctions);
+        }
+        return functionResolver;
     }
 
     public void setEncoding(String encoding) {
@@ -120,27 +145,29 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
     public JtwigConfiguration configuration() {
         return configuration;
     }
-    FunctionResolver getFunctionResolver() {
-        if (functionResolver == null) {
-            SpringFunctions springFunctions = new SpringFunctions();
-            getApplicationContext().getAutowireCapableBeanFactory().autowireBean(springFunctions);
-            functionRepository.store(springFunctions);
-        }
-        return functionRepository;
-    }
 
-    public JtwigViewResolver include (TypeMethodParameterResolver resolver) {
-        functionRepository.add(resolver);
-        return this;
-    }
-
-    public JtwigViewResolver include (AnnotatedMethodParameterResolver resolver) {
-        functionRepository.add(resolver);
+    public JtwigViewResolver include (ParameterResolver resolver) {
+        parameterResolver.withResolver(resolver);
         return this;
     }
 
     public JtwigViewResolver includeFunctions (Object functionBean) {
-        functionRepository.store(functionBean);
+        functionRepository.include(functionBean);
         return this;
+    }
+
+    private InputParameterResolverFactory parameterResolverFactory(final DemultiplexerConverter converter) {
+        return new InputParameterResolverFactory() {
+            @Override
+            public ParameterResolver create(InputParameters parameters) {
+                return new CompoundParameterResolver()
+                        .withResolver(new ParameterAnnotationParameterResolver(parameters, converter))
+                        .withResolver(parameterResolver);
+            }
+        };
+    }
+
+    private DelegateFunctionResolver resolver(DemultiplexerConverter converter) {
+        return new DelegateFunctionResolver(functionRepository, new InputDelegateMethodParametersResolver(parameterResolverFactory(converter)));
     }
 }

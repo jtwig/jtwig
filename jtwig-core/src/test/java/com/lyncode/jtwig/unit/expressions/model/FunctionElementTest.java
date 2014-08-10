@@ -16,7 +16,7 @@ package com.lyncode.jtwig.unit.expressions.model;
 
 import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.expressions.model.FunctionElement;
-import com.lyncode.jtwig.functions.parameters.GivenParameters;
+import com.lyncode.jtwig.functions.parameters.input.InputParameters;
 import com.lyncode.jtwig.render.RenderContext;
 import org.junit.Test;
 
@@ -35,6 +35,6 @@ public class FunctionElementTest {
                 .compile(null)
                 .calculate(RenderContext.create(null, context, null));
 
-        verify(context).executeFunction(eq("name"), any(GivenParameters.class));
+        verify(context).executeFunction(eq("name"), any(InputParameters.class));
     }
 }

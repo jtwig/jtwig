@@ -39,7 +39,7 @@ public class Filter extends Content {
 //        content.render(local, context);
 //        CompilableExpression constant = new Constant<>(local.getOuputStream().toString());
 //
-//        this.expressions.get(0).insert(0, constant);
+//        this.expressions.retrieve(0).insert(0, constant);
 //
 //        try {
 //            renderStream.write(Iterables.getLast(this.expressions).compile(null).calculate(context).toString().getBytes());

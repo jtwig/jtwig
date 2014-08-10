@@ -21,13 +21,14 @@ import com.lyncode.jtwig.expressions.api.CompilableExpression;
 import com.lyncode.jtwig.expressions.api.Expression;
 import com.lyncode.jtwig.functions.exceptions.FunctionException;
 import com.lyncode.jtwig.functions.exceptions.FunctionNotFoundException;
-import com.lyncode.jtwig.functions.parameters.GivenParameters;
 import com.lyncode.jtwig.parser.model.JtwigPosition;
 import com.lyncode.jtwig.render.RenderContext;
 import com.lyncode.jtwig.util.ObjectExtractor;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.lyncode.jtwig.functions.parameters.input.InputParameters.parameters;
 
 public class FunctionElement extends AbstractCompilableExpression {
     private String name;
@@ -74,11 +75,8 @@ public class FunctionElement extends AbstractCompilableExpression {
         @Override
         public Object calculate(RenderContext context) throws CalculateException {
             try {
-                GivenParameters parameters = new GivenParameters()
-                        .add(calculateArguments(context));
-
                 try {
-                    return context.model().executeFunction(name, parameters);
+                    return context.model().executeFunction(name, parameters(calculateArguments(context)));
                 } catch (FunctionNotFoundException e) {
                     throw new CalculateException(position + ": " + e.getMessage(), e);
                 }

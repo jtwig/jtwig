@@ -31,7 +31,7 @@ public class Issue76Test extends AbstractJtwigTest {
             when(jtwigRenders(templateResource("templates/issue76/test1.twig")));
             fail();
         } catch (RenderException e) {
-            then(e.getCause().getMessage(), containsString("templates/issue76/test1.twig -> Line 1, column 24: Function with name 'nonExistingFunction' not found"));
+            then(e.getCause().getMessage(), containsString("templates/issue76/test1.twig -> Line 1, column 24: Unable to find function with name 'nonExistingFunction'"));
         }
     }
 

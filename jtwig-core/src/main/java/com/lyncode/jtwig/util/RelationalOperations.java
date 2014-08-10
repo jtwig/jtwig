@@ -39,7 +39,7 @@ public class RelationalOperations {
     }
 
     public static boolean eq (Object a, Object b) {
-        // Using the same behaviour for Jtwig as we get in twig
+        // Using the same behaviour for Jtwig as we retrieve in twig
         if (a == null)
             return b == null || ((b instanceof Number) && isZero((Number) b));
         if (b == null)

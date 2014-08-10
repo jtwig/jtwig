@@ -34,7 +34,7 @@ public class OperationMatchers {
 //                @Override
 //                protected boolean matchesSafely(OperationBinary item) {
 //                    if (item..getOperands().size() > index) {
-//                        return matcher.matches(item.getOperands().get(index));
+//                        return matcher.matches(item.getOperands().retrieve(index));
 //                    }
 //                    return false;
 //                }
@@ -52,7 +52,7 @@ public class OperationMatchers {
 //                @Override
 //                protected boolean matchesSafely(OperationBinary item) {
 //                    if (item.getOperators().size() > index)
-//                        return item.getOperators().get(index) == operator;
+//                        return item.getOperators().retrieve(index) == operator;
 //                    return false;
 //                }
 //
@@ -104,7 +104,7 @@ public class OperationMatchers {
 //        }
 //
 //        private Object getItem(OperationBinary item, int index) {
-//            return getOperand(item.getOperands().get(index));
+//            return getOperand(item.getOperands().retrieve(index));
 //        }
 //
 //        public OperationUnaryMatcherBuilder withOperator(final Operator operator) {

@@ -41,7 +41,7 @@ public class SetVariableTest {
 
         setVariable.compile(null).render(renderContext);
 
-        verify(context).set("hello", null);
+        verify(context).with("hello", null);
         verify(renderContext, times(0)).write(any(byte[].class));
     }
 

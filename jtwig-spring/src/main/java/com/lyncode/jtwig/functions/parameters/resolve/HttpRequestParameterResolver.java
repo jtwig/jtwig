@@ -14,28 +14,18 @@
 
 package com.lyncode.jtwig.functions.parameters.resolve;
 
-import com.lyncode.jtwig.functions.parameters.GivenParameters;
-import com.lyncode.jtwig.functions.parameters.convert.api.ParameterConverter;
-import com.lyncode.jtwig.functions.parameters.resolve.api.TypeMethodParameterResolver;
-import com.lyncode.jtwig.functions.parameters.resolve.exceptions.ResolveException;
-import com.lyncode.jtwig.functions.parameters.resolve.model.MethodParameter;
+import com.google.common.base.Optional;
+import com.lyncode.jtwig.functions.parameters.resolve.api.ParameterResolver;
+import com.lyncode.jtwig.functions.reflection.JavaMethodParameter;
 import com.lyncode.jtwig.util.LocalThreadHolder;
 
 import javax.servlet.http.HttpServletRequest;
 
-public class HttpRequestParameterResolver implements TypeMethodParameterResolver {
+public class HttpRequestParameterResolver implements ParameterResolver {
     @Override
-    public Class<?> resolveType() {
-        return HttpServletRequest.class;
-    }
-
-    @Override
-    public boolean canResolveParameter(MethodParameter javaParameter, GivenParameters templateGivenParameters, ParameterConverter converter) {
-        return javaParameter.type().equals(resolveType());
-    }
-
-    @Override
-    public Object resolveParameter(MethodParameter javaParameter, GivenParameters templateGivenParameters, ParameterConverter converter) throws ResolveException {
-        return LocalThreadHolder.getServletRequest();
+    public Optional<Value> resolve(JavaMethodParameter parameter) {
+        if (parameter.type().isAssignableFrom(HttpServletRequest.class))
+            return Optional.of(new Value(LocalThreadHolder.getServletRequest()));
+        return Optional.absent();
     }
 }

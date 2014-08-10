@@ -23,9 +23,9 @@ import com.lyncode.jtwig.expressions.api.CompilableExpression;
 import com.lyncode.jtwig.expressions.api.Expression;
 import com.lyncode.jtwig.render.RenderContext;
 import com.lyncode.jtwig.types.Undefined;
+
 import java.util.Arrays;
 import java.util.Collection;
-
 import java.util.Map;
 
 public class For extends Content<For> {
@@ -111,15 +111,15 @@ public class For extends Content<For> {
             }
             
             Loop loop = new Loop(map.size());
-            context.model().set("loop", loop);
+            context.model().with("loop", loop);
             int index = 0;
             for (Object k : map.keySet()) {
                 loop.update(index++);
 
                 if(key != null) {
-                    context.model().set(key, k);
+                    context.model().with(key, k);
                 }
-                context.model().set(value, map.get(k));
+                context.model().with(value, map.get(k));
 
                 iterationContent.render(context);
             }
@@ -135,12 +135,12 @@ public class For extends Content<For> {
             }
             
             Loop loop = new Loop(collection.size());
-            context.model().set("loop", loop);
+            context.model().with("loop", loop);
             for(Object obj : collection) {
                 if(key != null) {
-                    context.model().set(key, loop.index);
+                    context.model().with(key, loop.index);
                 }
-                context.model().set(value, obj);
+                context.model().with(value, obj);
                 
                 iterationContent.render(context);
                 loop.index++;
