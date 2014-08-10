@@ -30,8 +30,4 @@ public class Executable {
     public Object execute () throws InvocationTargetException, IllegalAccessException {
         return reference.method().invoke(reference.holder(), arguments);
     }
-
-    public Function function () {
-        return reference;
-    }
 }

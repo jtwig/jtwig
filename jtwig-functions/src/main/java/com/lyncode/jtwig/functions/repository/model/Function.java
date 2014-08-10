@@ -1,7 +1,5 @@
 package com.lyncode.jtwig.functions.repository.model;
 
-import com.lyncode.jtwig.functions.parameters.resolve.model.MethodInformation;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -14,12 +12,10 @@ public class Function implements Comparable<Function> {
 
     private final Object holder;
     private final Method method;
-    private final MethodInformation methodInformation;
 
     private Function(Object holder, Method method) {
         this.holder = holder;
         this.method = method;
-        this.methodInformation = new MethodInformation(method);
     }
 
     public Method method() {
@@ -32,11 +28,11 @@ public class Function implements Comparable<Function> {
 
     @Override
     public int compareTo(Function other) {
-        if (methodInformation.numberOfArgs() > 0 && other.methodInformation.numberOfArgs() == this.methodInformation.numberOfArgs()) {
+        if (numberOfArguments() > 0 && other.numberOfArguments() == numberOfArguments()) {
             int compareResult = 0;
-            for (int i = 0;i< methodInformation.numberOfArgs();i++) {
-                Class<?> type = this.methodInformation.getType(i);
-                Class<?> otherType = other.methodInformation.getType(i);
+            for (int i = 0;i< numberOfArguments();i++) {
+                Class<?> type = getType(i);
+                Class<?> otherType = other.getType(i);
 
                 if (type.equals(String.class) && otherType.equals(Object.class)) {
                     compareResult--;
@@ -60,7 +56,15 @@ public class Function implements Comparable<Function> {
                     compareResult--;
             }
             return compareResult;
-        } else return Integer.compare(this.methodInformation.numberOfArgs(), other.methodInformation.numberOfArgs()) * -1;
+        } else return Integer.compare(numberOfArguments(), other.numberOfArguments()) * -1;
+    }
+
+    private Class<?> getType(int i) {
+        return method.getParameterTypes()[i];
+    }
+
+    private int numberOfArguments() {
+        return method.getParameterTypes().length;
     }
 
 
