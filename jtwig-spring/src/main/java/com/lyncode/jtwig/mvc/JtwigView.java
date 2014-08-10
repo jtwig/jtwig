@@ -104,7 +104,7 @@ public class JtwigView extends AbstractTemplateView {
             response.setCharacterEncoding(this.getEncoding());
         }
 
-        JtwigContext jtwigContext = new JtwigContext(modelMap, getViewResolver().getFunctionResolver());
+        JtwigContext jtwigContext = new JtwigContext(modelMap, getViewResolver().functionResolver());
         getContent(request).render(RenderContext.create(getConfiguration().render(), jtwigContext, response.getOutputStream()));
 
         response.getOutputStream().flush();

@@ -14,9 +14,8 @@
 
 package com.lyncode.jtwig.functions.parameters.convert.api;
 
-import com.lyncode.jtwig.functions.parameters.convert.exceptions.ConvertException;
+import com.google.common.base.Optional;
 
 public interface ParameterConverter {
-    boolean canConvert (Object from, Class<?> to);
-    Object convert (Object from, Class<?> to) throws ConvertException;
+    Optional convert(Object input);
 }

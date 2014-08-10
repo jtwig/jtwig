@@ -14,10 +14,22 @@
 
 package com.lyncode.jtwig;
 
+import com.google.common.base.Optional;
 import com.lyncode.jtwig.functions.exceptions.FunctionException;
-import com.lyncode.jtwig.functions.parameters.GivenParameters;
-import com.lyncode.jtwig.functions.parameters.resolve.exceptions.ResolveException;
-import com.lyncode.jtwig.functions.repository.FunctionResolver;
+import com.lyncode.jtwig.functions.exceptions.FunctionNotFoundException;
+import com.lyncode.jtwig.functions.parameters.convert.DemultiplexerConverter;
+import com.lyncode.jtwig.functions.parameters.convert.impl.ObjectToStringConverter;
+import com.lyncode.jtwig.functions.parameters.input.InputParameters;
+import com.lyncode.jtwig.functions.parameters.resolve.api.InputParameterResolverFactory;
+import com.lyncode.jtwig.functions.parameters.resolve.api.ParameterResolver;
+import com.lyncode.jtwig.functions.parameters.resolve.impl.InputDelegateMethodParametersResolver;
+import com.lyncode.jtwig.functions.parameters.resolve.impl.ParameterAnnotationParameterResolver;
+import com.lyncode.jtwig.functions.repository.api.FunctionRepository;
+import com.lyncode.jtwig.functions.repository.impl.MapFunctionRepository;
+import com.lyncode.jtwig.functions.resolver.api.FunctionResolver;
+import com.lyncode.jtwig.functions.resolver.impl.CompoundFunctionResolver;
+import com.lyncode.jtwig.functions.resolver.impl.DelegateFunctionResolver;
+import com.lyncode.jtwig.functions.resolver.model.Executable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
@@ -32,22 +44,49 @@ public class JtwigContext {
         return new JtwigContext();
     }
 
-    private FunctionResolver functionRepository;
-    private JtwigModelMap modelMap;
+    private final JtwigModelMap modelMap;
+    private final FunctionResolver functionResolver;
 
-    public JtwigContext(JtwigModelMap modelMap, FunctionResolver functionRepository) {
-        this.functionRepository = functionRepository;
+    public JtwigContext(JtwigModelMap modelMap, FunctionRepository functionRepository) {
         this.modelMap = modelMap;
+        functionResolver = new CompoundFunctionResolver()
+            .withResolver(new DelegateFunctionResolver(functionRepository,
+                    new InputDelegateMethodParametersResolver(annotationWithoutConversion())))
+            .withResolver(new DelegateFunctionResolver(functionRepository,
+                    new InputDelegateMethodParametersResolver(annotationWithConversion())));
+    }
+
+    private InputParameterResolverFactory annotationWithoutConversion() {
+        return new InputParameterResolverFactory() {
+            @Override
+            public ParameterResolver create(InputParameters parameters) {
+                return new ParameterAnnotationParameterResolver(parameters, new DemultiplexerConverter());
+            }
+        };
+    }
+
+    private InputParameterResolverFactory annotationWithConversion() {
+        return new InputParameterResolverFactory() {
+            @Override
+            public ParameterResolver create(InputParameters parameters) {
+                return new ParameterAnnotationParameterResolver(parameters, new DemultiplexerConverter()
+                        .withConverter(String.class, new ObjectToStringConverter())
+                );
+            }
+        };
+    }
+
+    public JtwigContext(JtwigModelMap modelMap, FunctionResolver functionResolver) {
+        this.modelMap = modelMap;
+        this.functionResolver = functionResolver;
     }
 
     public JtwigContext(JtwigModelMap modelMap) {
-        this.functionRepository = new FunctionResolver();
-        this.modelMap = modelMap;
+        this(modelMap, new MapFunctionRepository());
     }
 
     public JtwigContext() {
-        this.functionRepository = new FunctionResolver();
-        this.modelMap = new JtwigModelMap();
+        this(new JtwigModelMap(), new MapFunctionRepository());
     }
 
     public JtwigContext withModelAttribute(String key, Object value) {
@@ -67,26 +106,29 @@ public class JtwigContext {
         }
     }
 
-    public void set(String key, Object value) {
-        modelMap.add(key, value);
-    }
-
-    public Object executeFunction(String name, GivenParameters parameters) throws FunctionException {
+    public Object executeFunction(String name, InputParameters parameters) throws FunctionException {
         try {
-            return functionRepository.get(name, parameters).execute();
-        } catch (InvocationTargetException | IllegalAccessException | ResolveException e) {
+            Optional<Executable> resolve = functionResolver.resolve(name, parameters);
+            if (resolve.isPresent()) return resolve.get().execute();
+            throw new FunctionNotFoundException("Unable to find function with name '"+ name +"'");
+        } catch (InvocationTargetException | IllegalAccessException e) {
             throw new FunctionException(e);
         }
     }
 
+    public JtwigContext with(String key, Object value) {
+        modelMap.add(key, value);
+        return this;
+    }
+
     public JtwigContext with(Map<Object, Object> calculate) {
         for (Map.Entry entry : calculate.entrySet()) {
-            set(entry.getKey().toString(), entry.getValue());
+            modelMap.add(entry.getKey().toString(), entry.getValue());
         }
         return this;
     }
 
     public JtwigContext clone() {
-        return new JtwigContext(modelMap.clone(), functionRepository);
+        return new JtwigContext(modelMap.clone(), functionResolver);
     }
 }

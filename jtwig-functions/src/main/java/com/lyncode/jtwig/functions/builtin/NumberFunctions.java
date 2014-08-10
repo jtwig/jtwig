@@ -74,7 +74,7 @@ public class NumberFunctions {
             throw new FunctionException("Step must not be 0");
 
         if (start > end) {
-            // negate step for reversed mode, if positive given
+            // negate step for reversed mode, if positive input
             if (step > 0) step = -step;
 
             if (step < end) throw new FunctionException("Step is too big");
