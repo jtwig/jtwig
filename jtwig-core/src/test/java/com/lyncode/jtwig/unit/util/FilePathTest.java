@@ -13,4 +13,9 @@ public class FilePathTest {
         assertThat(path("/test/test").parent().append("one").toString(), equalTo("/test/one"));
         assertThat(path("/test", "test").parent().toString(), equalTo("/test"));
     }
+
+    @Test
+    public void normalize() throws Exception {
+        assertThat(path("/test/../hello").normalize(), equalTo("/hello"));
+    }
 }

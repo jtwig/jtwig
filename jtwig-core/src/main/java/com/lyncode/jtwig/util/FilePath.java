@@ -50,4 +50,8 @@ public class FilePath {
     public String toString () {
         return file.getPath().replace('\\', '/');
     }
+
+    public String normalize() {
+        return file.toPath().normalize().toString().replace('\\', '/');
+    }
 }

@@ -41,7 +41,7 @@ public class ClasspathJtwigResource implements JtwigResource {
 
     @Override
     public JtwigResource resolve(String relativePath) throws ResourceException {
-        return new ClasspathJtwigResource(parentOf(resource).append(relativePath).toString());
+        return new ClasspathJtwigResource(parentOf(resource).append(relativePath).normalize());
     }
 
     @Override
