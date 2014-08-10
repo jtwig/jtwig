@@ -133,7 +133,7 @@ public class JtwigView extends AbstractTemplateView {
         else if (prefix.startsWith("file://"))
             return new FileJtwigResource(getUrl());
         else
-            return new WebJtwigResource(request.getSession().getServletContext(), getUrl());
+            return new WebJtwigResource(getServletContext(), getUrl());
     }
 
     private JtwigParser jtwigParser() {
