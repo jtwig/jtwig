@@ -20,6 +20,7 @@ public class ParserConfiguration {
     }
 
     private TagSymbols symbols = TagSymbols.DEFAULT;
+    private AddonParserList parserList = new AddonParserList();
 
     public ParserConfiguration withSymbols (TagSymbols symbols) {
         this.symbols = symbols;
@@ -45,4 +46,7 @@ public class ParserConfiguration {
         return symbols.endComment();
     }
 
+    public AddonParserList addons() {
+        return parserList;
+    }
 }
