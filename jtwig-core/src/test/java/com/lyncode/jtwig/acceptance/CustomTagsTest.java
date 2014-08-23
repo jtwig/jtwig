@@ -16,7 +16,7 @@ package com.lyncode.jtwig.acceptance;
 
 import org.junit.Test;
 
-import static com.lyncode.jtwig.parser.config.TagSymbols.JAVASCRIPT;
+import static com.lyncode.jtwig.parser.config.TagSymbols.JAVASCRIPT_COLLISION_FREE;
 import static com.lyncode.jtwig.util.SyntacticSugar.after;
 import static com.lyncode.jtwig.util.SyntacticSugar.given;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -26,7 +26,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class CustomTagsTest extends AbstractJtwigTest {
     @Test
     public void javascriptOutputTag() throws Exception {
-        given(theConfiguration().parse().withSymbols(JAVASCRIPT));
+        given(theConfiguration().parse().withSymbols(JAVASCRIPT_COLLISION_FREE));
 
         after(jtwigRenders(template("@> 1 <@")));
         assertThat(theRenderedTemplate(), is(equalTo("1")));
@@ -34,7 +34,7 @@ public class CustomTagsTest extends AbstractJtwigTest {
 
     @Test
     public void javascriptCodeTag() throws Exception {
-        given(theConfiguration().parse().withSymbols(JAVASCRIPT));
+        given(theConfiguration().parse().withSymbols(JAVASCRIPT_COLLISION_FREE));
 
         after(jtwigRenders(template("<# if (true) #>Hello<# endif #>")));
         assertThat(theRenderedTemplate(), is(equalTo("Hello")));
@@ -42,7 +42,7 @@ public class CustomTagsTest extends AbstractJtwigTest {
 
     @Test
     public void javascriptComment() throws Exception {
-        given(theConfiguration().parse().withSymbols(JAVASCRIPT));
+        given(theConfiguration().parse().withSymbols(JAVASCRIPT_COLLISION_FREE));
 
         after(jtwigRenders(template("<$ if (true) #>Hello<# endif $>")));
         assertThat(theRenderedTemplate(), is(equalTo("")));
