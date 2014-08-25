@@ -16,19 +16,40 @@
 package com.lyncode.jtwig.addons.concurrent;
 
 import com.lyncode.jtwig.addons.Addon;
+import com.lyncode.jtwig.addons.AddonModel;
 import com.lyncode.jtwig.compile.CompileContext;
 import com.lyncode.jtwig.content.api.Renderable;
 import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.RenderException;
+import com.lyncode.jtwig.parser.config.ParserConfiguration;
 import com.lyncode.jtwig.render.RenderContext;
+import com.lyncode.jtwig.resource.JtwigResource;
 
 import java.io.IOException;
 
-public class Concurrent extends Addon {
+public class ConcurrentAddon extends Addon {
+    public ConcurrentAddon(JtwigResource resource, ParserConfiguration configuration) {
+        super(resource, configuration);
+    }
 
     @Override
-    public Renderable compile(CompileContext context) throws CompileException {
-        return new Compiled(super.compile(context));
+    public AddonModel instance() {
+        return new AddonModel() {
+            @Override
+            public Renderable compile(CompileContext context) throws CompileException {
+                return new Compiled(super.compile(context));
+            }
+        };
+    }
+
+    @Override
+    public String beginKeyword() {
+        return "concurrent";
+    }
+
+    @Override
+    public String endKeyword() {
+        return "endconcurrent";
     }
 
     private static class Compiled implements Renderable {

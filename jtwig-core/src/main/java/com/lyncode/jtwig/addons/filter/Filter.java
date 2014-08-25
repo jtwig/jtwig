@@ -14,7 +14,7 @@
 
 package com.lyncode.jtwig.addons.filter;
 
-import com.lyncode.jtwig.addons.Addon;
+import com.lyncode.jtwig.addons.AddonModel;
 import com.lyncode.jtwig.compile.CompileContext;
 import com.lyncode.jtwig.content.api.Renderable;
 import com.lyncode.jtwig.exception.CalculateException;
@@ -33,7 +33,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-public class Filter extends Addon {
+public class Filter extends AddonModel {
     private CompilableExpression expression;
 
     public Filter(CompilableExpression expression) {

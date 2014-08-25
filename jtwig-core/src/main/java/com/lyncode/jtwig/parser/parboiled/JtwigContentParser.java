@@ -15,7 +15,7 @@
 package com.lyncode.jtwig.parser.parboiled;
 
 import com.lyncode.jtwig.addons.Addon;
-import com.lyncode.jtwig.addons.AddonParser;
+import com.lyncode.jtwig.addons.AddonModel;
 import com.lyncode.jtwig.content.api.Compilable;
 import com.lyncode.jtwig.content.api.Tag;
 import com.lyncode.jtwig.content.model.compilable.*;
@@ -49,7 +49,7 @@ public class JtwigContentParser extends JtwigBaseParser<Compilable> {
     public static JtwigContentParser newParser(
             JtwigResource resource,
             ParserConfiguration configuration,
-            List<Class<? extends AddonParser>> contentAddons
+            List<Class<? extends Addon>> contentAddons
 
     ) {
         return createParser(JtwigContentParser.class, resource, configuration, contentAddons);
@@ -78,7 +78,7 @@ public class JtwigContentParser extends JtwigBaseParser<Compilable> {
     final JtwigExpressionParser expressionParser;
     final JtwigTagPropertyParser tagPropertyParser;
 
-    AddonParser[] contentAddonParsers;
+    Addon[] contentAddons;
     List<Class<? extends BaseParser>> contentAddons;
     ParserConfiguration configuration;
 
@@ -91,10 +91,10 @@ public class JtwigContentParser extends JtwigBaseParser<Compilable> {
         this.contentAddons = contentAddons;
         this.configuration = configuration;
 
-        contentAddonParsers = new AddonParser[contentAddons.size()];
+        this.contentAddons = new Addon[contentAddons.size()];
 
         for (int i = 0; i < contentAddons.size(); i++) {
-            contentAddonParsers[i] = (AddonParser) createParser(contentAddons.get(i), resource, configuration);
+            this.contentAddons[i] = (Addon) createParser(contentAddons.get(i), resource, configuration);
         }
     }
 
@@ -182,38 +182,38 @@ public class JtwigContentParser extends JtwigBaseParser<Compilable> {
     }
 
     Rule keywordsContent() {
-        if (contentAddonParsers.length == 0) {
+        if (contentAddons.length == 0) {
             return Test(false);
         }
-        Rule[] rules = new Rule[contentAddonParsers.length];
-        for (int i = 0; i < contentAddonParsers.length; i++) {
+        Rule[] rules = new Rule[contentAddons.length];
+        for (int i = 0; i < contentAddons.length; i++) {
             rules[i] = FirstOf(
-                    basicParser.terminal(contentAddonParsers[i].beginKeyword()),
-                    basicParser.terminal(contentAddonParsers[i].endKeyword())
+                    basicParser.terminal(contentAddons[i].beginKeyword()),
+                    basicParser.terminal(contentAddons[i].endKeyword())
             );
         }
         return FirstOf(rules);
     }
 
     Rule contentParsers() {
-        if (contentAddonParsers.length == 0) {
+        if (contentAddons.length == 0) {
             return Test(false);
         }
-        Rule[] rules = new Rule[contentAddonParsers.length];
-        for (int i = 0; i < contentAddonParsers.length; i++) {
-            rules[i] = contentAddon(contentAddonParsers[i]);
+        Rule[] rules = new Rule[contentAddons.length];
+        for (int i = 0; i < contentAddons.length; i++) {
+            rules[i] = contentAddon(contentAddons[i]);
         }
         return FirstOf(rules);
     }
 
-    Rule contentAddon(AddonParser parser) {
+    Rule contentAddon(Addon parser) {
         return Sequence(
                 openCode(),
                 basicParser.terminal(parser.beginKeyword()),
                 basicParser.spacing(),
                 parser.startRule(),
                 mandatory(
-                        Test(instanceOf(Addon.class).matches(peek())),
+                        Test(instanceOf(AddonModel.class).matches(peek())),
                         new ParseException(
                                 "Addon parser not pushing a JtwigContentAddon object to the top of the stack")
                 ),
@@ -223,7 +223,7 @@ public class JtwigContentParser extends JtwigBaseParser<Compilable> {
                                 closeCode(),
                                 action(afterBeginTrim()),
                                 content(),
-                                action(peek(1, Addon.class).withContent(pop(Sequence.class))),
+                                action(peek(1, AddonModel.class).withContent(pop(Sequence.class))),
                                 openCode(),
                                 basicParser.terminal(parser.endKeyword()),
                                 basicParser.spacing(),

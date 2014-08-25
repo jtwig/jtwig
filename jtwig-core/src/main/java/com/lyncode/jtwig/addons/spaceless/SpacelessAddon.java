@@ -15,12 +15,12 @@
 package com.lyncode.jtwig.addons.spaceless;
 
 import com.google.common.base.Function;
-import com.lyncode.jtwig.addons.tag.TagParser;
+import com.lyncode.jtwig.addons.tag.TagAddon;
 import com.lyncode.jtwig.parser.config.ParserConfiguration;
 import com.lyncode.jtwig.resource.JtwigResource;
 
-public class SpacelessParser extends TagParser {
-    public SpacelessParser(JtwigResource resource, ParserConfiguration configuration) {
+public class SpacelessAddon extends TagAddon {
+    public SpacelessAddon(JtwigResource resource, ParserConfiguration configuration) {
         super(resource, configuration);
     }
 

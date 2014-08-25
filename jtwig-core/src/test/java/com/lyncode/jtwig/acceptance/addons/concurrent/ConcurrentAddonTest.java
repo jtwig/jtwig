@@ -26,7 +26,7 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-public class ConcurrentTest extends AbstractAddonTest {
+public class ConcurrentAddonTest extends AbstractAddonTest {
 
     @Test
     public void concurrentWithStaticContent() throws Exception {

@@ -14,10 +14,10 @@
 
 package com.lyncode.jtwig.parser;
 
-import com.lyncode.jtwig.addons.AddonParser;
-import com.lyncode.jtwig.addons.concurrent.ConcurrentParser;
-import com.lyncode.jtwig.addons.filter.FilterParser;
-import com.lyncode.jtwig.addons.spaceless.SpacelessParser;
+import com.lyncode.jtwig.addons.Addon;
+import com.lyncode.jtwig.addons.concurrent.ConcurrentAddon;
+import com.lyncode.jtwig.addons.filter.FilterAddon;
+import com.lyncode.jtwig.addons.spaceless.SpacelessAddon;
 import com.lyncode.jtwig.compile.CompileContext;
 import com.lyncode.jtwig.content.api.Compilable;
 import com.lyncode.jtwig.content.api.Renderable;
@@ -35,15 +35,15 @@ import java.util.List;
 
 public class JtwigParser {
     private final ParserConfiguration configuration;
-    private final List<Class<? extends AddonParser>> addons = new ArrayList<>();
+    private final List<Class<? extends Addon>> addons = new ArrayList<>();
 
     public JtwigParser(ParserConfiguration configuration) {
         this.configuration = configuration;
 
         this
-                .withAddonParser(SpacelessParser.class)
-                .withAddonParser(FilterParser.class)
-                .withAddonParser(ConcurrentParser.class)
+                .withAddonParser(SpacelessAddon.class)
+                .withAddonParser(FilterAddon.class)
+                .withAddonParser(ConcurrentAddon.class)
         ;
     }
 
@@ -51,7 +51,7 @@ public class JtwigParser {
         this(new ParserConfiguration());
     }
 
-    public JtwigParser withAddonParser(Class<? extends AddonParser> addonParser) {
+    public JtwigParser withAddonParser(Class<? extends Addon> addonParser) {
         this.addons.add(addonParser);
         return this;
     }
