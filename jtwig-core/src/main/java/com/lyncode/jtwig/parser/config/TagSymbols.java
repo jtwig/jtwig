@@ -16,7 +16,7 @@ package com.lyncode.jtwig.parser.config;
 
 public enum TagSymbols {
     DEFAULT("{%", "%}", "{{", "}}", "{#", "#}"),
-    JAVASCRIPT("<#","#>","@>","<@", "<$","$>");
+    JAVASCRIPT_COLLISION_FREE("<#","#>","@>","<@", "<$","$>");
 
     private final String beginOutput;
     private final String endOutput;
