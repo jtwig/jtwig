@@ -14,19 +14,26 @@
 
 package com.lyncode.jtwig.addons.spaceless;
 
-import com.lyncode.jtwig.addons.Addon;
-import com.lyncode.jtwig.addons.AddonParser;
+import com.google.common.base.Function;
+import com.lyncode.jtwig.addons.tag.TagParser;
 import com.lyncode.jtwig.parser.config.ParserConfiguration;
 import com.lyncode.jtwig.resource.JtwigResource;
 
-public class SpacelessParser extends AddonParser {
+public class SpacelessParser extends TagParser {
     public SpacelessParser(JtwigResource resource, ParserConfiguration configuration) {
         super(resource, configuration);
     }
 
     @Override
-    public Addon instance() {
-        return new Spaceless();
+    protected Function<String, String> transformation() {
+        return new Function<String, String>() {
+            @Override
+            public String apply(String input) {
+                return input
+                        .replaceAll("\\s+<", "<")
+                        .replaceAll(">\\s+", ">");
+            }
+        };
     }
 
     @Override
