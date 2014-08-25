@@ -37,6 +37,15 @@ public class SetVariable extends AbstractElement {
         return new Compiled(variable, assignment.compile(context));
     }
 
+    public String getVariable() {
+        return variable;
+    }
+
+    @Override
+    public String toString() {
+        return variable;
+    }
+
     private static class Compiled implements Renderable {
         private final String variable;
         private final Expression assignment;
