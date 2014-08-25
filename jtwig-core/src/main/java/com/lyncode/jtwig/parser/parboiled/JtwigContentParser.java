@@ -14,6 +14,8 @@
 
 package com.lyncode.jtwig.parser.parboiled;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Collections2;
 import com.lyncode.jtwig.addons.Addon;
 import com.lyncode.jtwig.addons.AddonParser;
 import com.lyncode.jtwig.content.api.Compilable;
@@ -35,8 +37,9 @@ import org.parboiled.errors.ParserRuntimeException;
 import org.parboiled.parserunners.ReportingParseRunner;
 import org.parboiled.support.ParsingResult;
 
+import javax.annotation.Nullable;
 import java.nio.charset.Charset;
-import java.util.List;
+import java.util.Collection;
 
 import static com.lyncode.jtwig.parser.model.JtwigKeyword.*;
 import static com.lyncode.jtwig.parser.model.JtwigSymbol.ATTR;
@@ -48,11 +51,9 @@ import static org.parboiled.Parboiled.createParser;
 public class JtwigContentParser extends JtwigBaseParser<Compilable> {
     public static JtwigContentParser newParser(
             JtwigResource resource,
-            ParserConfiguration configuration,
-            List<Class<? extends AddonParser>> contentAddons
-
+            ParserConfiguration configuration
     ) {
-        return createParser(JtwigContentParser.class, resource, configuration, contentAddons);
+        return createParser(JtwigContentParser.class, resource, configuration);
     }
 
     public static Compilable parse(JtwigContentParser parser, JtwigResource input) throws ParseException {
@@ -79,23 +80,34 @@ public class JtwigContentParser extends JtwigBaseParser<Compilable> {
     final JtwigTagPropertyParser tagPropertyParser;
 
     AddonParser[] contentAddonParsers;
-    List<Class<? extends BaseParser>> contentAddons;
+    Collection<Class<? extends BaseParser>> contentAddons;
     ParserConfiguration configuration;
 
-    public JtwigContentParser(JtwigResource resource, ParserConfiguration configuration, List<Class<? extends BaseParser>> contentAddons) {
+    public JtwigContentParser(JtwigResource resource, ParserConfiguration configuration) {
         super(resource);
         basicParser = createParser(JtwigBasicParser.class, configuration);
         tagPropertyParser = createParser(JtwigTagPropertyParser.class, configuration);
         expressionParser = createParser(JtwigExpressionParser.class, resource, configuration);
 
-        this.contentAddons = contentAddons;
+        this.contentAddons = Collections2.transform(configuration.addons().list(), toBaseParser());
         this.configuration = configuration;
 
         contentAddonParsers = new AddonParser[contentAddons.size()];
 
-        for (int i = 0; i < contentAddons.size(); i++) {
-            contentAddonParsers[i] = (AddonParser) createParser(contentAddons.get(i), resource, configuration);
+        int i = 0;
+        for (Class<? extends BaseParser> contentAddon : contentAddons) {
+            contentAddonParsers[i++] = (AddonParser) createParser(contentAddon, resource, configuration);
         }
+    }
+
+    private Function<Class<? extends AddonParser>, Class<? extends BaseParser>> toBaseParser() {
+        return new Function<Class<? extends AddonParser>, Class<? extends BaseParser>>() {
+            @Nullable
+            @Override
+            public Class<? extends BaseParser> apply(@Nullable Class<? extends AddonParser> input) {
+                return input;
+            }
+        };
     }
 
     public Rule start() {

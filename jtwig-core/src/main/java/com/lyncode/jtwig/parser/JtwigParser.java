@@ -14,10 +14,6 @@
 
 package com.lyncode.jtwig.parser;
 
-import com.lyncode.jtwig.addons.AddonParser;
-import com.lyncode.jtwig.addons.concurrent.ConcurrentParser;
-import com.lyncode.jtwig.addons.filter.FilterParser;
-import com.lyncode.jtwig.addons.spaceless.SpacelessParser;
 import com.lyncode.jtwig.compile.CompileContext;
 import com.lyncode.jtwig.content.api.Compilable;
 import com.lyncode.jtwig.content.api.Renderable;
@@ -30,35 +26,21 @@ import com.lyncode.jtwig.render.RenderContext;
 import com.lyncode.jtwig.resource.JtwigResource;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class JtwigParser {
     private final ParserConfiguration configuration;
-    private final List<Class<? extends AddonParser>> addons = new ArrayList<>();
 
     public JtwigParser(ParserConfiguration configuration) {
         this.configuration = configuration;
-
-        this
-                .withAddonParser(SpacelessParser.class)
-                .withAddonParser(FilterParser.class)
-                .withAddonParser(ConcurrentParser.class)
-        ;
     }
 
     public JtwigParser() {
         this(new ParserConfiguration());
     }
 
-    public JtwigParser withAddonParser(Class<? extends AddonParser> addonParser) {
-        this.addons.add(addonParser);
-        return this;
-    }
-
     public Compilable parse(JtwigResource resource) throws ParseException {
         JtwigContentParser parser = JtwigContentParser
-                .newParser(resource, configuration, addons);
+                .newParser(resource, configuration);
 
         return new Document(JtwigContentParser.parse(parser, resource));
     }
