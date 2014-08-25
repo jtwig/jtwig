@@ -37,12 +37,8 @@ public class SpacelessAddon extends TagAddon {
     }
 
     @Override
-    public String beginKeyword() {
+    protected String keyword() {
         return "spaceless";
     }
 
-    @Override
-    public String endKeyword() {
-        return "endspaceless";
-    }
 }

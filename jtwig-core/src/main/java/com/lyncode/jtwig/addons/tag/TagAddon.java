@@ -17,4 +17,15 @@ public abstract class TagAddon extends Addon {
     }
 
     protected abstract Function<String,String> transformation();
+    protected abstract String keyword ();
+
+    @Override
+    public String beginKeyword() {
+        return keyword();
+    }
+
+    @Override
+    public String endKeyword() {
+        return "end"+keyword();
+    }
 }
