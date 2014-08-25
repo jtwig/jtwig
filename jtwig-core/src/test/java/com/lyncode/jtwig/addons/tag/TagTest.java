@@ -22,9 +22,9 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-public class TagAddonTest {
+public class TagTest {
     private Function<String, String> transformation = mock(Function.class);
-    private TagAddon underTest = new TagAddon(transformation);
+    private Tag underTest = new Tag(transformation);
     private CompileContext compileContext;
     private ByteArrayOutputStream output;
     private RenderContext renderContext;

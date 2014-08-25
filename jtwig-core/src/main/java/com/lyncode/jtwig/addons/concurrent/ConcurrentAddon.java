@@ -1,4 +1,5 @@
 /**
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,37 +13,31 @@
  * limitations under the License.
  */
 
-package com.lyncode.jtwig.addons.spaceless;
+package com.lyncode.jtwig.addons.concurrent;
 
-import com.google.common.base.Function;
-import com.lyncode.jtwig.addons.tag.TagParser;
+import com.lyncode.jtwig.addons.Addon;
+import com.lyncode.jtwig.addons.AddonModel;
 import com.lyncode.jtwig.parser.config.ParserConfiguration;
 import com.lyncode.jtwig.resource.JtwigResource;
 
-public class SpacelessParser extends TagParser {
-    public SpacelessParser(JtwigResource resource, ParserConfiguration configuration) {
+public class ConcurrentAddon extends Addon {
+
+    public ConcurrentAddon(JtwigResource resource, ParserConfiguration configuration) {
         super(resource, configuration);
     }
 
     @Override
-    protected Function<String, String> transformation() {
-        return new Function<String, String>() {
-            @Override
-            public String apply(String input) {
-                return input
-                        .replaceAll("\\s+<", "<")
-                        .replaceAll(">\\s+", ">");
-            }
-        };
+    public AddonModel instance() {
+        return new Concurrent();
     }
 
     @Override
     public String beginKeyword() {
-        return "spaceless";
+        return "concurrent";
     }
 
     @Override
     public String endKeyword() {
-        return "endspaceless";
+        return "endconcurrent";
     }
 }
