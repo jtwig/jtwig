@@ -37,13 +37,13 @@ public class Extends extends AbstractElement {
     public Renderable compile(CompileContext context) throws CompileException {
         try {
             JtwigResource extendResource = context.retrieve(relativePath);
-            context = context.clone().withResource(extendResource);
+            CompileContext newContext = context.clone().withResource(extendResource);
 
             for (Block block : blocks)
-                context.withReplacement(block.name(), block.compile(context));
+                newContext.withReplacement(block.name(), block.compile(context));
 
-            Compilable parsed = context.parse(extendResource);
-            return parsed.compile(context);
+            Compilable parsed = newContext.parse(extendResource);
+            return parsed.compile(newContext);
         } catch (ResourceException | ParseException e) {
             throw new CompileException(e);
         }
