@@ -2,47 +2,30 @@ package com.lyncode.jtwig.addons.tag;
 
 import com.google.common.base.Function;
 import com.lyncode.jtwig.addons.Addon;
-import com.lyncode.jtwig.compile.CompileContext;
-import com.lyncode.jtwig.content.api.Renderable;
-import com.lyncode.jtwig.exception.CompileException;
-import com.lyncode.jtwig.exception.RenderException;
-import com.lyncode.jtwig.render.RenderContext;
+import com.lyncode.jtwig.addons.AddonModel;
+import com.lyncode.jtwig.parser.config.ParserConfiguration;
+import com.lyncode.jtwig.resource.JtwigResource;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-
-public class TagAddon extends Addon {
-    private final Function<String,String> transformation;
-
-    public TagAddon(Function<String, String> transformation) {
-        this.transformation = transformation;
+public abstract class TagAddon extends Addon {
+    public TagAddon(JtwigResource resource, ParserConfiguration configuration) {
+        super(resource, configuration);
     }
 
     @Override
-    public Renderable compile(CompileContext context) throws CompileException {
-        return new Compiled(super.compile(context), transformation);
+    public AddonModel instance() {
+        return new Tag(transformation());
     }
 
+    protected abstract Function<String,String> transformation();
+    protected abstract String keyword ();
 
-    private static class Compiled implements Renderable {
-        private final Renderable content;
-        private final Function<String, String> transformation;
+    @Override
+    public String beginKeyword() {
+        return keyword();
+    }
 
-        private Compiled(Renderable content, Function<String, String> transformation) {
-            this.content = content;
-            this.transformation = transformation;
-        }
-
-        @Override
-        public void render(RenderContext context) throws RenderException {
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            content.render(context.newRenderContext(outputStream));
-            String result = this.transformation.apply(outputStream.toString());
-            try {
-                context.write(result.getBytes());
-            } catch (IOException e) {
-                throw new RenderException(e);
-            }
-        }
+    @Override
+    public String endKeyword() {
+        return "end"+keyword();
     }
 }

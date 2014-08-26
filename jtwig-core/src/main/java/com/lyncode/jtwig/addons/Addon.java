@@ -14,7 +14,44 @@
 
 package com.lyncode.jtwig.addons;
 
-import com.lyncode.jtwig.content.model.compilable.Content;
+import com.lyncode.jtwig.parser.config.ParserConfiguration;
+import com.lyncode.jtwig.parser.parboiled.JtwigBaseParser;
+import com.lyncode.jtwig.parser.parboiled.JtwigBasicParser;
+import com.lyncode.jtwig.parser.parboiled.JtwigExpressionParser;
+import com.lyncode.jtwig.parser.parboiled.JtwigTagPropertyParser;
+import com.lyncode.jtwig.resource.JtwigResource;
+import org.parboiled.Parboiled;
+import org.parboiled.Rule;
 
-public abstract class Addon extends Content {
+public abstract class Addon extends JtwigBaseParser<AddonModel> {
+    final JtwigBasicParser basicParser;
+    final JtwigExpressionParser expressionParser;
+    final JtwigTagPropertyParser tagPropertyParser;
+
+    public Addon(JtwigResource resource, ParserConfiguration configuration) {
+        super(resource);
+        basicParser = Parboiled.createParser(JtwigBasicParser.class, configuration);
+        expressionParser = Parboiled.createParser(JtwigExpressionParser.class, resource, configuration);
+        tagPropertyParser = Parboiled.createParser(JtwigTagPropertyParser.class, configuration);
+    }
+
+    public JtwigBasicParser basicParser() {
+        return basicParser;
+    }
+
+    public JtwigExpressionParser expressionParser() {
+        return expressionParser;
+    }
+
+    public JtwigTagPropertyParser tagPropertyParser() {
+        return tagPropertyParser;
+    }
+
+    public Rule startRule() {
+        return Optional(push(instance()));
+    }
+
+    public abstract AddonModel instance ();
+    public abstract String beginKeyword ();
+    public abstract String endKeyword ();
 }

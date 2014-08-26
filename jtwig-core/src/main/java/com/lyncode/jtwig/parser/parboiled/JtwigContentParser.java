@@ -17,7 +17,7 @@ package com.lyncode.jtwig.parser.parboiled;
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
 import com.lyncode.jtwig.addons.Addon;
-import com.lyncode.jtwig.addons.AddonParser;
+import com.lyncode.jtwig.addons.AddonModel;
 import com.lyncode.jtwig.content.api.Compilable;
 import com.lyncode.jtwig.content.api.Tag;
 import com.lyncode.jtwig.content.model.compilable.*;
@@ -79,7 +79,7 @@ public class JtwigContentParser extends JtwigBaseParser<Compilable> {
     final JtwigExpressionParser expressionParser;
     final JtwigTagPropertyParser tagPropertyParser;
 
-    AddonParser[] contentAddonParsers;
+    Addon[] contentAddonParsers;
     Collection<Class<? extends BaseParser>> contentAddons;
     ParserConfiguration configuration;
 
@@ -92,19 +92,19 @@ public class JtwigContentParser extends JtwigBaseParser<Compilable> {
         this.contentAddons = Collections2.transform(configuration.addons().list(), toBaseParser());
         this.configuration = configuration;
 
-        contentAddonParsers = new AddonParser[contentAddons.size()];
+        contentAddonParsers = new Addon[contentAddons.size()];
 
         int i = 0;
         for (Class<? extends BaseParser> contentAddon : contentAddons) {
-            contentAddonParsers[i++] = (AddonParser) createParser(contentAddon, resource, configuration);
+            contentAddonParsers[i++] = (Addon) createParser(contentAddon, resource, configuration);
         }
     }
 
-    private Function<Class<? extends AddonParser>, Class<? extends BaseParser>> toBaseParser() {
-        return new Function<Class<? extends AddonParser>, Class<? extends BaseParser>>() {
+    private Function<Class<? extends Addon>, Class<? extends BaseParser>> toBaseParser() {
+        return new Function<Class<? extends Addon>, Class<? extends BaseParser>>() {
             @Nullable
             @Override
-            public Class<? extends BaseParser> apply(@Nullable Class<? extends AddonParser> input) {
+            public Class<? extends BaseParser> apply(@Nullable Class<? extends Addon> input) {
                 return input;
             }
         };
@@ -218,14 +218,14 @@ public class JtwigContentParser extends JtwigBaseParser<Compilable> {
         return FirstOf(rules);
     }
 
-    Rule contentAddon(AddonParser parser) {
+    Rule contentAddon(Addon parser) {
         return Sequence(
                 openCode(),
                 basicParser.terminal(parser.beginKeyword()),
                 basicParser.spacing(),
                 parser.startRule(),
                 mandatory(
-                        Test(instanceOf(Addon.class).matches(peek())),
+                        Test(instanceOf(AddonModel.class).matches(peek())),
                         new ParseException(
                                 "Addon parser not pushing a JtwigContentAddon object to the top of the stack")
                 ),
@@ -235,7 +235,7 @@ public class JtwigContentParser extends JtwigBaseParser<Compilable> {
                                 closeCode(),
                                 action(afterBeginTrim()),
                                 content(),
-                                action(peek(1, Addon.class).withContent(pop(Sequence.class))),
+                                action(peek(1, AddonModel.class).withContent(pop(Sequence.class))),
                                 openCode(),
                                 basicParser.terminal(parser.endKeyword()),
                                 basicParser.spacing(),

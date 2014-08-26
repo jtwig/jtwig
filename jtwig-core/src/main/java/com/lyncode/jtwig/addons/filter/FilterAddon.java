@@ -15,20 +15,20 @@
 package com.lyncode.jtwig.addons.filter;
 
 import com.lyncode.jtwig.addons.Addon;
-import com.lyncode.jtwig.addons.AddonParser;
+import com.lyncode.jtwig.addons.AddonModel;
 import com.lyncode.jtwig.exception.ParseException;
 import com.lyncode.jtwig.expressions.model.Operator;
 import com.lyncode.jtwig.parser.config.ParserConfiguration;
 import com.lyncode.jtwig.resource.JtwigResource;
 import org.parboiled.Rule;
 
-public class FilterParser extends AddonParser {
-    public FilterParser(JtwigResource resource, ParserConfiguration configuration) {
+public class FilterAddon extends Addon {
+    public FilterAddon(JtwigResource resource, ParserConfiguration configuration) {
         super(resource, configuration);
     }
 
     @Override
-    public Addon instance() {
+    public AddonModel instance() {
         return null;
     }
 

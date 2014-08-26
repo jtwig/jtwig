@@ -15,7 +15,7 @@
 
 package com.lyncode.jtwig.addons.concurrent;
 
-import com.lyncode.jtwig.addons.Addon;
+import com.lyncode.jtwig.addons.AddonModel;
 import com.lyncode.jtwig.compile.CompileContext;
 import com.lyncode.jtwig.content.api.Renderable;
 import com.lyncode.jtwig.exception.CompileException;
@@ -24,7 +24,7 @@ import com.lyncode.jtwig.render.RenderContext;
 
 import java.io.IOException;
 
-public class Concurrent extends Addon {
+public class Concurrent extends AddonModel {
 
     @Override
     public Renderable compile(CompileContext context) throws CompileException {
