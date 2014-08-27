@@ -34,6 +34,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.security.web.csrf.CsrfToken;
+import org.springframework.ui.context.Theme;
 import org.springframework.web.servlet.view.AbstractTemplateView;
 
 import javax.servlet.*;
@@ -44,6 +45,8 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.springframework.web.servlet.support.RequestContextUtils.getTheme;
+
 public class JtwigView extends AbstractTemplateView {
 
     private static Logger log = LogManager.getLogger(JtwigView.class);
@@ -52,10 +55,6 @@ public class JtwigView extends AbstractTemplateView {
 
     protected String getEncoding() {
         return getViewResolver().getEncoding();
-    }
-
-    protected String getTheme() {
-        return getViewResolver().getTheme();
     }
 
     protected JtwigConfiguration getConfiguration() {
@@ -84,7 +83,7 @@ public class JtwigView extends AbstractTemplateView {
         JtwigModelMap modelMap = new JtwigModelMap()
                 .add(model)
                 .add("beans", new BeanResolver(getApplicationContext()))
-                .add("theme", getTheme())
+                .add("theme", getThemeName(request))
                 .add("request", request);
 
         CsrfToken token = (CsrfToken) request.getAttribute(CsrfToken.class.getName());
@@ -105,35 +104,42 @@ public class JtwigView extends AbstractTemplateView {
         }
 
         JtwigContext jtwigContext = new JtwigContext(modelMap, getViewResolver().functionResolver());
-        getContent(request).render(RenderContext.create(getConfiguration().render(), jtwigContext, response.getOutputStream()));
+        getContent().render(RenderContext.create(getConfiguration().render(), jtwigContext, response.getOutputStream()));
 
         response.getOutputStream().flush();
         response.getOutputStream().close();
     }
 
-    public Renderable getContent(HttpServletRequest request) throws CompileException, ParseException {
+    private String getThemeName(HttpServletRequest request) {
+        Theme theme = getTheme(request);
+        if (theme == null)
+            return null;
+        return theme.getName();
+    }
+
+    public Renderable getContent() throws CompileException, ParseException {
         if (getViewResolver().isCached()) {
             if (!compiledTemplates.containsKey(getUrl())) {
-                compiledTemplates.put(getUrl(), getCompiledJtwigTemplate(request));
+                compiledTemplates.put(getUrl(), getCompiledJtwigTemplate());
             }
             return compiledTemplates.get(getUrl());
         }
-        return getCompiledJtwigTemplate(request);
+        return getCompiledJtwigTemplate();
     }
 
-    private Renderable getCompiledJtwigTemplate(HttpServletRequest request) throws ParseException, CompileException {
-        return new JtwigTemplate(getResource(request))
+    private Renderable getCompiledJtwigTemplate() throws ParseException, CompileException {
+        return new JtwigTemplate(getResource())
                 .compile(jtwigParser());
     }
 
-    private JtwigResource getResource(HttpServletRequest request) {
-        String prefix = getViewResolver().getPrefix();
-        if (prefix.startsWith("classpath:"))
-            return new ClasspathJtwigResource(getUrl());
-        else if (prefix.startsWith("file://"))
-            return new FileJtwigResource(getUrl());
+    private JtwigResource getResource() {
+        String url = getUrl();
+        if (url.startsWith("classpath:"))
+            return new ClasspathJtwigResource(url);
+        else if (url.startsWith("file://"))
+            return new FileJtwigResource(url);
         else
-            return new WebJtwigResource(getServletContext(), getUrl());
+            return new WebJtwigResource(getServletContext(), url);
     }
 
     private JtwigParser jtwigParser() {

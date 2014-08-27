@@ -17,10 +17,13 @@ package com.lyncode.jtwig.services.impl.assets;
 import com.lyncode.jtwig.exceptions.AssetResolveException;
 import com.lyncode.jtwig.mvc.JtwigViewResolver;
 import com.lyncode.jtwig.services.api.assets.AssetResolver;
+import com.lyncode.jtwig.util.LocalThreadHolder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ui.context.Theme;
 import org.springframework.web.servlet.ViewResolver;
 
 import static com.lyncode.jtwig.util.FilePath.path;
+import static org.springframework.web.servlet.support.RequestContextUtils.getTheme;
 
 public class BaseAssetResolver implements AssetResolver {
     private String prefix;
@@ -34,8 +37,9 @@ public class BaseAssetResolver implements AssetResolver {
         if (!(viewResolver instanceof JtwigViewResolver))
             throw new AssetResolveException("The view resolver must be a JtwigViewResolver");
         else {
-            if (((JtwigViewResolver) viewResolver).hasTheme()) {
-                return path(prefix).append(((JtwigViewResolver) viewResolver).getTheme()).append(asset).toString();
+            Theme theme = getTheme(LocalThreadHolder.getServletRequest());
+            if (theme != null) {
+                return path(prefix).append(theme.getName()).append(asset).toString();
             } else {
                 return path(prefix).append(asset).toString();
             }
