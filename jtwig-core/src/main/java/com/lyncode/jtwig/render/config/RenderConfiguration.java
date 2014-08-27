@@ -16,6 +16,7 @@ package com.lyncode.jtwig.render.config;
 
 public class RenderConfiguration {
     private boolean strictMode = false;
+    private boolean logNonStrictMode = true;
 
     public boolean strictMode() {
         return strictMode;
@@ -23,6 +24,15 @@ public class RenderConfiguration {
 
     public RenderConfiguration strictMode(boolean value) {
         this.strictMode = value;
+        return this;
+    }
+
+    public boolean logNonStrictMode() {
+        return logNonStrictMode;
+    }
+
+    public RenderConfiguration logNonStrictMode(boolean logNonStrictMode) {
+        this.logNonStrictMode = logNonStrictMode;
         return this;
     }
 }
