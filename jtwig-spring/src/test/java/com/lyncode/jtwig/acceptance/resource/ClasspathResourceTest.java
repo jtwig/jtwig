@@ -21,9 +21,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.ThemeResolver;
 import org.springframework.web.servlet.ViewResolver;
-import org.springframework.web.servlet.theme.FixedThemeResolver;
 
 import static com.lyncode.jtwig.util.SyntacticSugar.then;
 import static com.lyncode.jtwig.util.SyntacticSugar.when;
@@ -56,17 +54,11 @@ public class ClasspathResourceTest extends AbstractJtwigAcceptanceTest {
     @Configuration
     public static class JtwigViewResolverConfig {
         @Bean
-        public ThemeResolver themeResolver () {
-            FixedThemeResolver fixedThemeResolver = new FixedThemeResolver();
-            fixedThemeResolver.setDefaultThemeName("default");
-            return fixedThemeResolver;
-        }
-
-        @Bean
         public ViewResolver viewResolver () {
             JtwigViewResolver jtwigViewResolver = new JtwigViewResolver();
             jtwigViewResolver.setPrefix("classpath:/templates/");
             jtwigViewResolver.setSuffix(".twig");
+            jtwigViewResolver.setUseThemeInViewPath(false);
             return jtwigViewResolver;
         }
     }

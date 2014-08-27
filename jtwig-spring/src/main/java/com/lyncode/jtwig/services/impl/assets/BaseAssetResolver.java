@@ -37,13 +37,14 @@ public class BaseAssetResolver implements AssetResolver {
         if (!(viewResolver instanceof JtwigViewResolver))
             throw new AssetResolveException("The view resolver must be a JtwigViewResolver");
         else {
-            Theme theme = getTheme(LocalThreadHolder.getServletRequest());
-            if (theme != null) {
-                return path(prefix).append(theme.getName()).append(asset).toString();
-            } else {
-                return path(prefix).append(asset).toString();
+            if (((JtwigViewResolver) viewResolver).useThemeInViewPath()) {
+                Theme theme = getTheme(LocalThreadHolder.getServletRequest());
+                if (theme != null) {
+                    return path(prefix).append(theme.getName()).append(asset).toString();
+                }
             }
         }
+        return path(prefix).append(asset).toString();
     }
 
     public void setPrefix(String prefix) {

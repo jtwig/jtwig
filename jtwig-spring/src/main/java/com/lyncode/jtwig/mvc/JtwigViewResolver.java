@@ -50,6 +50,7 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
 
     private String encoding;
     private boolean cached = true;
+    private boolean useThemeInViewPath = false;
 
     private JtwigConfiguration configuration = new JtwigConfiguration();
     private FunctionRepository functionRepository = new MapFunctionRepository();
@@ -80,7 +81,7 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
     }
 
     private ResourceUrlResolver urlResolver() {
-        if (themeResolver == null)
+        if (themeResolver == null || !useThemeInViewPath)
             return IdentityUrlResolver.INSTANCE;
         else
             return new ThemedResourceUrlResolver(themeResolver.resolveThemeName(getServletRequest()));
@@ -96,6 +97,14 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
 
     public void setThemeResolver(ThemeResolver themeResolver) {
         this.themeResolver = themeResolver;
+    }
+
+    public boolean useThemeInViewPath() {
+        return useThemeInViewPath;
+    }
+
+    public void setUseThemeInViewPath(boolean useThemeInViewPath) {
+        this.useThemeInViewPath = useThemeInViewPath;
     }
 
     public String getEncoding() {
