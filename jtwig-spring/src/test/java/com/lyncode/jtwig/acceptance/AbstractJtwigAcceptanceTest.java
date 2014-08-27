@@ -30,9 +30,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
+import org.springframework.web.servlet.ThemeResolver;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.theme.FixedThemeResolver;
 
 import java.io.IOException;
 
@@ -99,11 +101,17 @@ public abstract class AbstractJtwigAcceptanceTest {
     @Configuration
     public static class JtwigViewResolverConfig {
         @Bean
+        public ThemeResolver themeResolver () {
+            FixedThemeResolver fixedThemeResolver = new FixedThemeResolver();
+            fixedThemeResolver.setDefaultThemeName("default");
+            return fixedThemeResolver;
+        }
+
+        @Bean
         public ViewResolver viewResolver () {
             JtwigViewResolver jtwigViewResolver = new JtwigViewResolver();
             jtwigViewResolver.setPrefix("/WEB-INF/views/");
             jtwigViewResolver.setSuffix(".twig.html");
-            jtwigViewResolver.setTheme("default");
             return jtwigViewResolver;
         }
     }

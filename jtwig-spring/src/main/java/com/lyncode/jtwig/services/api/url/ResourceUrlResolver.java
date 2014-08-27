@@ -12,8 +12,8 @@
  * limitations under the License.
  */
 
-package com.lyncode.jtwig.services.api.theme;
+package com.lyncode.jtwig.services.api.url;
 
-public interface ThemePrefixResolver {
-    String getPrefix (String prefix, String theme);
+public interface ResourceUrlResolver {
+    String resolve(String prefix, String url, String suffix);
 }

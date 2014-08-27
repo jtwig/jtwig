@@ -30,34 +30,25 @@ import com.lyncode.jtwig.functions.repository.impl.MapFunctionRepository;
 import com.lyncode.jtwig.functions.resolver.api.FunctionResolver;
 import com.lyncode.jtwig.functions.resolver.impl.CompoundFunctionResolver;
 import com.lyncode.jtwig.functions.resolver.impl.DelegateFunctionResolver;
-import com.lyncode.jtwig.services.api.theme.ThemePrefixResolver;
-import com.lyncode.jtwig.util.FilePath;
+import com.lyncode.jtwig.services.api.url.ResourceUrlResolver;
+import com.lyncode.jtwig.services.impl.url.IdentityUrlResolver;
+import com.lyncode.jtwig.services.impl.url.ThemedResourceUrlResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.ThemeResolver;
 import org.springframework.web.servlet.view.AbstractTemplateViewResolver;
-
-import java.io.File;
+import org.springframework.web.servlet.view.AbstractUrlBasedView;
 
 import static com.lyncode.jtwig.render.stream.RenderStream.withMaxThreads;
 import static com.lyncode.jtwig.render.stream.RenderStream.withMinThreads;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static com.lyncode.jtwig.util.LocalThreadHolder.getServletRequest;
 
 @Service
 public class JtwigViewResolver extends AbstractTemplateViewResolver {
-    private static ThemePrefixResolver defaultPrefixResolver() {
-        return new ThemePrefixResolver() {
-            @Override
-            public String getPrefix(String prefix, String theme) {
-                return new FilePath(prefix, theme).toString();
-            }
-        };
-    }
-
     @Autowired(required = false)
-    private ThemePrefixResolver prefixResolver ;
+    private ThemeResolver themeResolver;
 
     private String encoding;
-    private String theme;
     private boolean cached = true;
 
     private JtwigConfiguration configuration = new JtwigConfiguration();
@@ -82,39 +73,29 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
     }
 
     @Override
-    protected String getPrefix() {
-        if (hasTheme())
-            return getPrefixWithTheme();
-        else
-            return super.getPrefix();
+    protected AbstractUrlBasedView buildView(String viewName) throws Exception {
+        AbstractUrlBasedView abstractUrlBasedView = super.buildView(viewName);
+        abstractUrlBasedView.setUrl(urlResolver().resolve(getPrefix(), viewName, getSuffix()));
+        return abstractUrlBasedView;
     }
 
-    private String getPrefixWithTheme() {
-        if (prefixResolver == null) prefixResolver = defaultPrefixResolver();
-        String prefix = prefixResolver.getPrefix(super.getPrefix(), getTheme());
-        if (super.getPrefix().endsWith(File.separator))
-            prefix += File.separator;
-        return prefix;
+    private ResourceUrlResolver urlResolver() {
+        if (themeResolver == null)
+            return IdentityUrlResolver.INSTANCE;
+        else
+            return new ThemedResourceUrlResolver(themeResolver.resolveThemeName(getServletRequest()));
     }
 
     public boolean isCached() {
         return cached;
     }
 
-    public String getTheme() {
-        return this.theme;
-    }
-
-    public boolean hasTheme() {
-        return isNotBlank(theme);
-    }
-
     public void setCached(boolean cached) {
         this.cached = cached;
     }
 
-    public void setTheme(String theme) {
-        this.theme = theme;
+    public void setThemeResolver(ThemeResolver themeResolver) {
+        this.themeResolver = themeResolver;
     }
 
     public String getEncoding() {
