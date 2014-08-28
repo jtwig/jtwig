@@ -14,7 +14,7 @@
 
 package com.lyncode.jtwig.acceptance;
 
-import com.lyncode.jtwig.JtwigContext;
+import com.lyncode.jtwig.JtwigModelMap;
 import com.lyncode.jtwig.JtwigTemplate;
 import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.ParseException;
@@ -27,27 +27,27 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class ListExpressionTest extends AbstractJtwigTest {
     @Test
     public void integerListByComprehension () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = new JtwigTemplate("{{ 1..5 | join(',') }}");
-        JtwigContext context = new JtwigContext();
+        JtwigTemplate template = JtwigTemplate.fromString("{{ 1..5 | join(',') }}");
+        JtwigModelMap context = new JtwigModelMap();
         assertThat(template.output(context), is("1,2,3,4,5"));
     }
     @Test
     public void integerListByComprehensionReverse () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = new JtwigTemplate("{{ 5..1 | join(',') }}");
-        JtwigContext context = new JtwigContext();
+        JtwigTemplate template = JtwigTemplate.fromString("{{ 5..1 | join(',') }}");
+        JtwigModelMap context = new JtwigModelMap();
         assertThat(template.output(context), is("5,4,3,2,1"));
     }
 
     @Test
     public void characterListByComprehension () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = new JtwigTemplate("{{ 'a'..'c' | join }}");
-        JtwigContext context = new JtwigContext();
+        JtwigTemplate template = JtwigTemplate.fromString("{{ 'a'..'c' | join }}");
+        JtwigModelMap context = new JtwigModelMap();
         assertThat(template.output(context), is("abc"));
     }
     @Test
     public void characterListByComprehensionReverse () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = new JtwigTemplate("{{ 'c'..'a' | join }}");
-        JtwigContext context = new JtwigContext();
+        JtwigTemplate template = JtwigTemplate.fromString("{{ 'c'..'a' | join }}");
+        JtwigModelMap context = new JtwigModelMap();
         assertThat(template.output(context), is("cba"));
     }
 }

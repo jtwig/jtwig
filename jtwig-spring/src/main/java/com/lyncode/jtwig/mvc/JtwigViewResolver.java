@@ -25,8 +25,6 @@ import com.lyncode.jtwig.functions.parameters.resolve.api.ParameterResolver;
 import com.lyncode.jtwig.functions.parameters.resolve.impl.CompoundParameterResolver;
 import com.lyncode.jtwig.functions.parameters.resolve.impl.InputDelegateMethodParametersResolver;
 import com.lyncode.jtwig.functions.parameters.resolve.impl.ParameterAnnotationParameterResolver;
-import com.lyncode.jtwig.functions.repository.api.FunctionRepository;
-import com.lyncode.jtwig.functions.repository.impl.MapFunctionRepository;
 import com.lyncode.jtwig.functions.resolver.api.FunctionResolver;
 import com.lyncode.jtwig.functions.resolver.impl.CompoundFunctionResolver;
 import com.lyncode.jtwig.functions.resolver.impl.DelegateFunctionResolver;
@@ -53,7 +51,6 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
     private boolean useThemeInViewPath = false;
 
     private JtwigConfiguration configuration = new JtwigConfiguration();
-    private FunctionRepository functionRepository = new MapFunctionRepository();
     private SpringFunctions springFunctions = null;
     private CompoundParameterResolver parameterResolver = new CompoundParameterResolver();
     private CompoundFunctionResolver functionResolver = new CompoundFunctionResolver()
@@ -123,7 +120,7 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
         if (springFunctions == null) {
             springFunctions = new SpringFunctions();
             getApplicationContext().getAutowireCapableBeanFactory().autowireBean(springFunctions);
-            functionRepository.include(springFunctions);
+            configuration.render().functionRepository().include(springFunctions);
         }
         return functionResolver;
     }
@@ -142,7 +139,7 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
     }
 
     public JtwigViewResolver includeFunctions (Object functionBean) {
-        functionRepository.include(functionBean);
+        configuration.render().functionRepository().include(functionBean);
         return this;
     }
 
@@ -158,6 +155,6 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
     }
 
     private DelegateFunctionResolver resolver(DemultiplexerConverter converter) {
-        return new DelegateFunctionResolver(functionRepository, new InputDelegateMethodParametersResolver(parameterResolverFactory(converter)));
+        return new DelegateFunctionResolver(configuration.render().functionRepository(), new InputDelegateMethodParametersResolver(parameterResolverFactory(converter)));
     }
 }

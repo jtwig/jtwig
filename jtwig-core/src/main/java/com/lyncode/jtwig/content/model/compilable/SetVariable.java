@@ -49,7 +49,7 @@ public class SetVariable extends AbstractElement {
         @Override
         public void render(RenderContext context) throws RenderException {
             try {
-                context.model().with(variable, assignment.calculate(context));
+                context.with(variable, assignment.calculate(context));
             } catch (CalculateException e) {
                 throw new RenderException(e);
             }

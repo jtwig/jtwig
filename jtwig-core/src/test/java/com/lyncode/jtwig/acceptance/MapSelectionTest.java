@@ -15,8 +15,9 @@
 package com.lyncode.jtwig.acceptance;
 
 import com.lyncode.builder.MapBuilder;
-import com.lyncode.jtwig.JtwigContext;
+import com.lyncode.jtwig.JtwigModelMap;
 import com.lyncode.jtwig.JtwigTemplate;
+import com.lyncode.jtwig.configuration.JtwigConfiguration;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -25,9 +26,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class MapSelectionTest extends AbstractJtwigTest {
     @Test
     public void testTrue() throws Exception {
-        JtwigTemplate template = new JtwigTemplate("{{ test['abc'] }}");
-        JtwigContext context = new JtwigContext();
-        context.withModelAttribute("test", aMap().withPair("abc", "a").build());
+        JtwigTemplate template = new JtwigTemplate("{{ test['abc'] }}", new JtwigConfiguration());
+        JtwigModelMap context = new JtwigModelMap();
+        context.add("test", aMap().withPair("abc", "a").build());
         String result = template.output(context);
         assertThat(result, is("a"));
     }

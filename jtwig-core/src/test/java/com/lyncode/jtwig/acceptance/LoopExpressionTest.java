@@ -24,7 +24,7 @@ import static org.hamcrest.core.IsEqual.equalTo;
 public class LoopExpressionTest extends AbstractJtwigTest {
     @Test
     public void simpleLoop() throws Exception {
-        given(aContext().withModelAttribute("list", asList("a", "b", "c")));
+        given(aModel().withModelAttribute("list", asList("a", "b", "c")));
         when(jtwigRenders(template("{% for item in list %}{{ item }}{% endfor %}")));
         then(theRenderedTemplate(), is(equalTo("abc")));
     }

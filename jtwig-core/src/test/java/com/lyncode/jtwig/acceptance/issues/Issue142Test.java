@@ -18,19 +18,22 @@ import com.lyncode.jtwig.acceptance.AbstractJtwigTest;
 import org.junit.Test;
 
 import static com.lyncode.jtwig.util.SyntacticSugar.*;
-import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 
 public class Issue142Test extends AbstractJtwigTest {
     @Test
     public void longFirstArgEvaluation() throws Exception {
-        given(aContext().withModelAttribute("var", 5L));
+        given(aModel().withModelAttribute("var", 5L));
         when(jtwigRenders(template("{{ var == 5 }}")));
         then(theRenderedTemplate(), is(equalTo("1")));
     }
-    
+
+
+
     @Test
     public void longSecondArgEvaluation() throws Exception {
-        given(aContext().withModelAttribute("var", 5L));
+        given(aModel().withModelAttribute("var", 5L));
         when(jtwigRenders(template("{{ 5 == var }}")));
         then(theRenderedTemplate(), is(equalTo("1")));
     }

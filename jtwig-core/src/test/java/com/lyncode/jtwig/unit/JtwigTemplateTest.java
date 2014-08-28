@@ -14,8 +14,9 @@
 
 package com.lyncode.jtwig.unit;
 
-import com.lyncode.jtwig.JtwigContext;
+import com.lyncode.jtwig.JtwigModelMap;
 import com.lyncode.jtwig.JtwigTemplate;
+import com.lyncode.jtwig.configuration.JtwigConfiguration;
 import com.lyncode.jtwig.resource.JtwigResource;
 import org.junit.Test;
 
@@ -30,8 +31,8 @@ import static org.mockito.Mockito.when;
 
 public class JtwigTemplateTest {
     private JtwigResource resource = mock(JtwigResource.class);
-    private JtwigContext context = new JtwigContext();
-    private JtwigTemplate underTest = new JtwigTemplate(resource);
+    private JtwigModelMap context = new JtwigModelMap();
+    private JtwigTemplate underTest = new JtwigTemplate(resource, new JtwigConfiguration());
     private ByteArrayOutputStream outputStream;
 
     @Test

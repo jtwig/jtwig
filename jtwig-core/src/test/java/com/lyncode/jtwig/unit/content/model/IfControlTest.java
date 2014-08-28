@@ -14,7 +14,6 @@
 
 package com.lyncode.jtwig.unit.content.model;
 
-import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.compile.CompileContext;
 import com.lyncode.jtwig.compile.config.CompileConfiguration;
 import com.lyncode.jtwig.content.api.Compilable;
@@ -40,8 +39,6 @@ public class IfControlTest {
                 .add(new IfControl.Case(toCalculate(condition)).withContent(toRender(render)));
 
         RenderContext context = mock(RenderContext.class);
-        JtwigContext jtwigContext = new JtwigContext();
-        when(context.model()).thenReturn(jtwigContext);
 
         when(condition.calculate(context)).thenReturn(true);
         control.compile(new CompileContext(mock(JtwigResource.class), mock(JtwigParser.class), mock(CompileConfiguration.class)))
@@ -57,8 +54,6 @@ public class IfControlTest {
                 .add(new IfControl.Case(toCalculate(condition)).withContent(toRender(render)));
 
         RenderContext context = mock(RenderContext.class);
-        JtwigContext jtwigContext = new JtwigContext();
-        when(context.model()).thenReturn(jtwigContext);
 
         when(condition.calculate(context)).thenReturn(false);
         control.compile(new CompileContext(mock(JtwigResource.class), mock(JtwigParser.class), mock(CompileConfiguration.class)))

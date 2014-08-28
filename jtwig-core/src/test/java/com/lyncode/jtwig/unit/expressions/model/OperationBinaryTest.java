@@ -14,7 +14,7 @@
 
 package com.lyncode.jtwig.unit.expressions.model;
 
-import com.lyncode.jtwig.JtwigContext;
+import com.lyncode.jtwig.JtwigModelMap;
 import com.lyncode.jtwig.compile.CompileContext;
 import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.expressions.api.CompilableExpression;
@@ -24,6 +24,7 @@ import com.lyncode.jtwig.expressions.model.Operator;
 import com.lyncode.jtwig.expressions.model.Variable;
 import com.lyncode.jtwig.parser.model.JtwigPosition;
 import com.lyncode.jtwig.render.RenderContext;
+import com.lyncode.jtwig.render.config.RenderConfiguration;
 import org.junit.Test;
 
 import static com.lyncode.jtwig.expressions.model.Operator.UNKNOWN;
@@ -39,13 +40,13 @@ public class OperationBinaryTest {
         when(left.calculate(any(RenderContext.class))).thenReturn(1);
         Expression right = mock(Expression.class);
         when(right.calculate(any(RenderContext.class))).thenReturn(1);
-        JtwigContext context = mock(JtwigContext.class);
+        JtwigModelMap context = mock(JtwigModelMap.class);
 
         Object result = new OperationBinary(null, expression(left))
                 .add(Operator.ADD)
                 .add(expression(right))
                 .compile(null)
-                .calculate(RenderContext.create(null, context, null));
+                .calculate(RenderContext.create(new RenderConfiguration(), context, null));
 
         assertEquals(2, result);
     }
@@ -55,13 +56,13 @@ public class OperationBinaryTest {
         Expression left = mock(Expression.class);
         when(left.calculate(any(RenderContext.class))).thenReturn(1);
         Variable right = new Variable(null, "defined");
-        JtwigContext context = new JtwigContext();
+        JtwigModelMap context = new JtwigModelMap();
 
         Object result = new OperationBinary(null, expression(left))
                 .add(Operator.COMPOSITION)
                 .add(right)
                 .compile(null)
-                .calculate(RenderContext.create(null, context, null));
+                .calculate(RenderContext.create(new RenderConfiguration(), context, null));
 
         assertEquals(true, result);
     }

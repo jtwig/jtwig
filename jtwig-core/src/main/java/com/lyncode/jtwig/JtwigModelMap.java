@@ -28,6 +28,10 @@ public class JtwigModelMap extends HashMap<String, Object> {
         return this;
     }
 
+    public JtwigModelMap withModelAttribute (String key, Object object) {
+        return add(key, object);
+    }
+
     public JtwigModelMap clone() {
         JtwigModelMap modelMap = new JtwigModelMap();
         modelMap.putAll(this);

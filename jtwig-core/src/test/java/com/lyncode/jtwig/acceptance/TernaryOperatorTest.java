@@ -14,7 +14,7 @@
 
 package com.lyncode.jtwig.acceptance;
 
-import com.lyncode.jtwig.JtwigContext;
+import com.lyncode.jtwig.JtwigModelMap;
 import com.lyncode.jtwig.JtwigTemplate;
 import org.junit.Test;
 
@@ -24,14 +24,14 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class TernaryOperatorTest extends AbstractJtwigTest {
     @Test
     public void testTrue() throws Exception {
-        JtwigTemplate template = new JtwigTemplate("{{ true ? 1 : 2 }}");
-        String result = template.output(new JtwigContext());
+        JtwigTemplate template = JtwigTemplate.fromString("{{ true ? 1 : 2 }}");
+        String result = template.output(new JtwigModelMap());
         assertThat(result, is("1"));
     }
     @Test
      public void testFalse() throws Exception {
-        JtwigTemplate template = new JtwigTemplate("{{ false ? 1 : 2 }}");
-        String result = template.output(new JtwigContext());
+        JtwigTemplate template = JtwigTemplate.fromString("{{ false ? 1 : 2 }}");
+        String result = template.output(new JtwigModelMap());
         assertThat(result, is("2"));
     }
 }

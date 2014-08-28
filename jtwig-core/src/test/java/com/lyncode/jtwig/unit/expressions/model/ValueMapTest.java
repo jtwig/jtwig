@@ -14,12 +14,13 @@
 
 package com.lyncode.jtwig.unit.expressions.model;
 
-import com.lyncode.jtwig.JtwigContext;
+import com.lyncode.jtwig.JtwigModelMap;
 import com.lyncode.jtwig.compile.CompileContext;
 import com.lyncode.jtwig.expressions.api.Expression;
 import com.lyncode.jtwig.expressions.model.Constant;
 import com.lyncode.jtwig.expressions.model.ValueMap;
 import com.lyncode.jtwig.render.RenderContext;
+import com.lyncode.jtwig.render.config.RenderConfiguration;
 import org.junit.Test;
 
 import java.util.Map;
@@ -35,12 +36,11 @@ public class ValueMapTest {
                 .add("key", new Constant<>(null));
 
         CompileContext context = mock(CompileContext.class);
-        JtwigContext jtwigContext = mock(JtwigContext.class);
 
         Expression expression = underTest.compile(context);
         assertNotNull(expression);
 
-        Map map = (Map) expression.calculate(RenderContext.create(null, jtwigContext, null));
+        Map map = (Map) expression.calculate(RenderContext.create(new RenderConfiguration(), new JtwigModelMap(), null));
         assertTrue(map.containsKey("key"));
     }
 }

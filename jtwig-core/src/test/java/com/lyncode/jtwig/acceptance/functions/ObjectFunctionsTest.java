@@ -37,7 +37,7 @@ public class ObjectFunctionsTest extends AbstractJtwigTest {
 
     @Test
     public void defaultUndefinedMethodOrFieldTest() throws Exception {
-        given(aContext().withModelAttribute("a", new Object()));
+        given(aModel().withModelAttribute("a", new Object()));
         when(jtwigRenders(template("{{ default(a.call, 1) }}")));
         then(theRenderedTemplate(), is(equalTo("1")));
     }
@@ -98,7 +98,7 @@ public class ObjectFunctionsTest extends AbstractJtwigTest {
 
     @Test
     public void arrayLast() throws Exception {
-        given(aContext().withModelAttribute("array", new int[]{1,2}));
+        given(aModel().withModelAttribute("array", new int[]{1,2}));
         when(jtwigRenders(template("{{ last(array) }}")));
         then(theRenderedTemplate(), is(equalTo("2")));
     }

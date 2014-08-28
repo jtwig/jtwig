@@ -14,7 +14,7 @@
 
 package com.lyncode.jtwig.acceptance;
 
-import com.lyncode.jtwig.JtwigContext;
+import com.lyncode.jtwig.JtwigModelMap;
 import com.lyncode.jtwig.JtwigTemplate;
 import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.ParseException;
@@ -32,16 +32,16 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class ForExpressionTest {
     @Test
     public void emptyListShouldOutputNothing () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = new JtwigTemplate("{% for item in list %}Item {{ item }}{% endfor %}");
-        JtwigContext context = new JtwigContext();
+        JtwigTemplate template = JtwigTemplate.fromString("{% for item in list %}Item {{ item }}{% endfor %}");
+        JtwigModelMap context = new JtwigModelMap();
         ArrayList<String> value = new ArrayList<String>();
         context.withModelAttribute("list", value);
         assertThat(template.output(context), is(""));
     }
     @Test
     public void nonEmptyListShouldOutputSomething () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = new JtwigTemplate("{% for item in list %}Item {{ item }}{% endfor %}");
-        JtwigContext context = new JtwigContext();
+        JtwigTemplate template = JtwigTemplate.fromString("{% for item in list %}Item {{ item }}{% endfor %}");
+        JtwigModelMap context = new JtwigModelMap();
         ArrayList<String> value = new ArrayList<String>();
         value.add("a");
         context.withModelAttribute("list", value);
@@ -50,10 +50,10 @@ public class ForExpressionTest {
 
     @Test
     public void forLoopMustExposeTheLoopVariable () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = new JtwigTemplate("{% for item in list %}" +
+        JtwigTemplate template = JtwigTemplate.fromString("{% for item in list %}" +
                 "{% if loop.first %}First {% elseif loop.last %}Last{% else %}I: {{ loop.index }} R: {{ loop.revindex }} {% endif %}" +
                 "{% endfor %}");
-        JtwigContext context = new JtwigContext();
+        JtwigModelMap context = new JtwigModelMap();
         ArrayList<String> value = new ArrayList<String>();
         value.add("a");
         value.add("b");
@@ -66,8 +66,8 @@ public class ForExpressionTest {
 
     @Test
     public void shouldNotOutputNothingIfListIsNull () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = new JtwigTemplate("{% for item in list %}a{% endfor %}");
-        JtwigContext context = new JtwigContext();
+        JtwigTemplate template = JtwigTemplate.fromString("{% for item in list %}a{% endfor %}");
+        JtwigModelMap context = new JtwigModelMap();
         context.withModelAttribute("list", null);
         assertThat(template.output(context), is(""));
     }
@@ -75,8 +75,8 @@ public class ForExpressionTest {
 
     @Test
     public void iterateOverMap () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = new JtwigTemplate("{% for key, value in map %}{{ key }} = {{ value }}|{% endfor %}");
-        JtwigContext context = new JtwigContext();
+        JtwigTemplate template = JtwigTemplate.fromString("{% for key, value in map %}{{ key }} = {{ value }}|{% endfor %}");
+        JtwigModelMap context = new JtwigModelMap();
         LinkedHashMap<String, String> value = new  LinkedHashMap<String, String>();
         value.put("one", "1");
         value.put("two", "2");
@@ -87,8 +87,8 @@ public class ForExpressionTest {
     
     @Test
     public void avoidElseOnPopulatedList () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = new JtwigTemplate("{% for value in list %}{{ value }}{% else %}nothing{% endfor %}");
-        JtwigContext context = new JtwigContext();
+        JtwigTemplate template = JtwigTemplate.fromString("{% for value in list %}{{ value }}{% else %}nothing{% endfor %}");
+        JtwigModelMap context = new JtwigModelMap();
         List<String> list = new ArrayList<>();
         list.add("a");
         list.add("b");
@@ -98,8 +98,8 @@ public class ForExpressionTest {
     
     @Test
     public void outputElseOnEmptyList () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = new JtwigTemplate("{% for value in list %}item{% else %}nothing{% endfor %}");
-        JtwigContext context = new JtwigContext();
+        JtwigTemplate template = JtwigTemplate.fromString("{% for value in list %}item{% else %}nothing{% endfor %}");
+        JtwigModelMap context = new JtwigModelMap();
         List list = Collections.EMPTY_LIST;
         context.withModelAttribute("list", list);
         assertThat(template.output(context), is("nothing"));
@@ -107,15 +107,15 @@ public class ForExpressionTest {
     
     @Test
     public void outputElseOnUndefined () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = new JtwigTemplate("{% for value in var %}{{ value }}{% else %}nothing{% endfor %}");
-        JtwigContext context = new JtwigContext();
+        JtwigTemplate template = JtwigTemplate.fromString("{% for value in var %}{{ value }}{% else %}nothing{% endfor %}");
+        JtwigModelMap context = new JtwigModelMap();
         assertThat(template.output(context), is("nothing"));
     }
     
     @Test
     public void iterateOnSelection () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = new JtwigTemplate("{% for value in obj.getList(name) %}{{ value }}{% endfor %}");
-        JtwigContext context = new JtwigContext();
+        JtwigTemplate template = JtwigTemplate.fromString("{% for value in obj.getList(name) %}{{ value }}{% endfor %}");
+        JtwigModelMap context = new JtwigModelMap();
         context.withModelAttribute("obj", new Obj());
         context.withModelAttribute("name", "Test");
         assertThat(template.output(context), is("ab"));

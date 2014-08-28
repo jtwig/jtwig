@@ -14,7 +14,7 @@
 
 package com.lyncode.jtwig.acceptance;
 
-import com.lyncode.jtwig.JtwigContext;
+import com.lyncode.jtwig.JtwigModelMap;
 import com.lyncode.jtwig.JtwigTemplate;
 import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.ParseException;
@@ -27,8 +27,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class SetTest extends AbstractJtwigTest {
     @Test
     public void testShouldChangeTheContext() throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = new JtwigTemplate("{% set a = 1 %}{{ a }}");
-        JtwigContext context = new JtwigContext();
+        JtwigTemplate template = JtwigTemplate.fromString("{% set a = 1 %}{{ a }}");
+        JtwigModelMap context = new JtwigModelMap();
         assertThat(template.output(context), is("1"));
     }
 }

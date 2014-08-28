@@ -76,7 +76,7 @@ public class FunctionElement extends AbstractCompilableExpression {
         public Object calculate(RenderContext context) throws CalculateException {
             try {
                 try {
-                    return context.model().executeFunction(name, parameters(calculateArguments(context)));
+                    return context.executeFunction(name, parameters(calculateArguments(context)));
                 } catch (FunctionNotFoundException e) {
                     throw new CalculateException(position + ": " + e.getMessage(), e);
                 }

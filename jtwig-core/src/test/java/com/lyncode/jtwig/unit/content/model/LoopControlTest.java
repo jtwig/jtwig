@@ -14,7 +14,6 @@
 
 package com.lyncode.jtwig.unit.content.model;
 
-import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.compile.CompileContext;
 import com.lyncode.jtwig.content.api.Compilable;
 import com.lyncode.jtwig.content.api.Renderable;
@@ -35,7 +34,6 @@ public class LoopControlTest {
         Renderable content = mock(Renderable.class);
         Expression expression = mock(Expression.class);
         RenderContext renderContext = mock(RenderContext.class);
-        when(renderContext.model()).thenReturn(mock(JtwigContext.class));
 
         when(expression.calculate(any(RenderContext.class))).thenReturn(asList(1, 2));
 
