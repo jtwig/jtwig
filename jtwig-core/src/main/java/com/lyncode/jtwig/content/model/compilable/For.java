@@ -111,15 +111,15 @@ public class For extends Content<For> {
             }
             
             Loop loop = new Loop(map.size());
-            context.model().with("loop", loop);
+            context.with("loop", loop);
             int index = 0;
             for (Object k : map.keySet()) {
                 loop.update(index++);
 
                 if(key != null) {
-                    context.model().with(key, k);
+                    context.with(key, k);
                 }
-                context.model().with(value, map.get(k));
+                context.with(value, map.get(k));
 
                 iterationContent.render(context);
             }
@@ -135,12 +135,12 @@ public class For extends Content<For> {
             }
             
             Loop loop = new Loop(collection.size());
-            context.model().with("loop", loop);
+            context.with("loop", loop);
             for(Object obj : collection) {
                 if(key != null) {
-                    context.model().with(key, loop.index);
+                    context.with(key, loop.index);
                 }
-                context.model().with(value, obj);
+                context.with(value, obj);
                 
                 iterationContent.render(context);
                 loop.index++;

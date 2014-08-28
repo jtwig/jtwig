@@ -58,7 +58,7 @@ public class Variable extends AbstractCompilableExpression {
 
         @Override
         public Object calculate(RenderContext context) throws CalculateException {
-            Object result = context.model().map(name);
+            Object result = context.map(name);
             if (result instanceof Undefined) {
                 if (context.configuration().strictMode())
                     throw new CalculateException(position + format(": Variable '%s' does not exist", name));

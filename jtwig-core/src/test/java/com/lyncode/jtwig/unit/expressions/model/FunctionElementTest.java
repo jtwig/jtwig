@@ -14,7 +14,6 @@
 
 package com.lyncode.jtwig.unit.expressions.model;
 
-import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.expressions.model.FunctionElement;
 import com.lyncode.jtwig.functions.parameters.input.InputParameters;
 import com.lyncode.jtwig.render.RenderContext;
@@ -30,10 +29,10 @@ public class FunctionElementTest {
 
     @Test
     public void expressionCalculationQueriesContext() throws Exception {
-        JtwigContext context = mock(JtwigContext.class);
+        RenderContext context = mock(RenderContext.class);
         functionElement
                 .compile(null)
-                .calculate(RenderContext.create(null, context, null));
+                .calculate(context);
 
         verify(context).executeFunction(eq("name"), any(InputParameters.class));
     }

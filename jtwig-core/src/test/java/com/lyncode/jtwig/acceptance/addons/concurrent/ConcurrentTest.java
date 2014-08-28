@@ -15,7 +15,7 @@
 
 package com.lyncode.jtwig.acceptance.addons.concurrent;
 
-import com.lyncode.jtwig.JtwigContext;
+import com.lyncode.jtwig.JtwigModelMap;
 import com.lyncode.jtwig.JtwigTemplate;
 import com.lyncode.jtwig.acceptance.addons.AbstractAddonTest;
 import org.junit.Test;
@@ -30,41 +30,41 @@ public class ConcurrentTest extends AbstractAddonTest {
 
     @Test
     public void concurrentWithStaticContent() throws Exception {
-        JtwigTemplate template = new JtwigTemplate("{% concurrent %}a{% endconcurrent %}b");
-        JtwigContext context = new JtwigContext();
+        JtwigTemplate template = JtwigTemplate.fromString("{% concurrent %}a{% endconcurrent %}b");
+        JtwigModelMap context = new JtwigModelMap();
         assertThat(template.output(context), is("ab"));
     }
 
     @Test
     public void concurrentWithConditionalContent() throws Exception {
-        JtwigTemplate template = new JtwigTemplate("{% concurrent %}{% if true %}a{% endif %}{% endconcurrent %}b");
-        JtwigContext context = new JtwigContext();
+        JtwigTemplate template = JtwigTemplate.fromString("{% concurrent %}{% if true %}a{% endif %}{% endconcurrent %}b");
+        JtwigModelMap context = new JtwigModelMap();
         assertThat(template.output(context), is("ab"));
     }
 
     @Test
     public void doubleConcurrentWithStaticContent() throws Exception {
-        JtwigTemplate template = new JtwigTemplate("{% concurrent %}a{% endconcurrent %}"
+        JtwigTemplate template = JtwigTemplate.fromString("{% concurrent %}a{% endconcurrent %}"
                 +"{% concurrent %}b{% endconcurrent %}"
                 +"c");
-        JtwigContext context = new JtwigContext();
+        JtwigModelMap context = new JtwigModelMap();
         assertThat(template.output(context), is("abc"));
     }
 
     @Test
     public void concurrentWithDynamicContent() throws Exception {
-        JtwigTemplate template = new JtwigTemplate("{% concurrent %}{% for item in list %}{{ item }}{% endfor %}{% endconcurrent %}");
-        JtwigContext context = new JtwigContext()
+        JtwigTemplate template = JtwigTemplate.fromString("{% concurrent %}{% for item in list %}{{ item }}{% endfor %}{% endconcurrent %}");
+        JtwigModelMap context = new JtwigModelMap()
                 .withModelAttribute("list", asList("a", "b", "c", "d"));
         assertThat(template.output(context), is("abcd"));
     }
 
     @Test
     public void test_concurrent_1() throws Exception {
-        JtwigTemplate template = new JtwigTemplate("{% concurrent %}{% for item in list %}" +
+        JtwigTemplate template = JtwigTemplate.fromString("{% concurrent %}{% for item in list %}" +
                                                            "{% if loop.first %}{% concurrent %}First {% endconcurrent %}{% elseif loop.last %}{% concurrent %}Last{% endconcurrent %}{% else %}I: {{ loop.index }} R: {{ loop.revindex }} {% endif %}" +
                                                            "{% endfor %}{% endconcurrent %}");
-        JtwigContext context = new JtwigContext();
+        JtwigModelMap context = new JtwigModelMap();
         ArrayList<String> value = new ArrayList<String>();
         value.add("a");
         value.add("b");
@@ -77,9 +77,9 @@ public class ConcurrentTest extends AbstractAddonTest {
 
     @Test
     public void test_concurrent_2() throws Exception {
-        JtwigTemplate template2 = new JtwigTemplate(
+        JtwigTemplate template2 = JtwigTemplate.fromString(
                 "{% concurrent %}1{% endconcurrent %}{% concurrent %}{% concurrent %}{% concurrent %}2{% endconcurrent %}{% endconcurrent %}{% endconcurrent %}{% concurrent %}3{% endconcurrent %}{% concurrent %}{% concurrent %}{% concurrent %}{% concurrent %}{% concurrent %}{% concurrent %}4{% endconcurrent %}{% endconcurrent %}{% endconcurrent %}{% endconcurrent %}{% endconcurrent %}{% endconcurrent %}5{% concurrent %}6{% endconcurrent %}{% concurrent %}7{% endconcurrent %}");
-        JtwigContext context = new JtwigContext();
+        JtwigModelMap context = new JtwigModelMap();
         assertThat(template2.output(context), is("1234567"));
     }
 }

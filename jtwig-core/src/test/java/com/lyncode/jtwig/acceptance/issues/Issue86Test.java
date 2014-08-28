@@ -35,13 +35,13 @@ public class Issue86Test extends AbstractJtwigTest {
     }
     @Test
     public void issue86WithVariable() throws Exception {
-        given(aContext().withModelAttribute("value", 1));
+        given(aModel().withModelAttribute("value", 1));
         when(jtwigRenders(template("{{ value-1 }}")));
         then(theRenderedTemplate(), is(equalTo("0")));
     }
     @Test
     public void issue86WithVariableUnary() throws Exception {
-        given(aContext().withModelAttribute("value", -1));
+        given(aModel().withModelAttribute("value", -1));
         when(jtwigRenders(template("{{ -value }}")));
         then(theRenderedTemplate(), is(equalTo("1")));
     }

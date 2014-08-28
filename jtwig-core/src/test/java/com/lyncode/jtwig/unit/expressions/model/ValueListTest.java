@@ -14,13 +14,14 @@
 
 package com.lyncode.jtwig.unit.expressions.model;
 
-import com.lyncode.jtwig.JtwigContext;
+import com.lyncode.jtwig.JtwigModelMap;
 import com.lyncode.jtwig.compile.CompileContext;
 import com.lyncode.jtwig.exception.ParseBypassException;
 import com.lyncode.jtwig.expressions.model.Constant;
 import com.lyncode.jtwig.expressions.model.ValueList;
 import com.lyncode.jtwig.parser.model.JtwigPosition;
 import com.lyncode.jtwig.render.RenderContext;
+import com.lyncode.jtwig.render.config.RenderConfiguration;
 import org.junit.Test;
 
 import java.util.List;
@@ -38,9 +39,9 @@ public class ValueListTest {
     public void resultIsAList() throws Exception {
         ValueList list = create(null, new Constant(1), new Constant(2));
         CompileContext context = mock(CompileContext.class);
-        JtwigContext jtwigContext = mock(JtwigContext.class);
+        JtwigModelMap modelMap = new JtwigModelMap();
 
-        Object result = list.compile(context).calculate(RenderContext.create(null, jtwigContext, null));
+        Object result = list.compile(context).calculate(RenderContext.create(new RenderConfiguration(), modelMap, null));
 
         assertThat(result, is(instanceOf(List.class)));
     }

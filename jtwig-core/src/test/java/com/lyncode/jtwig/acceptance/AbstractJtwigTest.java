@@ -14,7 +14,7 @@
 
 package com.lyncode.jtwig.acceptance;
 
-import com.lyncode.jtwig.JtwigContext;
+import com.lyncode.jtwig.JtwigModelMap;
 import com.lyncode.jtwig.JtwigTemplate;
 import com.lyncode.jtwig.configuration.JtwigConfiguration;
 import com.lyncode.jtwig.content.api.Renderable;
@@ -34,7 +34,7 @@ import java.io.ByteArrayOutputStream;
 public class AbstractJtwigTest {
     private JtwigConfiguration configuration = new JtwigConfiguration();
     private JtwigParser parser = new JtwigParser(configuration.parse());
-    private JtwigContext context = new JtwigContext();
+    private JtwigModelMap model = new JtwigModelMap();
     private String output;
 
     @Before
@@ -44,20 +44,19 @@ public class AbstractJtwigTest {
 
     protected String theResultOfRendering(JtwigTemplate template) throws Exception {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        template.compile(parser).render(RenderContext.create(configuration.render(), context, outputStream));
+        template.compile().render(RenderContext.create(configuration.render(), model, outputStream));
         return outputStream.toString();
     }
 
     protected JtwigTemplate theTemplate(String content) {
-        return new JtwigTemplate(content);
+        return new JtwigTemplate(content, configuration);
     }
 
     protected JtwigConfiguration theConfiguration() {
         return this.configuration;
     }
-
-    protected JtwigContext aContext() {
-        return context;
+    protected JtwigModelMap aModel() {
+        return this.model;
     }
 
     protected String theRenderedTemplate() {
@@ -74,8 +73,8 @@ public class AbstractJtwigTest {
 
     protected String jtwigRenders(JtwigResource resource) throws ParseException, CompileException, RenderException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        Renderable compiled = new JtwigTemplate(resource, configuration).compile(parser);
-        compiled.render(RenderContext.create(configuration.render(), context, outputStream));
+        Renderable compiled = new JtwigTemplate(resource, configuration).compile();
+        compiled.render(RenderContext.create(configuration.render(), model, outputStream));
         this.output = outputStream.toString();
         return output;
     }

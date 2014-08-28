@@ -14,7 +14,7 @@
 
 package com.lyncode.jtwig.acceptance;
 
-import com.lyncode.jtwig.JtwigContext;
+import com.lyncode.jtwig.JtwigModelMap;
 import com.lyncode.jtwig.JtwigTemplate;
 import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.ParseException;
@@ -29,16 +29,16 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class OutputTest {
     @Test
     public void shouldAllowConcatenationOfDistinctElements () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = new JtwigTemplate("{{ concat ('1', list.size ,'3') }}");
-        JtwigContext context = new JtwigContext();
+        JtwigTemplate template = JtwigTemplate.fromString("{{ concat ('1', list.size ,'3') }}");
+        JtwigModelMap context = new JtwigModelMap();
         context.withModelAttribute("list", new ArrayList<Object>());
         assertThat(template.output(context), is("103"));
     }
 
     @Test
     public void shouldAllowFilters () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = new JtwigTemplate("{{ ['1', '2' ,'3'] | join(',') }}");
-        JtwigContext context = new JtwigContext();
+        JtwigTemplate template = JtwigTemplate.fromString("{{ ['1', '2' ,'3'] | join(',') }}");
+        JtwigModelMap context = new JtwigModelMap();
         assertThat(template.output(context), is("1,2,3"));
     }
 }

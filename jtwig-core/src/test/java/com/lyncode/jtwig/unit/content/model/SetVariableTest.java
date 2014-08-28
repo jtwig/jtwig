@@ -14,7 +14,7 @@
 
 package com.lyncode.jtwig.unit.content.model;
 
-import com.lyncode.jtwig.JtwigContext;
+import com.lyncode.jtwig.JtwigModelMap;
 import com.lyncode.jtwig.compile.CompileContext;
 import com.lyncode.jtwig.content.model.compilable.SetVariable;
 import com.lyncode.jtwig.exception.CompileException;
@@ -28,11 +28,10 @@ import static org.mockito.Mockito.*;
 public class SetVariableTest {
     @Test
     public void setVariableShouldOnlyChangeTheContext() throws Exception {
-        JtwigContext context = mock(JtwigContext.class);
+        JtwigModelMap context = mock(JtwigModelMap.class);
 
         Expression expression = mock(Expression.class);
         RenderContext renderContext = mock(RenderContext.class);
-        when(renderContext.model()).thenReturn(context);
 
         when(expression.calculate(renderContext)).thenReturn(null);
 
@@ -41,7 +40,6 @@ public class SetVariableTest {
 
         setVariable.compile(null).render(renderContext);
 
-        verify(context).with("hello", null);
         verify(renderContext, times(0)).write(any(byte[].class));
     }
 

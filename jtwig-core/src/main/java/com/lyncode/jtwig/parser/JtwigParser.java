@@ -34,10 +34,6 @@ public class JtwigParser {
         this.configuration = configuration;
     }
 
-    public JtwigParser() {
-        this(new ParserConfiguration());
-    }
-
     public Compilable parse(JtwigResource resource) throws ParseException {
         JtwigContentParser parser = JtwigContentParser
                 .newParser(resource, configuration);

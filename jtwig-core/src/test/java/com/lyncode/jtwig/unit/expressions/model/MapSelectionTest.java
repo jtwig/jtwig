@@ -14,7 +14,7 @@
 
 package com.lyncode.jtwig.unit.expressions.model;
 
-import com.lyncode.jtwig.JtwigContext;
+import com.lyncode.jtwig.JtwigModelMap;
 import com.lyncode.jtwig.compile.CompileContext;
 import com.lyncode.jtwig.exception.CalculateException;
 import com.lyncode.jtwig.expressions.api.CompilableExpression;
@@ -23,6 +23,7 @@ import com.lyncode.jtwig.expressions.model.Constant;
 import com.lyncode.jtwig.expressions.model.MapSelection;
 import com.lyncode.jtwig.expressions.model.Variable;
 import com.lyncode.jtwig.render.RenderContext;
+import com.lyncode.jtwig.render.config.RenderConfiguration;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -41,7 +42,6 @@ public class MapSelectionTest {
         Variable variable = mock(Variable.class);
         CompilableExpression key = new Constant<>("test");
         CompileContext context = mock(CompileContext.class);
-        JtwigContext jtwigContext = mock(JtwigContext.class);
 
         when(variable.compile(context)).thenReturn(mapExpression("test", "value"));
 
@@ -49,7 +49,7 @@ public class MapSelectionTest {
         Expression compiled = selection.compile(context);
 
         assertThat(compiled, notNullValue(Expression.class));
-        assertEquals("value", compiled.calculate(RenderContext.create(null, jtwigContext, null)));
+        assertEquals("value", compiled.calculate(RenderContext.create(new RenderConfiguration(), new JtwigModelMap(), null)));
     }
 
     @Test(expected = CalculateException.class)
@@ -57,7 +57,6 @@ public class MapSelectionTest {
         Variable variable = mock(Variable.class);
         CompilableExpression key = new Constant<>(UNDEFINED);
         CompileContext context = mock(CompileContext.class);
-        JtwigContext jtwigContext = mock(JtwigContext.class);
 
         when(variable.compile(context)).thenReturn(mapExpression("test", "value"));
 
@@ -65,7 +64,7 @@ public class MapSelectionTest {
         Expression compiled = selection.compile(context);
 
         assertThat(compiled, notNullValue(Expression.class));
-        compiled.calculate(RenderContext.create(null, jtwigContext, null));
+        compiled.calculate(RenderContext.create(new RenderConfiguration(), new JtwigModelMap(), null));
     }
 
 
@@ -74,7 +73,6 @@ public class MapSelectionTest {
         Variable variable = mock(Variable.class);
         CompilableExpression key = new Constant<>("test");
         CompileContext context = mock(CompileContext.class);
-        JtwigContext jtwigContext = mock(JtwigContext.class);
 
         when(variable.compile(context)).thenReturn(new Expression() {
             @Override
@@ -87,7 +85,7 @@ public class MapSelectionTest {
         Expression compiled = selection.compile(context);
 
         assertThat(compiled, notNullValue(Expression.class));
-        compiled.calculate(RenderContext.create(null, jtwigContext, null));
+        compiled.calculate(RenderContext.create(new RenderConfiguration(), new JtwigModelMap(), null));
     }
 
     private Expression mapExpression(final String key, final String value) {

@@ -14,9 +14,12 @@
 
 package com.lyncode.jtwig.render.config;
 
+import com.lyncode.jtwig.functions.repository.impl.MapFunctionRepository;
+
 public class RenderConfiguration {
     private boolean strictMode = false;
     private boolean logNonStrictMode = true;
+    private final MapFunctionRepository functionRepository = new MapFunctionRepository();
 
     public boolean strictMode() {
         return strictMode;
@@ -34,5 +37,9 @@ public class RenderConfiguration {
     public RenderConfiguration logNonStrictMode(boolean logNonStrictMode) {
         this.logNonStrictMode = logNonStrictMode;
         return this;
+    }
+
+    public MapFunctionRepository functionRepository() {
+        return functionRepository;
     }
 }

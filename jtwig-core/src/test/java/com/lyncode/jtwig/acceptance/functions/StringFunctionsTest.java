@@ -72,7 +72,7 @@ public class StringFunctionsTest extends AbstractJtwigTest {
 
     @Test
     public void nl2brTest() throws Exception {
-        given(aContext().withModelAttribute("var", "Hi\n\n"));
+        given(aModel().withModelAttribute("var", "Hi\n\n"));
         when(jtwigRenders(template("{{ nl2br(var) }}")));
         then(theRenderedTemplate(), is(equalTo("Hi<br /><br />")));
     }

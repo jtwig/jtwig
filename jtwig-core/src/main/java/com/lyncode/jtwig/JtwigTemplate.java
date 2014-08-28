@@ -16,7 +16,6 @@ package com.lyncode.jtwig;
 
 import com.lyncode.jtwig.compile.CompileContext;
 import com.lyncode.jtwig.configuration.JtwigConfiguration;
-import com.lyncode.jtwig.content.api.Compilable;
 import com.lyncode.jtwig.content.api.Renderable;
 import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.ParseException;
@@ -32,30 +31,30 @@ import java.io.File;
 import java.io.OutputStream;
 
 public class JtwigTemplate {
-    private JtwigResource resource;
-    private JtwigConfiguration configuration = new JtwigConfiguration();
-
-    public JtwigTemplate(JtwigResource resource) {
-        this.resource = resource;
+    public static JtwigTemplate fromString (String template) {
+        return new JtwigTemplate(template, new JtwigConfiguration());
     }
+
+    private final JtwigResource resource;
+    private final JtwigConfiguration configuration;
 
     public JtwigTemplate(JtwigResource resource, JtwigConfiguration configuration) {
         this.resource = resource;
         this.configuration = configuration;
     }
 
-    public JtwigTemplate(String content) {
-        this.resource = new StringJtwigResource(content);
+    public JtwigTemplate(String content, JtwigConfiguration configuration) {
+        this(new StringJtwigResource(content), configuration);
     }
 
-    public JtwigTemplate(File file) {
-        this.resource = new FileJtwigResource(file);
+    public JtwigTemplate(File file, JtwigConfiguration configuration) {
+        this(new FileJtwigResource(file), configuration);
     }
 
-    public void output (OutputStream outputStream, JtwigContext context) throws ParseException, CompileException, RenderException {
+    public void output (OutputStream outputStream, JtwigModelMap modelMap) throws ParseException, CompileException, RenderException {
         JtwigParser parser = new JtwigParser(configuration.parse());
         CompileContext compileContext = new CompileContext(resource, parser, configuration.compile());
-        RenderContext renderContext = RenderContext.create(configuration.render(), context, outputStream);
+        RenderContext renderContext = RenderContext.create(configuration.render(), modelMap, outputStream);
 
         parser
                 .parse(resource)
@@ -63,9 +62,9 @@ public class JtwigTemplate {
                 .render(renderContext);
     }
 
-    public String output(JtwigContext context) throws ParseException, CompileException, RenderException {
+    public String output(JtwigModelMap modelMap) throws ParseException, CompileException, RenderException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        output(outputStream, context);
+        output(outputStream, modelMap);
         return outputStream.toString();
     }
 
@@ -73,11 +72,5 @@ public class JtwigTemplate {
         JtwigParser parser = new JtwigParser(configuration.parse());
         return parser.parse(resource)
                 .compile(new CompileContext(resource, parser, configuration.compile()));
-    }
-
-
-    public Renderable compile(JtwigParser parser) throws ParseException, CompileException {
-        Compilable compilable = parser.parse(resource);
-        return compilable.compile(new CompileContext(resource, parser, configuration.compile()));
     }
 }

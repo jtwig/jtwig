@@ -14,22 +14,22 @@
 
 package com.lyncode.jtwig.unit.expressions.model;
 
-import com.lyncode.jtwig.JtwigContext;
+import com.lyncode.jtwig.JtwigModelMap;
 import com.lyncode.jtwig.expressions.model.Variable;
 import com.lyncode.jtwig.render.RenderContext;
+import com.lyncode.jtwig.render.config.RenderConfiguration;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class VariableTest {
     private Variable underTest = new Variable(null, "variable");
 
     @Test
     public void resolveValueTest() throws Exception {
-        JtwigContext context = mock(JtwigContext.class);
-        when(context.map("variable")).thenReturn("one");
-        assertEquals("one", underTest.compile(null).calculate(RenderContext.create(null, context, null)));
+        JtwigModelMap modelMap = new JtwigModelMap()
+                .withModelAttribute("variable", "one")
+                ;
+        assertEquals("one", underTest.compile(null).calculate(RenderContext.create(new RenderConfiguration(), modelMap, null)));
     }
 }

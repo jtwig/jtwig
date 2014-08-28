@@ -14,7 +14,6 @@
 
 package com.lyncode.jtwig.mvc;
 
-import com.lyncode.jtwig.JtwigContext;
 import com.lyncode.jtwig.JtwigModelMap;
 import com.lyncode.jtwig.JtwigTemplate;
 import com.lyncode.jtwig.beans.BeanResolver;
@@ -22,7 +21,6 @@ import com.lyncode.jtwig.configuration.JtwigConfiguration;
 import com.lyncode.jtwig.content.api.Renderable;
 import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.ParseException;
-import com.lyncode.jtwig.parser.JtwigParser;
 import com.lyncode.jtwig.render.RenderContext;
 import com.lyncode.jtwig.resource.ClasspathJtwigResource;
 import com.lyncode.jtwig.resource.FileJtwigResource;
@@ -103,8 +101,7 @@ public class JtwigView extends AbstractTemplateView {
             response.setCharacterEncoding(this.getEncoding());
         }
 
-        JtwigContext jtwigContext = new JtwigContext(modelMap, getViewResolver().functionResolver());
-        getContent().render(RenderContext.create(getConfiguration().render(), jtwigContext, response.getOutputStream()));
+        getContent().render(RenderContext.create(getConfiguration().render(), modelMap, getViewResolver().functionResolver(), response.getOutputStream()));
 
         response.getOutputStream().flush();
         response.getOutputStream().close();
@@ -128,8 +125,7 @@ public class JtwigView extends AbstractTemplateView {
     }
 
     private Renderable getCompiledJtwigTemplate() throws ParseException, CompileException {
-        return new JtwigTemplate(getResource())
-                .compile(jtwigParser());
+        return new JtwigTemplate(getResource(), getConfiguration()).compile();
     }
 
     private JtwigResource getResource() {
@@ -140,10 +136,6 @@ public class JtwigView extends AbstractTemplateView {
             return new FileJtwigResource(url);
         else
             return new WebJtwigResource(getServletContext(), url);
-    }
-
-    private JtwigParser jtwigParser() {
-        return new JtwigParser(getConfiguration().parse());
     }
 
     @SuppressWarnings("serial")

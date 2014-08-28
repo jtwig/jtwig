@@ -14,8 +14,9 @@
 
 package com.lyncode.jtwig.acceptance;
 
-import com.lyncode.jtwig.JtwigContext;
+import com.lyncode.jtwig.JtwigModelMap;
 import com.lyncode.jtwig.JtwigTemplate;
+import com.lyncode.jtwig.configuration.JtwigConfiguration;
 import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.ParseException;
 import com.lyncode.jtwig.exception.RenderException;
@@ -30,83 +31,83 @@ public class BinaryBooleanOperatorTest extends AbstractJtwigTest {
 
     @Test(expected = ParseException.class)
     public void AndBadSyntax () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = new JtwigTemplate("{% if (items && true) %}Hi{% endif %}");
-        JtwigContext context = new JtwigContext();
-        template.output(context);
+        JtwigTemplate template = new JtwigTemplate("{% if (items && true) %}Hi{% endif %}", new JtwigConfiguration());
+        JtwigModelMap modelMap = new JtwigModelMap();
+        template.output(modelMap);
     }
 
     @Test
     public void AndGoodSyntax () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = new JtwigTemplate("{% if (items and true) %}Hi{% endif %}");
-        JtwigContext context = new JtwigContext();
+        JtwigTemplate template = new JtwigTemplate("{% if (items and true) %}Hi{% endif %}", new JtwigConfiguration());
+        JtwigModelMap modelMap = new JtwigModelMap();
         ArrayList<String> value = new ArrayList<String>();
         value.add("a");
-        context.withModelAttribute("items", value);
-        assertThat(template.output(context), is("Hi"));
+        modelMap.add("items", value);
+        assertThat(template.output(modelMap), is("Hi"));
     }
 
     @Test(expected = ParseException.class)
     public void OrBadSyntax () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = new JtwigTemplate("{% if (items || true) %}Hi{% endif %}");
-        JtwigContext context = new JtwigContext();
-        template.output(context);
+        JtwigTemplate template = new JtwigTemplate("{% if (items || true) %}Hi{% endif %}", new JtwigConfiguration());
+        JtwigModelMap modelMap = new JtwigModelMap();
+        template.output(modelMap);
     }
 
     @Test
     public void OrGoodSyntax () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = new JtwigTemplate("{% if (false or items) %}Hi{% endif %}");
-        JtwigContext context = new JtwigContext();
+        JtwigTemplate template = new JtwigTemplate("{% if (false or items) %}Hi{% endif %}", new JtwigConfiguration());
+        JtwigModelMap modelMap = new JtwigModelMap();
         ArrayList<String> value = new ArrayList<String>();
         value.add("a");
-        context.withModelAttribute("items", value);
-        assertThat(template.output(context), is("Hi"));
+        modelMap.add("items", value);
+        assertThat(template.output(modelMap), is("Hi"));
     }
 
     @Test
     public void StartsWith () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = new JtwigTemplate("{% if ('Hello' starts with 'H') %}Hi{% endif %}");
-        assertThat(template.output(new JtwigContext()), is("Hi"));
+        JtwigTemplate template = new JtwigTemplate("{% if ('Hello' starts with 'H') %}Hi{% endif %}", new JtwigConfiguration());
+        assertThat(template.output(new JtwigModelMap()), is("Hi"));
     }
 
     @Test
     public void StartsWithFail () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = new JtwigTemplate("{% if ('Hello' starts with 'e') %}Hi{% endif %}");
-        assertThat(template.output(new JtwigContext()), is(""));
+        JtwigTemplate template = new JtwigTemplate("{% if ('Hello' starts with 'e') %}Hi{% endif %}", new JtwigConfiguration());
+        assertThat(template.output(new JtwigModelMap()), is(""));
     }
 
     @Test
     public void EndsWith () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = new JtwigTemplate("{% if ('Hello' ends with 'llo') %}Hi{% endif %}");
-        assertThat(template.output(new JtwigContext()), is("Hi"));
+        JtwigTemplate template = new JtwigTemplate("{% if ('Hello' ends with 'llo') %}Hi{% endif %}", new JtwigConfiguration());
+        assertThat(template.output(new JtwigModelMap()), is("Hi"));
     }
 
     @Test
     public void EndsWithFail () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = new JtwigTemplate("{% if ('Hello' ends with 'a') %}Hi{% endif %}");
-        assertThat(template.output(new JtwigContext()), is(""));
+        JtwigTemplate template = new JtwigTemplate("{% if ('Hello' ends with 'a') %}Hi{% endif %}", new JtwigConfiguration());
+        assertThat(template.output(new JtwigModelMap()), is(""));
     }
 
     @Test
     public void Matches () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = new JtwigTemplate("{% if ('Hello' matches 'H.*') %}Hi{% endif %}");
-        assertThat(template.output(new JtwigContext()), is("Hi"));
+        JtwigTemplate template = new JtwigTemplate("{% if ('Hello' matches 'H.*') %}Hi{% endif %}", new JtwigConfiguration());
+        assertThat(template.output(new JtwigModelMap()), is("Hi"));
     }
 
     @Test
     public void MatchesFail () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = new JtwigTemplate("{% if ('Hello' matches '^A.*') %}Hi{% endif %}");
-        assertThat(template.output(new JtwigContext()), is(""));
+        JtwigTemplate template = new JtwigTemplate("{% if ('Hello' matches '^A.*') %}Hi{% endif %}", new JtwigConfiguration());
+        assertThat(template.output(new JtwigModelMap()), is(""));
     }
 
     @Test
     public void Contains () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = new JtwigTemplate("{% if ('a' in 'abc') %}Hi{% endif %}");
-        assertThat(template.output(new JtwigContext()), is("Hi"));
+        JtwigTemplate template = new JtwigTemplate("{% if ('a' in 'abc') %}Hi{% endif %}", new JtwigConfiguration());
+        assertThat(template.output(new JtwigModelMap()), is("Hi"));
     }
 
     @Test
     public void ContainsFail () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = new JtwigTemplate("{% if ('a' in ['b','c']) %}Hi{% endif %}");
-        assertThat(template.output(new JtwigContext()), is(""));
+        JtwigTemplate template = new JtwigTemplate("{% if ('a' in ['b','c']) %}Hi{% endif %}", new JtwigConfiguration());
+        assertThat(template.output(new JtwigModelMap()), is(""));
     }
 }

@@ -14,7 +14,7 @@
 
 package com.lyncode.jtwig.acceptance;
 
-import com.lyncode.jtwig.JtwigContext;
+import com.lyncode.jtwig.JtwigModelMap;
 import com.lyncode.jtwig.JtwigTemplate;
 import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.ParseException;
@@ -38,23 +38,23 @@ public class MapExpressionTest extends AbstractJtwigTest {
 
     @Test
     public void ifWithEmptyMapShouldBeTheSameAsFalse () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = new JtwigTemplate("{% if (map) %}not empty{% else %}empty{% endif %}");
-        JtwigContext context = new JtwigContext();
+        JtwigTemplate template = JtwigTemplate.fromString("{% if (map) %}not empty{% else %}empty{% endif %}");
+        JtwigModelMap context = new JtwigModelMap();
         context.withModelAttribute("map", new HashMap());
         assertThat(template.output(context), is("empty"));
     }
 
     @Test
     public void ifNoKeyInMapTryMethods () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = new JtwigTemplate("{{ map.size }}");
-        JtwigContext context = new JtwigContext();
+        JtwigTemplate template = JtwigTemplate.fromString("{{ map.size }}");
+        JtwigModelMap context = new JtwigModelMap();
         context.withModelAttribute("map", new HashMap());
         assertThat(template.output(context), is("0"));
     }
     @Test
     public void methodsAndFieldsShouldPrevail () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = new JtwigTemplate("{{ map.size }}");
-        JtwigContext context = new JtwigContext();
+        JtwigTemplate template = JtwigTemplate.fromString("{{ map.size }}");
+        JtwigModelMap context = new JtwigModelMap();
         HashMap value = new HashMap();
         value.put("size", "Hello!");
         context.withModelAttribute("map", value);

@@ -14,7 +14,7 @@
 
 package com.lyncode.jtwig.acceptance;
 
-import com.lyncode.jtwig.JtwigContext;
+import com.lyncode.jtwig.JtwigModelMap;
 import com.lyncode.jtwig.JtwigTemplate;
 import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.ParseException;
@@ -27,8 +27,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class VerbatimTest extends AbstractJtwigTest {
     @Test
     public void verbatimDoesntTryToResolveExpressions() throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = new JtwigTemplate("{% verbatim %}{{ name }}{% endverbatim %}");
-        JtwigContext context = new JtwigContext();
+        JtwigTemplate template = JtwigTemplate.fromString("{% verbatim %}{{ name }}{% endverbatim %}");
+        JtwigModelMap context = new JtwigModelMap();
         assertThat(template.output(context), is("{{ name }}"));
     }
 

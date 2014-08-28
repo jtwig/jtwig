@@ -14,7 +14,7 @@
 
 package com.lyncode.jtwig.acceptance;
 
-import com.lyncode.jtwig.JtwigContext;
+import com.lyncode.jtwig.JtwigModelMap;
 import com.lyncode.jtwig.JtwigTemplate;
 import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.ParseException;
@@ -29,16 +29,16 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class IfExpressionTest extends AbstractJtwigTest {
     @Test
     public void ifWithEmptyListShouldBeTheSameAsFalse () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = new JtwigTemplate("{% if (list) %}not empty{% else %}empty{% endif %}");
-        JtwigContext context = new JtwigContext();
+        JtwigTemplate template = JtwigTemplate.fromString("{% if (list) %}not empty{% else %}empty{% endif %}");
+        JtwigModelMap context = new JtwigModelMap();
         context.withModelAttribute("list", new ArrayList<String>());
         assertThat(template.output(context), is("empty"));
     }
 
     @Test
     public void ifWithNonEmptyListShouldBeTheSameAsTrue () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = new JtwigTemplate("{% if (list) %}not empty{% else %}empty{% endif %}");
-        JtwigContext context = new JtwigContext();
+        JtwigTemplate template = JtwigTemplate.fromString("{% if (list) %}not empty{% else %}empty{% endif %}");
+        JtwigModelMap context = new JtwigModelMap();
         ArrayList<String> value = new ArrayList<String>();
         value.add("a");
         context.withModelAttribute("list", value);
@@ -47,14 +47,14 @@ public class IfExpressionTest extends AbstractJtwigTest {
 
     @Test
     public void IfWithContentInside () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = new JtwigTemplate("{% if (items) %}" +
+        JtwigTemplate template = JtwigTemplate.fromString("{% if (items) %}" +
                 "Items: "+
                 "{% for item in items %}" +
                 "{{ item }}" +
                 "{% endfor %}" +
                 "{% endif %}");
 
-        JtwigContext context = new JtwigContext();
+        JtwigModelMap context = new JtwigModelMap();
         ArrayList<String> value = new ArrayList<String>();
         value.add("a");
         context.withModelAttribute("items", value);

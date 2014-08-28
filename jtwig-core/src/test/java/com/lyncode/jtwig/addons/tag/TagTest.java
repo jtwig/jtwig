@@ -1,12 +1,13 @@
 package com.lyncode.jtwig.addons.tag;
 
 import com.google.common.base.Function;
-import com.lyncode.jtwig.JtwigContext;
+import com.lyncode.jtwig.JtwigModelMap;
 import com.lyncode.jtwig.compile.CompileContext;
 import com.lyncode.jtwig.compile.config.CompileConfiguration;
 import com.lyncode.jtwig.content.model.compilable.Sequence;
 import com.lyncode.jtwig.content.model.compilable.Text;
 import com.lyncode.jtwig.parser.JtwigParser;
+import com.lyncode.jtwig.parser.config.ParserConfiguration;
 import com.lyncode.jtwig.render.RenderContext;
 import com.lyncode.jtwig.render.config.RenderConfiguration;
 import com.lyncode.jtwig.resource.StringJtwigResource;
@@ -32,8 +33,8 @@ public class TagTest {
     @Before
     public void setUp() throws Exception {
         output = new ByteArrayOutputStream();
-        renderContext = RenderContext.create(new RenderConfiguration(), new JtwigContext(), output);
-        compileContext = new CompileContext(new StringJtwigResource(""), new JtwigParser(), new CompileConfiguration());
+        renderContext = RenderContext.create(new RenderConfiguration(), new JtwigModelMap(), output);
+        compileContext = new CompileContext(new StringJtwigResource(""), new JtwigParser(new ParserConfiguration()), new CompileConfiguration());
     }
 
     @Test
