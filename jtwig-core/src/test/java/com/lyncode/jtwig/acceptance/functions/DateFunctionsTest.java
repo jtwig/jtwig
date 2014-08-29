@@ -27,24 +27,24 @@ public class DateFunctionsTest extends AbstractJtwigTest {
     @Test
     public void dateFormatWithDate() throws Exception {
         given(aModel().withModelAttribute("time", new Date()));
-        when(jtwigRenders(template("{{ date_format(time, 'yyyy') }}")));
+        when(jtwigRenders(template("{{ date(time, 'yyyy') }}")));
     }
 
     @Test
     public void dateFormat() throws Exception {
         given(aModel().withModelAttribute("time", new Date()));
-        when(jtwigRenders(template("{{ date_format(time) }}")));
+        when(jtwigRenders(template("{{ date(time) }}")));
     }
 
     @Test
     public void dateModify() throws Exception {
         given(aModel().withModelAttribute("time", new Date()));
-        when(jtwigRenders(template("{{ date_format(time, '+1 day') }}")));
+        when(jtwigRenders(template("{{ date(time, '+1 day') }}")));
     }
 
     @Test(expected = RenderException.class)
     public void dateModifyWithWrongFormat() throws Exception {
         given(aModel().withModelAttribute("time", new Date()));
-        when(jtwigRenders(template("{{ date_modify(time, '+1 unknown') }}")));
+        when(jtwigRenders(template("{{ date(time, '+1 unknown') }}")));
     }
 }
