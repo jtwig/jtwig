@@ -42,7 +42,7 @@ public class StringFunctions {
     }
 
     @JtwigFunction(name = "convert_encoding")
-    public String capitalize (@Parameter String input, @Parameter String from, @Parameter String to) {
+    public String convertEncoding (@Parameter String input, @Parameter String from, @Parameter String to) {
         return new String(input.getBytes(forName(from)), forName(to));
     }
 
