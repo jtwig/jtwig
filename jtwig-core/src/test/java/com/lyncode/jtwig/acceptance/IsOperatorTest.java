@@ -51,6 +51,11 @@ public class IsOperatorTest extends AbstractJtwigTest {
         assertThat(template.output(context), is(equalTo("Hi")));
     }
     @Test
+    public void isNotOddFunction () throws Exception {
+        JtwigTemplate template = JtwigTemplate.fromString("{% if (1 is not odd) %}Hi{% endif %}");
+        assertThat(template.output(context), is(equalTo("")));
+    }
+    @Test
     public void isOddFunction () throws Exception {
         JtwigTemplate template = JtwigTemplate.fromString("{% if (1 is odd) %}Hi{% endif %}");
         assertThat(template.output(context), is(equalTo("Hi")));

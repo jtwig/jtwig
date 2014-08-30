@@ -14,7 +14,9 @@
 
 package com.lyncode.jtwig.functions.builtin;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,10 +26,12 @@ import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.Assert.*;
 
 public class StringFunctionsTest {
+    @Rule public ExpectedException expectedException = ExpectedException.none();
+
     StringFunctions underTest = new StringFunctions();
 
 
@@ -35,10 +39,19 @@ public class StringFunctionsTest {
     public void first() throws Exception {
         assertEquals(underTest.first("test"), (Character) 't');
     }
+    @Test
+    public void firstWithEmptyString() throws Exception {
+        assertNull(underTest.first(""));
+    }
 
     @Test
     public void last() throws Exception {
         assertEquals(underTest.last("test"), (Character) 't');
+    }
+
+    @Test
+    public void lastWithEmptyString() throws Exception {
+        assertNull(underTest.last(""));
     }
 
 
@@ -47,6 +60,10 @@ public class StringFunctionsTest {
         assertEquals(underTest.capitalize("my first car"), "My first car");
     }
 
+    @Test
+    public void capitalizeWithEmptyString() throws Exception {
+        assertEquals("", underTest.capitalize(""));
+    }
 
     @Test
     public void escapeExecuteDefault() throws Exception {
@@ -61,6 +78,14 @@ public class StringFunctionsTest {
     @Test
     public void escapeExecuteJs() throws Exception {
         assertEquals("<xml \\/>", underTest.escape("<xml />", "js"));
+    }
+
+    @Test
+    public void escapeNonSupportedType() throws Exception {
+        expectedException.expect(IllegalStateException.class);
+        expectedException.expectMessage(equalTo("Unknown strategy 'test'"));
+
+        underTest.escape("<xml />", "test");
     }
 
 
@@ -95,6 +120,21 @@ public class StringFunctionsTest {
         }});
 
         assertEquals("I like foo and bar.", result);
+    }
+    @Test
+    public void replaceReplace() throws Exception {
+        Object result = underTest.replace("I like %this% and %that%.", (Map) new HashMap<String, String>() {{
+            put("%this%", "foo");
+        }});
+
+        assertEquals("I like foo and %that%.", result);
+    }
+
+    @Test
+    public void replaceWithoutReplacementExecute() throws Exception {
+        Object result = underTest.replace("I like %this%.", (Map) new HashMap<String, String>() {});
+
+        assertEquals("I like %this%.", result);
     }
 
     @Test
@@ -158,5 +198,12 @@ public class StringFunctionsTest {
     @Test
     public void reverse() throws Exception {
         assertEquals("cba", underTest.reverse("abc"));
+    }
+
+    @Test
+    public void convertFromUtf8ToIso8859_1() throws Exception {
+        assertArrayEquals(
+                new String("hello".getBytes(), "ISO-8859-1").getBytes(),
+                underTest.convertEncoding("hello", "UTF-8", "ISO-8859-1").getBytes());
     }
 }

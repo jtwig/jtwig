@@ -16,5 +16,5 @@ package com.lyncode.jtwig.addons;
 
 import com.lyncode.jtwig.content.model.compilable.Content;
 
-public abstract class AddonModel extends Content {
+public abstract class AddonModel<T extends AddonModel> extends Content<T> {
 }

@@ -14,18 +14,26 @@
 
 package com.lyncode.jtwig.functions.builtin;
 
+import com.lyncode.jtwig.functions.exceptions.FunctionException;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import static com.lyncode.jtwig.types.Undefined.UNDEFINED;
+import static java.util.Arrays.asList;
+import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class BooleanFunctionsTest {
     public static final String STATIC = "value";
     private BooleanFunctions underTest = new BooleanFunctions();
+
+    @Rule public ExpectedException expectedException = ExpectedException.none();
 
     @Test
     public void even() throws Exception {
@@ -48,6 +56,22 @@ public class BooleanFunctionsTest {
     @Test
     public void constant() throws Exception {
         assertTrue(underTest.isEqualToConstant("value", getClass().getName() + ".STATIC"));
+    }
+
+    @Test
+    public void invalidConstant() throws Exception {
+        expectedException.expect(FunctionException.class);
+        expectedException.expectMessage(equalTo("Invalid constant specified 'UnknownClass'"));
+
+        underTest.isEqualToConstant("value", "UnknownClass");
+    }
+
+    @Test
+    public void undefinedConstant() throws Exception {
+        expectedException.expect(FunctionException.class);
+        expectedException.expectMessage(equalTo("Constant 'UnknownClass.TEST' does not exist"));
+
+        underTest.isEqualToConstant("value", "UnknownClass.TEST");
     }
 
     @Test
@@ -83,6 +107,34 @@ public class BooleanFunctionsTest {
         assertTrue(underTest.isEmpty(new HashMap<>()));
         assertTrue(underTest.isEmpty(null));
         assertTrue(underTest.isEmpty(0));
+    }
+
+    @Test
+    public void someOnNonEmptyIterator() throws Exception {
+        assertFalse(underTest.isEmpty(nonEmptyIterator()));
+    }
+
+    @Test
+    public void emptyOnEmptyIterator() throws Exception {
+        assertTrue(underTest.isEmpty(emptyIterator()));
+    }
+
+    private Iterable<Object> nonEmptyIterator() {
+        return new Iterable<Object>() {
+            @Override
+            public Iterator iterator() {
+                return asList(1).iterator();
+            }
+        };
+    }
+
+    private Iterable<Object> emptyIterator() {
+        return new Iterable<Object>() {
+            @Override
+            public Iterator iterator() {
+                return new ArrayList<>().iterator();
+            }
+        };
     }
 
 }

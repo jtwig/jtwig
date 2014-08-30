@@ -74,7 +74,7 @@ public class IfControl extends AbstractElement {
         List<CompiledCase> cases = new ArrayList<>();
 
         for (Case aCase : this.cases)
-            cases.add(new CompiledCase(aCase.expression.compile(context), aCase.compile(context)));
+            cases.add((CompiledCase) aCase.compile(context));
 
         return new Compiled(cases);
     }
@@ -84,6 +84,11 @@ public class IfControl extends AbstractElement {
 
         public Case(CompilableExpression condition) {
             this.expression = condition;
+        }
+
+        @Override
+        public Renderable compile(CompileContext context) throws CompileException {
+            return new CompiledCase(expression.compile(context), super.compile(context));
         }
     }
 

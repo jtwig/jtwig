@@ -52,7 +52,7 @@ public class SelectionOperation implements BinaryOperation {
         ObjectExtractor extractor = new ObjectExtractor(calculate);
         try {
             if (right instanceof Variable.Compiled)
-                return ((Variable.Compiled) right).extract(context, extractor);
+                return ((Variable.Compiled) right).extract(extractor);
             else if (right instanceof FunctionElement.Compiled)
                 return ((FunctionElement.Compiled) right).extract(context, extractor);
             else throw new CalculateException("Selection operator must be given a variable/function as right argument");

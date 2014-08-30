@@ -42,7 +42,7 @@ public class StringFunctions {
     }
 
     @JtwigFunction(name = "convert_encoding")
-    public String capitalize (@Parameter String input, @Parameter String from, @Parameter String to) {
+    public String convertEncoding (@Parameter String input, @Parameter String from, @Parameter String to) {
         return new String(input.getBytes(forName(from)), forName(to));
     }
 
@@ -54,14 +54,13 @@ public class StringFunctions {
     @JtwigFunction(name = "escape", aliases = {"e"})
     public String escape (@Parameter String input, @Parameter String strategy) throws FunctionException {
         switch (EscapeStrategy.strategyByName(strategy.toLowerCase())) {
-            case HTML:
-                return StringEscapeUtils.escapeHtml4(input);
             case JAVASCRIPT:
                 return StringEscapeUtils.escapeEcmaScript(input);
             case XML:
                 return StringEscapeUtils.escapeXml(input);
+            case HTML: // Default html
             default:
-                throw new FunctionException("Unknown escaping strategy "+strategy);
+                return StringEscapeUtils.escapeHtml4(input);
         }
     }
 
@@ -83,10 +82,16 @@ public class StringFunctions {
 
     @JtwigFunction(name = "replace")
     public String replace (@Parameter String input, @Parameter Map<String, Object> replacements) {
-        for (String key : replacements.keySet())
-            if (replacements.get(key) != null)
+        for (String key : replacements.keySet()) {
+            if (replacements.containsKey(key)) {
                 input = input.replace(key, replacements.get(key).toString());
+            }
+        }
         return input;
+    }
+
+    private boolean test(Map<String, Object> replacements, String key) {
+        return replacements.containsKey(key);
     }
 
     @JtwigFunction(name = "split")
@@ -165,7 +170,7 @@ public class StringFunctions {
                 if (escape.representations.contains(name))
                     return escape;
             }
-            return null;
+            throw new IllegalStateException(String.format("Unknown strategy '%s'", name));
         }
     }
 

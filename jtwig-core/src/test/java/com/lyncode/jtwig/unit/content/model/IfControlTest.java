@@ -20,13 +20,16 @@ import com.lyncode.jtwig.content.api.Compilable;
 import com.lyncode.jtwig.content.api.Renderable;
 import com.lyncode.jtwig.content.model.compilable.IfControl;
 import com.lyncode.jtwig.content.model.compilable.Sequence;
+import com.lyncode.jtwig.exception.CalculateException;
 import com.lyncode.jtwig.exception.CompileException;
+import com.lyncode.jtwig.exception.RenderException;
 import com.lyncode.jtwig.expressions.api.CompilableExpression;
 import com.lyncode.jtwig.expressions.api.Expression;
 import com.lyncode.jtwig.parser.JtwigParser;
 import com.lyncode.jtwig.render.RenderContext;
 import com.lyncode.jtwig.resource.JtwigResource;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import static org.mockito.Mockito.*;
 
@@ -62,8 +65,32 @@ public class IfControlTest {
         verify(render, times(0)).render(context);
     }
 
+    @Test
+    public void tagWhiteSpace() throws Exception {
+        IfControl.Case aCase = mock(IfControl.Case.class, Mockito.RETURNS_DEEP_STUBS);
+        IfControl control = new IfControl().add(aCase);
+
+        control.tag().whiteSpaceControl().trimAfterBegin();
+        control.tag().whiteSpaceControl().trimBeforeEnd();
+
+        verify(aCase.tag().whiteSpaceControl()).trimAfterBegin();
+        verify(aCase.tag().whiteSpaceControl()).trimBeforeEnd();
+    }
 
 
+    @Test(expected = RenderException.class)
+    public void renderThrowsExceptionWhenCalculateException() throws Exception {
+        Renderable render = mock(Renderable.class);
+        Expression condition = mock(Expression.class);
+        IfControl control = new IfControl()
+                .add(new IfControl.Case(toCalculate(condition)).withContent(toRender(render)));
+
+        RenderContext context = mock(RenderContext.class);
+
+        when(condition.calculate(context)).thenThrow(CalculateException.class);
+        control.compile(new CompileContext(mock(JtwigResource.class), mock(JtwigParser.class), mock(CompileConfiguration.class)))
+                .render(context);
+    }
 
     private Sequence toRender(final Renderable elementRender) {
         return new Sequence().add(new Compilable() {

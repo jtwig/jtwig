@@ -30,6 +30,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 
+import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
@@ -82,6 +83,22 @@ public class TextTest {
                 .render(renderContext);
 
         verify(renderContext).write(" Hello".getBytes());
+    }
+
+    @Test(expected = RenderException.class)
+    public void renderWhenIOException() throws Exception {
+        doThrow(IOException.class)
+                .when(renderContext)
+                .write(any(byte[].class));
+
+        underTest.compile(context)
+                .render(renderContext);
+    }
+
+    @Test
+    public void builderIsFakeContent() throws Exception {
+        Text.Builder b = new Text.Builder();
+        assertNull(b.compile(null));
     }
 
     @Test

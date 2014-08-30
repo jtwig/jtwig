@@ -55,6 +55,19 @@ public class ObjectExtractorTest {
         assertEquals("b", underTest.extract("b"));
     }
 
+    @Test(expected = ObjectExtractor.ExtractException.class)
+    public void methodException() throws Exception {
+        ObjectExtractor underTest = new ObjectExtractor(new TestClass());
+
+        underTest.extract("method");
+    }
+
+    public static class TestClass {
+        public String method () {
+            throw new RuntimeException();
+        }
+    }
+
     public static class A {
         public String a;
     }

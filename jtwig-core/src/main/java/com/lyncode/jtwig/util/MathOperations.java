@@ -26,7 +26,7 @@ public class MathOperations {
     }
 
     public static Object mod (Object a, Object b) {
-        return toDouble(a) % toDouble(b);
+        return toInt(a) % toInt(b);
     }
 
     public static Object mul (Object a, Object b) {
