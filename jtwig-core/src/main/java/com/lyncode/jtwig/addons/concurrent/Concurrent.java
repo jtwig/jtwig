@@ -24,7 +24,7 @@ import com.lyncode.jtwig.render.RenderContext;
 
 import java.io.IOException;
 
-public class Concurrent extends AddonModel {
+public class Concurrent extends AddonModel<Concurrent> {
 
     @Override
     public Renderable compile(CompileContext context) throws CompileException {

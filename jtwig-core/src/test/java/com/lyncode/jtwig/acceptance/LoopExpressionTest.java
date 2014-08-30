@@ -16,6 +16,8 @@ package com.lyncode.jtwig.acceptance;
 
 import org.junit.Test;
 
+import java.util.HashMap;
+
 import static com.lyncode.jtwig.util.SyntacticSugar.*;
 import static java.util.Arrays.asList;
 import static org.hamcrest.core.Is.is;
@@ -27,5 +29,23 @@ public class LoopExpressionTest extends AbstractJtwigTest {
         given(aModel().withModelAttribute("list", asList("a", "b", "c")));
         when(jtwigRenders(template("{% for item in list %}{{ item }}{% endfor %}")));
         then(theRenderedTemplate(), is(equalTo("abc")));
+    }
+    @Test
+    public void simpleLoopLength() throws Exception {
+        given(aModel().withModelAttribute("list", asList("a", "b", "c")));
+        when(jtwigRenders(template("{% for item in list %}{{ loop.length }}{% endfor %}")));
+        then(theRenderedTemplate(), is(equalTo("333")));
+    }
+    @Test
+    public void simpleMapLoopWithList() throws Exception {
+        given(aModel().withModelAttribute("list", asList("a")));
+        when(jtwigRenders(template("{% for key, value in list %}{{ key }} - {{ value }}{% endfor %}")));
+        then(theRenderedTemplate(), is(equalTo("0 - a")));
+    }
+    @Test
+    public void emptyMap() throws Exception {
+        given(aModel().withModelAttribute("list", new HashMap<>()));
+        when(jtwigRenders(template("{% for key, value in list %}{{ key }} - {{ value }}{% else %}Test{% endfor %}")));
+        then(theRenderedTemplate(), is(equalTo("Test")));
     }
 }

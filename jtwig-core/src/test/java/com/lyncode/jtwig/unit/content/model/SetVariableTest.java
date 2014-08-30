@@ -14,10 +14,11 @@
 
 package com.lyncode.jtwig.unit.content.model;
 
-import com.lyncode.jtwig.JtwigModelMap;
 import com.lyncode.jtwig.compile.CompileContext;
 import com.lyncode.jtwig.content.model.compilable.SetVariable;
+import com.lyncode.jtwig.exception.CalculateException;
 import com.lyncode.jtwig.exception.CompileException;
+import com.lyncode.jtwig.exception.RenderException;
 import com.lyncode.jtwig.expressions.api.CompilableExpression;
 import com.lyncode.jtwig.expressions.api.Expression;
 import com.lyncode.jtwig.render.RenderContext;
@@ -26,23 +27,27 @@ import org.junit.Test;
 import static org.mockito.Mockito.*;
 
 public class SetVariableTest {
+    private final CompileContext compileContext = mock(CompileContext.class);
+    private RenderContext renderContext = mock(RenderContext.class);
+    private Expression expression = mock(Expression.class);
+    private SetVariable underTest = new SetVariable("hello", toCalculate(expression));
+
     @Test
     public void setVariableShouldOnlyChangeTheContext() throws Exception {
-        JtwigModelMap context = mock(JtwigModelMap.class);
-
-        Expression expression = mock(Expression.class);
-        RenderContext renderContext = mock(RenderContext.class);
-
         when(expression.calculate(renderContext)).thenReturn(null);
 
-
-        SetVariable setVariable = new SetVariable("hello", toCalculate(expression));
-
-        setVariable.compile(null).render(renderContext);
+        underTest.compile(compileContext).render(renderContext);
 
         verify(renderContext, times(0)).write(any(byte[].class));
     }
 
+
+    @Test(expected = RenderException.class)
+    public void renderThrowsExceptionWhenCalculateException() throws Exception {
+        when(expression.calculate(renderContext)).thenThrow(CalculateException.class);
+
+        underTest.compile(compileContext).render(renderContext);
+    }
 
     private CompilableExpression toCalculate (final Expression exp) {
         return new CompilableExpression() {

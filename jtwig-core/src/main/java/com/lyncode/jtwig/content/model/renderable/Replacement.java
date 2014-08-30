@@ -31,9 +31,4 @@ public class Replacement implements Renderable {
     public void render(RenderContext context) throws RenderException {
         replacement.render(context);
     }
-
-    public Renderable getParent() {
-        return original;
-    }
-
 }

@@ -33,7 +33,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-public class Filter extends AddonModel {
+public class Filter extends AddonModel<Filter> {
     private CompilableExpression expression;
 
     public Filter(CompilableExpression expression) {

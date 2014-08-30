@@ -17,11 +17,13 @@ package com.lyncode.jtwig.functions.builtin;
 import com.lyncode.jtwig.functions.annotations.JtwigFunction;
 import com.lyncode.jtwig.functions.annotations.Parameter;
 import com.lyncode.jtwig.functions.exceptions.FunctionException;
+import com.lyncode.jtwig.functions.util.CastMatcher;
 import com.lyncode.jtwig.types.Undefined;
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
+import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
+import org.hamcrest.core.AnyOf;
 
+import java.util.Collection;
 import java.util.Map;
 
 import static com.lyncode.jtwig.types.Undefined.UNDEFINED;
@@ -31,26 +33,30 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 
 public class BooleanFunctions { // Or Predicates
+
     @JtwigFunction(name = "constant")
     public boolean isEqualToConstant(@Parameter Object value, @Parameter String constant) throws FunctionException {
         int constantNamePosition = constant.lastIndexOf(".");
+        if (constantNamePosition == -1)
+            throw new FunctionException(String.format("Invalid constant specified '%s'", constant));
+
         String className = constant.substring(0, constantNamePosition);
-        String constantName = constant.substring(constantNamePosition+1);
+        String constantName = constant.substring(constantNamePosition + 1);
 
         try {
             return value.equals(forName(className).getDeclaredField(constantName).get(null));
         } catch (Exception e) {
-            throw new FunctionException("Constant "+constant+" not found");
+            throw new FunctionException(String.format("Constant '%s' does not exist", constant));
         }
     }
 
     @JtwigFunction(name = "defined")
-    public boolean isDefined (@Parameter Object value) {
+    public boolean isDefined(@Parameter Object value) {
         return !UNDEFINED.equals(value);
     }
 
     @JtwigFunction(name = "divisable by")
-    public boolean isDivisableBy (@Parameter Number value, @Parameter Number dividend) {
+    public boolean isDivisableBy(@Parameter Number value, @Parameter Number dividend) {
         double value1 = value.doubleValue();
         double value2 = dividend.doubleValue();
 
@@ -58,107 +64,61 @@ public class BooleanFunctions { // Or Predicates
     }
 
     @JtwigFunction(name = "even")
-    public boolean even (@Parameter int number) {
+    public boolean even(@Parameter int number) {
         return number % 2 == 0;
     }
 
     @JtwigFunction(name = "odd")
-    public boolean odd (@Parameter int number) {
+    public boolean odd(@Parameter int number) {
         return number % 2 == 1;
     }
 
     @JtwigFunction(name = "null")
-    public boolean isNull (@Parameter Object input) {
+    public boolean isNull(@Parameter Object input) {
         return input == null || input instanceof Undefined;
     }
 
     @JtwigFunction(name = "iterable")
-    public boolean iterable (@Parameter Object input) {
+    public boolean iterable(@Parameter Object input) {
         return input instanceof Iterable
                 || input.getClass().isArray()
                 || input instanceof Map;
     }
 
     @JtwigFunction(name = "empty")
-    public boolean isEmpty (@Parameter Object input) {
-        return anyOf(
-                input,
+    public boolean isEmpty(@Parameter Object input) {
+        return AnyOf.<Object>anyOf(
                 nullValue(Object.class),
-                emptyList(),
+                emptyCollection(),
                 emptyMap(),
                 notHasNext(),
                 zeroValue()
-        );
+        ).matches(input);
     }
-
-    private boolean anyOf(Object input, Matcher<Object>... objectMatchers) {
-        for (Matcher<Object> objectMatcher : objectMatchers) {
-            if (objectMatcher.matches(input))
-                return true;
-        }
-        return false;
-    }
-
 
     private Matcher<Object> emptyMap() {
-        return new BaseMatcher<Object>() {
+        return new CastMatcher<>(Map.class, new FeatureMatcher<Map, Collection>(emptyCollection(), "empty list", "empty list") {
             @Override
-            public boolean matches(Object item) {
-                if (item instanceof Map)
-                    return ((Map) item).isEmpty();
-                return false;
+            protected Collection featureValueOf(Map actual) {
+                return actual.keySet();
             }
-
-            @Override
-            public void describeTo(Description description) {
-                description.appendDescriptionOf(empty());
-            }
-        };
+        });
     }
 
     private Matcher<Object> zeroValue() {
-        return new BaseMatcher<Object>() {
-            @Override
-            public boolean matches(Object item) {
-                return equalTo(0).matches(item);
-            }
-
-            @Override
-            public void describeTo(Description description) {
-                description.appendDescriptionOf(equalTo(0));
-            }
-        };
+        return new CastMatcher<>(Integer.class, equalTo(0));
     }
 
-    private Matcher<Object> emptyList() {
-        return new BaseMatcher<Object>() {
-            @Override
-            public boolean matches(Object item) {
-                return empty().matches(item);
-            }
-
-            @Override
-            public void describeTo(Description description) {
-                description.appendDescriptionOf(empty());
-            }
-        };
+    private Matcher<Object> emptyCollection() {
+        return new CastMatcher<>(Collection.class, (Matcher) empty());
     }
 
     private Matcher<Object> notHasNext() {
-        return new BaseMatcher<Object>() {
-
+        return new CastMatcher<>(Iterable.class, new FeatureMatcher<Iterable, Boolean>(equalTo(false), "has next", "has next") {
             @Override
-            public boolean matches(Object item) {
-                if (item instanceof Iterable)
-                    return !((Iterable) item).iterator().hasNext();
-                else
-                    return false;
+            protected Boolean featureValueOf(Iterable actual) {
+                return actual.iterator().hasNext();
             }
-
-            @Override
-            public void describeTo(Description description) {
-                description.appendText("not has next");
-            }
-        };
+        });
     }
 }

@@ -78,7 +78,7 @@ public class Include extends AbstractElement {
                     Object calculate = withExpression.calculate(context);
                     if (calculate instanceof Map) {
                         renderable.render(context.isolatedModel().with((Map) calculate));
-                    } else throw new RenderException(position+": Include with must be given a map.");
+                    } else throw new RenderException(position+": Include 'with' must be given a map.");
                 } catch (CalculateException e) {
                     throw new RenderException(e);
                 }

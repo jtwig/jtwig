@@ -25,8 +25,8 @@ public class MathOperationsTest {
         assertEquals(3.0, sum(1.0, 2.0));
     }
     @Test
-    public void modDoubleTest() throws Exception {
-        assertEquals(0.0, mod(4.0, 2.0));
+    public void modTest() throws Exception {
+        assertEquals(0, mod(4.0, 2.0));
     }
     @Test
     public void intDivDoubleTest() throws Exception {

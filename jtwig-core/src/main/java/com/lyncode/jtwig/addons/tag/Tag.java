@@ -11,7 +11,7 @@ import com.lyncode.jtwig.render.RenderContext;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-public class Tag extends AddonModel {
+public class Tag extends AddonModel<Tag> {
     private final Function<String,String> transformation;
 
     public Tag(Function<String, String> transformation) {

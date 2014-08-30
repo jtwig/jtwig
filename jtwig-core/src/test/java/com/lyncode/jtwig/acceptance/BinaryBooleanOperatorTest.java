@@ -100,6 +100,12 @@ public class BinaryBooleanOperatorTest extends AbstractJtwigTest {
     }
 
     @Test
+    public void MatchesFail_withNull () throws ParseException, CompileException, RenderException {
+        JtwigTemplate template = new JtwigTemplate("{% if (null matches '^A.*') %}Hi{% endif %}", new JtwigConfiguration());
+        assertThat(template.output(new JtwigModelMap()), is(""));
+    }
+
+    @Test
     public void Contains () throws ParseException, CompileException, RenderException {
         JtwigTemplate template = new JtwigTemplate("{% if ('a' in 'abc') %}Hi{% endif %}", new JtwigConfiguration());
         assertThat(template.output(new JtwigModelMap()), is("Hi"));
@@ -109,5 +115,47 @@ public class BinaryBooleanOperatorTest extends AbstractJtwigTest {
     public void ContainsFail () throws ParseException, CompileException, RenderException {
         JtwigTemplate template = new JtwigTemplate("{% if ('a' in ['b','c']) %}Hi{% endif %}", new JtwigConfiguration());
         assertThat(template.output(new JtwigModelMap()), is(""));
+    }
+
+    @Test
+    public void lessOrEqualTo () throws ParseException, CompileException, RenderException {
+        JtwigTemplate template = new JtwigTemplate("{% if (2 <= 2) %}Hi{% endif %}", new JtwigConfiguration());
+        assertThat(template.output(new JtwigModelMap()), is("Hi"));
+    }
+
+    @Test
+    public void lessThan () throws ParseException, CompileException, RenderException {
+        JtwigTemplate template = new JtwigTemplate("{% if (2 < 2) %}Hi{% endif %}", new JtwigConfiguration());
+        assertThat(template.output(new JtwigModelMap()), is(""));
+    }
+
+    @Test
+    public void greaterThan () throws ParseException, CompileException, RenderException {
+        JtwigTemplate template = new JtwigTemplate("{% if (2 > 2) %}Hi{% endif %}", new JtwigConfiguration());
+        assertThat(template.output(new JtwigModelMap()), is(""));
+    }
+
+    @Test
+    public void greaterOrEqualThan () throws ParseException, CompileException, RenderException {
+        JtwigTemplate template = new JtwigTemplate("{% if (2 >= 2) %}Hi{% endif %}", new JtwigConfiguration());
+        assertThat(template.output(new JtwigModelMap()), is("Hi"));
+    }
+
+    @Test
+    public void modOperator () throws ParseException, CompileException, RenderException {
+        JtwigTemplate template = new JtwigTemplate("{{ 4 % 2 }}", new JtwigConfiguration());
+        assertThat(template.output(new JtwigModelMap()), is("0"));
+    }
+
+    @Test
+    public void endsWithNull () throws ParseException, CompileException, RenderException {
+        JtwigTemplate template = new JtwigTemplate("{{ null ends with 'tree' }}", new JtwigConfiguration());
+        assertThat(template.output(new JtwigModelMap()), is("0"));
+    }
+
+    @Test
+    public void startsWithNull () throws ParseException, CompileException, RenderException {
+        JtwigTemplate template = new JtwigTemplate("{{ null starts with 'tree' }}", new JtwigConfiguration());
+        assertThat(template.output(new JtwigModelMap()), is("0"));
     }
 }

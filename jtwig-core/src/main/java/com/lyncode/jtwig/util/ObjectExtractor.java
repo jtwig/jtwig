@@ -54,15 +54,11 @@ public class ObjectExtractor {
         return UNDEFINED;
     }
 
-    public Object context() {
-        return context;
-    }
-
     private Callable tryKnownType() {
         return new Callable() {
             @Override
             public Result<Object> execute(String name, Object... args) throws ExtractException {
-                return new Result<Object>(extractKnownType(name, args));
+                return new Result<>(extractKnownType(name, args));
             }
         };
     }
@@ -160,10 +156,6 @@ public class ObjectExtractor {
                 }
             }
         };
-    }
-
-    public boolean contextIsEmpty() {
-        return context == null || context == UNDEFINED;
     }
 
     private static interface Callable {

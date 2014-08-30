@@ -18,7 +18,7 @@ import com.lyncode.jtwig.compile.CompileContext;
 import com.lyncode.jtwig.content.api.Renderable;
 import com.lyncode.jtwig.exception.CompileException;
 
-public abstract class Content<T extends AbstractElement> extends AbstractElement {
+public abstract class Content<T extends Content> extends AbstractElement {
     private Sequence content;
 
     public T withContent (Sequence content) {

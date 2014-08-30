@@ -68,7 +68,7 @@ public class Variable extends AbstractCompilableExpression {
             return result;
         }
 
-        public Object extract(RenderContext context, ObjectExtractor extractor) throws ObjectExtractor.ExtractException {
+        public Object extract(ObjectExtractor extractor) throws ObjectExtractor.ExtractException {
             // if we reach this we are already sure that the extractor content is not null/undefined
             return extractor.extract(name);
         }

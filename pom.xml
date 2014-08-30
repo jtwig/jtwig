@@ -251,6 +251,7 @@
                                                     <classfiles>
                                                         <fileset dir="jtwig-core/target/classes">
                                                             <exclude name="**/*Parser*" />
+                                                            <exclude name="**/*Addon*" />
                                                             <exclude name="**/parboiled/**" />
                                                         </fileset>
                                                     </classfiles>

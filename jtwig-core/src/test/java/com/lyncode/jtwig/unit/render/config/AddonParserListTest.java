@@ -1,10 +1,12 @@
-package com.lyncode.jtwig.parser.config;
+package com.lyncode.jtwig.unit.render.config;
 
 import com.lyncode.jtwig.addons.Addon;
 import com.lyncode.jtwig.addons.AddonModel;
 import com.lyncode.jtwig.addons.concurrent.ConcurrentAddon;
 import com.lyncode.jtwig.addons.filter.FilterAddon;
 import com.lyncode.jtwig.addons.spaceless.SpacelessAddon;
+import com.lyncode.jtwig.parser.config.AddonParserList;
+import com.lyncode.jtwig.parser.config.ParserConfiguration;
 import com.lyncode.jtwig.resource.JtwigResource;
 import org.junit.Test;
 
