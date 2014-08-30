@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -11,7 +10,7 @@
 
     <groupId>com.lyncode</groupId>
     <artifactId>jtwig</artifactId>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>3.0.0</version>
     <packaging>pom</packaging>
 
     <name>JTwig Root</name>
@@ -31,7 +30,7 @@
         <connection>scm:git:git@github.com:lyncode/jtwig.git</connection>
         <developerConnection>scm:git:git@github.com:lyncode/jtwig.git</developerConnection>
         <url>git@github.com:lyncode/jtwig.git</url>
-        <tag>HEAD</tag>
+        <tag>jtwig-3.0.0</tag>
     </scm>
 
     <properties>
@@ -229,21 +228,21 @@
                                 </goals>
                                 <configuration>
                                     <target name="merge">
-                                        <echo message="Generating JaCoCo Reports"/>
+                                        <echo message="Generating JaCoCo Reports" />
                                         <taskdef name="report" classname="org.jacoco.ant.ReportTask">
-                                            <classpath path="${basedir}/target/jacoco-jars/org.jacoco.ant.jar"/>
+                                            <classpath path="${basedir}/target/jacoco-jars/org.jacoco.ant.jar" />
                                         </taskdef>
-                                        <mkdir dir="${basedir}/target/site/jacoco"/>
+                                        <mkdir dir="${basedir}/target/site/jacoco" />
                                         <report>
                                             <executiondata>
                                                 <fileset dir="jtwig-functions/target">
-                                                    <include name="jacoco.exec"/>
+                                                    <include name="jacoco.exec" />
                                                 </fileset>
                                                 <fileset dir="jtwig-core/target">
-                                                    <include name="jacoco.exec"/>
+                                                    <include name="jacoco.exec" />
                                                 </fileset>
                                                 <fileset dir="jtwig-spring/target">
-                                                    <include name="jacoco.exec"/>
+                                                    <include name="jacoco.exec" />
                                                 </fileset>
                                             </executiondata>
                                             <structure name="Jtwig Coverage">
@@ -256,15 +255,15 @@
                                                         </fileset>
                                                     </classfiles>
                                                     <sourcefiles encoding="UTF-8">
-                                                        <fileset dir="jtwig-core/target/generated-sources/annotations"/>
+                                                        <fileset dir="jtwig-core/target/generated-sources/annotations" />
                                                     </sourcefiles>
                                                 </group>
                                                 <group name="jtwig-functions">
                                                     <classfiles>
-                                                        <fileset dir="jtwig-functions/target/classes"/>
+                                                        <fileset dir="jtwig-functions/target/classes" />
                                                     </classfiles>
                                                     <sourcefiles encoding="UTF-8">
-                                                        <fileset dir="jtwig-functions/target/generated-sources/annotations"/>
+                                                        <fileset dir="jtwig-functions/target/generated-sources/annotations" />
                                                     </sourcefiles>
                                                 </group>
                                                 <group name="jtwig-spring">
@@ -276,12 +275,12 @@
                                                         </fileset>
                                                     </classfiles>
                                                     <sourcefiles encoding="UTF-8">
-                                                        <fileset dir="jtwig-spring/target/generated-sources/annotations"/>
+                                                        <fileset dir="jtwig-spring/target/generated-sources/annotations" />
                                                     </sourcefiles>
                                                 </group>
                                             </structure>
-                                            <xml destfile="${basedir}/target/site/jacoco/jacoco.xml"/>
-                                            <html destdir="${basedir}/target/site/jacoco"/>
+                                            <xml destfile="${basedir}/target/site/jacoco/jacoco.xml" />
+                                            <html destdir="${basedir}/target/site/jacoco" />
                                         </report>
                                     </target>
                                 </configuration>
