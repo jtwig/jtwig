@@ -63,13 +63,13 @@ public class DateFunctions {
         return instance.getTime();
     }
 
-    @JtwigFunction(name = "date_format")
+    @JtwigFunction(name = "date")
     public String format (@Parameter Date input, @Parameter String format) {
         DateFormat dateFormat = new SimpleDateFormat(format);
         return dateFormat.format(input);
     }
 
-    @JtwigFunction(name = "date_format")
+    @JtwigFunction(name = "date")
     public String format (@Parameter Date input) {
         return format(input, "yyyy-MM-dd HH:mm:ss");
     }
