@@ -92,7 +92,10 @@ public class MapFunctionRepository implements FunctionRepository {
         return new Predicate<Function>() {
             @Override
             public boolean apply(@Nullable Function input) {
-                return integerPredicate.apply(input.getParameterTypesWithAnnotation(Parameter.class).size());
+                int size = input.getParameterTypesWithAnnotation(Parameter.class).size();
+                if (input.method().isVarArgs())
+                    size--;
+                return integerPredicate.apply(size);
             }
         };
     }

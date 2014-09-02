@@ -19,7 +19,6 @@ import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNot.not;
-import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -72,7 +71,14 @@ public class MapFunctionRepositoryTest {
     public void includeAddsAllDeclaredFunctions() throws Exception {
         underTest.include(new TestClass());
 
-        assertThat(underTest.retrieve("echo", parameters), notNullValue());
+        assertThat(underTest.retrieve("echo", InputParameters.parameters("one")), not(empty()));
+    }
+
+    @Test
+    public void shouldRetrieveFunctionWithVarArgs() throws Exception {
+        underTest.include(new TestClass());
+        assertThat(underTest.retrieve("test", InputParameters.parameters("one", "two")), not(empty()));
+        assertThat(underTest.retrieve("test", InputParameters.parameters("one")), not(empty()));
     }
 
     @Test
@@ -84,6 +90,10 @@ public class MapFunctionRepositoryTest {
         @JtwigFunction(name = "echo")
         public String echo (@Parameter String input) {
             return input;
+        }
+        @JtwigFunction(name = "test")
+        public String echo (@Parameter String test, @Parameter String... inputs) {
+            return test;
         }
     }
 }

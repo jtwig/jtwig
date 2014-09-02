@@ -47,6 +47,7 @@ public class TranslateTest extends AbstractJtwigAcceptanceTest {
     public MessageSource messageSource () {
         InMemoryMessageSource inMemoryMessageSource = new InMemoryMessageSource();
         inMemoryMessageSource.add("test", "Hello {0}");
+        inMemoryMessageSource.add("example", "New");
         return inMemoryMessageSource;
     }
 
@@ -60,7 +61,7 @@ public class TranslateTest extends AbstractJtwigAcceptanceTest {
     @Test
     public void translateTest() throws Exception {
         when(serverReceivesGetRequest("/"));
-        then(theGetResult(), body(is(equalTo("Hello JTwig"))));
+        then(theGetResult(), body(is(equalTo("Hello JTwig-New"))));
     }
 
     public static class InMemoryMessageSource extends AbstractMessageSource {
