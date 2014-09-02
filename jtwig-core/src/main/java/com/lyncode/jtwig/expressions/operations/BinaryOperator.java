@@ -43,6 +43,7 @@ public enum BinaryOperator {
     LT(Operator.LT, new LessThanOperation()),
     LTE(Operator.LTE, new LessOrEqualThanOperation()),
     EQUAL(Operator.EQUAL, new EqualOperation()),
+    DIFF(Operator.DIFF, new DiffOperation()),
 
     // Other
     IN(Operator.IN, new InOperation()),
