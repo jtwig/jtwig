@@ -96,7 +96,6 @@ public class JtwigView extends AbstractTemplateView {
             log.debug("Model: " + modelMap);
         }
 
-        response.setContentType(this.getContentType());
         if (this.getEncoding() != null) {
             response.setCharacterEncoding(this.getEncoding());
         }
