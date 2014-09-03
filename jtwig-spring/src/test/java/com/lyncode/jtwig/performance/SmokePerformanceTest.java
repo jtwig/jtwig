@@ -1,20 +1,34 @@
 package com.lyncode.jtwig.performance;
 
 import com.lyncode.jtwig.acceptance.AbstractJtwigAcceptanceTest;
+import com.lyncode.jtwig.acceptance.functions.TranslateTest;
 import org.apache.commons.httpclient.HostConfiguration;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
+import org.joda.time.DateTime;
+import org.joda.time.DurationFieldType;
+import org.joda.time.Period;
+import org.joda.time.Seconds;
 import org.junit.Test;
+import org.springframework.context.MessageSource;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.LocaleResolver;
+import org.springframework.web.servlet.i18n.FixedLocaleResolver;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import static java.util.Locale.ENGLISH;
+import static org.joda.time.DateTime.now;
 
 /**
  * This is not a real performance test. In fact, this is a test
@@ -31,7 +45,9 @@ public class SmokePerformanceTest extends AbstractJtwigAcceptanceTest {
     @Test
     public void canHandleMultipleRequestsAtOnce() throws Exception {
         serverReceivesGetRequest("/performance");
+//        System.out.println(theGetResult().getResponseBodyAsString());
         System.out.println("Starting...");
+        DateTime startDate = now();
 
         for (int i=0;i < CALLS;i++) {
             executorService.execute(new Runnable() {
@@ -48,15 +64,41 @@ public class SmokePerformanceTest extends AbstractJtwigAcceptanceTest {
             });
         }
 
-        System.out.println("Waiting to finish...");
+        System.out.println("Jobs queued... waiting to finish...");
         counter.await();
-        System.out.println("Finished");
+        Seconds seconds = new Period(startDate, DateTime.now()).toStandardSeconds();
+        System.out.println(String.format("Finished in %s seconds (Speed: %d requests per second)",
+                seconds.toString(), CALLS / seconds.get(DurationFieldType.seconds())));
     }
 
     @RequestMapping("/performance")
     public String test (ModelMap modelMap) {
-        modelMap.addAttribute("test", "hello");
+        modelMap.addAttribute("summary", "Example");
+        modelMap.addAttribute("presentations", presentations());
         return "performance/index";
+    }
+
+    private List<Elem> presentations() {
+        ArrayList<Elem> list = new ArrayList<>();
+        for (int i=0;i<10;i++)
+            list.add(elem("elem"+i, "value"+i));
+        return list;
+    }
+
+    private Elem elem(String title, String test) {
+        return new Elem(title, test);
+    }
+
+    @Bean
+    public MessageSource messageSource () {
+        TranslateTest.InMemoryMessageSource inMemoryMessageSource = new TranslateTest.InMemoryMessageSource();
+        inMemoryMessageSource.add("example.title", "Performance test");
+        return inMemoryMessageSource;
+    }
+
+    @Bean
+    public LocaleResolver localeResolver () {
+        return new FixedLocaleResolver(ENGLISH);
     }
 
     protected HttpClient httpClient() {
@@ -69,5 +111,15 @@ public class SmokePerformanceTest extends AbstractJtwigAcceptanceTest {
         connectionManagerParams.setMaxTotalConnections(100);
         httpConnectionManager.setParams(connectionManagerParams);
         return new HttpClient(httpConnectionManager);
+    }
+
+    public class Elem {
+        public String title;
+        public String speakerName;
+
+        public Elem(String title, String speakerName) {
+            this.title = title;
+            this.speakerName = speakerName;
+        }
     }
 }

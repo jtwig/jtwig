@@ -27,6 +27,7 @@ import com.lyncode.jtwig.util.ObjectExtractor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import static com.lyncode.jtwig.functions.parameters.input.InputParameters.parameters;
 
@@ -61,7 +62,7 @@ public class FunctionElement extends AbstractCompilableExpression {
         public Compiled(JtwigPosition position, String name, List<Expression> arguments) {
             this.position = position;
             this.name = name;
-            this.arguments = arguments;
+            this.arguments = new CopyOnWriteArrayList<>(arguments);
         }
 
         private Object[] calculateArguments(RenderContext context) throws CalculateException {
