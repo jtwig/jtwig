@@ -39,10 +39,11 @@ import org.springframework.web.servlet.theme.FixedThemeResolver;
 import java.io.IOException;
 
 public abstract class AbstractJtwigAcceptanceTest {
-    private HttpClient httpClient = new HttpClient();
-    private Server jetty;
-    private GetMethod getResult;
+    private HttpClient httpClient = httpClient();
 
+    private Server jetty;
+
+    private GetMethod getResult;
     private void startServer () throws Exception {
         jetty = new Server(0);
 
@@ -69,14 +70,18 @@ public abstract class AbstractJtwigAcceptanceTest {
         jetty.join();
     }
 
-
-
     @Before
     public void setUp () throws Exception {
         startServer();
     }
 
-    private int thePort() {
+
+
+    protected HttpClient httpClient() {
+        return new HttpClient();
+    }
+
+    protected int thePort() {
         return ((ServerConnector) jetty.getConnectors()[0]).getLocalPort();
     }
 
@@ -112,6 +117,7 @@ public abstract class AbstractJtwigAcceptanceTest {
             JtwigViewResolver jtwigViewResolver = new JtwigViewResolver();
             jtwigViewResolver.setPrefix("/WEB-INF/views/");
             jtwigViewResolver.setSuffix(".twig.html");
+            jtwigViewResolver.setCached(false);
             jtwigViewResolver.setUseThemeInViewPath(true);
             return jtwigViewResolver;
         }
