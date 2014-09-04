@@ -86,13 +86,18 @@ public class FunctionElement extends AbstractCompilableExpression {
             }
         }
 
-        public Compiled addFirstArgument(Expression expression) {
-            this.arguments.add(0, expression);
-            return this;
+        public Compiled cloneAndAddArgument (Expression expression) {
+            List<Expression> arguments = new ArrayList<>(this.arguments);
+            arguments.add(0, expression);
+            return new Compiled(position(), name, arguments);
         }
 
         public Object extract(RenderContext context, ObjectExtractor extractor) throws CalculateException, ObjectExtractor.ExtractException {
             return extractor.extract(name, calculateArguments(context));
+        }
+
+        public Expression getFirstArgument() {
+            return this.arguments.get(0);
         }
 
         public JtwigPosition position() {
@@ -101,6 +106,10 @@ public class FunctionElement extends AbstractCompilableExpression {
 
         public String name() {
             return name;
+        }
+
+        public boolean hasArguments() {
+            return !this.arguments.isEmpty();
         }
     }
 }

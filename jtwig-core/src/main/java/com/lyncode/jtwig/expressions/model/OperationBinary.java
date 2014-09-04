@@ -14,16 +14,14 @@
 
 package com.lyncode.jtwig.expressions.model;
 
+import com.google.common.base.Function;
 import com.lyncode.jtwig.compile.CompileContext;
-import com.lyncode.jtwig.exception.CalculateException;
 import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.OperationNotFoundException;
-import com.lyncode.jtwig.expressions.api.BinaryOperation;
 import com.lyncode.jtwig.expressions.api.CompilableExpression;
 import com.lyncode.jtwig.expressions.api.Expression;
 import com.lyncode.jtwig.expressions.operations.BinaryOperator;
 import com.lyncode.jtwig.parser.model.JtwigPosition;
-import com.lyncode.jtwig.render.RenderContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,7 +58,9 @@ public class OperationBinary extends AbstractCompilableExpression {
                 Operator operator = operators.get(i - 1);
 
                 try {
-                    left = new Compiled(position(), left, right, BinaryOperator.fromOperator(operator).operation());
+                    left = BinaryOperator
+                            .fromOperator(operator)
+                            .expression(position(), left, right);
                 } catch (OperationNotFoundException e) {
                     throw new CompileException(position()+": "+ e.getMessage());
                 }
@@ -69,30 +69,7 @@ public class OperationBinary extends AbstractCompilableExpression {
         }
     }
 
-    public static class Compiled implements Expression {
-        private final JtwigPosition position;
-        private Expression leftOperand;
-        private Expression rightOperand;
-        private BinaryOperation operation;
-
-        private Compiled(JtwigPosition position, Expression leftOperand, Expression rightOperand, BinaryOperation operation) {
-            this.position = position;
-            this.leftOperand = leftOperand;
-            this.rightOperand = rightOperand;
-            this.operation = operation;
-        }
-
-        @Override
-        public Object calculate(RenderContext context) throws CalculateException {
-            return operation.apply(context, position, leftOperand, rightOperand);
-        }
-
-        public Expression left () { return leftOperand; }
-
-        public Compiled left(Expression expression) {
-            this.leftOperand = expression;
-            return this;
-        }
+    public void transformFirst(Function<CompilableExpression, CompilableExpression> transformation) {
+        operands.set(0, transformation.apply(operands.get(0)));
     }
-
 }

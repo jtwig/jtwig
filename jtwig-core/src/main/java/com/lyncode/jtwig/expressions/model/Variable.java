@@ -17,6 +17,7 @@ package com.lyncode.jtwig.expressions.model;
 import com.lyncode.jtwig.compile.CompileContext;
 import com.lyncode.jtwig.exception.CalculateException;
 import com.lyncode.jtwig.exception.CompileException;
+import com.lyncode.jtwig.expressions.api.CompilableExpression;
 import com.lyncode.jtwig.expressions.api.Expression;
 import com.lyncode.jtwig.parser.model.JtwigPosition;
 import com.lyncode.jtwig.render.RenderContext;
@@ -40,6 +41,10 @@ public class Variable extends AbstractCompilableExpression {
     @Override
     public Expression compile(CompileContext context) throws CompileException {
         return new Compiled(position(), name);
+    }
+
+    public CompilableExpression toFunction() {
+        return new FunctionElement(position(), name);
     }
 
     public static class Compiled implements Expression {

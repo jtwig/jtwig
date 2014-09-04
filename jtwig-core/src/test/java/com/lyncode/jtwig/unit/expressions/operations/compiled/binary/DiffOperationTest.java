@@ -1,5 +1,6 @@
-package com.lyncode.jtwig.expressions.operations.binary;
+package com.lyncode.jtwig.unit.expressions.operations.compiled.binary;
 
+import com.lyncode.jtwig.expressions.operations.binary.DiffOperation;
 import com.lyncode.jtwig.parser.model.JtwigPosition;
 import org.junit.Test;
 
