@@ -33,7 +33,7 @@ public class OperationMatchers {
 //            matchers.add(new TypeSafeMatcher<OperationBinary>() {
 //                @Override
 //                protected boolean matchesSafely(OperationBinary item) {
-//                    if (item..getOperands().size() > index) {
+//                    if (item..getOperands().operandsCount() > index) {
 //                        return matcher.matches(item.getOperands().retrieve(index));
 //                    }
 //                    return false;
@@ -51,7 +51,7 @@ public class OperationMatchers {
 //            matchers.add(new TypeSafeMatcher<OperationBinary>() {
 //                @Override
 //                protected boolean matchesSafely(OperationBinary item) {
-//                    if (item.getOperators().size() > index)
+//                    if (item.getOperators().operandsCount() > index)
 //                        return item.getOperators().retrieve(index) == operator;
 //                    return false;
 //                }
@@ -65,7 +65,7 @@ public class OperationMatchers {
 //        }
 //
 //        public Matcher<OperationBinary> build () {
-//            Matcher<? super OperationBinary>[] matcherArray = new Matcher[matchers.size()];
+//            Matcher<? super OperationBinary>[] matcherArray = new Matcher[matchers.operandsCount()];
 //            return AllOf.allOf(this.matchers.toArray(matcherArray));
 //        }
 //
@@ -123,7 +123,7 @@ public class OperationMatchers {
 //        }
 //
 //        public Matcher<OperationUnary> build () {
-//            Matcher<? super OperationUnary>[] matcherArray = new Matcher[matchers.size()];
+//            Matcher<? super OperationUnary>[] matcherArray = new Matcher[matchers.operandsCount()];
 //            return AllOf.allOf(this.matchers.toArray(matcherArray));
 //        }
 //

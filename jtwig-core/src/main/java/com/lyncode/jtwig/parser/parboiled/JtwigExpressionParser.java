@@ -416,6 +416,14 @@ public class JtwigExpressionParser extends JtwigBaseParser<CompilableExpression>
         );
     }
 
+
+    public Rule variableAsFunction() {
+        return Sequence(
+                variable(),
+                push(pop(Variable.class).toFunction())
+        );
+    }
+
     Rule identifierAsString() {
         return Sequence(
                 basic.identifier(),

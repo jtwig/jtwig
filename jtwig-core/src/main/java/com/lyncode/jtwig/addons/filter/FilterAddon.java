@@ -49,11 +49,11 @@ public class FilterAddon extends Addon {
                         expressionParser().binary(
                                 FirstOf(
                                         expressionParser().functionWithBrackets(),
-                                        expressionParser().variable()
+                                        expressionParser().variableAsFunction()
                                 ),
                                 Operator.COMPOSITION
                         ),
-                        push(new Filter(expressionParser().pop()))
+                        push(new Filter(currentPosition(), expressionParser().pop()))
                 ),
                 new ParseException("Filter should have at least one function")
         );

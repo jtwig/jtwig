@@ -14,64 +14,86 @@
 
 package com.lyncode.jtwig.expressions.operations;
 
+import com.google.common.base.Function;
 import com.lyncode.jtwig.exception.OperationNotFoundException;
-import com.lyncode.jtwig.expressions.api.BinaryOperation;
+import com.lyncode.jtwig.expressions.api.BinaryExpressionFactory;
 import com.lyncode.jtwig.expressions.model.Operator;
 import com.lyncode.jtwig.expressions.operations.binary.*;
+import com.lyncode.jtwig.expressions.operations.factories.CompositionExpressionFactory;
+import com.lyncode.jtwig.expressions.operations.factories.TransformationExpressionFactory;
+
+import static com.lyncode.jtwig.expressions.operations.factories.ConstantExpressionFactory.operation;
+import static com.lyncode.jtwig.util.BooleanOperations.isTrue;
+
 
 public enum BinaryOperator {
     // Jtwig Operations
-    COMPOSITION(Operator.COMPOSITION, new CompositionOperation()),
-    SELECTION(Operator.SELECTION, new SelectionOperation()),
+    COMPOSITION(Operator.COMPOSITION, new CompositionExpressionFactory()),
+    SELECTION(Operator.SELECTION, operation(new SelectionOperation())),
 
     // Math Operations
-    SUM(Operator.ADD, new SumOperation()),
-    SUB(Operator.SUB, new SubOperation()),
-    MOD(Operator.MOD, new ModOperation()),
-    MUL(Operator.TIMES, new MultOperation()),
-    INT_MUL(Operator.INT_TIMES, new IntMultOperation()),
-    DIV(Operator.DIV, new DivOperation()),
-    INT_DIV(Operator.INT_DIV, new IntDivOperation()),
+    SUM(Operator.ADD, operation(new SumOperation())),
+    SUB(Operator.SUB, operation(new SubOperation())),
+    MOD(Operator.MOD, operation(new ModOperation())),
+    MUL(Operator.TIMES, operation(new MultOperation())),
+    INT_MUL(Operator.INT_TIMES, operation(new IntMultOperation())),
+    DIV(Operator.DIV, operation(new DivOperation())),
+    INT_DIV(Operator.INT_DIV, operation(new IntDivOperation())),
 
     // Boolean Operations
-    AND(Operator.AND, new AndOperation()),
-    OR(Operator.OR, new OrOperation()),
+    AND(Operator.AND, operation(new AndOperation())),
+    OR(Operator.OR, operation(new OrOperation())),
 
     // Relational Operations
-    GT(Operator.GT, new GreaterThanOperation()),
-    GTE(Operator.GTE, new GreaterOrEqualThanOperation()),
-    LT(Operator.LT, new LessThanOperation()),
-    LTE(Operator.LTE, new LessOrEqualThanOperation()),
-    EQUAL(Operator.EQUAL, new EqualOperation()),
-    DIFF(Operator.DIFF, new DiffOperation()),
+    GT(Operator.GT, operation(new GreaterThanOperation())),
+    GTE(Operator.GTE, operation(new GreaterOrEqualThanOperation())),
+    LT(Operator.LT, operation(new LessThanOperation())),
+    LTE(Operator.LTE, operation(new LessOrEqualThanOperation())),
+    EQUAL(Operator.EQUAL, operation(new EqualOperation())),
+    DIFF(Operator.DIFF, operation(new DiffOperation())),
 
     // Other
-    IN(Operator.IN, new InOperation()),
-    MATCHES(Operator.MATCHES, new MatchesOperation()),
-    ENDS_WITH(Operator.ENDS_WITH, new EndsWithOperation()),
-    STARTS_WITH(Operator.STARTS_WITH, new StartsWithOperation()),
-    IS(Operator.IS, new IsOperator()),
-    IS_NOT(Operator.IS_NOT, new IsNotOperator())
+    IN(Operator.IN, operation(new InOperation())),
+    MATCHES(Operator.MATCHES, operation(new MatchesOperation())),
+    ENDS_WITH(Operator.ENDS_WITH, operation(new EndsWithOperation())),
+    STARTS_WITH(Operator.STARTS_WITH, operation(new StartsWithOperation())),
+    IS(Operator.IS, new TransformationExpressionFactory(new CompositionExpressionFactory(), isTrueFunction())),
+    IS_NOT(Operator.IS_NOT, new TransformationExpressionFactory(new CompositionExpressionFactory(), notIsTrueFunction()))
     ;
 
-    public static BinaryOperator fromOperator (Operator operator) throws OperationNotFoundException {
-        for (BinaryOperator dictionary : BinaryOperator.values()) {
-            if (dictionary.operator == operator)
-                return dictionary;
+    public static BinaryExpressionFactory fromOperator(Operator operator) throws OperationNotFoundException {
+        for (BinaryOperator binaryOperator : BinaryOperator.values()) {
+            if (binaryOperator.operator == operator)
+                return binaryOperator.expression;
         }
 
         throw new OperationNotFoundException(" Unable to find implementation for operator "+operator);
     }
 
     private Operator operator;
-    private BinaryOperation operation;
+    private BinaryExpressionFactory expression;
 
-    BinaryOperator(Operator operator, BinaryOperation operation) {
+    BinaryOperator(Operator operator, BinaryExpressionFactory expression) {
         this.operator = operator;
-        this.operation = operation;
+        this.expression = expression;
     }
 
-    public BinaryOperation operation() {
-        return operation;
+
+    private static Function<Object, Object> notIsTrueFunction() {
+        return new Function<Object, Object>() {
+            @Override
+            public Object apply(Object input) {
+                return !isTrue(input);
+            }
+        };
+    }
+
+    private static Function<Object, Object> isTrueFunction() {
+        return new Function<Object, Object>() {
+            @Override
+            public Object apply(Object input) {
+                return isTrue(input);
+            }
+        };
     }
 }
