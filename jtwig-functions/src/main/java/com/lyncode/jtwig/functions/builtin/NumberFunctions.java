@@ -22,7 +22,6 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.commons.lang3.StringUtils;
 
 public class NumberFunctions {
     @JtwigFunction(name = "number_format")
@@ -67,51 +66,50 @@ public class NumberFunctions {
     }
 
     @JtwigFunction(name = "range")
-    public List<Integer> range (@Parameter int start, @Parameter int end, @Parameter int step) throws FunctionException {
+    public <T> List<T> range (@Parameter T start, @Parameter T end, @Parameter int step) throws FunctionException {
         step = Math.abs(step);
         if (step == 0)
             throw new FunctionException("Step must not be 0");
         
-        if (start > end) {
-            // negate step for reversed mode, if positive input
-            step = -step;
+        // Determine the start value
+        int startInt;
+        int endInt;
+        if(start instanceof Number) {
+            startInt = ((Number)start).intValue();
+            endInt = ((Number)end).intValue();
+        } else if(start instanceof Character) {
+            startInt = ((Character)start).charValue();
+            endInt = ((Character)end).charValue();
+        } else if(start instanceof CharSequence) {
+            startInt = ((CharSequence)start).charAt(0);
+            endInt = ((CharSequence)end).charAt(0);
+        } else {
+            throw new IllegalArgumentException("range() function requires Number, Character, or CharSequence limits.");
         }
-
-        List<Integer> result = new ArrayList<>();
-        for (int i = start; (step > 0) ? i <= end : i >= end; i += step) {
-            result.add(i);
-        }
-
-        return result;
-    }
-    @JtwigFunction(name = "range")
-    public List<Integer> range (@Parameter int start, @Parameter int end) throws FunctionException {
-        return range(start, end, 1);
-    }
-    @JtwigFunction(name = "range")
-    public List<Character> range (@Parameter String start, @Parameter String end, @Parameter int step) throws FunctionException {
-        step = Math.abs(step);
-        if (step == 0)
-            throw new FunctionException("Step must not be 0");
         
-        int startInt = start.codePointAt(0);
-        int endInt = end.codePointAt(0);
-        
+        // Handle negative progressions
         if (startInt > endInt) {
-            // negate step for reversed mode, if positive input
             step = -step;
         }
 
-        List<Character> result = new ArrayList<>();
+        // Build the list and convert if necessary
+        List<T> results = new ArrayList<>();
         for (int i = startInt; (step > 0) ? i <= endInt : i >= endInt; i += step) {
-            result.add((char) i);
+            T result = null;
+            if(start instanceof Number) {
+                result = (T)start.getClass().cast(i);
+            } else if(start instanceof Character) {
+                result = (T)Character.valueOf((char)i);
+            } else if(start instanceof CharSequence) {
+                result = (T)String.valueOf((char)i);
+            }
+            results.add(result);
         }
 
-        return result;
-//        return new ArrayList<Character>(){{add('A');add('B');add('C');add('D');}};
+        return results;
     }
     @JtwigFunction(name = "range")
-    public List<Character> range (@Parameter String start, @Parameter String end) throws FunctionException {
-        return range(StringUtils.substring(start, 0, 1), StringUtils.substring(end, 0, 1), 1);
+    public <T> List<T> range (@Parameter T start, @Parameter T end) throws FunctionException {
+        return range(start, end, 1);
     }
 }

@@ -58,7 +58,7 @@ public class NumberFunctionsTest {
     }
     @Test
     public void rangeChars() throws FunctionException {
-        List<Character> list = underTest.range("A", "D");
+        List<Character> list = underTest.range('A', 'D');
         assertThat(list, contains('A', 'B', 'C', 'D'));
     }
 
