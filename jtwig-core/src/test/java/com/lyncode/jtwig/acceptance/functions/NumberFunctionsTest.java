@@ -54,4 +54,14 @@ public class NumberFunctionsTest extends AbstractJtwigTest {
         when(jtwigRenders(template("{{ range(1, 3, 2) }}")));
         then(theRenderedTemplate(), is(equalTo("[1, 3]")));
     }
+    @Test
+    public void rangeCharTest() throws Exception {
+        when(jtwigRenders(template("{{ range('a', 'c') }}")));
+        then(theRenderedTemplate(), is(equalTo("[a, b, c]")));
+    }
+    @Test
+    public void rangeStringTest() throws Exception {
+        when(jtwigRenders(template("{{ range(\"AA\", \"BZ\") }}")));
+        then(theRenderedTemplate(), is(equalTo("[A, B]")));
+    }
 }
