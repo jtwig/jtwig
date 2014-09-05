@@ -44,11 +44,7 @@ public class RelationalOperations {
             return b == null || ((b instanceof Number) && isZero((Number) b));
         if (b == null)
             return (a instanceof Number) && isZero((Number) a);
-        if (a instanceof Long)
-            return (b instanceof Number) && ((Long)a).equals(((Number)b).longValue());
-        if (b instanceof Long)
-            return (a instanceof Number) && ((Long)b).equals(((Number)a).longValue());
-        return a.equals(b);
+        return a.toString().equals(b.toString());
     }
 
     public static boolean isZero(Number number) {
