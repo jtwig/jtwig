@@ -28,6 +28,13 @@ public class TernaryOperatorTest extends AbstractJtwigTest {
         String result = template.output(new JtwigModelMap());
         assertThat(result, is("1"));
     }
+
+    @Test
+    public void testTemplateTrue() throws Exception {
+        JtwigTemplate template = JtwigTemplate.fromString("{{ value ? '1' : '2' }}");
+        String result = template.output(new JtwigModelMap().withModelAttribute("value", true));
+        assertThat(result, is("1"));
+    }
     @Test
      public void testFalse() throws Exception {
         JtwigTemplate template = JtwigTemplate.fromString("{{ false ? 1 : 2 }}");
