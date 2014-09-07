@@ -186,4 +186,34 @@ public class ListFunctionsTest {
         String result = (String) underTest.slice("ab", 3, 2);
         assertEquals("", result);
     }
+    @Test
+    public void maxPrefersIntegersOverCharacters() throws Exception {
+        Object result = underTest.max(1,2,'a','e');
+        assertEquals(2, result);
+    }
+    @Test
+    public void maxPrefersLowercase() throws Exception {
+        Object result = underTest.max('a','A','b');
+        assertEquals('b', result);
+    }
+    @Test
+    public void maxWorksAlphabetically() throws Exception {
+        Object result = underTest.max("hello","help",'z');
+        assertEquals('z', result);
+    }
+    @Test
+    public void minPrefersCharsOverIntegers() throws Exception {
+        Object result = underTest.min(1,2,'a','e');
+        assertEquals('a', result);
+    }
+    @Test
+    public void minPrefersUppercase() throws Exception {
+        Object result = underTest.min('a','A');
+        assertEquals('A', result);
+    }
+    @Test
+    public void minWorksAlphabetically() throws Exception {
+        Object result = underTest.min("hello","help",'z');
+        assertEquals("hello", result);
+    }
 }
