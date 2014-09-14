@@ -33,10 +33,13 @@ import com.lyncode.jtwig.functions.resolver.impl.DelegateFunctionResolver;
 import com.lyncode.jtwig.functions.resolver.model.Executable;
 import com.lyncode.jtwig.render.config.RenderConfiguration;
 import com.lyncode.jtwig.render.stream.RenderStream;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -48,20 +51,24 @@ public class RenderContext {
     /**
      * NOTE: This method should only be used once (in JtwigTemplate)
      */
-    public static RenderContext create (RenderConfiguration configuration, JtwigModelMap modelMap, OutputStream output) {
+    public static RenderContext create(RenderConfiguration configuration, JtwigModelMap modelMap, OutputStream output) {
         return new RenderContext(configuration, modelMap, new CompoundFunctionResolver()
                 .withResolver(new DelegateFunctionResolver(configuration.functionRepository(),
                         new InputDelegateMethodParametersResolver(annotationWithoutConversion())))
                 .withResolver(new DelegateFunctionResolver(configuration.functionRepository(),
                         new InputDelegateMethodParametersResolver(annotationWithConversion()))), new RenderStream(output));
     }
-    public static RenderContext create (RenderConfiguration configuration, JtwigModelMap modelMap, FunctionResolver functionResolver, OutputStream output) {
+
+    public static RenderContext create(RenderConfiguration configuration, JtwigModelMap modelMap, FunctionResolver functionResolver, OutputStream output) {
         return new RenderContext(configuration, modelMap, functionResolver, new RenderStream(output));
     }
 
     private final FunctionResolver functionResolver;
+
     private final RenderConfiguration configuration;
+
     private final JtwigModelMap modelMap;
+
     private final RenderStream renderStream;
 
     private RenderContext(RenderConfiguration configuration, JtwigModelMap modelMap, FunctionResolver functionResolver, RenderStream renderStream) {
@@ -75,7 +82,7 @@ public class RenderContext {
         renderStream.write(bytes);
     }
 
-    public RenderStream renderStream () {
+    public RenderStream renderStream() {
         return this.renderStream;
     }
 
@@ -127,8 +134,21 @@ public class RenderContext {
     public Object executeFunction(String name, InputParameters parameters) throws FunctionException {
         try {
             Optional<Executable> resolve = functionResolver.resolve(name, parameters);
+
             if (resolve.isPresent()) return resolve.get().execute();
-            throw new FunctionNotFoundException("Unable to find function with name '"+ name +"'");
+            String message = "Unable to find function with name '" + name + "'";
+
+            if (parameters.length() > 0) {
+                message += ", and parameters: ";
+                List<String> params = new ArrayList<>();
+                for (int i = 0; i < parameters.length(); i++) {
+                    params.add(parameters.valueAt(i).getClass().getName());
+                }
+                message += StringUtils.join(params, ", ");
+            }
+
+            throw new FunctionNotFoundException(message);
+
         } catch (InvocationTargetException | IllegalAccessException e) {
             throw new FunctionException(e);
         }

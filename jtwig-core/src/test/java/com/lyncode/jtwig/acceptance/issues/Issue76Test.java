@@ -25,6 +25,17 @@ import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.Assert.fail;
 
 public class Issue76Test extends AbstractJtwigTest {
+
+    @Test
+    public void shouldGiveNiceExplanationForNonExistingFunctionsWithParams() throws Exception {
+        try {
+            when(jtwigRenders(templateResource("templates/issue76/test3.twig")));
+            fail();
+        } catch (RenderException e) {
+            then(e.getCause().getMessage(), containsString("templates/issue76/test3.twig -> Line 1, column 24: Unable to find function with name 'nonExistingFunction', and parameters: java.lang.String, java.lang.String, java.lang.Integer"));
+        }
+    }
+
     @Test
     public void shouldGiveNiceExplanationForNonExistingFunctions() throws Exception {
         try {
