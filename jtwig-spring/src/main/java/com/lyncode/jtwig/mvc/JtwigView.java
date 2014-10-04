@@ -31,7 +31,6 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanInitializationException;
-import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.ui.context.Theme;
 import org.springframework.web.servlet.view.AbstractTemplateView;
 
@@ -84,7 +83,7 @@ public class JtwigView extends AbstractTemplateView {
                 .add("theme", getThemeName(request))
                 .add("request", request);
 
-        CsrfToken token = (CsrfToken) request.getAttribute(CsrfToken.class.getName());
+        Object token = request.getAttribute("org.springframework.security.web.csrf.CsrfToken");
         if(token != null){
             modelMap.add("csrf", token);
         }else{
