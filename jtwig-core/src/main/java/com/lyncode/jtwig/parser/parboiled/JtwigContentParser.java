@@ -126,10 +126,11 @@ public class JtwigContentParser extends JtwigBaseParser<Compilable> {
                         keyword(EXTENDS),
                         mandatory(
                                 Sequence(
-                                        basicParser.stringLiteral(),
+                                        expressionParser.expression(),
+                                        push(new Extends(expressionParser.pop())),
                                         basicParser.spacing(),
                                         basicParser.closeCode(),
-                                        push(new Extends(basicParser.pop())),
+                                        
                                         ZeroOrMore(
                                                 basicParser.spacing(),
                                                 block(),
@@ -138,7 +139,7 @@ public class JtwigContentParser extends JtwigBaseParser<Compilable> {
                                         basicParser.spacing(),
                                         EOI
                                 ),
-                                new ParseException("Wrong include syntax")
+                                new ParseException("Wrong extends syntax")
                         )
                 )
         );
