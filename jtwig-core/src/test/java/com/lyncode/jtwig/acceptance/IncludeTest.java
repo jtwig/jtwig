@@ -27,4 +27,10 @@ public class IncludeTest extends AbstractJtwigTest {
         when(jtwigRenders(templateResource("templates/acceptance/include/main.twig")));
         then(theRenderedTemplate(), is(equalTo("test")));
     }
+    
+    @Test
+    public void includeWithVars() throws Exception {
+        when(jtwigRenders(templateResource("templates/acceptance/include/main-vars.twig")));
+        then(theRenderedTemplate(), is(equalTo("hello, world")));
+    }
 }
