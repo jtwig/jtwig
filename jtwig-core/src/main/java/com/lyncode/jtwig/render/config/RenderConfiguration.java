@@ -15,10 +15,12 @@
 package com.lyncode.jtwig.render.config;
 
 import com.lyncode.jtwig.functions.repository.impl.MapFunctionRepository;
+import java.nio.charset.Charset;
 
 public class RenderConfiguration {
     private boolean strictMode = false;
     private boolean logNonStrictMode = true;
+    private Charset charset = Charset.forName("UTF-8");
     private final MapFunctionRepository functionRepository = new MapFunctionRepository();
 
     public boolean strictMode() {
@@ -38,8 +40,19 @@ public class RenderConfiguration {
         this.logNonStrictMode = logNonStrictMode;
         return this;
     }
+    
+    public Charset charset() {
+        return charset;
+    }
+    
+    public RenderConfiguration charset(Charset charset) {
+        this.charset = charset;
+        return this;
+    }
 
     public MapFunctionRepository functionRepository() {
         return functionRepository;
     }
+    
+    
 }
