@@ -76,6 +76,56 @@ public class JtwigTemplateTest {
 
         assertThat(theOutput(), is("Block one and two"));
     }
+    
+    @Test
+    public void testExtendsVariableDefinedTemplate() throws Exception {
+        JtwigResource oneResource = mock(JtwigResource.class);
+        JtwigResource twoResource = mock(JtwigResource.class);
+        
+        when(resource.resolve("num-one")).thenReturn(oneResource);
+        when(resource.resolve("num-two")).thenReturn(twoResource);
+        
+        when(oneResource.retrieve()).thenReturn(new ByteArrayInputStream("first".getBytes()));
+        when(twoResource.retrieve()).thenReturn(new ByteArrayInputStream("second".getBytes()));
+        
+        when(resource.retrieve()).thenReturn(new ByteArrayInputStream("{% extends var %}".getBytes()));
+
+        context.withModelAttribute("var", "num-two");
+        underTest.output(toTheOutputStream(), context);
+        assertThat(theOutput(), is("second"));
+    }
+    
+    @Test
+    public void testExtendsExpression() throws Exception {
+        JtwigResource oneResource = mock(JtwigResource.class);
+        JtwigResource twoResource = mock(JtwigResource.class);
+        
+        when(resource.resolve("num-one")).thenReturn(oneResource);
+        when(resource.resolve("num-two")).thenReturn(twoResource);
+        
+        when(oneResource.retrieve()).thenReturn(new ByteArrayInputStream("first".getBytes()));
+        when(twoResource.retrieve()).thenReturn(new ByteArrayInputStream("second".getBytes()));
+        
+        when(resource.retrieve()).thenReturn(new ByteArrayInputStream("{% extends var ? 'num-one' : 'num-two' %}".getBytes()));
+
+        context.withModelAttribute("var", false);
+        underTest.output(toTheOutputStream(), context);
+        assertThat(theOutput(), is("second"));
+    }
+    
+    @Test
+    public void testExtendsWithArrayOfTemplates() throws Exception {
+        JtwigResource twoResource = mock(JtwigResource.class);
+        
+        when(resource.resolve("num-two")).thenReturn(twoResource);
+        
+        when(twoResource.retrieve()).thenReturn(new ByteArrayInputStream("second".getBytes()));
+        
+        when(resource.retrieve()).thenReturn(new ByteArrayInputStream("{% extends ['num-one','num-two','num-three'] %}".getBytes()));
+
+        underTest.output(toTheOutputStream(), context);
+        assertThat(theOutput(), is("second"));
+    }
 
     private String theOutput() {
         return outputStream.toString();

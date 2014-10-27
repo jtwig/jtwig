@@ -17,34 +17,54 @@ package com.lyncode.jtwig.content.model.compilable;
 import com.lyncode.jtwig.compile.CompileContext;
 import com.lyncode.jtwig.content.api.Compilable;
 import com.lyncode.jtwig.content.api.Renderable;
+import com.lyncode.jtwig.exception.CalculateException;
 import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.ParseException;
+import com.lyncode.jtwig.exception.RenderException;
 import com.lyncode.jtwig.exception.ResourceException;
+import com.lyncode.jtwig.expressions.api.CompilableExpression;
+import com.lyncode.jtwig.expressions.api.Expression;
+import com.lyncode.jtwig.render.RenderContext;
 import com.lyncode.jtwig.resource.JtwigResource;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Extends extends AbstractElement {
-    private final String relativePath;
-    private List<Block> blocks = new ArrayList<>();
+    private final String resourcePath;
+    private final CompilableExpression expr;
+    private final List<Block> blocks = new ArrayList<>();
 
-    public Extends(String relativeUrl) {
-        this.relativePath = relativeUrl;
+    public Extends(CompilableExpression expr) {
+        this.resourcePath = null;
+        this.expr = expr;
+    }
+    public Extends(String resourcePath) {
+        this.resourcePath = resourcePath;
+        this.expr = null;
     }
 
     @Override
     public Renderable compile(CompileContext context) throws CompileException {
         try {
-            JtwigResource extendResource = context.retrieve(relativePath);
-            CompileContext newContext = context.clone().withResource(extendResource);
+            if (expr != null) {
+                return new Compiled(expr.compile(context), context, blocks);
+            }
+            if (resourcePath != null) {
+                JtwigResource extendResource = context.retrieve(resourcePath);
+                CompileContext newContext = context.clone().withResource(extendResource);
 
-            for (Block block : blocks)
-                newContext.withReplacement(block.name(), block.compile(context));
+                for (Block block : blocks)
+                    newContext.withReplacement(block.name(), block.compile(context));
 
-            Compilable parsed = newContext.parse(extendResource);
-            return parsed.compile(newContext);
-        } catch (ResourceException | ParseException e) {
+                Compilable parsed = newContext.parse(extendResource);
+                return parsed.compile(newContext);
+            }
+            throw new CompileException("Invalid extends syntax. Neither string or expression resource path provided");
+        } catch (ParseException | ResourceException e) {
             throw new CompileException(e);
         }
     }
@@ -52,5 +72,61 @@ public class Extends extends AbstractElement {
     public Extends add(Block block) {
         this.blocks.add(block);
         return this;
+    }
+
+    public static class Compiled implements Renderable {
+        private final Expression resourcePathExpression;
+        private final CompileContext globalContext;
+        private final List<Block> blocks;
+
+        public Compiled(Expression resourcePathExpression,
+                CompileContext globalContext, List<Block> blocks) {
+            this.resourcePathExpression = resourcePathExpression;
+            this.globalContext = globalContext;
+            this.blocks = blocks;
+        }
+
+        @Override
+        public void render(RenderContext context) throws RenderException {
+            try {
+                Object obj = resourcePathExpression.calculate(context);
+                
+                // Resolve the resource to extend
+                JtwigResource extendedResource = null;
+                if (obj instanceof Collection) {
+                    Collection col = (Collection)obj;
+                    for (Object o : col) {
+                        if ((extendedResource = find(o.toString())) != null) {
+                            break;
+                        }
+                    }
+                } else if (obj instanceof String) {
+                    extendedResource = globalContext.retrieve(obj.toString());
+                }
+//                throw new RuntimeException("Type: "+obj.getClass().getCanonicalName());
+                
+                // Ensure that we actually have a resource
+                if (extendedResource == null) {
+                    throw new ResourceException("No resource found for extends tag");
+                }
+                
+                // Handle the context, replace the blocks, and render
+                CompileContext localContext = globalContext.clone().withResource(extendedResource);
+                for (Block block : blocks)
+                    localContext.withReplacement(block.name(), block.compile(globalContext));
+                Compilable parsed = localContext.parse(extendedResource);
+                Renderable r = parsed.compile(localContext);
+                r.render(context);
+            } catch (CalculateException | CompileException | ParseException | ResourceException ex) {
+                throw new RenderException(ex);
+            }
+        }
+        
+        protected JtwigResource find(final String name) {
+            try {
+                return globalContext.retrieve(name);
+            } catch (ResourceException ex) {}
+            return null;
+        }
     }
 }
