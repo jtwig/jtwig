@@ -21,8 +21,9 @@ import com.lyncode.jtwig.functions.util.ObjectIterator;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
+import org.apache.commons.lang3.ArrayUtils;
 
-import static java.lang.Math.min;
+import org.apache.commons.lang3.ObjectUtils;
 
 public class ListFunctions {
     @JtwigFunction(name = "batch")
@@ -137,7 +138,7 @@ public class ListFunctions {
         if (input instanceof String) {
             String value = (String) input;
             if (value.length() < begin) return "";
-            return value.substring(begin, min(value.length(), begin + length));
+            return value.substring(begin, Math.min(value.length(), begin + length));
         }
 
         ObjectIterator iterator = new ObjectIterator(input);
@@ -162,9 +163,35 @@ public class ListFunctions {
         Collections.sort(input);
         return input;
     }
+    
+    @JtwigFunction(name = "max")
+    public Object max (@Parameter Object ... values) {
+        Object result = values[0];
+        values = ArrayUtils.remove(values, 0);
+        for(Object value : values) {
+            int cmp = com.lyncode.jtwig.functions.util.ObjectUtils.compare(result, value);
+            if(cmp < 0) {
+                result = value;
+            }
+        }
+        return result;
+    }
+    
+    @JtwigFunction(name = "min")
+    public Object min (@Parameter Object ... values) {
+        Object result = values[0];
+        values = ArrayUtils.remove(values, 0);
+        for(Object value : values) {
+            int cmp = com.lyncode.jtwig.functions.util.ObjectUtils.compare(result, value);
+            if(cmp > 0) {
+                result = value;
+            }
+        }
+        return result;
+    }
 
     private Object mergeArray(Object first, Object... arguments) {
-        List<Object> result = new ArrayList<Object>();
+        List<Object> result = new ArrayList<>();
         for (Object obj : (Object[]) first)
             result.add(obj);
         for (Object obj : arguments) {
