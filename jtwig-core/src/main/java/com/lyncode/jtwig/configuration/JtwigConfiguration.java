@@ -15,15 +15,13 @@
 package com.lyncode.jtwig.configuration;
 
 import com.lyncode.jtwig.compile.config.CompileConfiguration;
-import com.lyncode.jtwig.functions.config.JsonConfiguration;
 import com.lyncode.jtwig.parser.config.ParserConfiguration;
 import com.lyncode.jtwig.render.config.RenderConfiguration;
 
 public class JtwigConfiguration {
     private ParserConfiguration parserConfiguration = new ParserConfiguration();
     private CompileConfiguration compileConfiguration = new CompileConfiguration();
-    private JsonConfiguration functionConfiguration = new JsonConfiguration();
-    private RenderConfiguration renderConfiguration = new RenderConfiguration(functionConfiguration);
+    private RenderConfiguration renderConfiguration = new RenderConfiguration();
 
     public RenderConfiguration render() { return renderConfiguration; }
     public CompileConfiguration compile () { return compileConfiguration; }

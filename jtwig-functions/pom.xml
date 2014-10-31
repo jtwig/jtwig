@@ -11,11 +11,6 @@
     <name>Jtwig Functions</name>
 
     <dependencies>
-        <dependency>
-            <groupId>com.lyncode</groupId>
-            <artifactId>jtwig-types</artifactId>
-            <version>${project.version}</version>
-        </dependency>
 
         <dependency>
             <groupId>org.apache.commons</groupId>
