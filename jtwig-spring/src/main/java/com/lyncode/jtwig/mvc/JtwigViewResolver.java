@@ -133,6 +133,10 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
         return configuration;
     }
 
+    public void setConfiguration (JtwigConfiguration configuration) {
+        this.configuration = configuration;
+    }
+
     public JtwigViewResolver include (ParameterResolver resolver) {
         parameterResolver.withResolver(resolver);
         return this;
