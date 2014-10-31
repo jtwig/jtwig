@@ -51,7 +51,7 @@
         <gson.version>2.3</gson.version>
         <yatspec.version>209</yatspec.version>
 
-        <jacoco.version>0.6.4.201312101107</jacoco.version>
+        <jacoco.version>0.7.2.201409121644</jacoco.version>
     </properties>
 
     <modules>
