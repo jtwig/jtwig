@@ -14,14 +14,23 @@
 
 package com.lyncode.jtwig.render.config;
 
+import com.google.common.base.Function;
+import com.lyncode.jtwig.functions.config.JsonConfiguration;
 import com.lyncode.jtwig.functions.repository.impl.MapFunctionRepository;
+
 import java.nio.charset.Charset;
 
 public class RenderConfiguration {
     private boolean strictMode = false;
     private boolean logNonStrictMode = true;
     private Charset charset = Charset.forName("UTF-8");
-    private final MapFunctionRepository functionRepository = new MapFunctionRepository();
+    private final JsonConfiguration jsonConfiguration;
+    private final MapFunctionRepository functionRepository;
+
+    public RenderConfiguration() {
+        this.jsonConfiguration = new JsonConfiguration();
+        this.functionRepository = new MapFunctionRepository(jsonConfiguration);
+    }
 
     public boolean strictMode() {
         return strictMode;
@@ -53,6 +62,8 @@ public class RenderConfiguration {
     public MapFunctionRepository functionRepository() {
         return functionRepository;
     }
-    
-    
+    public RenderConfiguration jsonMapper(Function<Object, String> mapper) {
+        this.jsonConfiguration.jsonMapper(mapper);
+        return this;
+    }
 }

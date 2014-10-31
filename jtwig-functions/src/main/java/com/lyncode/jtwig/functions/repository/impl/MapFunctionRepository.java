@@ -5,6 +5,7 @@ import com.google.common.collect.Collections2;
 import com.lyncode.jtwig.functions.annotations.JtwigFunction;
 import com.lyncode.jtwig.functions.annotations.Parameter;
 import com.lyncode.jtwig.functions.builtin.*;
+import com.lyncode.jtwig.functions.config.JsonConfiguration;
 import com.lyncode.jtwig.functions.parameters.input.InputParameters;
 import com.lyncode.jtwig.functions.repository.api.FunctionRepository;
 import com.lyncode.jtwig.functions.repository.model.Function;
@@ -23,7 +24,7 @@ import static com.lyncode.jtwig.functions.repository.model.Function.functionFrom
 public class MapFunctionRepository implements FunctionRepository {
     private final ConcurrentHashMap<String, Collection<Function>> repository = new ConcurrentHashMap<>();
 
-    public MapFunctionRepository() {
+    public MapFunctionRepository(JsonConfiguration configuration) {
         include(new BooleanFunctions());
         include(new DateFunctions());
         include(new ListFunctions());
@@ -32,6 +33,7 @@ public class MapFunctionRepository implements FunctionRepository {
         include(new NumberFunctions());
         include(new ObjectFunctions());
         include(new StringFunctions());
+        include(new JsonFunctions(configuration));
     }
 
     @Override
