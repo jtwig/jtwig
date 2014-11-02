@@ -18,12 +18,12 @@ import com.lyncode.jtwig.functions.annotations.JtwigFunction;
 import com.lyncode.jtwig.functions.annotations.Parameter;
 import com.lyncode.jtwig.functions.exceptions.FunctionException;
 import com.lyncode.jtwig.functions.util.ObjectIterator;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
-import org.apache.commons.lang3.ArrayUtils;
 
-import org.apache.commons.lang3.ObjectUtils;
+import static com.lyncode.jtwig.functions.util.ObjectUtils.compare;
 
 public class ListFunctions {
     @JtwigFunction(name = "batch")
@@ -169,7 +169,7 @@ public class ListFunctions {
         Object result = values[0];
         values = ArrayUtils.remove(values, 0);
         for(Object value : values) {
-            int cmp = com.lyncode.jtwig.functions.util.ObjectUtils.compare(result, value);
+            int cmp = compare(result, value);
             if(cmp < 0) {
                 result = value;
             }
@@ -182,7 +182,7 @@ public class ListFunctions {
         Object result = values[0];
         values = ArrayUtils.remove(values, 0);
         for(Object value : values) {
-            int cmp = com.lyncode.jtwig.functions.util.ObjectUtils.compare(result, value);
+            int cmp = compare(result, value);
             if(cmp > 0) {
                 result = value;
             }
