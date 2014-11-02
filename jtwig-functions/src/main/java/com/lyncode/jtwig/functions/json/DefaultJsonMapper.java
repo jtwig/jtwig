@@ -13,7 +13,8 @@ import static java.util.Arrays.asList;
 
 public class DefaultJsonMapper implements Function<Object, String> {
     private static List<JsonMapperProvider> providers = asList(
-        new JacksonCodehausJsonMapperProvider(), new JacksonFasterXmlJsonMapperProvider(),
+            new JacksonFasterXmlJsonMapperProvider(),
+            new JacksonCodehausJsonMapperProvider(),
             new GsonJsonMapperProvider()
     );
 
