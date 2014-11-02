@@ -14,11 +14,6 @@
     <dependencies>
         <dependency>
             <groupId>com.lyncode</groupId>
-            <artifactId>jtwig-types</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.lyncode</groupId>
             <artifactId>jtwig-functions</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -88,6 +83,12 @@
             <groupId>com.jayway.jsonpath</groupId>
             <artifactId>json-path</artifactId>
             <version>0.9.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-mapper-asl</artifactId>
+            <version>1.9.13</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

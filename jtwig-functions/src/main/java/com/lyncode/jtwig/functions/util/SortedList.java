@@ -1,11 +1,11 @@
 package com.lyncode.jtwig.functions.util;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 
 import static java.util.Collections.binarySearch;
-import static java.util.Collections.sort;
 
 public class SortedList<T extends Comparable<T>> extends LinkedList<T> {
     private final Comparator<T> comparator;
@@ -31,7 +31,7 @@ public class SortedList<T extends Comparable<T>> extends LinkedList<T> {
         boolean result = false;
         if (paramCollection.size() > 4) {
             result = super.addAll(paramCollection);
-            sort(this, comparator);
+            Collections.sort(this, comparator);
         }
         else {
             for (T paramT:paramCollection) {

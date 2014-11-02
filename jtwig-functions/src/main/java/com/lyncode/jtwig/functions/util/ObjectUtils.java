@@ -14,8 +14,6 @@
 
 package com.lyncode.jtwig.functions.util;
 
-import org.apache.commons.lang3.CharUtils;
-
 public class ObjectUtils {
     /**
      * This compare function is designed to operate the same way as its PHP
@@ -34,7 +32,7 @@ public class ObjectUtils {
         if(obj1 != null && obj2 == null) {
             return 1;
         }
-        if(obj1 == null && obj2 != null) {
+        if(obj1 == null) {
             return -1;
         }
         
@@ -45,7 +43,7 @@ public class ObjectUtils {
         if(!(obj1 instanceof Number) && obj2 instanceof Number) {
             return -1;
         }
-        if(obj1 instanceof Number && obj2 instanceof Number) {
+        if(obj1 instanceof Number) {
             return compareNumber((Number)obj1, (Number)obj2);
         }
         

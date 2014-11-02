@@ -60,27 +60,8 @@ public class ObjectFunctionsTest {
 
 
     @Test
-    public void testExecute() throws Exception {
-        Hello world = new Hello("world");
-        assertEquals("{\"hello\":\"world\"}", underTest.jsonEncode(world));
-    }
-
-
-    @Test
     public void testExecuteWithString() throws Exception {
         int length = underTest.length("test");
         assertThat(length, is(4));
-    }
-
-    private static class Hello {
-        private String hello;
-
-        private Hello(String hello) {
-            this.hello = hello;
-        }
-
-        public String getHello() {
-            return hello;
-        }
     }
 }

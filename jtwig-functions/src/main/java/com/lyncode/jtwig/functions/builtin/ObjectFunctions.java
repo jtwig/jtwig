@@ -16,27 +16,18 @@ package com.lyncode.jtwig.functions.builtin;
 
 import com.lyncode.jtwig.functions.annotations.JtwigFunction;
 import com.lyncode.jtwig.functions.annotations.Parameter;
-import org.codehaus.jackson.map.ObjectMapper;
 
-import java.io.IOException;
 import java.lang.reflect.Array;
 
 import static com.lyncode.jtwig.types.Undefined.UNDEFINED;
 
 public class ObjectFunctions {
-    private final ObjectMapper mapper = new ObjectMapper();
-
     @JtwigFunction(name = "default")
     public Object defaultFunction (@Parameter Object input, @Parameter Object defaultValue) {
         if (input == null || input.equals(UNDEFINED))
             return defaultValue;
         else
             return input;
-    }
-
-    @JtwigFunction(name = "json_encode")
-    public String jsonEncode (@Parameter Object input) throws IOException {
-        return mapper.writeValueAsString(input);
     }
 
 

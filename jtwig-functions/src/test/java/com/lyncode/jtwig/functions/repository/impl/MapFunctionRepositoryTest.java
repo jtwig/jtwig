@@ -2,6 +2,7 @@ package com.lyncode.jtwig.functions.repository.impl;
 
 import com.lyncode.jtwig.functions.annotations.JtwigFunction;
 import com.lyncode.jtwig.functions.annotations.Parameter;
+import com.lyncode.jtwig.functions.config.JsonConfiguration;
 import com.lyncode.jtwig.functions.parameters.input.InputParameters;
 import com.lyncode.jtwig.functions.repository.api.FunctionRepository;
 import com.lyncode.jtwig.functions.repository.model.Function;
@@ -29,7 +30,7 @@ public class MapFunctionRepositoryTest {
 
     @Before
     public void setUp() throws Exception {
-        underTest = new MapFunctionRepository();
+        underTest = new MapFunctionRepository(new JsonConfiguration());
     }
 
     @Test

@@ -14,11 +14,17 @@
 
 package com.lyncode.jtwig.functions.util;
 
+import org.junit.Assert;
 import org.junit.Test;
 
-import org.junit.Assert;
-
 public class ObjectUtilsTest {
+    @Test
+    public void compareEdgeCases() throws Exception {
+        Assert.assertEquals(0, ObjectUtils.compare(null, null));
+        Assert.assertEquals(1, ObjectUtils.compare(new Object(), null));
+        Assert.assertEquals(-1, ObjectUtils.compare(null, new Object()));
+    }
+
     @Test
     public void compareLowercaseToUppercase() {
         Assert.assertEquals(0, ObjectUtils.compare('a', 'a'));
@@ -34,9 +40,26 @@ public class ObjectUtilsTest {
     @Test
     public void compareNumbers() {
         Assert.assertEquals(-1, ObjectUtils.compare(1, 1.1));
-        Assert.assertEquals(-1, ObjectUtils.compare(1, 1.0000000000001));
         Assert.assertEquals(0, ObjectUtils.compare(1, 1.0));
         Assert.assertEquals(1, ObjectUtils.compare(1.1, 1));
+        Assert.assertEquals(-1, ObjectUtils.compare(1, 1.0000000000001));
         Assert.assertEquals(1, ObjectUtils.compare(1.00000000000001, 1));
+
+
+        Assert.assertEquals(-1, ObjectUtils.compare(1F, 1.1F));
+        Assert.assertEquals(0, ObjectUtils.compare(1F, 1.0F));
+        Assert.assertEquals(1, ObjectUtils.compare(1.1F, 1F));
+
+        Assert.assertEquals(-1, ObjectUtils.compare(1L, 2L));
+        Assert.assertEquals(0, ObjectUtils.compare(1L, 1L));
+        Assert.assertEquals(1, ObjectUtils.compare(2L, 1L));
+
+        Assert.assertEquals(-1, ObjectUtils.compare((short) 1, (short) 2));
+        Assert.assertEquals(0, ObjectUtils.compare((short) 1, (short) 1 ));
+        Assert.assertEquals(1, ObjectUtils.compare((short) 2, (short) 1));
+
+        Assert.assertEquals(-1, ObjectUtils.compare((byte) 0x00, (byte)0x01));
+        Assert.assertEquals(0, ObjectUtils.compare((byte) 0x00, (byte)0x00));
+        Assert.assertEquals(1, ObjectUtils.compare((byte) 0x01, (byte)0x00));
     }
 }
