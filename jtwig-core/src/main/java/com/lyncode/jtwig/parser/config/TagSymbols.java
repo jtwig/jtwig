@@ -14,7 +14,7 @@
 
 package com.lyncode.jtwig.parser.config;
 
-public enum TagSymbols {
+public enum TagSymbols implements Symbols {
     DEFAULT("{%", "%}", "{{", "}}", "{#", "#}"),
     JAVASCRIPT_COLLISION_FREE("<#","#>","@>","<@", "<$","$>");
 
