@@ -28,6 +28,8 @@ import com.lyncode.jtwig.functions.parameters.resolve.impl.ParameterAnnotationPa
 import com.lyncode.jtwig.functions.resolver.api.FunctionResolver;
 import com.lyncode.jtwig.functions.resolver.impl.CompoundFunctionResolver;
 import com.lyncode.jtwig.functions.resolver.impl.DelegateFunctionResolver;
+import com.lyncode.jtwig.resource.loader.DefaultResourceResolver;
+import com.lyncode.jtwig.resource.loader.JtwigResourceResolver;
 import com.lyncode.jtwig.services.api.url.ResourceUrlResolver;
 import com.lyncode.jtwig.services.impl.url.IdentityUrlResolver;
 import com.lyncode.jtwig.services.impl.url.ThemedResourceUrlResolver;
@@ -50,6 +52,7 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
     private boolean cached = true;
     private boolean useThemeInViewPath = false;
 
+    private JtwigResourceResolver loader;
     private JtwigConfiguration configuration = new JtwigConfiguration();
     private SpringFunctions springFunctions = null;
     private CompoundParameterResolver parameterResolver = new CompoundParameterResolver();
@@ -77,43 +80,29 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
         return abstractUrlBasedView;
     }
 
-    private ResourceUrlResolver urlResolver() {
-        if (themeResolver == null || !useThemeInViewPath)
-            return IdentityUrlResolver.INSTANCE;
-        else
-            return new ThemedResourceUrlResolver(themeResolver.resolveThemeName(getServletRequest()));
-    }
-
-    public boolean isCached() {
-        return cached;
-    }
-
-    public void setCached(boolean cached) {
+    public JtwigViewResolver setCached(boolean cached) {
         this.cached = cached;
+        return this;
     }
 
-    public void setThemeResolver(ThemeResolver themeResolver) {
+    public JtwigViewResolver setThemeResolver(ThemeResolver themeResolver) {
         this.themeResolver = themeResolver;
+        return this;
     }
 
-    public boolean useThemeInViewPath() {
-        return useThemeInViewPath;
-    }
-
-    public void setUseThemeInViewPath(boolean useThemeInViewPath) {
+    public JtwigViewResolver setUseThemeInViewPath(boolean useThemeInViewPath) {
         this.useThemeInViewPath = useThemeInViewPath;
+        return this;
     }
 
-    public String getEncoding() {
-        return encoding;
-    }
-
-    public void setConcurrentMaxThreads (int value) {
+    public JtwigViewResolver setConcurrentMaxThreads(int value) {
         withMaxThreads(value);
+        return this;
     }
 
-    public void setConcurrentMinThreads (int value) {
+    public JtwigViewResolver setConcurrentMinThreads(int value) {
         withMinThreads(value);
+        return this;
     }
 
     public FunctionResolver functionResolver() {
@@ -125,16 +114,18 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
         return functionResolver;
     }
 
-    public void setEncoding(String encoding) {
+    public JtwigViewResolver setEncoding(String encoding) {
         this.encoding = encoding;
+        return this;
     }
 
     public JtwigConfiguration configuration() {
         return configuration;
     }
 
-    public void setConfiguration (JtwigConfiguration configuration) {
+    public JtwigViewResolver setConfiguration(JtwigConfiguration configuration) {
         this.configuration = configuration;
+        return this;
     }
 
     public JtwigViewResolver include (ParameterResolver resolver) {
@@ -145,6 +136,27 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
     public JtwigViewResolver includeFunctions (Object functionBean) {
         configuration.render().functionRepository().include(functionBean);
         return this;
+    }
+
+    public JtwigViewResolver setResourceLoader(DefaultResourceResolver resourceLoader) {
+        this.loader = resourceLoader;
+        return this;
+    }
+
+    // Methods only accessible to JtwigView, no need to give them to the end user
+    JtwigResourceResolver resourceLoader() {
+        if (loader == null) {
+            setResourceLoader(new DefaultResourceResolver(getServletContext()));
+        }
+        return loader;
+    }
+
+    String getEncoding() {
+        return encoding;
+    }
+
+    boolean isCached() {
+        return cached;
     }
 
     private InputParameterResolverFactory parameterResolverFactory(final DemultiplexerConverter converter) {
@@ -160,5 +172,12 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
 
     private DelegateFunctionResolver resolver(DemultiplexerConverter converter) {
         return new DelegateFunctionResolver(configuration.render().functionRepository(), new InputDelegateMethodParametersResolver(parameterResolverFactory(converter)));
+    }
+
+    private ResourceUrlResolver urlResolver() {
+        if (themeResolver == null || !useThemeInViewPath)
+            return IdentityUrlResolver.INSTANCE;
+        else
+            return new ThemedResourceUrlResolver(themeResolver.resolveThemeName(getServletRequest()));
     }
 }
