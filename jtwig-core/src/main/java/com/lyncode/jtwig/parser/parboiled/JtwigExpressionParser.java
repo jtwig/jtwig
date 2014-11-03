@@ -57,7 +57,8 @@ public class JtwigExpressionParser extends JtwigBaseParser<CompilableExpression>
                 Operator.STARTS_WITH,
                 Operator.ENDS_WITH,
                 Operator.MATCHES,
-                Operator.IN
+                Operator.IN,
+                Operator.NOT_IN
         );
     }
 

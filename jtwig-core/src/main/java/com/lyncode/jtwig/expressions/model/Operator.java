@@ -44,6 +44,7 @@ public enum Operator {
     IN("in"),
     IS("is"),
     IS_NOT("is not"),
+    NOT_IN("not in"),
 
     UNKNOWN("unknown");
 

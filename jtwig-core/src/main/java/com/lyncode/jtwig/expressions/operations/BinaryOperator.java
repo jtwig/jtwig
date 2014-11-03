@@ -54,6 +54,7 @@ public enum BinaryOperator {
 
     // Other
     IN(Operator.IN, operation(new InOperation())),
+    NOT_IN(Operator.NOT_IN, operation(new NotInOperation())),
     MATCHES(Operator.MATCHES, operation(new MatchesOperation())),
     ENDS_WITH(Operator.ENDS_WITH, operation(new EndsWithOperation())),
     STARTS_WITH(Operator.STARTS_WITH, operation(new StartsWithOperation())),
