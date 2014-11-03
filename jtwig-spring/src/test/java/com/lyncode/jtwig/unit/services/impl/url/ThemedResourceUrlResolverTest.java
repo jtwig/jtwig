@@ -1,5 +1,6 @@
-package com.lyncode.jtwig.services.impl.url;
+package com.lyncode.jtwig.unit.services.impl.url;
 
+import com.lyncode.jtwig.services.impl.url.ThemedResourceUrlResolver;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
