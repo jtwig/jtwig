@@ -36,6 +36,21 @@ public class IfExpressionTest extends AbstractJtwigTest {
     }
 
     @Test
+    public void ifInOperator () throws ParseException, CompileException, RenderException {
+        JtwigTemplate template = JtwigTemplate.fromString("{% if (1 in [1, 2]) %}ok{% else %}ko{% endif %}");
+        JtwigModelMap context = new JtwigModelMap();
+        assertThat(template.output(context), is("ok"));
+    }
+
+
+    @Test
+    public void ifNotInOperator () throws ParseException, CompileException, RenderException {
+        JtwigTemplate template = JtwigTemplate.fromString("{% if (1 not in [3, 2]) %}ok{% else %}ko{% endif %}");
+        JtwigModelMap context = new JtwigModelMap();
+        assertThat(template.output(context), is("ok"));
+    }
+
+    @Test
     public void ifWithNonEmptyListShouldBeTheSameAsTrue () throws ParseException, CompileException, RenderException {
         JtwigTemplate template = JtwigTemplate.fromString("{% if (list) %}not empty{% else %}empty{% endif %}");
         JtwigModelMap context = new JtwigModelMap();
