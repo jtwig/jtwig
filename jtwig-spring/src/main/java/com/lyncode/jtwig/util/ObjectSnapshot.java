@@ -15,17 +15,16 @@
 package com.lyncode.jtwig.util;
 
 import com.google.common.reflect.AbstractInvocationHandler;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.apache.log4j.Logger.getLogger;
-
 public class ObjectSnapshot {
-    private static Logger LOG = getLogger(ObjectSnapshot.class);
+    private static Logger LOG = LoggerFactory.getLogger(ObjectSnapshot.class);
 
     public static <T> T snapshot (T object) {
         Class<T> objectClass = (Class<T>) object.getClass();

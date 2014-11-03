@@ -26,8 +26,6 @@ import com.lyncode.jtwig.render.RenderContext;
 import com.lyncode.jtwig.resource.ClasspathJtwigResource;
 import com.lyncode.jtwig.resource.JtwigResource;
 import com.lyncode.jtwig.resource.StringJtwigResource;
-import org.apache.log4j.BasicConfigurator;
-import org.junit.Before;
 
 import java.io.ByteArrayOutputStream;
 
@@ -36,11 +34,6 @@ public class AbstractJtwigTest {
     private JtwigParser parser = new JtwigParser(configuration.parse());
     private JtwigModelMap model = new JtwigModelMap();
     private String output;
-
-    @Before
-    public void setUp() throws Exception {
-        BasicConfigurator.configure();
-    }
 
     protected String theResultOfRendering(JtwigTemplate template) throws Exception {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
