@@ -47,27 +47,27 @@ public class JtwigBasicParser extends BaseParser<String> {
     }
 
     public Rule closeCode() {
-        return String(parserConfiguration.getEndCode());
+        return String(parserConfiguration.symbols().endTag());
     }
 
     public Rule openCode() {
-        return String(parserConfiguration.getBeginCode());
+        return String(parserConfiguration.symbols().beginTag());
     }
 
     public Rule openOutput () {
-        return String(parserConfiguration.getBeginOutput());
+        return String(parserConfiguration.symbols().beginOutput());
     }
 
     public Rule closeOutput () {
-        return String(parserConfiguration.getEndOutput());
+        return String(parserConfiguration.symbols().endOutput());
     }
 
     public Rule openComment () {
-        return String(parserConfiguration.getBeginComment());
+        return String(parserConfiguration.symbols().beginComment());
     }
 
     public Rule closeComment () {
-        return String(parserConfiguration.getEndComment());
+        return String(parserConfiguration.symbols().endComment());
     }
 
     @MemoMismatches

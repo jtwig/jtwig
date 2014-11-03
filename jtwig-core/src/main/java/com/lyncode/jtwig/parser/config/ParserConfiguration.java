@@ -19,31 +19,16 @@ public class ParserConfiguration {
         return new ParserConfiguration();
     }
 
-    private TagSymbols symbols = TagSymbols.DEFAULT;
+    private Symbols symbols = TagSymbols.DEFAULT;
     private AddonParserList parserList = new AddonParserList();
 
-    public ParserConfiguration withSymbols (TagSymbols symbols) {
+    public ParserConfiguration withSymbols (Symbols symbols) {
         this.symbols = symbols;
         return this;
     }
 
-    public String getBeginCode() {
-        return symbols.beginTag();
-    }
-    public String getEndCode() {
-        return symbols.endTag();
-    }
-    public String getBeginOutput() {
-        return symbols.beginOutput();
-    }
-    public String getEndOutput() {
-        return symbols.endOutput();
-    }
-    public String getBeginComment() {
-        return symbols.beginComment();
-    }
-    public String getEndComment() {
-        return symbols.endComment();
+    public Symbols symbols() {
+        return symbols;
     }
 
     public AddonParserList addons() {
