@@ -14,7 +14,8 @@
 
 package com.lyncode.jtwig.util.render;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.parboiled.common.StringUtils;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
@@ -34,7 +35,7 @@ import static com.lyncode.jtwig.util.FilePath.path;
 import static com.lyncode.jtwig.util.ObjectSnapshot.snapshot;
 
 public class RenderHttpServletRequest implements HttpServletRequest {
-    private static Logger LOG = Logger.getLogger(RenderHttpServletRequest.class);
+    private static Logger LOG = LoggerFactory.getLogger(RenderHttpServletRequest.class);
 
     private static final String URL_GET_ATTR = "=";
     private static final String URL_GET_SEPARATOR = "&amp;";

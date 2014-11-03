@@ -27,8 +27,8 @@ import com.lyncode.jtwig.resource.FileJtwigResource;
 import com.lyncode.jtwig.resource.JtwigResource;
 import com.lyncode.jtwig.resource.WebJtwigResource;
 import com.lyncode.jtwig.types.Undefined;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.ui.context.Theme;
@@ -46,7 +46,7 @@ import static org.springframework.web.servlet.support.RequestContextUtils.getThe
 
 public class JtwigView extends AbstractTemplateView {
 
-    private static Logger log = LogManager.getLogger(JtwigView.class);
+    private static Logger log = LoggerFactory.getLogger(JtwigView.class);
 
     private Map<String, Renderable> compiledTemplates = new HashMap<>();
 

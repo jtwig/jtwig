@@ -14,7 +14,8 @@
 
 package com.lyncode.jtwig.util.render;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
@@ -26,7 +27,7 @@ import java.io.PrintWriter;
 import java.util.Locale;
 
 public class RenderHttpServletResponse implements HttpServletResponse {
-    private static Logger LOG = Logger.getLogger(RenderHttpServletResponse.class);
+    private static Logger LOG = LoggerFactory.getLogger(RenderHttpServletResponse.class);
 
     private int contentLength = 0;
     private OutputStream output = new ByteArrayOutputStream();

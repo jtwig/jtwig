@@ -44,7 +44,7 @@
         <mockito.version>1.9.5</mockito.version>
         <junit.version>4.11</junit.version>
         <servlet-api.version>2.5</servlet-api.version>
-        <log4j.version>1.2.14</log4j.version>
+        <slf4j.version>1.7.7</slf4j.version>
         <commons.lang3.version>3.1</commons.lang3.version>
         <jackson.version>1.9.13</jackson.version>
         <jackson2.version>2.4.3</jackson2.version>

@@ -2,13 +2,14 @@ package com.lyncode.jtwig.render.stream;
 
 import com.lyncode.jtwig.content.api.Renderable;
 import com.lyncode.jtwig.render.RenderContext;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by rsilva on 3/20/14.
  */
 class RenderTask implements Runnable {
-    private static Logger logger = Logger.getLogger(RenderTask.class);
+    private static Logger logger = LoggerFactory.getLogger(RenderTask.class);
 
     private Renderable content;
     private RenderContext context;

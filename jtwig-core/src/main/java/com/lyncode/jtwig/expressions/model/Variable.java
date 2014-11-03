@@ -23,14 +23,15 @@ import com.lyncode.jtwig.parser.model.JtwigPosition;
 import com.lyncode.jtwig.render.RenderContext;
 import com.lyncode.jtwig.types.Undefined;
 import com.lyncode.jtwig.util.ObjectExtractor;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 
 import static java.lang.String.format;
 
 public class Variable extends AbstractCompilableExpression {
-    private static Logger log = Logger.getLogger(Variable.class);
+    private static Logger log = LoggerFactory.getLogger(Variable.class);
     private String name;
 
     public Variable(JtwigPosition position, String name) {
