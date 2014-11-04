@@ -109,16 +109,6 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
         return encoding;
     }
 
-    public void setConcurrentMaxThreads(int value) {
-        //TODO
-//        withMaxThreads(value);
-    }
-
-    public void setConcurrentMinThreads(int value) {
-        //TODO
-//        withMinThreads(value);
-    }
-
     public FunctionResolver functionResolver() {
         if (springFunctions == null) {
             springFunctions = new SpringFunctions();
