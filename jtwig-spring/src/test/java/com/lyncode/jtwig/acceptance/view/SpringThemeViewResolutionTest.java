@@ -51,6 +51,7 @@ public class SpringThemeViewResolutionTest extends AbstractJtwigAcceptanceTest {
             jtwigViewResolver.setPrefix("/WEB-INF/views/");
             jtwigViewResolver.setSuffix(".twig.html");
             jtwigViewResolver.setUseThemeInViewPath(true);
+            jtwigViewResolver.setThemeResolver(themeResolver());
             return jtwigViewResolver;
         }
     }
