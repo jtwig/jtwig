@@ -22,10 +22,7 @@ import com.lyncode.jtwig.content.api.Renderable;
 import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.ParseException;
 import com.lyncode.jtwig.render.RenderContext;
-import com.lyncode.jtwig.resource.ClasspathJtwigResource;
-import com.lyncode.jtwig.resource.FileJtwigResource;
 import com.lyncode.jtwig.resource.JtwigResource;
-import com.lyncode.jtwig.resource.WebJtwigResource;
 import com.lyncode.jtwig.types.Undefined;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -127,13 +124,9 @@ public class JtwigView extends AbstractTemplateView {
     }
 
     private JtwigResource getResource() {
-        String url = getUrl();
-        if (url.startsWith("classpath:"))
-            return new ClasspathJtwigResource(url);
-        else if (url.startsWith("file://"))
-            return new FileJtwigResource(url);
-        else
-            return new WebJtwigResource(getServletContext(), url);
+        return getViewResolver()
+                .resourceLoader()
+                .resolve(getUrl());
     }
 
     @SuppressWarnings("serial")
