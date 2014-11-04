@@ -17,6 +17,7 @@ package com.lyncode.jtwig.render.stream;
 import com.lyncode.jtwig.content.api.Renderable;
 import com.lyncode.jtwig.exception.RenderException;
 import com.lyncode.jtwig.render.RenderContext;
+import com.lyncode.jtwig.render.config.RenderThreadingConfig;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -27,30 +28,30 @@ import java.util.concurrent.TimeUnit;
 
 public class RenderStream {
 
-    private static int sMinThreads = 20;
-    private static int sMaxThreads = 100;
-    private static long sKeepAliveTime = 60L; // seconds
     private static ExecutorService sExecutor = null;
 
-    private static ExecutorService executorService() {
+    private static void initExecutorService(RenderThreadingConfig renderConfiguration) {
         if (sExecutor == null) {
-            sExecutor = new ThreadPoolExecutor(sMinThreads, sMaxThreads, sKeepAliveTime, TimeUnit.SECONDS,
+            sExecutor = new ThreadPoolExecutor(renderConfiguration.minThreads(), renderConfiguration.maxThreads(),
+                                               renderConfiguration.keepAliveTime(), TimeUnit.SECONDS,
                                                new SynchronousQueue<Runnable>());
         }
-        return sExecutor;
     }
 
     private final OutputStream mRootOutputStream;
     private final MultiOuputStream mMultiStream;
     private final RenderControl mControl;
+    private final RenderThreadingConfig mRenderConfiguration;
     private RenderIndex mIndex;
 
     private RenderStream(MultiOuputStream multiStream, OutputStream stream, RenderIndex dIndex,
-                         RenderControl renderControl) {
-        this.mMultiStream = multiStream;
-        this.mRootOutputStream = stream;
-        this.mIndex = dIndex;
-        this.mControl = renderControl;
+                         RenderControl renderControl, RenderThreadingConfig renderConfiguration) {
+        mMultiStream = multiStream;
+        mRootOutputStream = stream;
+        mIndex = dIndex;
+        mControl = renderControl;
+        mRenderConfiguration = renderConfiguration;
+        initExecutorService(mRenderConfiguration);
 
         if (mIndex != null) {
             SingleOuputStream.Builder builder = SingleOuputStream.builder().withInheritedStream(true);
@@ -65,17 +66,17 @@ public class RenderStream {
         }
     }
 
-    public RenderStream(OutputStream outputStream) {
+    public RenderStream(OutputStream outputStream, RenderThreadingConfig renderConfiguration) {
         this(new MultiOuputStream(), outputStream, null,
-             new RenderControl());
+             new RenderControl(), renderConfiguration);
     }
 
     public RenderStream renderConcurrent(final Renderable content, final RenderContext context) {
         try {
             mControl.push();
-            executorService().execute(new RenderTask(content, context));
+            sExecutor.execute(new RenderTask(content, context));
         } catch (OutOfMemoryError e) {
-            executorService().shutdownNow();
+            sExecutor.shutdownNow();
             mControl.cancel();
         }
         return this;
@@ -130,7 +131,8 @@ public class RenderStream {
         mIndex = mIndex.right(); // this will continue with the right children
         mMultiStream.addStream(mIndex);
 
-        RenderStream forkedStream = new RenderStream(mMultiStream, getRootOutputStream(), forkedIndex, mControl);
+        RenderStream forkedStream = new RenderStream(mMultiStream, getRootOutputStream(), forkedIndex, mControl,
+                                                     mRenderConfiguration);
         mControl.unlockChange();
         return forkedStream;
     }
