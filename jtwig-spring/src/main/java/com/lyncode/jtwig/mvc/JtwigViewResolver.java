@@ -90,6 +90,28 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
         return this;
     }
 
+    /**
+     * Do not use. Use JtwigConfiguration.render().renderThreadingConfig().maxThreads()
+     * @param value
+     * @return
+     */
+    @Deprecated
+    public JtwigViewResolver setConcurrentMaxThreads(int value) {
+        configuration.render().renderThreadingConfig().maxThreads(value);
+        return this;
+    }
+
+    /**
+     * Do not use. Use JtwigConfiguration.render().renderThreadingConfig().minThreads()
+     * @param value
+     * @return
+     */
+    @Deprecated
+    public JtwigViewResolver setConcurrentMinThreads(int value) {
+        configuration.render().renderThreadingConfig().minThreads(value);
+        return this;
+    }
+
     public FunctionResolver functionResolver() {
         if (springFunctions == null) {
             springFunctions = new SpringFunctions();
