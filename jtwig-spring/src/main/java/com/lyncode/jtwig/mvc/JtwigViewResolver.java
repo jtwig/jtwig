@@ -14,6 +14,8 @@
 
 package com.lyncode.jtwig.mvc;
 
+import com.lyncode.jtwig.cache.JtwigTemplateCacheSystem;
+import com.lyncode.jtwig.cache.impl.PersistentTemplateCacheSystem;
 import com.lyncode.jtwig.configuration.JtwigConfiguration;
 import com.lyncode.jtwig.functions.SpringFunctions;
 import com.lyncode.jtwig.functions.parameters.convert.DemultiplexerConverter;
@@ -52,8 +54,9 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
     private CompoundParameterResolver parameterResolver = new CompoundParameterResolver();
     private CompoundFunctionResolver functionResolver = new CompoundFunctionResolver()
             .withResolver(resolver(new DemultiplexerConverter()))
-            .withResolver(
-                    resolver(new DemultiplexerConverter().withConverter(String.class, new ObjectToStringConverter())));
+            .withResolver(resolver(new DemultiplexerConverter().withConverter(String.class, new ObjectToStringConverter())));
+    private JtwigTemplateCacheSystem cache = new PersistentTemplateCacheSystem();
+
 
     public JtwigViewResolver() {
         setViewClass(requiredViewClass());
@@ -75,6 +78,7 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
         return abstractUrlBasedView;
     }
 
+    @Deprecated // Remove in 4.0.0
     public JtwigViewResolver setCached(boolean cached) {
         this.cached = cached;
         return this;
@@ -150,6 +154,11 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
         return this;
     }
 
+    public JtwigViewResolver setCacheSystem(JtwigTemplateCacheSystem cache) {
+        this.cache = cache;
+        return this;
+    }
+
     public boolean useThemeInViewPath() {
         return useThemeInViewPath;
     }
@@ -168,6 +177,10 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
 
     boolean isCached() {
         return cached;
+    }
+
+    JtwigTemplateCacheSystem cache() {
+        return cache;
     }
 
     private InputParameterResolverFactory parameterResolverFactory(final DemultiplexerConverter converter) {
