@@ -1,11 +1,13 @@
-package com.lyncode.jtwig.mvc;
+package com.lyncode.jtwig.unit.mvc;
 
+import com.lyncode.jtwig.cache.JtwigTemplateCacheSystem;
 import com.lyncode.jtwig.configuration.JtwigConfiguration;
-import com.lyncode.jtwig.resource.JtwigResource;
-import com.lyncode.jtwig.resource.StringJtwigResource;
-import com.lyncode.jtwig.resource.loader.JtwigResourceResolver;
+import com.lyncode.jtwig.content.api.Renderable;
+import com.lyncode.jtwig.mvc.JtwigView;
+import com.lyncode.jtwig.mvc.JtwigViewResolver;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -18,9 +20,13 @@ import org.springframework.web.servlet.view.AbstractUrlBasedView;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Locale;
+import java.util.concurrent.Callable;
 
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -43,6 +49,10 @@ public class JtwigViewResolverTest {
 
     @Test
     public void renders() throws Exception {
+        JtwigTemplateCacheSystem cacheSystem = mock(JtwigTemplateCacheSystem.class);
+        Mockito.when(cacheSystem.get(anyString(), Matchers.any(Callable.class))).thenReturn(mock(Renderable.class));
+
+
         servletContext = new MockServletContext();
         applicationContext = new GenericWebApplicationContext(servletContext);
         applicationContext.getBeanFactory().registerSingleton("viewResolver", underTest);
@@ -50,14 +60,9 @@ public class JtwigViewResolverTest {
 
         underTest.setApplicationContext(applicationContext);
         underTest.setServletContext(servletContext);
-        underTest.setResourceLoader(new JtwigResourceResolver() {
-            @Override
-            public JtwigResource resolve(String viewUrl) {
-                return new StringJtwigResource("test");
-            }
-        });
+        underTest.setCacheSystem(cacheSystem);
 
-        AbstractUrlBasedView one = underTest.buildView("one");
+        AbstractUrlBasedView one = (AbstractUrlBasedView) underTest.resolveViewName("one", Locale.ENGLISH);
         assertThat(one, instanceOf(JtwigView.class));
 
         one.setApplicationContext(applicationContext);
@@ -65,6 +70,7 @@ public class JtwigViewResolverTest {
         one.afterPropertiesSet();
 
         one.render(model, request, response);
+        verify(cacheSystem).get(eq("one"), Matchers.any(Callable.class));
     }
 
     @Test

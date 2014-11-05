@@ -38,6 +38,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 import static org.springframework.web.servlet.support.RequestContextUtils.getTheme;
 
@@ -111,10 +112,12 @@ public class JtwigView extends AbstractTemplateView {
 
     public Renderable getContent() throws CompileException, ParseException {
         if (getViewResolver().isCached()) {
-            if (!compiledTemplates.containsKey(getUrl())) {
-                compiledTemplates.put(getUrl(), getCompiledJtwigTemplate());
-            }
-            return compiledTemplates.get(getUrl());
+            return getViewResolver().cache().get(getUrl(), new Callable<Renderable>() {
+                @Override
+                public Renderable call() throws Exception {
+                    return getCompiledJtwigTemplate();
+                }
+            });
         }
         return getCompiledJtwigTemplate();
     }
