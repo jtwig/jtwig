@@ -56,11 +56,11 @@ public class RenderContext {
                 .withResolver(new DelegateFunctionResolver(configuration.functionRepository(),
                         new InputDelegateMethodParametersResolver(annotationWithoutConversion())))
                 .withResolver(new DelegateFunctionResolver(configuration.functionRepository(),
-                        new InputDelegateMethodParametersResolver(annotationWithConversion()))), new RenderStream(output));
+                        new InputDelegateMethodParametersResolver(annotationWithConversion()))), new RenderStream(output, configuration.renderThreadingConfig()));
     }
 
     public static RenderContext create(RenderConfiguration configuration, JtwigModelMap modelMap, FunctionResolver functionResolver, OutputStream output) {
-        return new RenderContext(configuration, modelMap, functionResolver, new RenderStream(output));
+        return new RenderContext(configuration, modelMap, functionResolver, new RenderStream(output, configuration.renderThreadingConfig()));
     }
 
     private final FunctionResolver functionResolver;
@@ -87,7 +87,7 @@ public class RenderContext {
     }
 
     public RenderContext newRenderContext(OutputStream outputStream) {
-        return new RenderContext(configuration, modelMap, functionResolver, new RenderStream(outputStream));
+        return new RenderContext(configuration, modelMap, functionResolver, new RenderStream(outputStream, configuration.renderThreadingConfig()));
     }
 
     public RenderConfiguration configuration() {

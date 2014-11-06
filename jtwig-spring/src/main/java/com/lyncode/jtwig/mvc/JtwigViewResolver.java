@@ -39,11 +39,10 @@ import org.springframework.web.servlet.ThemeResolver;
 import org.springframework.web.servlet.view.AbstractTemplateViewResolver;
 import org.springframework.web.servlet.view.AbstractUrlBasedView;
 
-import static com.lyncode.jtwig.render.stream.RenderStream.withMaxThreads;
-import static com.lyncode.jtwig.render.stream.RenderStream.withMinThreads;
 import static com.lyncode.jtwig.util.LocalThreadHolder.getServletRequest;
 
 public class JtwigViewResolver extends AbstractTemplateViewResolver {
+
     private ThemeResolver themeResolver;
     private String encoding;
     private boolean cached = true;
@@ -57,6 +56,7 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
             .withResolver(resolver(new DemultiplexerConverter()))
             .withResolver(resolver(new DemultiplexerConverter().withConverter(String.class, new ObjectToStringConverter())));
     private JtwigTemplateCacheSystem cache = new PersistentTemplateCacheSystem();
+
 
     public JtwigViewResolver() {
         setViewClass(requiredViewClass());
@@ -94,13 +94,25 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
         return this;
     }
 
+    /**
+     * Do not use. Use JtwigConfiguration.render().renderThreadingConfig().maxThreads()
+     * @param value
+     * @return
+     */
+    @Deprecated
     public JtwigViewResolver setConcurrentMaxThreads(int value) {
-        withMaxThreads(value);
+        configuration.render().renderThreadingConfig().maxThreads(value);
         return this;
     }
 
+    /**
+     * Do not use. Use JtwigConfiguration.render().renderThreadingConfig().minThreads()
+     * @param value
+     * @return
+     */
+    @Deprecated
     public JtwigViewResolver setConcurrentMinThreads(int value) {
-        withMinThreads(value);
+        configuration.render().renderThreadingConfig().minThreads(value);
         return this;
     }
 
@@ -127,12 +139,12 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
         return this;
     }
 
-    public JtwigViewResolver include (ParameterResolver resolver) {
+    public JtwigViewResolver include(ParameterResolver resolver) {
         parameterResolver.withResolver(resolver);
         return this;
     }
 
-    public JtwigViewResolver includeFunctions (Object functionBean) {
+    public JtwigViewResolver includeFunctions(Object functionBean) {
         configuration.render().functionRepository().include(functionBean);
         return this;
     }
@@ -183,13 +195,16 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
     }
 
     private DelegateFunctionResolver resolver(DemultiplexerConverter converter) {
-        return new DelegateFunctionResolver(configuration.render().functionRepository(), new InputDelegateMethodParametersResolver(parameterResolverFactory(converter)));
+        return new DelegateFunctionResolver(configuration.render().functionRepository(),
+                                            new InputDelegateMethodParametersResolver(
+                                                    parameterResolverFactory(converter)));
     }
 
     private ResourceUrlResolver urlResolver() {
-        if (themeResolver == null || !useThemeInViewPath)
+        if (themeResolver == null || !useThemeInViewPath) {
             return IdentityUrlResolver.INSTANCE;
-        else
+        } else {
             return new ThemedResourceUrlResolver(themeResolver.resolveThemeName(getServletRequest()));
+        }
     }
 }

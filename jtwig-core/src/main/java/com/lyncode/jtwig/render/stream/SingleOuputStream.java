@@ -1,12 +1,23 @@
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.lyncode.jtwig.render.stream;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-/**
- * Created by rsilva on 3/25/14.
- */
 public class SingleOuputStream extends ByteArrayOutputStream {
 
     private OutputStream mStream;
@@ -14,15 +25,15 @@ public class SingleOuputStream extends ByteArrayOutputStream {
     private final boolean mInheritedStream;
     private final boolean mByteStream;
 
-    public SingleOuputStream() {
-        this(new FastByteArrayOutputStream(), false, true);
+    private SingleOuputStream(Builder builder) {
+        mStream = builder.mStream;
+        mInheritedStream = builder.mInheritedStream;
+        mByteStream = builder.mByteStream;
+        mStreamState = StreamState.OPEN;
     }
 
-    public SingleOuputStream(OutputStream outputStream, boolean inheritedStream, boolean byteStream) {
-        mStream = outputStream;
-        mStreamState = StreamState.OPEN;
-        mInheritedStream = inheritedStream;
-        mByteStream = byteStream;
+    public static Builder builder() {
+        return new Builder();
     }
 
     @Override
@@ -88,5 +99,37 @@ public class SingleOuputStream extends ByteArrayOutputStream {
 
     public OutputStream getStream() {
         return mStream;
+    }
+
+    public static final class Builder {
+
+        private OutputStream mStream;
+        private boolean mInheritedStream = false;
+        private boolean mByteStream = true;
+
+        private Builder() {
+        }
+
+        public Builder withStream(OutputStream mStream) {
+            this.mStream = mStream;
+            return this;
+        }
+
+        public Builder withInheritedStream(boolean mInheritedStream) {
+            this.mInheritedStream = mInheritedStream;
+            return this;
+        }
+
+        public Builder withByteStream(boolean mByteStream) {
+            this.mByteStream = mByteStream;
+            return this;
+        }
+
+        public SingleOuputStream build() {
+            if (mStream == null) {
+                mStream = new FastByteArrayOutputStream();
+            }
+            return new SingleOuputStream(this);
+        }
     }
 }

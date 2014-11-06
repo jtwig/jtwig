@@ -21,15 +21,18 @@ import com.lyncode.jtwig.functions.repository.impl.MapFunctionRepository;
 import java.nio.charset.Charset;
 
 public class RenderConfiguration {
+
     private boolean strictMode = false;
     private boolean logNonStrictMode = true;
     private Charset charset = Charset.forName("UTF-8");
     private final JsonConfiguration jsonConfiguration;
     private final MapFunctionRepository functionRepository;
+    private final RenderThreadingConfig mRenderThreadingConfig;
 
     public RenderConfiguration() {
         this.jsonConfiguration = new JsonConfiguration();
         this.functionRepository = new MapFunctionRepository(jsonConfiguration);
+        this.mRenderThreadingConfig = new RenderThreadingConfig();
     }
 
     public boolean strictMode() {
@@ -49,11 +52,11 @@ public class RenderConfiguration {
         this.logNonStrictMode = logNonStrictMode;
         return this;
     }
-    
+
     public Charset charset() {
         return charset;
     }
-    
+
     public RenderConfiguration charset(Charset charset) {
         this.charset = charset;
         return this;
@@ -62,6 +65,11 @@ public class RenderConfiguration {
     public MapFunctionRepository functionRepository() {
         return functionRepository;
     }
+
+    public RenderThreadingConfig renderThreadingConfig() {
+        return mRenderThreadingConfig;
+    }
+
     public RenderConfiguration jsonMapper(Function<Object, String> mapper) {
         this.jsonConfiguration.jsonMapper(mapper);
         return this;

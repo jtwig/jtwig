@@ -1,8 +1,23 @@
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.lyncode.jtwig.render.stream;
 
 import com.lyncode.jtwig.content.api.Renderable;
 import com.lyncode.jtwig.exception.RenderException;
 import com.lyncode.jtwig.render.RenderContext;
+import com.lyncode.jtwig.render.config.RenderThreadingConfig;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -10,66 +25,58 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class RenderStream {
-    private static int minThreads = 20;
-    private static int maxThreads = 100;
+
     private static ExecutorService sExecutor = null;
 
-    private static ExecutorService executorService() {
-        if (sExecutor == null)
-            sExecutor = new ThreadPoolExecutor(minThreads, maxThreads, 60L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>());
-        return sExecutor;
-    }
-
-    public static void withMinThreads (int value) {
-        // Should run this method before do any parsing (initialization)
-        minThreads = value;
-    }
-    public static void withMaxThreads (int value) {
-        // Should run this method before do any parsing (initialization)
-        maxThreads = value;
+    private static void initExecutorService(RenderThreadingConfig renderConfiguration) {
+        if (sExecutor == null) {
+            sExecutor = new ThreadPoolExecutor(renderConfiguration.minThreads(), renderConfiguration.maxThreads(),
+                                               renderConfiguration.keepAliveTime(), TimeUnit.SECONDS,
+                                               new SynchronousQueue<Runnable>());
+        }
     }
 
     private final OutputStream mRootOutputStream;
     private final MultiOuputStream mMultiStream;
-    private RenderIndex mIndex;
-    private final ReentrantReadWriteLock mLock;
     private final RenderControl mControl;
+    private final RenderThreadingConfig mRenderConfiguration;
+    private RenderIndex mIndex;
 
     private RenderStream(MultiOuputStream multiStream, OutputStream stream, RenderIndex dIndex,
-                         ReentrantReadWriteLock rwl, RenderControl renderControl) {
-        this.mMultiStream = multiStream;
-        this.mRootOutputStream = stream;
-        this.mIndex = dIndex;
-        this.mControl = renderControl;
-        this.mLock = rwl;
+                         RenderControl renderControl, RenderThreadingConfig renderConfiguration) {
+        mMultiStream = multiStream;
+        mRootOutputStream = stream;
+        mIndex = dIndex;
+        mControl = renderControl;
+        mRenderConfiguration = renderConfiguration;
+        initExecutorService(mRenderConfiguration);
 
         if (mIndex != null) {
+            SingleOuputStream.Builder builder = SingleOuputStream.builder().withInheritedStream(true);
             if (mIndex.isMostLeft()) {
-                multiStream.newStream(mIndex, new SingleOuputStream(stream, true, false));
+                builder.withByteStream(false);
+                builder.withStream(stream);
             } else if (mIndex.isLeft()) {
-                multiStream.newStream(mIndex, new SingleOuputStream(
-                        multiStream.get(mIndex.previous()).getStream(), true, true));
-            } else {
-                multiStream.newStream(mIndex);
+                builder.withByteStream(true);
+                builder.withStream(multiStream.get(mIndex.previous()).getStream());
             }
+            multiStream.addStream(mIndex, builder.build());
         }
     }
 
-    public RenderStream(OutputStream outputStream) {
+    public RenderStream(OutputStream outputStream, RenderThreadingConfig renderConfiguration) {
         this(new MultiOuputStream(), outputStream, null,
-             new ReentrantReadWriteLock(),
-             new RenderControl());
+             new RenderControl(), renderConfiguration);
     }
 
     public RenderStream renderConcurrent(final Renderable content, final RenderContext context) {
         try {
             mControl.push();
-            executorService().execute(new RenderTask(content, context));
+            sExecutor.execute(new RenderTask(content, context));
         } catch (OutOfMemoryError e) {
-            executorService().shutdownNow();
+            sExecutor.shutdownNow();
             mControl.cancel();
         }
         return this;
@@ -98,23 +105,23 @@ public class RenderStream {
     }
 
     public RenderStream write(byte[] bytes) throws IOException {
-        lockWrite();
+        mControl.lockWrite();
         getOuputStream().write(bytes);
-        unlockWrite();
+        mControl.unlockWrite();
         return this;
     }
 
     public RenderStream close() throws IOException {
-        lockWrite();
+        mControl.lockWrite();
         if (mIndex != null) {
             mMultiStream.close(mIndex);
         }
-        unlockWrite();
+        mControl.unlockWrite();
         return this;
     }
 
     public RenderStream fork() throws IOException {
-        lockChange();
+        mControl.lockChange();
         if (mIndex == null) {
             mIndex = RenderIndex.newIndex(); //create new index for the first time we have a concurrent stream
         }
@@ -122,16 +129,16 @@ public class RenderStream {
 
         RenderIndex forkedIndex = mIndex.left(); // forked will render the left children
         mIndex = mIndex.right(); // this will continue with the right children
-        mMultiStream.newStream(mIndex);
+        mMultiStream.addStream(mIndex);
 
-        RenderStream forkedStream = new RenderStream(mMultiStream, getRootOutputStream(), forkedIndex,
-                                                     mLock, mControl);
-        unlockChange();
+        RenderStream forkedStream = new RenderStream(mMultiStream, getRootOutputStream(), forkedIndex, mControl,
+                                                     mRenderConfiguration);
+        mControl.unlockChange();
         return forkedStream;
     }
 
     public RenderStream merge() throws IOException {
-        lockChange();
+        mControl.lockChange();
         if (mIndex != null && mMultiStream.isClosed(mIndex)) {
             RenderIndex index = mIndex.clone();
             RenderIndex previous = index.previous();
@@ -156,7 +163,7 @@ public class RenderStream {
                     }
                 } else if (mMultiStream.isOpen(previous) || (mMultiStream.isWaitingOrder(
                         previous) && !index.isLeft())) {
-                    unlockChange();
+                    mControl.unlockChange();
                     return this;
                 }
                 index = previous;
@@ -165,7 +172,7 @@ public class RenderStream {
             getRootOutputStream().write(mMultiStream.get(toMerge).toByteArray());
             mMultiStream.merged(toMerge);
         }
-        unlockChange();
+        mControl.unlockChange();
         return this;
     }
 
@@ -178,19 +185,4 @@ public class RenderStream {
         return mRootOutputStream;
     }
 
-    private void lockWrite() {
-        this.mLock.readLock().lock();
-    }
-
-    private void unlockWrite() {
-        this.mLock.readLock().unlock();
-    }
-
-    private void lockChange() {
-        this.mLock.writeLock().lock();
-    }
-
-    private void unlockChange() {
-        this.mLock.writeLock().unlock();
-    }
 }
