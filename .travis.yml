@@ -16,4 +16,4 @@ addons:
 
 after_success:
   - mvn compile -Pmerge-reports -N
-  - mvn coveralls:jacoco
+  - mvn coveralls:report
