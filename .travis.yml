@@ -2,8 +2,7 @@ language: java
 
 env:
    secure: "OkFYNXvPgdRGL3juvdPyLWaDIwjxEgU7/aTxWC5DsSiTQVk8DyStZcfL8aquhlq6lcZpPReWgqQMyjHBK+hJ/FQ47+WqgbD5HLuFR5dWpaLWH7oSxjEtbER4JlhktMFJCGXyuCgnvdlEKAfBBjgm7jx9XhngkGv7yW3af23kU60="
-   global:
-     - secure: "BgE0PmU1UhJ157I8FPTh95DaUAbAYf4+1umL0eeKMaF7BvlijtbL2+I4TIPPNlaGBzzXALrNtZr+thmVnJTZ3TWnSJW5RsH5sDncipNlbtLY/Udu7WQHrvrCgbmX5RlopSSlvd0ThQwG/v6YnPT9ZZGh/kpp5Rl0RwkvKnFGVT4="
+   secure: "BgE0PmU1UhJ157I8FPTh95DaUAbAYf4+1umL0eeKMaF7BvlijtbL2+I4TIPPNlaGBzzXALrNtZr+thmVnJTZ3TWnSJW5RsH5sDncipNlbtLY/Udu7WQHrvrCgbmX5RlopSSlvd0ThQwG/v6YnPT9ZZGh/kpp5Rl0RwkvKnFGVT4="
 
 addons:
   coverity_scan:
