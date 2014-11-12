@@ -62,7 +62,7 @@ public class ConcurrentTest extends AbstractAddonTest {
     @Test
     public void test_concurrent_1() throws Exception {
         JtwigTemplate template = JtwigTemplate.fromString("{% concurrent %}{% for item in list %}" +
-                                                           "{% if loop.first %}{% concurrent %}First {% endconcurrent %}{% elseif loop.last %}{% concurrent %}Last{% endconcurrent %}{% else %}I: {{ loop.index }} R: {{ loop.revindex }} {% endif %}" +
+                                                           "{% if loop.first %}{% concurrent %}First {% endconcurrent %}{% elseif loop.last %}{% concurrent %}Last{% endconcurrent %}{% else %}I: {{ loop.index0 }} R: {{ loop.revindex0 }} {% endif %}" +
                                                            "{% endfor %}{% endconcurrent %}");
         JtwigModelMap context = new JtwigModelMap();
         ArrayList<String> value = new ArrayList<String>();

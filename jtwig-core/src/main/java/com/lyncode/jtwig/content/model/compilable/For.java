@@ -170,12 +170,20 @@ public class For extends Content<For> {
             return length;
         }
 
-        public int getIndex() {
+        public int getIndex0() {
             return index;
         }
+        
+        public int getIndex() {
+            return index + 1;
+        }
 
-        public int getRevindex() {
+        public int getRevindex0() {
             return length - index - 1;
+        }
+        
+        public int getRevindex() {
+            return length - index;
         }
 
         public boolean isFirst() {
