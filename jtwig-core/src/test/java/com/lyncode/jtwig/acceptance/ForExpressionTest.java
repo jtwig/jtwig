@@ -51,7 +51,7 @@ public class ForExpressionTest {
     @Test
     public void forLoopMustExposeTheLoopVariable () throws ParseException, CompileException, RenderException {
         JtwigTemplate template = JtwigTemplate.fromString("{% for item in list %}" +
-                "{% if loop.first %}First {% elseif loop.last %}Last{% else %}I: {{ loop.index }} R: {{ loop.revindex }} {% endif %}" +
+                "{% if loop.first %}First {% elseif loop.last %}Last{% else %}I: {{ loop.index0 }} R: {{ loop.revindex0 }} {% endif %}" +
                 "{% endfor %}");
         JtwigModelMap context = new JtwigModelMap();
         ArrayList<String> value = new ArrayList<String>();
@@ -62,6 +62,22 @@ public class ForExpressionTest {
         value.add("e");
         context.withModelAttribute("list", value);
         assertThat(template.output(context), is("First I: 1 R: 3 I: 2 R: 2 I: 3 R: 1 Last"));
+    }
+
+    @Test
+    public void ensureProperLoopVariableIndexing () throws ParseException, CompileException, RenderException {
+        JtwigTemplate template = JtwigTemplate.fromString("{% for item in list %}" +
+                "{{ loop.index0 }}{{ loop.index }}{{ loop.revindex0 }}{{ loop.revindex }} " +
+                "{% endfor %}");
+        JtwigModelMap context = new JtwigModelMap();
+        ArrayList<String> value = new ArrayList<String>();
+        value.add("a");
+        value.add("b");
+        value.add("c");
+        value.add("d");
+        value.add("e");
+        context.withModelAttribute("list", value);
+        assertThat(template.output(context), is("0145 1234 2323 3412 4501 "));
     }
 
     @Test
