@@ -29,7 +29,11 @@ import static com.lyncode.jtwig.expressions.model.Operator.*;
 import static com.lyncode.jtwig.parser.model.JtwigKeyword.NULL;
 import static com.lyncode.jtwig.parser.model.JtwigSymbol.*;
 import static com.lyncode.jtwig.parser.model.JtwigSymbol.DIV;
+import org.parboiled.Context;
+import org.parboiled.MatcherContext;
 import static org.parboiled.Parboiled.createParser;
+import org.parboiled.matchers.CustomMatcher;
+import org.parboiled.support.ValueStack;
 
 public class JtwigExpressionParser extends JtwigBaseParser<CompilableExpression> {
     final JtwigBasicParser basic;
@@ -398,14 +402,22 @@ public class JtwigExpressionParser extends JtwigBaseParser<CompilableExpression>
                 )
         );
     }
-
+    
     Rule comprehensionList() {
         return Sequence(
-                constants.anyConstant(),
-                basic.symbol(TWO_DOTS),
-                constants.anyConstant(),
-                push(ValueList.create(currentPosition(), constants.pop(1), constants.pop())),
-                basic.spacing()
+                TestNot(InValueStack(ValueRange.class)),
+                push(new ValueRange()),
+                expression(),
+                action(peek(1, ValueRange.class).withStart(pop(CompilableExpression.class))),
+                symbol(TWO_DOTS),
+                mandatory(
+                        Sequence(
+                                expression(),
+                                action(peek(1, ValueRange.class).withEnd(pop(CompilableExpression.class))),
+                                basic.spacing()
+                        ),
+                        new ParseException("Invalid comprehension syntax")
+                )
         );
     }
 
@@ -512,6 +524,7 @@ public class JtwigExpressionParser extends JtwigBaseParser<CompilableExpression>
                 push(new OperationBinary(currentPosition(), pop())),
                 ZeroOrMore(
                         firstOperatorOf(operators),
+                        TestNot(firstOperatorOf(operators)),
                         action(peek(1, OperationBinary.class).add((Operator) pop(Constant.class).getValue())),
                         mandatory(
                                 Sequence(
@@ -562,5 +575,58 @@ public class JtwigExpressionParser extends JtwigBaseParser<CompilableExpression>
 
     public <T> T pop(int position, Class<T> type) {
         return type.cast(pop(position));
+    }
+    
+    public Rule InValueStack(Class<?> cls) {
+        return InValueStack(cls, 0);
+    }
+    public Rule InValueStack(Class<?> cls, int start) {
+        return InValueStack(cls, start, start+1);
+    }
+    public Rule InValueStack(Class<?> cls, int start, int end) {
+        return new InValueStack(Ch('*'), cls, start, end);
+    }
+    
+    
+    public static class InValueStack extends CustomMatcher {
+        private final Class<?> cls;
+        private final int start;
+        private final int end;
+        public InValueStack(Rule rule, Class<?> cls, int start, int end) {
+            super(rule, "a");
+            this.cls = cls;
+            this.start = start;
+            this.end = end;
+        }
+
+        @Override
+        public boolean isSingleCharMatcher() {
+            return false;
+        }
+
+        @Override
+        public boolean canMatchEmpty() {
+            return true;
+        }
+
+        @Override
+        public boolean isStarterChar(char c) {
+            return false;
+        }
+
+        @Override
+        public char getStarterChar() { return '^'; }
+
+        @Override
+        public <V> boolean match(MatcherContext<V> context) {
+            ValueStack vs = context.getValueStack();
+            for (int i = start; i < end; i++) {
+                if (vs.size() > i && cls.isAssignableFrom(vs.peek(i).getClass())) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        
     }
 }
