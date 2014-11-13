@@ -56,19 +56,24 @@ public class NumberFunctionsTest {
         List<Integer> list = underTest.range(1, 3);
         assertThat(list, contains(1, 2, 3));
     }
+    @Test
+    public void rangeChars() throws FunctionException {
+        List<Character> list = underTest.range('A', 'D');
+        assertThat(list, contains('A', 'B', 'C', 'D'));
+    }
 
     @Test(expected = FunctionException.class)
     public void rangeInvalidStep() throws FunctionException {
         underTest.range(1, 3, 0);
     }
-
-    @Test(expected = FunctionException.class)
-    public void rangeInvalidLimits() throws FunctionException {
-        underTest.range(3, 1);
+    @Test
+    public void rangeHugeStep() throws FunctionException {
+        List<Integer> list = underTest.range(1, 3, 50);
+        assertThat(list, contains(1));
     }
-
-    @Test(expected = FunctionException.class)
-    public void rangeTooBigStep() throws FunctionException {
-        underTest.range(3, 1, 5);
+    @Test
+    public void rangeNegativeStepWithPositiveProgression() throws FunctionException {
+        List<Integer> list = underTest.range(1, 3, -1);
+        assertThat(list, contains(1, 2, 3));
     }
 }

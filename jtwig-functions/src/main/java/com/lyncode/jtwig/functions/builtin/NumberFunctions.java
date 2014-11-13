@@ -66,31 +66,50 @@ public class NumberFunctions {
     }
 
     @JtwigFunction(name = "range")
-    public List<Integer> range (@Parameter int start, @Parameter int end, @Parameter int step) throws FunctionException {
-        List<Integer> result = new ArrayList<>();
-
-
+    public <T> List<T> range (@Parameter T start, @Parameter T end, @Parameter int step) throws FunctionException {
+        step = Math.abs(step);
         if (step == 0)
             throw new FunctionException("Step must not be 0");
-
-        if (start > end) {
-            // negate step for reversed mode, if positive input
-            if (step > 0) step = -step;
-
-            if (step < end) throw new FunctionException("Step is too big");
+        
+        // Determine the start value
+        int startInt;
+        int endInt;
+        if(start instanceof Number) {
+            startInt = ((Number)start).intValue();
+            endInt = ((Number)end).intValue();
+        } else if(start instanceof Character) {
+            startInt = ((Character)start).charValue();
+            endInt = ((Character)end).charValue();
+        } else if(start instanceof CharSequence) {
+            startInt = ((CharSequence)start).charAt(0);
+            endInt = ((CharSequence)end).charAt(0);
         } else {
-            if (step > end) throw new FunctionException("Step is too big");
+            throw new IllegalArgumentException("range() function requires Number, Character, or CharSequence limits.");
+        }
+        
+        // Handle negative progressions
+        if (startInt > endInt) {
+            step = -step;
         }
 
-
-        for (int i = start; (step > 0) ? i <= end : i >= end; i += step) {
-            result.add(i);
+        // Build the list and convert if necessary
+        List<T> results = new ArrayList<>();
+        for (int i = startInt; (step > 0) ? i <= endInt : i >= endInt; i += step) {
+            T result = null;
+            if(start instanceof Number) {
+                result = (T)start.getClass().cast(i);
+            } else if(start instanceof Character) {
+                result = (T)Character.valueOf((char)i);
+            } else if(start instanceof CharSequence) {
+                result = (T)String.valueOf((char)i);
+            }
+            results.add(result);
         }
 
-        return result;
+        return results;
     }
     @JtwigFunction(name = "range")
-    public List<Integer> range (@Parameter int start, @Parameter int end) throws FunctionException {
+    public <T> List<T> range (@Parameter T start, @Parameter T end) throws FunctionException {
         return range(start, end, 1);
     }
 }
