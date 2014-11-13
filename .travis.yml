@@ -1,8 +1,9 @@
 language: java
 
 env:
-   secure: "OkFYNXvPgdRGL3juvdPyLWaDIwjxEgU7/aTxWC5DsSiTQVk8DyStZcfL8aquhlq6lcZpPReWgqQMyjHBK+hJ/FQ47+WqgbD5HLuFR5dWpaLWH7oSxjEtbER4JlhktMFJCGXyuCgnvdlEKAfBBjgm7jx9XhngkGv7yW3af23kU60="
-   secure: "BgE0PmU1UhJ157I8FPTh95DaUAbAYf4+1umL0eeKMaF7BvlijtbL2+I4TIPPNlaGBzzXALrNtZr+thmVnJTZ3TWnSJW5RsH5sDncipNlbtLY/Udu7WQHrvrCgbmX5RlopSSlvd0ThQwG/v6YnPT9ZZGh/kpp5Rl0RwkvKnFGVT4="
+   global:
+        - secure: "OkFYNXvPgdRGL3juvdPyLWaDIwjxEgU7/aTxWC5DsSiTQVk8DyStZcfL8aquhlq6lcZpPReWgqQMyjHBK+hJ/FQ47+WqgbD5HLuFR5dWpaLWH7oSxjEtbER4JlhktMFJCGXyuCgnvdlEKAfBBjgm7jx9XhngkGv7yW3af23kU60="
+        - secure: "MzTquHmCRU0gVRo1IdigsfJy95tVslsw7CU2/MpCBCcpPGPmZOL2Cu8tFpH+DfHPniEd0hkaGQts9aDCf04fdeG8w5gxN80317i0obFYW7Isynw6djrd0M9I52fNdtdgwTbpYbnoenKCizjCnDdE0wquS8acQ+QPH2O3EHcZG9A="
 
 addons:
   coverity_scan:
@@ -12,7 +13,7 @@ addons:
     notification_email: jmelo@lyncode.com
     build_command_prepend: "mvn clean"
     build_command:   "mvn -DskipTests=true compile"
-    branch_pattern: coverity_scan
+    branch_pattern: master
 
 after_success:
   - mvn compile -Pmerge-reports -N
