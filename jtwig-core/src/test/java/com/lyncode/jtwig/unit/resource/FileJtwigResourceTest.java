@@ -16,6 +16,7 @@ package com.lyncode.jtwig.unit.resource;
 
 import com.lyncode.jtwig.exception.ResourceException;
 import com.lyncode.jtwig.resource.FileJtwigResource;
+import com.lyncode.jtwig.resource.JtwigResource;
 import org.junit.Test;
 import org.parboiled.common.FileUtils;
 
@@ -38,6 +39,15 @@ public class FileJtwigResourceTest {
         assertThat(FileUtils.readAllText(resource.retrieve()), notNullValue());
         assertThat(resource.toString(), endsWith("/templates/unit/sample.twig"));
         assertThat(resource.resolve("other.jtwig"), notNullValue());
+    }
+    
+    @Test
+    public void ensureExistsMethodWorksProperly() throws Exception {
+        JtwigResource resource = new FileJtwigResource(new File(getClass().getResource("/templates/unit/sample.twig").toURI()));
+        assertThat(resource.exists(), equalTo(true));
+        
+        resource = resource.resolve("invalid.twig");
+        assertThat(resource.exists(), equalTo(false));
     }
 
     @Test

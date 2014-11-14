@@ -19,6 +19,7 @@ import com.lyncode.jtwig.exception.ResourceException;
 import java.io.InputStream;
 
 public interface JtwigResource {
+    boolean exists ();
     InputStream retrieve () throws ResourceException;
     JtwigResource resolve (String relativePath) throws ResourceException;
 }

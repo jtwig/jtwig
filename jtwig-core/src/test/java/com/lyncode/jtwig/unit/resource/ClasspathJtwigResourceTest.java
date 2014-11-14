@@ -15,10 +15,11 @@
 package com.lyncode.jtwig.unit.resource;
 
 import com.lyncode.jtwig.resource.ClasspathJtwigResource;
-import junit.framework.Assert;
 import org.junit.Test;
 
-import static junit.framework.TestCase.assertNotNull;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class ClasspathJtwigResourceTest {
     private ClasspathJtwigResource underTest = new ClasspathJtwigResource("/templates/unit/sample.twig");
@@ -36,6 +37,12 @@ public class ClasspathJtwigResourceTest {
     @Test
     public void classpathPrefixRemoved() throws Exception {
         ClasspathJtwigResource resource = new ClasspathJtwigResource("classpath:/templates/../templates/unit/sample.twig");
-        Assert.assertNotNull(resource.retrieve());
+        assertNotNull(resource.retrieve());
+    }
+    
+    @Test
+    public void ensureExistsMethodWorksProperly() throws Exception {
+        assertTrue(underTest.exists());
+        assertFalse(underTest.resolve("invalid.twig").exists());
     }
 }

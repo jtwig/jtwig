@@ -20,14 +20,23 @@ import javax.servlet.ServletContext;
 import java.io.InputStream;
 
 import static com.lyncode.jtwig.util.FilePath.parentOf;
+import java.net.MalformedURLException;
 
 public class WebJtwigResource implements JtwigResource {
-    private ServletContext servletContext;
-    private String url;
+    private final ServletContext servletContext;
+    private final String url;
 
     public WebJtwigResource(ServletContext servletContext, String url) {
         this.servletContext = servletContext;
         this.url = url;
+    }
+
+    @Override
+    public boolean exists() {
+        try {
+            return servletContext.getResource(url) != null;
+        } catch (MalformedURLException ex) {}
+        return false;
     }
 
     @Override
