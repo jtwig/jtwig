@@ -56,15 +56,20 @@ public class NumberFunctionsTest {
         List<Integer> list = underTest.range(1, 3);
         assertThat(list, contains(1, 2, 3));
     }
+    @Test
+    public void rangeSameLimits() throws FunctionException {
+        List<Integer> list = underTest.range(1,1,5);
+        assertThat(list, contains(1));
+    }
+    @Test
+    public void rangeBackward() throws FunctionException {
+        List<Integer> list = underTest.range(3, 1);
+        assertThat(list, contains(3, 2, 1));
+    }
 
     @Test(expected = FunctionException.class)
     public void rangeInvalidStep() throws FunctionException {
         underTest.range(1, 3, 0);
-    }
-
-    @Test(expected = FunctionException.class)
-    public void rangeInvalidLimits() throws FunctionException {
-        underTest.range(3, 1);
     }
 
     @Test(expected = FunctionException.class)
