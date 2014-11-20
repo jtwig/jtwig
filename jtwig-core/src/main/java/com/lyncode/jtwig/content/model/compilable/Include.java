@@ -30,6 +30,7 @@ public class Include extends AbstractElement {
     private final String relativePath;
     private final JtwigPosition position;
     private CompilableExpression withExpression = null;
+    private boolean isolated = false;
 
     public Include(JtwigPosition position, String relativePath) {
         this.position = position;
@@ -40,6 +41,11 @@ public class Include extends AbstractElement {
         this.withExpression = with;
         return this;
     }
+    
+    public Include setIsolated(boolean isolated) {
+        this.isolated = isolated;
+        return this;
+    }
 
     @Override
     public Renderable compile(CompileContext context) throws CompileException {
@@ -47,7 +53,7 @@ public class Include extends AbstractElement {
             JtwigResource resource = context.retrieve(relativePath);
             context = context.clone().withResource(resource);
 
-            Compiled compiled = new Compiled(position, context.parse(resource).compile(context));
+            Compiled compiled = new Compiled(position, context.parse(resource).compile(context), isolated);
             if (withExpression != null)
                 compiled.with(withExpression.compile(context));
             return compiled;
@@ -59,11 +65,13 @@ public class Include extends AbstractElement {
     public static class Compiled implements Renderable {
         private final Renderable renderable;
         private final JtwigPosition position;
+        private final boolean isolated;
         private Expression withExpression = null;
 
-        public Compiled(JtwigPosition position, Renderable renderable) {
+        public Compiled(JtwigPosition position, Renderable renderable, boolean isolated) {
             this.renderable = renderable;
             this.position = position;
+            this.isolated = isolated;
         }
 
         public Compiled with (Expression expression) {
@@ -73,17 +81,23 @@ public class Include extends AbstractElement {
 
         @Override
         public void render(RenderContext context) throws RenderException {
+            RenderContext usedContext = context;
+            if (isolated) {
+                usedContext = context.isolatedModel();
+                ((Map)usedContext.map("model")).clear();
+            }
+            
             if (withExpression != null) {
                 try {
                     Object calculate = withExpression.calculate(context);
                     if (calculate instanceof Map) {
-                        renderable.render(context.isolatedModel().with((Map) calculate));
+                        renderable.render(usedContext.with((Map) calculate));
                     } else throw new RenderException(position+": Include 'with' must be given a map.");
                 } catch (CalculateException e) {
                     throw new RenderException(e);
                 }
             } else
-                renderable.render(context);
+                renderable.render(usedContext);
         }
     }
 }

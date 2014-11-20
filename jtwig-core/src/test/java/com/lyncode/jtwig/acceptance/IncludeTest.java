@@ -16,6 +16,7 @@ package com.lyncode.jtwig.acceptance;
 
 import org.junit.Test;
 
+import static com.lyncode.jtwig.util.SyntacticSugar.given;
 import static com.lyncode.jtwig.util.SyntacticSugar.then;
 import static com.lyncode.jtwig.util.SyntacticSugar.when;
 import static org.hamcrest.core.Is.is;
@@ -32,5 +33,19 @@ public class IncludeTest extends AbstractJtwigTest {
     public void includeWithVars() throws Exception {
         when(jtwigRenders(templateResource("templates/acceptance/include/main-vars.twig")));
         then(theRenderedTemplate(), is(equalTo("hello, world")));
+    }
+    
+    @Test
+    public void includeOnlyCannotAccessContext() throws Exception {
+        given(aModel().add("variable", "test"));
+        when(jtwigRenders(templateResource("templates/acceptance/include/include-only.twig")));
+        then(theRenderedTemplate(), is(equalTo("")));
+    }
+    
+    @Test
+    public void includeWithOnlyCannotAccessContext() throws Exception {
+        given(aModel().add("variable", "pink"));
+        when(jtwigRenders(templateResource("templates/acceptance/include/include-with-only.twig")));
+        then(theRenderedTemplate(), is(equalTo("pink-purple-")));
     }
 }

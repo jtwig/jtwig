@@ -46,6 +46,7 @@ public enum JtwigKeyword {
 
     SET("set"),
     INCLUDE("include"),
+    ONLY("only"),
     EXCLUDE("exclude"),
     IN("in"),
     IS("is"),
