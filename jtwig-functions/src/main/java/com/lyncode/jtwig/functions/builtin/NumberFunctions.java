@@ -69,6 +69,10 @@ public class NumberFunctions {
     public List<Integer> range (@Parameter int start, @Parameter int end, @Parameter int step) throws FunctionException {
         List<Integer> result = new ArrayList<>();
 
+        if (start == end) {
+            result.add(start);
+            return result;
+        }
 
         if (step == 0)
             throw new FunctionException("Step must not be 0");
@@ -76,10 +80,9 @@ public class NumberFunctions {
         if (start > end) {
             // negate step for reversed mode, if positive input
             if (step > 0) step = -step;
-
-            if (step < end) throw new FunctionException("Step is too big");
-        } else {
-            if (step > end) throw new FunctionException("Step is too big");
+        }
+        if (Math.abs(step) > (Math.abs(start - end))) {
+            throw new FunctionException("Step is too big");
         }
 
 
