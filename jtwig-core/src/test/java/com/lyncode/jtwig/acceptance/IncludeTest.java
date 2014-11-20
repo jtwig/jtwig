@@ -14,6 +14,7 @@
 
 package com.lyncode.jtwig.acceptance;
 
+import com.lyncode.jtwig.exception.CompileException;
 import org.junit.Test;
 
 import static com.lyncode.jtwig.util.SyntacticSugar.given;
@@ -21,6 +22,7 @@ import static com.lyncode.jtwig.util.SyntacticSugar.then;
 import static com.lyncode.jtwig.util.SyntacticSugar.when;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
+import org.junit.Assert;
 
 public class IncludeTest extends AbstractJtwigTest {
     @Test
@@ -47,5 +49,19 @@ public class IncludeTest extends AbstractJtwigTest {
         given(aModel().add("variable", "pink"));
         when(jtwigRenders(templateResource("templates/acceptance/include/include-with-only.twig")));
         then(theRenderedTemplate(), is(equalTo("pink-purple-")));
+    }
+    
+    @Test
+    public void includeMissingWithoutFlagShouldThrowException() throws Exception {
+        try {
+            when(jtwigRenders(templateResource("templates/acceptance/include/ignore-missing-exception.twig")));
+            Assert.fail("Should have received a compile exception stating that the resource could not be found.");
+        } catch (CompileException e) {}
+    }
+    
+    @Test
+    public void includeMissingWithFlagShouldNotThrowException() throws Exception {
+        when(jtwigRenders(templateResource("templates/acceptance/include/ignore-missing-working.twig")));
+        then(theRenderedTemplate(), is(equalTo("start--end")));
     }
 }

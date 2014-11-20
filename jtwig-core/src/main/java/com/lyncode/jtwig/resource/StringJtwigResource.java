@@ -27,6 +27,11 @@ public class StringJtwigResource implements JtwigResource {
     }
 
     @Override
+    public boolean exists() {
+        return true;
+    }
+
+    @Override
     public InputStream retrieve() throws ResourceException {
         return new ByteArrayInputStream(content.getBytes());
     }
