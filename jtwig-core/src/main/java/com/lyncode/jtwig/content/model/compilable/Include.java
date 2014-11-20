@@ -30,6 +30,7 @@ public class Include extends AbstractElement {
     private final String relativePath;
     private final JtwigPosition position;
     private CompilableExpression withExpression = null;
+    private boolean ignoreMissing = false;
     private boolean isolated = false;
 
     public Include(JtwigPosition position, String relativePath) {
@@ -46,11 +47,19 @@ public class Include extends AbstractElement {
         this.isolated = isolated;
         return this;
     }
+    
+    public Include setIgnoreMissing (boolean ignoreMissing) {
+        this.ignoreMissing = ignoreMissing;
+        return this;
+    }
 
     @Override
     public Renderable compile(CompileContext context) throws CompileException {
         try {
             JtwigResource resource = context.retrieve(relativePath);
+            if (!resource.exists() && ignoreMissing) {
+                return new Missing();
+            }
             context = context.clone().withResource(resource);
 
             Compiled compiled = new Compiled(position, context.parse(resource).compile(context), isolated);
@@ -99,5 +108,10 @@ public class Include extends AbstractElement {
             } else
                 renderable.render(usedContext);
         }
+    }
+    
+    public static class Missing implements Renderable {
+        @Override
+        public void render(RenderContext context) throws RenderException {}
     }
 }

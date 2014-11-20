@@ -36,6 +36,11 @@ public class FileJtwigResource implements JtwigResource {
     }
 
     @Override
+    public boolean exists() {
+        return file.exists();
+    }
+
+    @Override
     public InputStream retrieve() throws ResourceException {
         try {
             return new FileInputStream(file);

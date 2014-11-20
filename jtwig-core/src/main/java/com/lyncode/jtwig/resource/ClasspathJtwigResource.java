@@ -32,6 +32,11 @@ public class ClasspathJtwigResource implements JtwigResource {
     }
 
     @Override
+    public boolean exists() {
+        return this.getClass().getClassLoader().getResource(this.resource) != null;
+    }
+
+    @Override
     public InputStream retrieve() throws ResourceException {
         InputStream resourceAsStream = this.getClass().getClassLoader().getResourceAsStream(this.resource);
         if (resourceAsStream == null)
