@@ -219,6 +219,7 @@ public class JtwigExpressionParser extends JtwigBaseParser<CompilableExpression>
     Rule elementar() {
         return FirstOf(
                 mapEntry(),
+                blockFunction(),
                 function(),
                 map(),
                 list(),
@@ -332,6 +333,28 @@ public class JtwigExpressionParser extends JtwigBaseParser<CompilableExpression>
                                 symbol(CLOSE_PARENT)
                         ),
                         new ParseException("Wrong function syntax")
+                )
+        );
+    }
+    
+    public Rule blockFunction() {
+        return Sequence(
+                "block",
+                basic.spacing(),
+                push(new BlockFunction(currentPosition())),
+                symbol(OPEN_PARENT),
+                mandatory(
+                        Sequence(
+                                expression(),
+                                action(peek(1, BlockFunction.class).add(pop())),
+                                ZeroOrMore(
+                                        symbol(COMMA),
+                                        expression(),
+                                        action((peek(1, BlockFunction.class)).add(pop()))
+                                ),
+                                symbol(CLOSE_PARENT)
+                        ),
+                        new ParseException("Invalid block function syntax")
                 )
         );
     }
