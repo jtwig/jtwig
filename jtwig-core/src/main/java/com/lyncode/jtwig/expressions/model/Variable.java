@@ -38,6 +38,10 @@ public class Variable extends AbstractCompilableExpression {
         super(position);
         this.name = name;
     }
+    
+    public String name() {
+        return name;
+    }
 
     @Override
     public Expression compile(CompileContext context) throws CompileException {

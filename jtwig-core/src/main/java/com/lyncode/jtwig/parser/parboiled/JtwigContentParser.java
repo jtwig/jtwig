@@ -26,6 +26,8 @@ import com.lyncode.jtwig.exception.ParseBypassException;
 import com.lyncode.jtwig.exception.ParseException;
 import com.lyncode.jtwig.exception.ResourceException;
 import com.lyncode.jtwig.expressions.model.Constant;
+import com.lyncode.jtwig.expressions.model.FunctionElement;
+import com.lyncode.jtwig.expressions.model.Variable;
 import com.lyncode.jtwig.parser.config.ParserConfiguration;
 import com.lyncode.jtwig.parser.model.JtwigKeyword;
 import com.lyncode.jtwig.parser.model.JtwigSymbol;
@@ -43,7 +45,9 @@ import java.util.Collection;
 
 import static com.lyncode.jtwig.parser.model.JtwigKeyword.*;
 import static com.lyncode.jtwig.parser.model.JtwigSymbol.ATTR;
+import static com.lyncode.jtwig.parser.model.JtwigSymbol.CLOSE_PARENT;
 import static com.lyncode.jtwig.parser.model.JtwigSymbol.COMMA;
+import static com.lyncode.jtwig.parser.model.JtwigSymbol.OPEN_PARENT;
 import static com.lyncode.jtwig.parser.model.JtwigTagProperty.Trim;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.parboiled.Parboiled.createParser;
@@ -161,6 +165,7 @@ public class JtwigContentParser extends JtwigBaseParser<Compilable> {
                                 addToContent(block()),
                                 addToContent(include()),
                                 addToContent(embed()),
+                                addToContent(macro()),
 //                                addToContent(filter()),
                                 addToContent(forEach()),
                                 addToContent(ifCondition()),
@@ -175,6 +180,7 @@ public class JtwigContentParser extends JtwigBaseParser<Compilable> {
                                                         keyword(ENDBLOCK),
                                                         keyword(ENDFOR),
                                                         keyword(ENDIF),
+                                                        keyword(ENDMACRO),
                                                         keyword(IF),
                                                         keyword(BLOCK),
                                                         keyword(FOR),
@@ -347,6 +353,48 @@ public class JtwigContentParser extends JtwigBaseParser<Compilable> {
                                 closeCode()
                         ),
                         new ParseException("Wrong embed syntax")
+                )
+        );
+    }
+    
+    Rule macro() {
+        return Sequence(
+                openCode(),
+                keyword(MACRO),
+                mandatory(
+                        Sequence(
+                                expressionParser.identifierAsString(),
+                                push(new Macro(currentPosition(), expressionParser.popIdentifierAsString())),
+                                symbolWithSpacing(OPEN_PARENT),
+                                Optional(
+                                        expressionParser.expression(),
+                                        action(peek(1, Macro.class).add(expressionParser.pop())),
+                                        ZeroOrMore(
+                                                symbolWithSpacing(COMMA),
+                                                expressionParser.expression(),
+                                                action((peek(1, Macro.class)).add(expressionParser.pop()))
+                                        )
+                                ),
+                                symbolWithSpacing(CLOSE_PARENT),
+                                action(beforeBeginTrim()),
+                                closeCode(),
+                                action(afterBeginTrim()),
+                                content(),
+                                action(peek(1, Macro.class).withContent(pop(Sequence.class))),
+                                openCode(),
+                                action(beforeEndTrim()),
+                                keyword(ENDMACRO),
+                                Optional(
+                                        expressionParser.variable(),
+                                        assertEqual(
+                                                peek(1, Macro.class).name(),
+                                                (String) expressionParser.pop(Variable.class).name()
+                                        )
+                                ),
+                                closeCode(),
+                                action(afterEndTrim())
+                        ),
+                        new ParseException("Wrong macro syntax")
                 )
         );
     }
