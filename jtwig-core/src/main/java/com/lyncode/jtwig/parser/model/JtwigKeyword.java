@@ -37,6 +37,7 @@ public enum JtwigKeyword {
     EXTENDS("extends"),
     
     FROM("from"),
+    SELF("_self"),
     IMPORT("import"),
     AS("as"),
     

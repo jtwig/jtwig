@@ -166,6 +166,7 @@ public class JtwigContentParser extends JtwigBaseParser<Compilable> {
                                 addToContent(include()),
                                 addToContent(embed()),
                                 addToContent(macro()),
+                                addToContent(importTemplate()),
 //                                addToContent(filter()),
                                 addToContent(forEach()),
                                 addToContent(ifCondition()),
@@ -396,6 +397,52 @@ public class JtwigContentParser extends JtwigBaseParser<Compilable> {
                         ),
                         new ParseException("Wrong macro syntax")
                 )
+        );
+    }
+    
+    Rule importTemplate() {
+        // {% import 'forms.html' as forms %}
+        return Sequence(
+                openCode(),
+                push(new Import(currentPosition())),
+                Optional(
+                        keyword(FROM),
+                        importLocation(),
+                        action(peek(1, Import.class).from(expressionParser.pop()))
+                ),
+                keyword(IMPORT),
+                mandatory(
+                        Sequence(
+                                importDefinition(),
+                                ZeroOrMore(
+                                        symbolWithSpacing(COMMA),
+                                        importDefinition()
+                                ),
+                                closeCode()
+                        ),
+                        new ParseException("Inavlid import syntax")
+                )
+        );
+    }
+    Rule importLocation() {
+        return FirstOf(
+                Sequence(
+                        keyword(SELF),
+                        expressionParser.push(new Constant<>("_self"))
+                ),
+                expressionParser.expression()
+        );
+    }
+    Rule importDefinition() {
+        return Sequence(
+                importLocation(),
+                push(new Import.Definition(expressionParser.pop())),
+                Optional(
+                        keyword(AS),
+                        expressionParser.variable(),
+                        action(peek(1, Import.Definition.class).as(expressionParser.pop()))
+                ),
+                action(peek(1, Import.class).add(pop(Import.Definition.class)))
         );
     }
 
