@@ -41,6 +41,12 @@ public class ImportTest extends AbstractJtwigTest {
         then(theRenderedTemplate().trim(), is(equalTo("jtwig")));
     }
     
+    @Test
+    public void ensureNestedSelfImportWorks() throws Exception {
+        when(jtwigRenders(templateResource("templates/acceptance/import/nested-import-self.twig")));
+        then(theRenderedTemplate().trim(), is(equalTo("<input type=\"password\" name=\"jtwig\">")));
+    }
+    
 //    @Test(expected = CompileException.class)
 //    public void ensureInvalidFromStatementThrowsException() throws Exception {
 //        when(jtwigRenders(templateResource("templates/acceptance/import/import-string-name.twig")));
