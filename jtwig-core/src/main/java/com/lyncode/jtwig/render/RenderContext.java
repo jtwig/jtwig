@@ -17,6 +17,7 @@ package com.lyncode.jtwig.render;
 import com.google.common.base.Optional;
 import com.lyncode.jtwig.JtwigModelMap;
 import com.lyncode.jtwig.content.api.Renderable;
+import com.lyncode.jtwig.content.model.compilable.Import;
 import com.lyncode.jtwig.exception.RenderException;
 import com.lyncode.jtwig.functions.exceptions.FunctionException;
 import com.lyncode.jtwig.functions.exceptions.FunctionNotFoundException;

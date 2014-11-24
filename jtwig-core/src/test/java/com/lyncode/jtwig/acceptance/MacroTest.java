@@ -14,18 +14,27 @@
 
 package com.lyncode.jtwig.acceptance;
 
+import com.lyncode.jtwig.compile.CompileContext;
+import com.lyncode.jtwig.configuration.JtwigConfiguration;
+import com.lyncode.jtwig.parser.JtwigParser;
+import com.lyncode.jtwig.resource.JtwigResource;
 import org.junit.Test;
 
 import static com.lyncode.jtwig.util.SyntacticSugar.then;
-import static com.lyncode.jtwig.util.SyntacticSugar.when;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 
 public class MacroTest extends AbstractJtwigTest {
     @Test
-    public void basicExample() throws Exception {
-        when(jtwigRenders(templateResource("templates/acceptance/macro/macro.twig")));
-        then(theRenderedTemplate(), is(equalTo("\n\n")));
+    public void ensureMacrosAreAddedToContext() throws Exception {
+        JtwigResource resource = templateResource("templates/acceptance/macro/macro.twig");
+        JtwigConfiguration configuration = new JtwigConfiguration();
+        JtwigParser parser = new JtwigParser(configuration.parse());
+        CompileContext ctx = new CompileContext(resource, parser, configuration.compile());
+        parser.parse(resource)
+                .compile(ctx);
+        then(ctx.macros().size(), is(equalTo(1)));
+        then(ctx.macros(resource).size(), is(equalTo(2)));
     }
     
 //    @Test

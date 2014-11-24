@@ -15,6 +15,8 @@
 package com.lyncode.jtwig.util;
 
 import com.google.common.base.Predicate;
+import com.lyncode.jtwig.content.model.compilable.Import;
+import com.lyncode.jtwig.exception.RenderException;
 import org.hamcrest.Matcher;
 
 import javax.annotation.Nullable;
@@ -23,6 +25,8 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 import static com.lyncode.jtwig.types.Undefined.UNDEFINED;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.getAllMethods;
@@ -35,6 +39,14 @@ public class ObjectExtractor {
     }
 
     public Object extract (final String name, Object... parameters) throws ExtractException {
+        if (context instanceof Import.MacroRepository) {
+            try {
+                return ((Import.MacroRepository)context).execute(name, parameters);
+            } catch (RenderException ex) {
+                throw new ExtractException(ex);
+            }
+        }
+        
         List<Callable> callables = new ArrayList<Callable>();
 
         if (parameters.length == 0) {

@@ -18,7 +18,6 @@ import com.lyncode.jtwig.compile.CompileContext;
 import com.lyncode.jtwig.content.api.Renderable;
 import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.RenderException;
-import com.lyncode.jtwig.expressions.api.CompilableExpression;
 import com.lyncode.jtwig.parser.model.JtwigPosition;
 import com.lyncode.jtwig.render.RenderContext;
 import java.util.ArrayList;
@@ -30,7 +29,7 @@ public class Macro extends Content<Macro> {
     private static final Logger LOG = LoggerFactory.getLogger(Macro.class);
     private final JtwigPosition position;
     private final String name;
-    private List<CompilableExpression> arguments = new ArrayList<>();
+    private List<String> arguments = new ArrayList<>();
 
     public Macro(JtwigPosition position, String name) {
         this.position = position;
@@ -41,16 +40,40 @@ public class Macro extends Content<Macro> {
         return name;
     }
 
-    public Macro add(CompilableExpression argument) {
-        arguments.add(argument);
+    public Macro add(final String arg) {
+        arguments.add(arg);
         return this;
     }
 
     @Override
     public Renderable compile(CompileContext context) throws CompileException {
+        context.withMacro(position.getResource(), name, new Compiled(name, arguments, super.compile(context)));
+        
         return new Renderable() {
             @Override
             public void render(RenderContext context) throws RenderException {}
         };
+    }
+    
+    public static class Compiled implements Renderable {
+        private final String name;
+        private final List<String> argumentNames;
+        private final Renderable content;
+        
+        public Compiled(final String name, final List<String> argumentNames, final Renderable content) {
+            this.name = name;
+            this.argumentNames = argumentNames;
+            this.content = content;
+        }
+        
+        public List<String> arguments() {
+            return argumentNames;
+        }
+        
+        @Override
+        public void render(RenderContext context) throws RenderException {
+            content.render(context);
+        }
+        
     }
 }

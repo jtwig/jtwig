@@ -25,6 +25,6 @@ public class ImportTest extends AbstractJtwigTest {
     @Test
     public void basicExample() throws Exception {
         when(jtwigRenders(templateResource("templates/acceptance/import/import.twig")));
-        then(theRenderedTemplate(), is(equalTo("")));
+        then(theRenderedTemplate().trim(), is(equalTo("<input type=\"text\" name=\"test\">")));
     }
 }

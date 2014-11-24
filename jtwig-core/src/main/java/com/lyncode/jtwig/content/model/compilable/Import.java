@@ -14,17 +14,33 @@
 
 package com.lyncode.jtwig.content.model.compilable;
 
+import com.lyncode.jtwig.JtwigModelMap;
 import com.lyncode.jtwig.compile.CompileContext;
 import com.lyncode.jtwig.content.api.Compilable;
 import com.lyncode.jtwig.content.api.Renderable;
+import com.lyncode.jtwig.exception.CalculateException;
 import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.ParseBypassException;
 import com.lyncode.jtwig.exception.ParseException;
 import com.lyncode.jtwig.exception.RenderException;
+import com.lyncode.jtwig.exception.ResourceException;
 import com.lyncode.jtwig.expressions.api.CompilableExpression;
+import com.lyncode.jtwig.expressions.api.Expression;
+import com.lyncode.jtwig.expressions.model.Constant;
+import com.lyncode.jtwig.expressions.model.Variable;
 import com.lyncode.jtwig.parser.model.JtwigPosition;
 import com.lyncode.jtwig.render.RenderContext;
+import com.lyncode.jtwig.render.config.RenderConfiguration;
+import com.lyncode.jtwig.resource.JtwigResource;
+import com.lyncode.jtwig.types.Undefined;
+import com.lyncode.jtwig.util.ObjectExtractor;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Import extends AbstractElement {
@@ -61,12 +77,78 @@ public class Import extends AbstractElement {
 
     @Override
     public Renderable compile(CompileContext context) throws CompileException {
-        return new Renderable() {
-            @Override
-            public void render(RenderContext context) throws RenderException {}
-        };
+        Map<Expression, Expression> imports = new HashMap<>();
+        for (Map.Entry<CompilableExpression, CompilableExpression> entry : this.imports.entrySet()) {
+            imports.put(entry.getKey().compile(context), entry.getValue().compile(context));
+        }
+        
+        Expression from = null;
+        if (this.from != null) {
+            from = this.from.compile(context);
+        }
+        
+        return new Compiled(context, from, imports);
     }
     
+    static class Compiled implements Renderable {
+        private final CompileContext context;
+        private final Expression from;
+        private final Map<Expression, Expression> imports;
+        
+        public Compiled(CompileContext context, Expression from, Map<Expression, Expression> imports) {
+            this.context = context;
+            this.from = from;
+            this.imports = imports;
+        }
+
+        @Override
+        public void render(final RenderContext context) throws RenderException {
+            try {
+                if (from != null) {
+                    from(context);
+                } else {
+                    imprt(context);
+                }
+            } catch (CalculateException | CompileException | IOException | ParseException | ResourceException e) {
+                throw new RenderException(e);
+            }
+        }
+        
+        protected void from(final RenderContext ctx) throws CalculateException, IOException, ResourceException, ParseException, CompileException {
+            final String template = (String)from.calculate(ctx);
+            final Map<String, Macro.Compiled> macros = getMacros(template);
+            ctx.write(template.getBytes());
+        }
+        
+        protected void imprt(final RenderContext ctx) throws CalculateException, IOException, ResourceException, ParseException, CompileException {
+            final Map.Entry<Expression, Expression> imprt = imports.entrySet().iterator().next();
+            final String template = (String)imprt.getKey().calculate(ctx);
+            final Map<String, Macro.Compiled> macros = getMacros(template);
+            ctx.with((String)imprt.getValue().calculate(ctx), new MacroRepository(macros));
+        }
+        
+        protected Map<String, Macro.Compiled> getMacros(final String template) throws ResourceException, ParseException, CompileException {
+            final JtwigResource source = this.context.retrieve(template);
+            Map<String, Macro.Compiled> macros = this.context.macros(source);
+            if (macros != null) {
+                return macros;
+            }
+            
+            // Load the file
+            this.context.parse(source).compile(context);
+            macros = this.context.macros(source);
+            if (macros != null) {
+                return macros;
+            }
+            return new HashMap<>();
+        }
+        
+    }
+    
+    /**
+     * The definition is used to build the `name as name` statements during the
+     * parsing phase.
+     */
     public static class Definition implements Compilable {
         private final CompilableExpression source;
         private CompilableExpression as;
@@ -76,7 +158,11 @@ public class Import extends AbstractElement {
         }
         
         public Definition as(final CompilableExpression as) {
-            this.as = as;
+            if (as instanceof Variable) {
+                this.as = new Constant<>(((Variable)as).name());
+            } else {
+                this.as = as;
+            }
             return this;
         }
         
@@ -90,9 +176,47 @@ public class Import extends AbstractElement {
 
         @Override
         public Renderable compile(CompileContext context) throws CompileException {
-            throw new UnsupportedOperationException("Not supported yet.");
+            throw new UnsupportedOperationException();
         }
         
     }
     
+    /**
+     * The MacroRepository maps macro names to instances. Instances are
+     * populated with macros that are retrieved through the use of the import
+     * statement, and those instances are then added to the RenderContext, in
+     * much the same way that Twig's macros are contained within a TwigTemplate
+     * which is itself within the RenderContext.
+     * 
+     * Some fancy footwork is done in the {@link ObjectExtractor} in order to
+     * get this to work.
+     */
+    public static class MacroRepository {
+        protected final Map<String, Macro.Compiled> macros;
+        
+        protected MacroRepository() {
+            this.macros = new HashMap<>();
+        }
+        public MacroRepository(final Map<String, Macro.Compiled> macros) {
+            this.macros = macros;
+        }
+        
+        public Object execute(final String name, final Object...parameters) throws RenderException {
+            if (!macros.containsKey(name)) {
+                return "";
+            }
+            Macro.Compiled macro = macros.get(name);
+            // Build the model
+            JtwigModelMap model = new JtwigModelMap();
+            for (int i = 0; i < macro.arguments().size(); i++) {
+                if (parameters.length > i) {
+                    model.put(macro.arguments().get(i), parameters[i]);
+                }
+            }
+            ByteArrayOutputStream buf = new ByteArrayOutputStream();
+            RenderContext rc = RenderContext.create(new RenderConfiguration(), model, buf);
+            macro.render(rc);
+            return buf.toString();
+        }
+    }
 }

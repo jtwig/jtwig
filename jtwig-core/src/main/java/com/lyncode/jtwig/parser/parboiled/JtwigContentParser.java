@@ -368,12 +368,12 @@ public class JtwigContentParser extends JtwigBaseParser<Compilable> {
                                 push(new Macro(currentPosition(), expressionParser.popIdentifierAsString())),
                                 symbolWithSpacing(OPEN_PARENT),
                                 Optional(
-                                        expressionParser.expression(),
-                                        action(peek(1, Macro.class).add(expressionParser.pop())),
+                                        expressionParser.variable(),
+                                        action(peek(1, Macro.class).add(expressionParser.pop(Variable.class).name())),
                                         ZeroOrMore(
                                                 symbolWithSpacing(COMMA),
-                                                expressionParser.expression(),
-                                                action((peek(1, Macro.class)).add(expressionParser.pop()))
+                                                expressionParser.variable(),
+                                                action((peek(1, Macro.class)).add(expressionParser.pop(Variable.class).name()))
                                         )
                                 ),
                                 symbolWithSpacing(CLOSE_PARENT),
