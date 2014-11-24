@@ -14,6 +14,8 @@
 
 package com.lyncode.jtwig.acceptance;
 
+import com.lyncode.jtwig.exception.CompileException;
+import com.lyncode.jtwig.exception.ParseException;
 import org.junit.Test;
 
 import static com.lyncode.jtwig.util.SyntacticSugar.then;
@@ -25,6 +27,16 @@ public class ImportTest extends AbstractJtwigTest {
     @Test
     public void basicExample() throws Exception {
         when(jtwigRenders(templateResource("templates/acceptance/import/import.twig")));
-        then(theRenderedTemplate().trim(), is(equalTo("<input type=\"text\" name=\"test\">")));
+        then(theRenderedTemplate().trim(), is(equalTo("text (test)\n\n\npassword (pass)\n\n\npassword (password)")));
+    }
+    
+    @Test(expected = ParseException.class)
+    public void ensureInvalidImportStatementThrowsException() throws Exception {
+        when(jtwigRenders(templateResource("templates/acceptance/import/multiple-import-as.twig")));
+    }
+    
+    @Test(expected = CompileException.class)
+    public void ensureInvalidFromStatementThrowsException() throws Exception {
+        when(jtwigRenders(templateResource("templates/acceptance/import/import-string-name.twig")));
     }
 }

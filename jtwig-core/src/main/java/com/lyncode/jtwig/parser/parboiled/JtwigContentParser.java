@@ -401,7 +401,6 @@ public class JtwigContentParser extends JtwigBaseParser<Compilable> {
     }
     
     Rule importTemplate() {
-        // {% import 'forms.html' as forms %}
         return Sequence(
                 openCode(),
                 push(new Import(currentPosition())),

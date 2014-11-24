@@ -1,3 +1,7 @@
 {% import "imported.twig" as test %}
+{% from "imported.twig" import password as pass %}
+{% from "imported.twig" import password %}
 
 {{ test.text('test') }}
+{{ pass('pass') }}
+{{ password('password') }}

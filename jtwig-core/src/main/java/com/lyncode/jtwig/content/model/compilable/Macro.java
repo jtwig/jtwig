@@ -14,13 +14,18 @@
 
 package com.lyncode.jtwig.content.model.compilable;
 
+import com.lyncode.jtwig.JtwigModelMap;
 import com.lyncode.jtwig.compile.CompileContext;
 import com.lyncode.jtwig.content.api.Renderable;
 import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.RenderException;
 import com.lyncode.jtwig.parser.model.JtwigPosition;
 import com.lyncode.jtwig.render.RenderContext;
+import com.lyncode.jtwig.render.config.RenderConfiguration;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,6 +78,24 @@ public class Macro extends Content<Macro> {
         @Override
         public void render(RenderContext context) throws RenderException {
             content.render(context);
+        }
+        
+        public String execute(final Object...parameters) throws IOException, RenderException {
+            return execute(Arrays.asList(parameters));
+        }
+        public String execute(final List<Object> parameters) throws IOException, RenderException {
+            // Build the model
+            JtwigModelMap model = new JtwigModelMap();
+            for (int i = 0; i < arguments().size(); i++) {
+                if (parameters.size() > i) {
+                    model.put(arguments().get(i), parameters.get(i));
+                }
+            }
+            try (ByteArrayOutputStream buf = new ByteArrayOutputStream()) {
+                RenderContext rc = RenderContext.create(new RenderConfiguration(), model, buf);
+                render(rc);
+                return buf.toString();
+            }
         }
         
     }

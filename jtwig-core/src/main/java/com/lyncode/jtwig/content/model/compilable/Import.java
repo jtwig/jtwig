@@ -27,6 +27,7 @@ import com.lyncode.jtwig.exception.ResourceException;
 import com.lyncode.jtwig.expressions.api.CompilableExpression;
 import com.lyncode.jtwig.expressions.api.Expression;
 import com.lyncode.jtwig.expressions.model.Constant;
+import com.lyncode.jtwig.expressions.model.OperationBinary;
 import com.lyncode.jtwig.expressions.model.Variable;
 import com.lyncode.jtwig.parser.model.JtwigPosition;
 import com.lyncode.jtwig.render.RenderContext;
@@ -61,17 +62,13 @@ public class Import extends AbstractElement {
     }
     public Import add(final Definition def) {
         if (from == null && imports.size() > 0) {
-            throw new ParseBypassException(new ParseException("Cannot have more than one import definition in an import statement."));
+            throw new ParseBypassException(new ParseException("End of statement block expected."));
         }
         if (from == null && def.as == null) {
             throw new ParseBypassException(new ParseException("Must specify 'as'"));
         }
         
-        if (def.as == null) {
-            imports.put(def.source(), def.source());
-        } else {
-            imports.put(def.source, def.as());
-        }
+        imports.put(def.source, def.as);
         return this;
     }
 
@@ -79,7 +76,19 @@ public class Import extends AbstractElement {
     public Renderable compile(CompileContext context) throws CompileException {
         Map<Expression, Expression> imports = new HashMap<>();
         for (Map.Entry<CompilableExpression, CompilableExpression> entry : this.imports.entrySet()) {
-            imports.put(entry.getKey().compile(context), entry.getValue().compile(context));
+            Expression name = entry.getKey().compile(context);
+            if (name instanceof Variable.Compiled) {
+                name = new Constant<>(((Variable.Compiled)name).name()).compile(context);
+            }
+            // TODO This should be moved into parsing phase
+            if (from != null && !(name instanceof Variable.Compiled)) {
+                throw new CompileException("Unexpected macro name. Expected variable-style name");
+            }
+            Expression newName = entry.getValue() == null ? name : entry.getValue().compile(context);
+            if (newName instanceof Variable.Compiled) {
+                newName = new Constant<>(((Variable.Compiled)newName).name()).compile(context);
+            }
+            imports.put(name, newName);
         }
         
         Expression from = null;
@@ -117,7 +126,14 @@ public class Import extends AbstractElement {
         protected void from(final RenderContext ctx) throws CalculateException, IOException, ResourceException, ParseException, CompileException {
             final String template = (String)from.calculate(ctx);
             final Map<String, Macro.Compiled> macros = getMacros(template);
-            ctx.write(template.getBytes());
+            for (Expression key : imports.keySet()) {
+                final String name = key.calculate(ctx).toString();
+                final String newName = imports.get(key).calculate(ctx).toString();
+                System.out.println("Importing macro '"+name+"' from "+template+" to name '"+newName+"'");
+                if (macros.containsKey(name)) {
+                    ctx.with(newName, macros.get(name));
+                }
+            }
         }
         
         protected void imprt(final RenderContext ctx) throws CalculateException, IOException, ResourceException, ParseException, CompileException {

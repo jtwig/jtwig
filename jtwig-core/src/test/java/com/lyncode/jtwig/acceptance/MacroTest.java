@@ -37,37 +37,16 @@ public class MacroTest extends AbstractJtwigTest {
         then(ctx.macros(resource).size(), is(equalTo(2)));
     }
     
-//    @Test
-//    public void includeWithVars() throws Exception {
-//        when(jtwigRenders(templateResource("templates/acceptance/include/main-vars.twig")));
-//        then(theRenderedTemplate(), is(equalTo("hello, world")));
-//    }
-//    
-//    @Test
-//    public void includeOnlyCannotAccessContext() throws Exception {
-//        given(aModel().add("variable", "test"));
-//        when(jtwigRenders(templateResource("templates/acceptance/include/include-only.twig")));
-//        then(theRenderedTemplate(), is(equalTo("")));
-//    }
-//    
-//    @Test
-//    public void includeWithOnlyCannotAccessContext() throws Exception {
-//        given(aModel().add("variable", "pink"));
-//        when(jtwigRenders(templateResource("templates/acceptance/include/include-with-only.twig")));
-//        then(theRenderedTemplate(), is(equalTo("pink-purple-")));
-//    }
-//    
-//    @Test
-//    public void includeMissingWithoutFlagShouldThrowException() throws Exception {
-//        try {
-//            when(jtwigRenders(templateResource("templates/acceptance/include/ignore-missing-exception.twig")));
-//            Assert.fail("Should have received a compile exception stating that the resource could not be found.");
-//        } catch (CompileException e) {}
-//    }
-//    
-//    @Test
-//    public void includeMissingWithFlagShouldNotThrowException() throws Exception {
-//        when(jtwigRenders(templateResource("templates/acceptance/include/ignore-missing-working.twig")));
-//        then(theRenderedTemplate(), is(equalTo("start--end")));
-//    }
+    @Test
+    public void ensureLastMacroDefinedWithSameNameIsUsed() throws Exception {
+        JtwigResource resource = templateResource("templates/acceptance/macro/overloading.twig");
+        JtwigConfiguration configuration = new JtwigConfiguration();
+        JtwigParser parser = new JtwigParser(configuration.parse());
+        CompileContext ctx = new CompileContext(resource, parser, configuration.compile());
+        parser.parse(resource)
+                .compile(ctx);
+        then(ctx.macros().size(), is(equalTo(1)));
+        then(ctx.macros(resource).size(), is(equalTo(1)));
+        then(ctx.macros(resource).entrySet().iterator().next().getValue().arguments().size(), is(equalTo(1)));
+    }
 }
