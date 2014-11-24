@@ -27,21 +27,16 @@ import com.lyncode.jtwig.exception.ResourceException;
 import com.lyncode.jtwig.expressions.api.CompilableExpression;
 import com.lyncode.jtwig.expressions.api.Expression;
 import com.lyncode.jtwig.expressions.model.Constant;
-import com.lyncode.jtwig.expressions.model.OperationBinary;
 import com.lyncode.jtwig.expressions.model.Variable;
 import com.lyncode.jtwig.parser.model.JtwigPosition;
 import com.lyncode.jtwig.render.RenderContext;
 import com.lyncode.jtwig.render.config.RenderConfiguration;
 import com.lyncode.jtwig.resource.JtwigResource;
-import com.lyncode.jtwig.types.Undefined;
 import com.lyncode.jtwig.util.ObjectExtractor;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class Import extends AbstractElement {
@@ -92,16 +87,18 @@ public class Import extends AbstractElement {
             from = this.from.compile(context);
         }
         
-        return new Compiled(context, from, imports);
+        return new Compiled(context, position, from, imports);
     }
     
     static class Compiled implements Renderable {
         private final CompileContext context;
+        private final JtwigPosition position;
         private final Expression from;
         private final Map<Expression, Expression> imports;
         
-        public Compiled(CompileContext context, Expression from, Map<Expression, Expression> imports) {
+        public Compiled(CompileContext context, JtwigPosition position, Expression from, Map<Expression, Expression> imports) {
             this.context = context;
+            this.position = position;
             this.from = from;
             this.imports = imports;
         }
@@ -120,12 +117,14 @@ public class Import extends AbstractElement {
         }
         
         protected void from(final RenderContext ctx) throws CalculateException, IOException, ResourceException, ParseException, CompileException {
-            final String template = (String)from.calculate(ctx);
+            String template = (String)from.calculate(ctx);
+            if ("_self".equals(template)) {
+                template = new File(position.getResource().toString()).getName();
+            }
             final Map<String, Macro.Compiled> macros = getMacros(template);
             for (Expression key : imports.keySet()) {
                 final String name = key.calculate(ctx).toString();
                 final String newName = imports.get(key).calculate(ctx).toString();
-                System.out.println("Importing macro '"+name+"' from "+template+" to name '"+newName+"'");
                 if (macros.containsKey(name)) {
                     ctx.with(newName, macros.get(name));
                 }
@@ -134,7 +133,10 @@ public class Import extends AbstractElement {
         
         protected void imprt(final RenderContext ctx) throws CalculateException, IOException, ResourceException, ParseException, CompileException {
             final Map.Entry<Expression, Expression> imprt = imports.entrySet().iterator().next();
-            final String template = (String)imprt.getKey().calculate(ctx);
+            String template = (String)imprt.getKey().calculate(ctx);
+            if ("_self".equals(template)) {
+                template = new File(position.getResource().toString()).getName();
+            }
             final Map<String, Macro.Compiled> macros = getMacros(template);
             ctx.with((String)imprt.getValue().calculate(ctx), new MacroRepository(macros));
         }
