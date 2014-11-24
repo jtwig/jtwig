@@ -80,10 +80,6 @@ public class Import extends AbstractElement {
             if (name instanceof Variable.Compiled) {
                 name = new Constant<>(((Variable.Compiled)name).name()).compile(context);
             }
-            // TODO This should be moved into parsing phase
-            if (from != null && !(name instanceof Variable.Compiled)) {
-                throw new CompileException("Unexpected macro name. Expected variable-style name");
-            }
             Expression newName = entry.getValue() == null ? name : entry.getValue().compile(context);
             if (newName instanceof Variable.Compiled) {
                 newName = new Constant<>(((Variable.Compiled)newName).name()).compile(context);

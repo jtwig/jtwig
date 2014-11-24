@@ -35,8 +35,8 @@ public class ImportTest extends AbstractJtwigTest {
         when(jtwigRenders(templateResource("templates/acceptance/import/multiple-import-as.twig")));
     }
     
-    @Test(expected = CompileException.class)
-    public void ensureInvalidFromStatementThrowsException() throws Exception {
-        when(jtwigRenders(templateResource("templates/acceptance/import/import-string-name.twig")));
-    }
+//    @Test(expected = CompileException.class)
+//    public void ensureInvalidFromStatementThrowsException() throws Exception {
+//        when(jtwigRenders(templateResource("templates/acceptance/import/import-string-name.twig")));
+//    }
 }
