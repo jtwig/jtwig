@@ -16,185 +16,165 @@ package com.lyncode.jtwig.content.model.compilable;
 
 import com.lyncode.jtwig.JtwigModelMap;
 import com.lyncode.jtwig.compile.CompileContext;
-import com.lyncode.jtwig.content.api.Compilable;
 import com.lyncode.jtwig.content.api.Renderable;
 import com.lyncode.jtwig.exception.CalculateException;
 import com.lyncode.jtwig.exception.CompileException;
-import com.lyncode.jtwig.exception.ParseBypassException;
 import com.lyncode.jtwig.exception.ParseException;
 import com.lyncode.jtwig.exception.RenderException;
 import com.lyncode.jtwig.exception.ResourceException;
 import com.lyncode.jtwig.expressions.api.CompilableExpression;
 import com.lyncode.jtwig.expressions.api.Expression;
 import com.lyncode.jtwig.expressions.model.Constant;
-import com.lyncode.jtwig.expressions.model.Variable;
 import com.lyncode.jtwig.parser.model.JtwigPosition;
 import com.lyncode.jtwig.render.RenderContext;
 import com.lyncode.jtwig.render.config.RenderConfiguration;
 import com.lyncode.jtwig.resource.JtwigResource;
 import com.lyncode.jtwig.util.ObjectExtractor;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
 
-public class Import extends AbstractElement {
-    private final JtwigPosition position;
-    private CompilableExpression from;
-    private Map<CompilableExpression, CompilableExpression> imports = new HashMap<>();
-    
-    public Import(final JtwigPosition position) {
-        this.position = position;
-    }
-    
-    public Import from(final CompilableExpression from) {
-        this.from = from;
-        return this;
-    }
-    public CompilableExpression from() {
-        return from;
-    }
-    public Import add(final Definition def) {
-        if (from == null && imports.size() > 0) {
-            throw new ParseBypassException(new ParseException("End of statement block expected."));
-        }
-        if (from == null && def.as == null) {
-            throw new ParseBypassException(new ParseException("Must specify 'as'"));
-        }
-        
-        imports.put(def.source, def.as);
-        return this;
-    }
-
-    @Override
-    public Renderable compile(CompileContext context) throws CompileException {
-        Map<Expression, Expression> imports = new HashMap<>();
-        for (Map.Entry<CompilableExpression, CompilableExpression> entry : this.imports.entrySet()) {
-            Expression name = entry.getKey().compile(context);
-            if (name instanceof Variable.Compiled) {
-                name = new Constant<>(((Variable.Compiled)name).name()).compile(context);
-            }
-            Expression newName = entry.getValue() == null ? name : entry.getValue().compile(context);
-            if (newName instanceof Variable.Compiled) {
-                newName = new Constant<>(((Variable.Compiled)newName).name()).compile(context);
-            }
-            imports.put(name, newName);
-        }
-        
-        Expression from = null;
-        if (this.from != null) {
-            from = this.from.compile(context);
-        }
-        
-        return new Compiled(context, position, from, imports);
-    }
-    
-    static class Compiled implements Renderable {
-        private final CompileContext context;
+public abstract class Import {
+    /**
+     * Represents the general import statement during execution.
+     * {% import (_self|constant|expression) as name %}
+     */
+    public static class General extends AbstractElement {
         private final JtwigPosition position;
-        private final Expression from;
-        private final Map<Expression, Expression> imports;
+        private final CompilableExpression from;
+        private final String as;
         
-        public Compiled(CompileContext context, JtwigPosition position, Expression from, Map<Expression, Expression> imports) {
-            this.context = context;
+        public General(final JtwigPosition position, final CompilableExpression from, final String as) {
             this.position = position;
             this.from = from;
-            this.imports = imports;
+            this.as = as;
         }
 
         @Override
-        public void render(final RenderContext context) throws RenderException {
-            try {
-                if (from != null) {
-                    from(context);
-                } else {
-                    imprt(context);
+        public Renderable compile(final CompileContext context) throws CompileException {
+            return new Compiled(context, evaluateFrom(from, context).compile(context), as);
+        }
+        
+        /**
+         * Pulls macros into the render context.
+         */
+        static class Compiled implements Renderable {
+            private final CompileContext compileContext;
+            private final Expression from;
+            private final String as;
+            
+            Compiled(final CompileContext compileContext, final Expression from, final String as) {
+                this.compileContext = compileContext;
+                this.from = from;
+                this.as = as;
+            }
+
+            @Override
+            public void render(RenderContext context) throws RenderException {
+                try {
+                    final JtwigResource template;
+                    if (from instanceof SelfReference) {
+                        template = ((SelfReference)from).resource();
+                    } else {
+                        template = compileContext.retrieve((String)from.calculate(context));
+                    }
+                    final Map<String, Macro.Compiled> macros = Import.getMacros(compileContext, template);
+                    context.with(as, new MacroRepository(macros));
+                } catch (CalculateException | CompileException | ParseException | ResourceException ex) {
+                    throw new RenderException(ex);
                 }
-            } catch (CalculateException | CompileException | IOException | ParseException | ResourceException e) {
-                throw new RenderException(e);
-            }
-        }
-        
-        protected void from(final RenderContext ctx) throws CalculateException, IOException, ResourceException, ParseException, CompileException {
-            String template = (String)from.calculate(ctx);
-            if ("_self".equals(template)) {
-                template = new File(position.getResource().toString()).getName();
-            }
-            final Map<String, Macro.Compiled> macros = getMacros(template);
-            for (Expression key : imports.keySet()) {
-                final String name = key.calculate(ctx).toString();
-                final String newName = imports.get(key).calculate(ctx).toString();
-                if (macros.containsKey(name)) {
-                    ctx.with(newName, macros.get(name));
-                }
-            }
-        }
-        
-        protected void imprt(final RenderContext ctx) throws CalculateException, IOException, ResourceException, ParseException, CompileException {
-            final Map.Entry<Expression, Expression> imprt = imports.entrySet().iterator().next();
-            String template = (String)imprt.getKey().calculate(ctx);
-            if ("_self".equals(template)) {
-                template = new File(position.getResource().toString()).getName();
-            }
-            final Map<String, Macro.Compiled> macros = getMacros(template);
-            ctx.with((String)imprt.getValue().calculate(ctx), new MacroRepository(macros));
-        }
-        
-        protected Map<String, Macro.Compiled> getMacros(final String template) throws ResourceException, ParseException, CompileException {
-            final JtwigResource source = this.context.retrieve(template);
-            Map<String, Macro.Compiled> macros = this.context.macros(source);
-            if (macros != null) {
-                return macros;
             }
             
-            // Load the file
-            this.context.parse(source).compile(context);
-            macros = this.context.macros(source);
-            if (macros != null) {
-                return macros;
-            }
-            return new HashMap<>();
         }
         
     }
-    
     /**
-     * The definition is used to build the `name as name` statements during the
-     * parsing phase.
+     * Represents the from..import statement during execution.
+     * {% from (_self|constant|expression) import name [as name]
      */
-    public static class Definition implements Compilable {
-        private final CompilableExpression source;
-        private CompilableExpression as;
+    public static class From extends AbstractElement {
+        private final JtwigPosition position;
+        private final CompilableExpression from;
+        private final Map<String, String> imports = new HashMap<>();
         
-        public Definition(final CompilableExpression source) {
-            this.source = source;
+        public From(final JtwigPosition position, final CompilableExpression from) {
+            this.position = position;
+            this.from = from;
         }
         
-        public Definition as(final CompilableExpression as) {
-            if (as instanceof Variable) {
-                this.as = new Constant<>(((Variable)as).name());
-            } else {
-                this.as = as;
-            }
+        public From add(final String source, final String as) {
+            imports.put(source, as);
             return this;
-        }
-        
-        public CompilableExpression source() {
-            return source;
-        }
-        
-        public CompilableExpression as() {
-            return as;
         }
 
         @Override
         public Renderable compile(CompileContext context) throws CompileException {
-            throw new UnsupportedOperationException();
+            return new Compiled(context, evaluateFrom(from, context).compile(context), imports);
         }
         
+        
+        /**
+         * Pulls macros into the render context.
+         */
+        static class Compiled implements Renderable {
+            private final CompileContext compileContext;
+            private final Expression from;
+            private Map<String, String> imports = new HashMap<>();
+            
+            Compiled(final CompileContext compileContext, final Expression from, final Map<String, String> imports) {
+                this.compileContext = compileContext;
+                this.from = from;
+                this.imports = imports;
+            }
+
+            @Override
+            public void render(final RenderContext context) throws RenderException {
+                try {
+                    final JtwigResource template;
+                    if (from instanceof SelfReference) {
+                        template = ((SelfReference)from).resource();
+                    } else {
+                        template = compileContext.retrieve((String)from.calculate(context));
+                    }
+                    final Map<String, Macro.Compiled> macros = Import.getMacros(compileContext, template);
+                    for (String name : imports.keySet()) {
+                        if (macros.containsKey(name)) {
+                            context.with(StringUtils.defaultIfBlank(imports.get(name), name), macros.get(name));
+                        }
+                    }
+                } catch (CalculateException | CompileException | ParseException | ResourceException ex) {
+                    throw new RenderException(ex);
+                }
+            }
+            
+        }
     }
-    
+    /**
+     * Preserves the reference to _self so that the resource in which the
+     * reference was made is always known.
+     */
+    public static class SelfReference implements CompilableExpression, Expression {
+        private final JtwigResource resource;
+        
+        public SelfReference(final JtwigPosition position) {
+            this.resource = position.getResource();
+        }
+        
+        public JtwigResource resource() {
+            return resource;
+        }
+
+        @Override
+        public Expression compile(final CompileContext context) throws CompileException {
+            return this;
+        }
+
+        @Override
+        public Object calculate(final RenderContext context) throws CalculateException {
+            throw new UnsupportedOperationException();
+        }
+    }
     /**
      * The MacroRepository maps macro names to instances. Instances are
      * populated with macros that are retrieved through the use of the import
@@ -233,4 +213,50 @@ public class Import extends AbstractElement {
             return buf.toString();
         }
     }
+    
+    /**
+     * Retrieves macros from the given context for the given template. Resides
+     * here due to common usage between implementation classes.
+     * @param ctx
+     * @param template
+     * @return
+     * @throws ResourceException
+     * @throws ParseException
+     * @throws CompileException 
+     */
+    protected static Map<String, Macro.Compiled> getMacros(final CompileContext ctx, final JtwigResource source) throws ResourceException, ParseException, CompileException {
+        if (ctx.macros(source) != null) {
+            return ctx.macros(source);
+        }
+
+        // Load the file
+        ctx.parse(source).compile(ctx);
+        if (ctx.macros(source) != null) {
+            return ctx.macros(source);
+        }
+        return new HashMap<>();
+    }
+    /**
+     * Evaluates the source template name/expression passed and tries to boil
+     * it down to something simpler for render time. If the source template name
+     * is a constant or a self reference, it loads the template macros ahead of
+     * time.
+     * @param from
+     * @param ctx
+     * @return
+     * @throws CompileException 
+     */
+    protected static CompilableExpression evaluateFrom(CompilableExpression from, final CompileContext ctx) throws CompileException {
+        // Keep parsing within the actual parse-phase where possible
+        if (from instanceof Constant) {
+            final String template = ((Constant)from).getValue().toString();
+            try {
+                ctx.parse(ctx.retrieve(template));
+            } catch (ParseException | ResourceException ex) {
+                throw new CompileException(ex);
+            }
+        }
+        return from;
+    }
+
 }

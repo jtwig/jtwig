@@ -167,6 +167,7 @@ public class JtwigContentParser extends JtwigBaseParser<Compilable> {
                                 addToContent(embed()),
                                 addToContent(macro()),
                                 addToContent(importTemplate()),
+                                addToContent(fromImportTemplate()),
 //                                addToContent(filter()),
                                 addToContent(forEach()),
                                 addToContent(ifCondition()),
@@ -403,12 +404,25 @@ public class JtwigContentParser extends JtwigBaseParser<Compilable> {
     Rule importTemplate() {
         return Sequence(
                 openCode(),
-                push(new Import(currentPosition())),
-                Optional(
-                        keyword(FROM),
-                        importLocation(),
-                        action(peek(1, Import.class).from(expressionParser.pop()))
-                ),
+                keyword(IMPORT),
+                mandatory(
+                        Sequence(
+                                importLocation(),
+                                keyword(AS),
+                                expressionParser.variable(),
+                                push(new Import.General(currentPosition(), expressionParser.pop(1), expressionParser.pop(Variable.class).name())),
+                                closeCode()
+                        ),
+                        new ParseException("Inavlid import syntax")
+                )
+        );
+    }
+    Rule fromImportTemplate() {
+        return Sequence(
+                openCode(),
+                keyword(FROM),
+                importLocation(),
+                push(new Import.From(currentPosition(), expressionParser.pop())),
                 keyword(IMPORT),
                 mandatory(
                         Sequence(
@@ -427,21 +441,25 @@ public class JtwigContentParser extends JtwigBaseParser<Compilable> {
         return FirstOf(
                 Sequence(
                         keyword(SELF),
-                        expressionParser.push(new Constant<>("_self"))
+                        expressionParser.push(new Import.SelfReference(currentPosition()))
                 ),
+                // Constants are checked for separately to ease some parse-time
+                // checking in the Import class
+                expressionParser.constant(),
                 expressionParser.expression()
         );
     }
     Rule importDefinition() {
         return Sequence(
-                importLocation(),
-                push(new Import.Definition(expressionParser.pop())),
-                Optional(
-                        keyword(AS),
-                        expressionParser.variable(),
-                        action(peek(1, Import.Definition.class).as(expressionParser.pop()))
-                ),
-                action(peek(1, Import.class).add(pop(Import.Definition.class)))
+                expressionParser.variable(),
+                FirstOf(
+                        Sequence(
+                                keyword(AS),
+                                expressionParser.variable(),
+                                action(peek(2, Import.From.class).add(expressionParser.pop(1, Variable.class).name(), expressionParser.pop(Variable.class).name()))
+                        ),
+                        action(peek(1, Import.From.class).add(expressionParser.pop(Variable.class).name(), null))
+                )
         );
     }
 

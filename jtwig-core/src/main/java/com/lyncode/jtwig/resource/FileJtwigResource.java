@@ -55,6 +55,11 @@ public class FileJtwigResource implements JtwigResource {
     }
 
     @Override
+    public String path() {
+        return file.getPath();
+    }
+    
+    @Override
     public String toString() {
         return file.getPath();
     }

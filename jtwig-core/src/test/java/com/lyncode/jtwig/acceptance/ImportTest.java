@@ -43,7 +43,7 @@ public class ImportTest extends AbstractJtwigTest {
     
     @Test
     public void ensureNestedSelfImportWorks() throws Exception {
-        when(jtwigRenders(templateResource("templates/acceptance/import/nested-import-self.twig")));
+        when(jtwigRenders(templateResource("templates/acceptance/import/nested-import-self-test.twig")));
         then(theRenderedTemplate().trim(), is(equalTo("<input type=\"password\" name=\"jtwig\">")));
     }
     

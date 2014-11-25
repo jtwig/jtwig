@@ -42,6 +42,11 @@ public class StringJtwigResource implements JtwigResource {
     }
 
     @Override
+    public String path() {
+        return null;
+    }
+
+    @Override
     public String toString() {
         return "String Source";
     }
