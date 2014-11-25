@@ -16,10 +16,11 @@ package com.lyncode.jtwig.acceptance;
 
 import com.lyncode.jtwig.exception.CompileException;
 import com.lyncode.jtwig.exception.ParseException;
+import com.lyncode.jtwig.functions.annotations.JtwigFunction;
+import com.lyncode.jtwig.functions.annotations.Parameter;
 import org.junit.Test;
 
-import static com.lyncode.jtwig.util.SyntacticSugar.then;
-import static com.lyncode.jtwig.util.SyntacticSugar.when;
+import static com.lyncode.jtwig.util.SyntacticSugar.*;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 
@@ -47,8 +48,22 @@ public class ImportTest extends AbstractJtwigTest {
         then(theRenderedTemplate().trim(), is(equalTo("<input type=\"password\" name=\"jtwig\">")));
     }
     
+    @Test
+    public void ensureMacrosCanUseCustomFunctions() throws Exception {
+        given(theConfiguration()).render().functionRepository().include(new TypeFunction());
+        when(jtwigRenders(templateResource("templates/acceptance/import/macro-can-use-functions.twig")));
+        then(theRenderedTemplate().trim(), is(equalTo("java.lang.String")));
+    }
+    
 //    @Test(expected = CompileException.class)
 //    public void ensureInvalidFromStatementThrowsException() throws Exception {
 //        when(jtwigRenders(templateResource("templates/acceptance/import/import-string-name.twig")));
 //    }
+    
+    public static class TypeFunction {
+        @JtwigFunction(name = "type")
+        public String type(@Parameter Object obj) {
+            return obj.getClass().getCanonicalName();
+        }
+    }
 }

@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,20 +81,20 @@ public class Macro extends Content<Macro> {
             content.render(context);
         }
         
-        public String execute(final Object...parameters) throws IOException, RenderException {
-            return execute(Arrays.asList(parameters));
+        public String execute(final RenderContext ctx, final Object...parameters) throws IOException, RenderException {
+            return execute(ctx, Arrays.asList(parameters));
         }
-        public String execute(final List<Object> parameters) throws IOException, RenderException {
+        public String execute(final RenderContext ctx, final List<Object> parameters) throws IOException, RenderException {
             // Build the model
-            JtwigModelMap model = new JtwigModelMap();
+            RenderContext isolated = ctx.isolatedModel();
+            ((Map)isolated.map("model")).clear();
             for (int i = 0; i < arguments().size(); i++) {
                 if (parameters.size() > i) {
-                    model.put(arguments().get(i), parameters.get(i));
+                    isolated.with(arguments().get(i), parameters.get(i));
                 }
             }
             try (ByteArrayOutputStream buf = new ByteArrayOutputStream()) {
-                RenderContext rc = RenderContext.create(new RenderConfiguration(), model, buf);
-                render(rc);
+                render(isolated);
                 return buf.toString();
             }
         }

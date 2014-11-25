@@ -14,7 +14,6 @@
 
 package com.lyncode.jtwig.content.model.compilable;
 
-import com.lyncode.jtwig.JtwigModelMap;
 import com.lyncode.jtwig.compile.CompileContext;
 import com.lyncode.jtwig.content.api.Renderable;
 import com.lyncode.jtwig.exception.CalculateException;
@@ -27,7 +26,6 @@ import com.lyncode.jtwig.expressions.api.Expression;
 import com.lyncode.jtwig.expressions.model.Constant;
 import com.lyncode.jtwig.parser.model.JtwigPosition;
 import com.lyncode.jtwig.render.RenderContext;
-import com.lyncode.jtwig.render.config.RenderConfiguration;
 import com.lyncode.jtwig.resource.JtwigResource;
 import com.lyncode.jtwig.util.ObjectExtractor;
 import java.io.ByteArrayOutputStream;
@@ -195,21 +193,23 @@ public abstract class Import {
             this.macros = macros;
         }
         
-        public Object execute(final String name, final Object...parameters) throws RenderException {
+        public Object execute(final RenderContext ctx, final String name, final Object...parameters) throws RenderException {
             if (!macros.containsKey(name)) {
                 return "";
             }
+            
+            final RenderContext isolated = ctx.isolatedModel();
+            ((Map)isolated.map("model")).clear();
+            
             Macro.Compiled macro = macros.get(name);
             // Build the model
-            JtwigModelMap model = new JtwigModelMap();
             for (int i = 0; i < macro.arguments().size(); i++) {
                 if (parameters.length > i) {
-                    model.put(macro.arguments().get(i), parameters[i]);
+                    isolated.with(macro.arguments().get(i), parameters[i]);
                 }
             }
             ByteArrayOutputStream buf = new ByteArrayOutputStream();
-            RenderContext rc = RenderContext.create(new RenderConfiguration(), model, buf);
-            macro.render(rc);
+            macro.render(isolated);
             return buf.toString();
         }
     }

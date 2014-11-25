@@ -14,7 +14,11 @@
 
 package com.lyncode.jtwig.unit.util;
 
+import com.lyncode.jtwig.JtwigModelMap;
+import com.lyncode.jtwig.render.RenderContext;
+import com.lyncode.jtwig.render.config.RenderConfiguration;
 import com.lyncode.jtwig.util.ObjectExtractor;
+import java.io.ByteArrayOutputStream;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -26,13 +30,14 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
+import org.mockito.Mockito;
 
 public class ObjectExtractorTest {
     @Test
     public void shouldExtractFromMap () throws ObjectExtractor.ExtractException {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("key", "value");
-        ObjectExtractor underTest = new ObjectExtractor(map);
+        ObjectExtractor underTest = new ObjectExtractor(Mockito.mock(RenderContext.class), map);
 
         assertThat(underTest.extract("key"), is((Object) "value"));
     }
@@ -40,7 +45,7 @@ public class ObjectExtractorTest {
     @Test
     public void shouldExtractFromInheritedMethod () throws ObjectExtractor.ExtractException {
         List<String> list = new ArrayList<String>();
-        ObjectExtractor underTest = new ObjectExtractor(list);
+        ObjectExtractor underTest = new ObjectExtractor(Mockito.mock(RenderContext.class), list);
 
         assertThat(underTest.extract("tostring"), is(notNullValue()));
     }
@@ -49,7 +54,7 @@ public class ObjectExtractorTest {
         B b = new B();
         b.a = "a";
         b.b = "b";
-        ObjectExtractor underTest = new ObjectExtractor(b);
+        ObjectExtractor underTest = new ObjectExtractor(Mockito.mock(RenderContext.class), b);
 
         assertEquals("a", underTest.extract("a"));
         assertEquals("b", underTest.extract("b"));
@@ -57,7 +62,7 @@ public class ObjectExtractorTest {
 
     @Test(expected = ObjectExtractor.ExtractException.class)
     public void methodException() throws Exception {
-        ObjectExtractor underTest = new ObjectExtractor(new TestClass());
+        ObjectExtractor underTest = new ObjectExtractor(Mockito.mock(RenderContext.class), new TestClass());
 
         underTest.extract("method");
     }

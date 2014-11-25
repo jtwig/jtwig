@@ -80,7 +80,7 @@ public class FunctionElement extends AbstractCompilableExpression {
         public Object calculate(RenderContext context) throws CalculateException {
             try {
                 if (context.map(name) instanceof Macro.Compiled) {
-                    return ((Macro.Compiled)context.map(name)).execute(calculateArguments(context));
+                    return ((Macro.Compiled)context.map(name)).execute(context, calculateArguments(context));
                 }
                 
                 try {

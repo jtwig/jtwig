@@ -17,6 +17,7 @@ package com.lyncode.jtwig.util;
 import com.google.common.base.Predicate;
 import com.lyncode.jtwig.content.model.compilable.Import;
 import com.lyncode.jtwig.exception.RenderException;
+import com.lyncode.jtwig.render.RenderContext;
 import org.hamcrest.Matcher;
 
 import javax.annotation.Nullable;
@@ -32,16 +33,18 @@ import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.getAllMethods;
 
 public class ObjectExtractor {
+    private RenderContext renderContext;
     private Object context;
 
-    public ObjectExtractor(Object context) {
+    public ObjectExtractor(RenderContext renderContext, Object context) {
+        this.renderContext = renderContext;
         this.context = context;
     }
 
     public Object extract (final String name, Object... parameters) throws ExtractException {
         if (context instanceof Import.MacroRepository) {
             try {
-                return ((Import.MacroRepository)context).execute(name, parameters);
+                return ((Import.MacroRepository)context).execute(renderContext, name, parameters);
             } catch (RenderException ex) {
                 throw new ExtractException(ex);
             }
