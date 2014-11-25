@@ -30,6 +30,7 @@ public enum BinaryOperator {
     // Jtwig Operations
     COMPOSITION(Operator.COMPOSITION, new CompositionExpressionFactory()),
     SELECTION(Operator.SELECTION, operation(new SelectionOperation())),
+    CONCATENATION(Operator.CONCATENATION, operation(new ConcatenationOperation())),
 
     // Math Operations
     SUM(Operator.ADD, operation(new SumOperation())),

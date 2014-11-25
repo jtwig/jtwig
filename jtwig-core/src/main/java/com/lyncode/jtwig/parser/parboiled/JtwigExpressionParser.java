@@ -124,12 +124,19 @@ public class JtwigExpressionParser extends JtwigBaseParser<CompilableExpression>
 
     Rule multiplication() {
         return binary(
-                composition(),
+                concatenation(),
                 Operator.INT_DIV,
                 Operator.INT_TIMES,
                 Operator.TIMES,
                 Operator.DIV,
                 Operator.MOD
+        );
+    }
+    
+    Rule concatenation() {
+        return binary(
+                composition(),
+                Operator.CONCATENATION
         );
     }
 
