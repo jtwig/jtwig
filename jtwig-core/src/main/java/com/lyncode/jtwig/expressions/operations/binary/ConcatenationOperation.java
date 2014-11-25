@@ -16,11 +16,12 @@ package com.lyncode.jtwig.expressions.operations.binary;
 
 import com.lyncode.jtwig.exception.CalculateException;
 import com.lyncode.jtwig.parser.model.JtwigPosition;
+import org.apache.commons.lang3.ObjectUtils;
 
 
 public class ConcatenationOperation extends SimpleBinaryOperation {
     @Override
     public Object apply(JtwigPosition position, Object left, Object right) throws CalculateException {
-        return left.toString()+right.toString();
+        return ObjectUtils.defaultIfNull(left, "").toString()+ObjectUtils.defaultIfNull(right, "").toString();
     }
 }
