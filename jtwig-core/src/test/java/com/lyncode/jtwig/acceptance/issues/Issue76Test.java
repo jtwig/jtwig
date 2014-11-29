@@ -56,14 +56,4 @@ public class Issue76Test extends AbstractJtwigTest {
             then(e.getCause().getMessage(), startsWith("templates/issue76/test2.twig -> Line 1, column 23:"));
         }
     }
-
-    @Test
-    public void shouldGiveNiceExplanationForNonExistingExpression() throws Exception {
-        try {
-            when(jtwigRenders(template("{{ 'abc'..'abc' }}")));
-            fail();
-        } catch (ParseException e) {
-            then(e.getMessage(), containsString("String Source -> Line 1, column 16: Only integers and characters are allowed in comprehension lists"));
-        }
-    }
 }

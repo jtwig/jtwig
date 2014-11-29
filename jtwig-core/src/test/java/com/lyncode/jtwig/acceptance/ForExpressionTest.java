@@ -135,7 +135,14 @@ public class ForExpressionTest {
         context.withModelAttribute("obj", new Obj());
         context.withModelAttribute("name", "Test");
         assertThat(template.output(context), is("ab"));
-        
+    }
+    
+    @Test
+    public void iterateOnSequence () throws ParseException, CompileException, RenderException {
+        JtwigTemplate template = JtwigTemplate.fromString("{% for value in start..end %}{{ value }}{% endfor %}");
+        JtwigModelMap context = new JtwigModelMap();
+        context.withModelAttribute("start", 'b').withModelAttribute("end", 'l');
+        assertThat(template.output(context), is("bcdefghijkl"));
     }
     
     public static class Obj {
