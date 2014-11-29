@@ -334,12 +334,14 @@ public class JtwigExpressionParser extends JtwigBaseParser<CompilableExpression>
                 push(new FunctionElement(currentPosition(), popIdentifierAsString())),
                 mandatory(
                         Sequence(
-                                expression(),
-                                action(peek(1, FunctionElement.class).add(pop())),
-                                ZeroOrMore(
-                                        symbol(COMMA),
+                                Optional(
                                         expression(),
-                                        action((peek(1, FunctionElement.class)).add(pop()))
+                                        action(peek(1, FunctionElement.class).add(pop())),
+                                        ZeroOrMore(
+                                                symbol(COMMA),
+                                                expression(),
+                                                action((peek(1, FunctionElement.class)).add(pop()))
+                                        )
                                 ),
                                 symbol(CLOSE_PARENT)
                         ),

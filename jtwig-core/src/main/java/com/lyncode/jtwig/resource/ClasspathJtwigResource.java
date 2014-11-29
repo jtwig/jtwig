@@ -50,6 +50,11 @@ public class ClasspathJtwigResource implements JtwigResource {
     }
 
     @Override
+    public String path() {
+        return resource;
+    }
+    
+    @Override
     public String toString() {
         return resource;
     }

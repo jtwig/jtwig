@@ -49,7 +49,7 @@ public class SelectionOperation implements BinaryOperation {
                 }
             } else return Undefined.UNDEFINED;
         }
-        ObjectExtractor extractor = new ObjectExtractor(calculate);
+        ObjectExtractor extractor = new ObjectExtractor(context, calculate);
         try {
             if (right instanceof Variable.Compiled)
                 return ((Variable.Compiled) right).extract(extractor);

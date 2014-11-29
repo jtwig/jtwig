@@ -20,6 +20,7 @@ import java.io.InputStream;
 
 public interface JtwigResource {
     boolean exists ();
+    String path ();
     InputStream retrieve () throws ResourceException;
     JtwigResource resolve (String relativePath) throws ResourceException;
 }

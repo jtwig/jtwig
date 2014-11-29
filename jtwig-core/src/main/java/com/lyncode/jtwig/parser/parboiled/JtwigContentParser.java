@@ -26,6 +26,8 @@ import com.lyncode.jtwig.exception.ParseBypassException;
 import com.lyncode.jtwig.exception.ParseException;
 import com.lyncode.jtwig.exception.ResourceException;
 import com.lyncode.jtwig.expressions.model.Constant;
+import com.lyncode.jtwig.expressions.model.FunctionElement;
+import com.lyncode.jtwig.expressions.model.Variable;
 import com.lyncode.jtwig.parser.config.ParserConfiguration;
 import com.lyncode.jtwig.parser.model.JtwigKeyword;
 import com.lyncode.jtwig.parser.model.JtwigSymbol;
@@ -43,7 +45,9 @@ import java.util.Collection;
 
 import static com.lyncode.jtwig.parser.model.JtwigKeyword.*;
 import static com.lyncode.jtwig.parser.model.JtwigSymbol.ATTR;
+import static com.lyncode.jtwig.parser.model.JtwigSymbol.CLOSE_PARENT;
 import static com.lyncode.jtwig.parser.model.JtwigSymbol.COMMA;
+import static com.lyncode.jtwig.parser.model.JtwigSymbol.OPEN_PARENT;
 import static com.lyncode.jtwig.parser.model.JtwigTagProperty.Trim;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.parboiled.Parboiled.createParser;
@@ -161,6 +165,9 @@ public class JtwigContentParser extends JtwigBaseParser<Compilable> {
                                 addToContent(block()),
                                 addToContent(include()),
                                 addToContent(embed()),
+                                addToContent(macro()),
+                                addToContent(importTemplate()),
+                                addToContent(fromImportTemplate()),
 //                                addToContent(filter()),
                                 addToContent(forEach()),
                                 addToContent(ifCondition()),
@@ -175,6 +182,7 @@ public class JtwigContentParser extends JtwigBaseParser<Compilable> {
                                                         keyword(ENDBLOCK),
                                                         keyword(ENDFOR),
                                                         keyword(ENDIF),
+                                                        keyword(ENDMACRO),
                                                         keyword(IF),
                                                         keyword(BLOCK),
                                                         keyword(FOR),
@@ -347,6 +355,110 @@ public class JtwigContentParser extends JtwigBaseParser<Compilable> {
                                 closeCode()
                         ),
                         new ParseException("Wrong embed syntax")
+                )
+        );
+    }
+    
+    Rule macro() {
+        return Sequence(
+                openCode(),
+                keyword(MACRO),
+                mandatory(
+                        Sequence(
+                                expressionParser.identifierAsString(),
+                                push(new Macro(currentPosition(), expressionParser.popIdentifierAsString())),
+                                symbolWithSpacing(OPEN_PARENT),
+                                Optional(
+                                        expressionParser.variable(),
+                                        action(peek(1, Macro.class).add(expressionParser.pop(Variable.class).name())),
+                                        ZeroOrMore(
+                                                symbolWithSpacing(COMMA),
+                                                expressionParser.variable(),
+                                                action((peek(1, Macro.class)).add(expressionParser.pop(Variable.class).name()))
+                                        )
+                                ),
+                                symbolWithSpacing(CLOSE_PARENT),
+                                action(beforeBeginTrim()),
+                                closeCode(),
+                                action(afterBeginTrim()),
+                                content(),
+                                action(peek(1, Macro.class).withContent(pop(Sequence.class))),
+                                openCode(),
+                                action(beforeEndTrim()),
+                                keyword(ENDMACRO),
+                                Optional(
+                                        expressionParser.variable(),
+                                        assertEqual(
+                                                peek(1, Macro.class).name(),
+                                                (String) expressionParser.pop(Variable.class).name()
+                                        )
+                                ),
+                                closeCode(),
+                                action(afterEndTrim())
+                        ),
+                        new ParseException("Wrong macro syntax")
+                )
+        );
+    }
+    
+    Rule importTemplate() {
+        return Sequence(
+                openCode(),
+                keyword(IMPORT),
+                mandatory(
+                        Sequence(
+                                importLocation(),
+                                keyword(AS),
+                                expressionParser.variable(),
+                                push(new Import.General(currentPosition(), expressionParser.pop(1), expressionParser.pop(Variable.class).name())),
+                                closeCode()
+                        ),
+                        new ParseException("Inavlid import syntax")
+                )
+        );
+    }
+    Rule fromImportTemplate() {
+        return Sequence(
+                openCode(),
+                keyword(FROM),
+                importLocation(),
+                push(new Import.From(currentPosition(), expressionParser.pop())),
+                keyword(IMPORT),
+                mandatory(
+                        Sequence(
+                                importDefinition(),
+                                ZeroOrMore(
+                                        symbolWithSpacing(COMMA),
+                                        importDefinition()
+                                ),
+                                closeCode()
+                        ),
+                        new ParseException("Inavlid import syntax")
+                )
+        );
+    }
+    Rule importLocation() {
+        return FirstOf(
+                Sequence(
+                        keyword(SELF),
+                        expressionParser.push(new Import.SelfReference(currentPosition()))
+                ),
+                // Constants are checked for separately to ease some parse-time
+                // checking in the Import class
+                expressionParser.constant(),
+                expressionParser.expression()
+        );
+    }
+    Rule importDefinition() {
+        return Sequence(
+                expressionParser.variable(),
+                FirstOf(
+                        Sequence(
+                                keyword(AS),
+                                expressionParser.variable(),
+                                action(peek(2, Import.From.class).add(expressionParser.pop(1, Variable.class).name(), expressionParser.pop(Variable.class).name()))
+                        ),
+                        action(peek(1, Import.From.class).add(expressionParser.pop(Variable.class).name(), null))
                 )
         );
     }

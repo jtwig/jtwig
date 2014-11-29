@@ -50,4 +50,14 @@ public class WebJtwigResource implements JtwigResource {
     public JtwigResource resolve(String relativePath) throws ResourceException {
         return new WebJtwigResource(servletContext, parentOf(url).append(relativePath).toString());
     }
+
+    @Override
+    public String path() {
+        return url;
+    }
+
+    @Override
+    public String toString() {
+        return url;
+    }
 }

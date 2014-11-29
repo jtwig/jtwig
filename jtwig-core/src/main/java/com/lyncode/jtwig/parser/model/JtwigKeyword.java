@@ -35,7 +35,14 @@ public enum JtwigKeyword {
     ENDBLOCK("endblock"),
 
     EXTENDS("extends"),
+    
+    FROM("from"),
+    SELF("_self"),
     IMPORT("import"),
+    AS("as"),
+    
+    MACRO("macro"),
+    ENDMACRO("endmacro"),
 
     EMBED("embed"),
     ENDEMBED("endembed"),

@@ -15,8 +15,10 @@
 package com.lyncode.jtwig.expressions.model;
 
 import com.lyncode.jtwig.compile.CompileContext;
+import com.lyncode.jtwig.content.model.compilable.Macro;
 import com.lyncode.jtwig.exception.CalculateException;
 import com.lyncode.jtwig.exception.CompileException;
+import com.lyncode.jtwig.exception.RenderException;
 import com.lyncode.jtwig.expressions.api.CompilableExpression;
 import com.lyncode.jtwig.expressions.api.Expression;
 import com.lyncode.jtwig.functions.exceptions.FunctionException;
@@ -30,6 +32,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static com.lyncode.jtwig.functions.parameters.input.InputParameters.parameters;
+import java.io.IOException;
 
 public class FunctionElement extends AbstractCompilableExpression {
     private String name;
@@ -76,12 +79,16 @@ public class FunctionElement extends AbstractCompilableExpression {
         @Override
         public Object calculate(RenderContext context) throws CalculateException {
             try {
+                if (context.map(name) instanceof Macro.Compiled) {
+                    return ((Macro.Compiled)context.map(name)).execute(context, calculateArguments(context));
+                }
+                
                 try {
                     return context.executeFunction(name, parameters(calculateArguments(context)));
                 } catch (FunctionNotFoundException e) {
                     throw new CalculateException(position + ": " + e.getMessage(), e);
                 }
-            } catch (FunctionException e) {
+            } catch (FunctionException | IOException | RenderException e) {
                 throw new CalculateException(e);
             }
         }

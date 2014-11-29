@@ -17,6 +17,7 @@ package com.lyncode.jtwig.compile;
 import com.lyncode.jtwig.compile.config.CompileConfiguration;
 import com.lyncode.jtwig.content.api.Compilable;
 import com.lyncode.jtwig.content.api.Renderable;
+import com.lyncode.jtwig.content.model.compilable.Macro;
 import com.lyncode.jtwig.content.model.compilable.Sequence;
 import com.lyncode.jtwig.content.model.renderable.Replacement;
 import com.lyncode.jtwig.exception.ParseException;
@@ -33,6 +34,7 @@ public class CompileContext {
     private final CompileConfiguration configuration;
     private Sequence parent;
     private Map<String, Renderable> replacements = new HashMap<>();
+    private Map<JtwigResource, Map<String, Macro.Compiled>> macros = new HashMap<>();
 
     public CompileContext(JtwigResource resource, JtwigParser parser, CompileConfiguration configuration) {
         this.resource = resource;
@@ -76,6 +78,25 @@ public class CompileContext {
     public Renderable replacement(String name) {
         return replacements.get(name);
     }
+    
+    public CompileContext withMacro(JtwigResource resource, String name, Macro.Compiled macro) {
+        if (!macros.containsKey(resource)) {
+            macros.put(resource, new HashMap<String, Macro.Compiled>());
+        }
+        macros.get(resource).put(name, macro);
+        return this;
+    }
+    
+    public Map<JtwigResource, Map<String, Macro.Compiled>> macros() {
+        return macros;
+    }
+    
+    public Map<String, Macro.Compiled> macros(JtwigResource resource) {
+        if (macros.containsKey(resource)) {
+            return macros.get(resource);
+        }
+        return null;
+    }
 
     public JtwigResource retrieve(String relativePath) throws ResourceException {
         return resource.resolve(relativePath);
@@ -90,6 +111,7 @@ public class CompileContext {
         compileContext
                 .withParent(parent)
                 .withReplacement(replacements);
+        compileContext.macros = this.macros;
         return compileContext;
     }
 
