@@ -17,6 +17,7 @@ package com.lyncode.jtwig.expressions.model;
 public enum Operator {
     SELECTION("."),
     COMPOSITION("|"),
+    CONCATENATION("~"),
 
     ADD("+"),
     SUB("-"),
