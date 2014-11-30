@@ -24,8 +24,6 @@ import org.jtwig.exception.ParseException;
 import org.jtwig.render.RenderContext;
 import org.jtwig.resource.JtwigResource;
 import org.jtwig.types.Undefined;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.ui.context.Theme;
@@ -36,18 +34,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
 import static org.springframework.web.servlet.support.RequestContextUtils.getTheme;
 
 public class JtwigView extends AbstractTemplateView {
-
-    private static Logger log = LoggerFactory.getLogger(JtwigView.class);
-
-    private Map<String, Renderable> compiledTemplates = new HashMap<>();
-
+    private static final String SPRING_CSRF = "org.springframework.security.web.csrf.CsrfToken";
     protected String getEncoding() {
         return getViewResolver().getEncoding();
     }
@@ -81,16 +74,11 @@ public class JtwigView extends AbstractTemplateView {
                 .add("theme", getThemeName(request))
                 .add("request", request);
 
-        Object token = request.getAttribute("org.springframework.security.web.csrf.CsrfToken");
-        if(token != null){
+        Object token = request.getAttribute(SPRING_CSRF);
+        if (token != null) {
             modelMap.add("csrf", token);
-        }else{
+        } else {
             modelMap.add("csrf", Undefined.UNDEFINED);
-        }
-
-        if (log.isDebugEnabled()) {
-            log.debug("Rendering Jtwig templates [" + getUrl() + "] in JtwigView '" + getBeanName() + "'");
-            log.debug("Model: " + modelMap);
         }
 
         if (this.getEncoding() != null) {
@@ -111,15 +99,12 @@ public class JtwigView extends AbstractTemplateView {
     }
 
     public Renderable getContent() throws CompileException, ParseException {
-        if (getViewResolver().isCached()) {
-            return getViewResolver().cache().get(getUrl(), new Callable<Renderable>() {
-                @Override
-                public Renderable call() throws Exception {
-                    return getCompiledJtwigTemplate();
-                }
-            });
-        }
-        return getCompiledJtwigTemplate();
+        return getViewResolver().cache().get(getUrl(), new Callable<Renderable>() {
+            @Override
+            public Renderable call() throws Exception {
+                return getCompiledJtwigTemplate();
+            }
+        });
     }
 
     private Renderable getCompiledJtwigTemplate() throws ParseException, CompileException {

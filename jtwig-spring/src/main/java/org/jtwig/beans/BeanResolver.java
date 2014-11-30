@@ -30,7 +30,7 @@ import java.util.Set;
  */
 public class BeanResolver implements Map {
 
-    private ApplicationContext context;
+    private final ApplicationContext context;
 
     public BeanResolver(ApplicationContext context) {
         this.context = context;
@@ -43,7 +43,7 @@ public class BeanResolver implements Map {
 
     @Override
     public boolean isEmpty() {
-        return context.getBeanDefinitionCount() == 0;
+        return size() == 0;
     }
 
     @Override

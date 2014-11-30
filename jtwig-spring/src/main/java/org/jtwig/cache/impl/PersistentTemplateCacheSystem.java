@@ -9,8 +9,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 
 public class PersistentTemplateCacheSystem implements JtwigTemplateCacheSystem {
-    private Cache<String, Renderable> cache = CacheBuilder.<String, Renderable>newBuilder()
-            .build();
+    private final Cache<String, Renderable> cache = CacheBuilder.<String, Renderable>newBuilder().build();
 
     @Override
     public Renderable get(String key, Callable<Renderable> instanceProvider) {

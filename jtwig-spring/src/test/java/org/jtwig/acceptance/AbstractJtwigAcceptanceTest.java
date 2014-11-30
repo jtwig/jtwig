@@ -117,7 +117,6 @@ public abstract class AbstractJtwigAcceptanceTest {
             JtwigViewResolver jtwigViewResolver = new JtwigViewResolver();
             jtwigViewResolver.setPrefix("/WEB-INF/views/");
             jtwigViewResolver.setSuffix(".twig.html");
-            jtwigViewResolver.setCached(false);
             jtwigViewResolver.setThemeResolver(themeResolver());
             jtwigViewResolver.setUseThemeInViewPath(true);
             return jtwigViewResolver;
