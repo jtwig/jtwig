@@ -15,13 +15,25 @@
 package org.jtwig.configuration;
 
 import org.jtwig.compile.config.CompileConfiguration;
+import org.jtwig.functions.repository.api.FunctionRepository;
 import org.jtwig.parser.config.ParserConfiguration;
 import org.jtwig.render.config.RenderConfiguration;
 
 public class JtwigConfiguration {
-    private ParserConfiguration parserConfiguration = new ParserConfiguration();
-    private CompileConfiguration compileConfiguration = new CompileConfiguration();
-    private RenderConfiguration renderConfiguration = new RenderConfiguration();
+    private final ParserConfiguration parserConfiguration;
+    private final CompileConfiguration compileConfiguration;
+    private final RenderConfiguration renderConfiguration;
+
+    public JtwigConfiguration() {
+        parserConfiguration = new ParserConfiguration();
+        compileConfiguration = new CompileConfiguration();
+        renderConfiguration = new RenderConfiguration();
+    }
+    public JtwigConfiguration(FunctionRepository functionRepository) {
+        parserConfiguration = new ParserConfiguration();
+        compileConfiguration = new CompileConfiguration();
+        renderConfiguration = new RenderConfiguration(functionRepository);
+    }
 
     public RenderConfiguration render() { return renderConfiguration; }
     public CompileConfiguration compile () { return compileConfiguration; }

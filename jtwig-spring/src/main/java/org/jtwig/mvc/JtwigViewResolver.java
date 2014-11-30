@@ -45,7 +45,6 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
 
     private ThemeResolver themeResolver;
     private String encoding;
-    private boolean cached = true;
     private boolean useThemeInViewPath = false;
 
     private JtwigResourceResolver loader;
@@ -78,12 +77,6 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
         return abstractUrlBasedView;
     }
 
-    @Deprecated // Remove in 4.0.0
-    public JtwigViewResolver setCached(boolean cached) {
-        this.cached = cached;
-        return this;
-    }
-
     public JtwigViewResolver setThemeResolver(ThemeResolver themeResolver) {
         this.themeResolver = themeResolver;
         return this;
@@ -91,28 +84,6 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
 
     public JtwigViewResolver setUseThemeInViewPath(boolean useThemeInViewPath) {
         this.useThemeInViewPath = useThemeInViewPath;
-        return this;
-    }
-
-    /**
-     * Do not use. Use JtwigConfiguration.render().renderThreadingConfig().maxThreads()
-     * @param value
-     * @return
-     */
-    @Deprecated
-    public JtwigViewResolver setConcurrentMaxThreads(int value) {
-        configuration.render().renderThreadingConfig().maxThreads(value);
-        return this;
-    }
-
-    /**
-     * Do not use. Use JtwigConfiguration.render().renderThreadingConfig().minThreads()
-     * @param value
-     * @return
-     */
-    @Deprecated
-    public JtwigViewResolver setConcurrentMinThreads(int value) {
-        configuration.render().renderThreadingConfig().minThreads(value);
         return this;
     }
 
@@ -173,10 +144,6 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
 
     String getEncoding() {
         return encoding;
-    }
-
-    boolean isCached() {
-        return cached;
     }
 
     JtwigTemplateCacheSystem cache() {

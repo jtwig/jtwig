@@ -26,11 +26,6 @@ import java.util.Map;
 public class ObjectSnapshot {
     private static Logger LOG = LoggerFactory.getLogger(ObjectSnapshot.class);
 
-    public static <T> T snapshot (T object) {
-        Class<T> objectClass = (Class<T>) object.getClass();
-        return snapshot(object, objectClass);
-    }
-
     public static <T> T snapshot(T object, Class<T> objectClass) {
         return objectClass.cast(Proxy.newProxyInstance(objectClass.getClassLoader(), new Class[]{
                 objectClass
@@ -38,11 +33,9 @@ public class ObjectSnapshot {
     }
 
     private static class SnapshotInvocationHandler extends AbstractInvocationHandler {
-        private final Object object;
         private final Map<String, Object> snapshotMap = new HashMap<>();
 
         private SnapshotInvocationHandler(Object object) {
-            this.object = object;
             for (Method method : object.getClass().getMethods()) {
                 if (Void.TYPE != method.getReturnType()) {
                     if (method.getParameterTypes().length == 0) {
@@ -62,7 +55,7 @@ public class ObjectSnapshot {
                 if (args.length == 0) {
                     Object result = snapshotMap.get(method.getName());
                     if (result instanceof StoreException)
-                        throw ((StoreException) result).e;
+                        throw ((StoreException) result).exception;
                     return result;
                 }
                 else LOG.debug("Unable to create a snapshot of a method with arguments");
@@ -72,11 +65,11 @@ public class ObjectSnapshot {
     }
 
     private static class StoreException {
-        private final Throwable e;
+        private final Throwable exception;
 
 
-        private StoreException(Throwable e) {
-            this.e = e;
+        private StoreException(Throwable exception) {
+            this.exception = exception;
         }
     }
 }

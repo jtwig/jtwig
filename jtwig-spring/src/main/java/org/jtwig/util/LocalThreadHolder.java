@@ -14,21 +14,13 @@
 
 package org.jtwig.util;
 
-import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-import org.springframework.web.servlet.support.RequestContextUtils;
 
 import javax.servlet.http.HttpServletRequest;
 
 public class LocalThreadHolder {
-    public static ApplicationContext getApplicationContext () {
-        HttpServletRequest servletRequest = getServletRequest();
-        if (servletRequest == null) return null;
-        return RequestContextUtils.getWebApplicationContext(servletRequest);
-    }
-
     public static HttpServletRequest getServletRequest () {
         RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
         if (requestAttributes instanceof ServletRequestAttributes)

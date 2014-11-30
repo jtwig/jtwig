@@ -34,7 +34,6 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <lyncode.builder.commons.version>1.0.2</lyncode.builder.commons.version>
 
         <spring.version>3.2.5.RELEASE</spring.version>
         <spring-security.version>3.2.0.RELEASE</spring-security.version>

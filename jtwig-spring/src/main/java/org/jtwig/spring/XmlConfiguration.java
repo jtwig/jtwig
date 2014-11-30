@@ -3,11 +3,17 @@ package org.jtwig.spring;
 import com.google.common.base.Function;
 import org.jtwig.addons.Addon;
 import org.jtwig.configuration.JtwigConfiguration;
+import org.jtwig.functions.repository.api.FunctionRepository;
 import org.jtwig.parser.config.TagSymbols;
 
 import java.nio.charset.Charset;
 
 public class XmlConfiguration extends JtwigConfiguration {
+    public XmlConfiguration() {}
+    public XmlConfiguration (FunctionRepository functionRepository) {
+        super(functionRepository);
+    }
+
     public void setRenderStrictMode (boolean activate) {
         render().strictMode(activate);
     }

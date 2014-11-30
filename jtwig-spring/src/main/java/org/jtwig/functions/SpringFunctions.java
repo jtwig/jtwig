@@ -19,7 +19,7 @@ import org.jtwig.functions.annotations.JtwigFunction;
 import org.jtwig.functions.annotations.Parameter;
 import org.jtwig.functions.exceptions.FunctionException;
 import org.jtwig.services.api.assets.AssetResolver;
-import org.jtwig.util.FilePath;
+import org.jtwig.util.UrlPath;
 import org.jtwig.util.render.RenderHttpServletRequest;
 import org.jtwig.util.render.RenderHttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,12 +53,17 @@ public class SpringFunctions {
     public String asset(HttpServletRequest request, @Parameter String input) throws AssetResolveException, FunctionException {
         if (assetResolver == null)
             throw new FunctionException("In order to use the asset function, a bean of type " + AssetResolver.class.getName() + " must be configured");
-        return new FilePath(request.getContextPath(), assetResolver.resolve(input)).toString();
+        return new UrlPath().append(request.getContextPath()).append(assetResolver.resolve(input)).toString();
     }
 
     @JtwigFunction(name = "path")
     public String path(HttpServletRequest request, @Parameter String input) {
-        return new FilePath(request.getContextPath(), input).toString();
+        return new UrlPath().append(request.getContextPath()).append(input).toString();
+    }
+
+    @JtwigFunction(name = "path")
+    public String path(HttpServletRequest request) {
+        return new UrlPath().append(request.getContextPath()).toString();
     }
 
     @JtwigFunction(name = "translate", aliases = {"message", "trans"})

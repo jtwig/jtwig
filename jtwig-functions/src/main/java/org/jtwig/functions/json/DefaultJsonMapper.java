@@ -27,6 +27,8 @@ public class DefaultJsonMapper implements Function<Object, String> {
                 return;
             }
         }
+
+        // hard to test this branch
         implementation = new Function<Object, String>() {
             @Nullable
             @Override

@@ -16,6 +16,7 @@ package org.jtwig.render.config;
 
 import com.google.common.base.Function;
 import org.jtwig.functions.config.JsonConfiguration;
+import org.jtwig.functions.repository.api.FunctionRepository;
 import org.jtwig.functions.repository.impl.MapFunctionRepository;
 
 import java.nio.charset.Charset;
@@ -26,13 +27,19 @@ public class RenderConfiguration {
     private boolean logNonStrictMode = true;
     private Charset charset = Charset.forName("UTF-8");
     private final JsonConfiguration jsonConfiguration;
-    private final MapFunctionRepository functionRepository;
+    private final FunctionRepository functionRepository;
     private final RenderThreadingConfig mRenderThreadingConfig;
+
+    public RenderConfiguration(FunctionRepository functionRepository) {
+        this.functionRepository = functionRepository;
+        this.jsonConfiguration = new JsonConfiguration();
+        this.mRenderThreadingConfig = new RenderThreadingConfig();
+    }
 
     public RenderConfiguration() {
         this.jsonConfiguration = new JsonConfiguration();
-        this.functionRepository = new MapFunctionRepository(jsonConfiguration);
         this.mRenderThreadingConfig = new RenderThreadingConfig();
+        this.functionRepository = new MapFunctionRepository(jsonConfiguration);
     }
 
     public boolean strictMode() {
@@ -62,7 +69,7 @@ public class RenderConfiguration {
         return this;
     }
 
-    public MapFunctionRepository functionRepository() {
+    public FunctionRepository functionRepository() {
         return functionRepository;
     }
 
@@ -73,5 +80,9 @@ public class RenderConfiguration {
     public RenderConfiguration jsonMapper(Function<Object, String> mapper) {
         this.jsonConfiguration.jsonMapper(mapper);
         return this;
+    }
+
+    public JsonConfiguration jsonConfiguration () {
+        return jsonConfiguration;
     }
 }
