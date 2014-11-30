@@ -27,15 +27,14 @@
     </licenses>
 
     <scm>
-        <connection>scm:git:git@github.com:lyncode/jtwig.git</connection>
-        <developerConnection>scm:git:git@github.com:lyncode/jtwig.git</developerConnection>
-        <url>git@github.com:lyncode/jtwig.git</url>
+        <connection>scm:git:git@github.com:jtwig/jtwig.git</connection>
+        <developerConnection>scm:git:git@github.com:jtwig/jtwig.git</developerConnection>
+        <url>git@github.com:jtwig/jtwig.git</url>
         <tag>HEAD</tag>
     </scm>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <lyncode.builder.commons.version>1.0.2</lyncode.builder.commons.version>
 
         <spring.version>3.2.5.RELEASE</spring.version>
         <spring-security.version>3.2.0.RELEASE</spring-security.version>
@@ -299,13 +298,4 @@
             </build>
         </profile>
     </profiles>
-
-    <developers>
-        <developer>
-            <name>DSpace @ Lyncode</name>
-            <email>dspace@lyncode.com</email>
-            <organization>Lyncode</organization>
-            <organizationUrl>http://www.lyncode.com</organizationUrl>
-        </developer>
-    </developers>
 </project>
