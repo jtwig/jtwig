@@ -3,17 +3,6 @@ language: java
 env:
    global:
         - secure: "JI6RwImFT05GUsoBY4D1PWZPkmdsZ34xkWVVm2HMmZpvURUmeHpUyVZw1o5bZE2UpfVPCIj9/z94Zo6o+lhXO0KY2qDr1KOFZUuJWU/B74zUL+bRUqb0A2XK3h4u+a/eeESL74gCsHtzaiMIZ6v6UEyNu8jywSs3B+PiKetrbfU="
-        - secure: "MzTquHmCRU0gVRo1IdigsfJy95tVslsw7CU2/MpCBCcpPGPmZOL2Cu8tFpH+DfHPniEd0hkaGQts9aDCf04fdeG8w5gxN80317i0obFYW7Isynw6djrd0M9I52fNdtdgwTbpYbnoenKCizjCnDdE0wquS8acQ+QPH2O3EHcZG9A="
-
-addons:
-  coverity_scan:
-    project:
-      name: "jtwig/jtwig"
-      description: "Build submitted via Travis CI"
-    notification_email: jmelo@lyncode.com
-    build_command_prepend: "mvn clean"
-    build_command:   "mvn -DskipTests=true compile"
-    branch_pattern: master
 
 after_success:
   - mvn compile -Pmerge-reports -N
