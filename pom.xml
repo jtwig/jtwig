@@ -8,8 +8,8 @@
         <version>7</version>
     </parent>
 
-    <groupId>com.lyncode</groupId>
-    <artifactId>jtwig</artifactId>
+    <groupId>org.jtwig</groupId>
+    <artifactId>jtwig-parent</artifactId>
     <version>4.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
@@ -27,10 +27,9 @@
     </licenses>
 
     <scm>
-        <connection>scm:git:git@github.com:jtwig/jtwig.git</connection>
-        <developerConnection>scm:git:git@github.com:jtwig/jtwig.git</developerConnection>
-        <url>git@github.com:jtwig/jtwig.git</url>
-        <tag>HEAD</tag>
+        <connection>scm:git:git@github.org/jtwig.git</connection>
+        <developerConnection>scm:git:git@github.org/jtwig.git</developerConnection>
+        <url>git@github.org/jtwig.git</url>
     </scm>
 
     <properties>
