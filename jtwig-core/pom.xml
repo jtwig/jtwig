@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <groupId>com.lyncode</groupId>
-        <artifactId>jtwig</artifactId>
+        <groupId>org.jtwig</groupId>
+        <artifactId>jtwig-parent</artifactId>
         <version>4.0.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -13,17 +13,16 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.lyncode</groupId>
+            <groupId>org.jtwig</groupId>
             <artifactId>jtwig-functions</artifactId>
             <version>${project.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>com.lyncode</groupId>
-            <artifactId>builder-commons</artifactId>
-            <version>${lyncode.builder.commons.version}</version>
+            <groupId>org.parboiled</groupId>
+            <artifactId>parboiled-core</artifactId>
+            <version>${parboiled.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.parboiled</groupId>
             <artifactId>parboiled-java</artifactId>
@@ -102,9 +101,9 @@
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <configuration>
                     <excludes>
-                        <exclude>com/lyncode/jtwig/parser/parboiled/**</exclude>
-                        <exclude>com/lyncode/jtwig/addons/AddonParser*</exclude>
-                        <exclude>com/lyncode/jtwig/addons/**/*Parser*</exclude>
+                        <exclude>org/jtwig/parser/parboiled/**</exclude>
+                        <exclude>org/jtwig/addons/AddonParser*</exclude>
+                        <exclude>org/jtwig/addons/**/*Parser*</exclude>
                     </excludes>
                 </configuration>
             </plugin>
