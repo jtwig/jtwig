@@ -8,7 +8,11 @@
 ### Project Information
 
 **Website**: http://jtwig.org
+
 **News**: [@jtwigTemplates](https://twitter.com/jtwigTemplates)
+
 **Versioning**:  [Semantic Versioning](http://semver.org/)
+
 **Changes**: [CHANGELOG.md](CHANGELOG.md)
+
 **License**: [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0)
