@@ -54,19 +54,19 @@ public class JtwigBasicParser extends BaseParser<String> {
         return String(parserConfiguration.symbols().beginTag());
     }
 
-    public Rule openOutput () {
+    public Rule openOutput() {
         return String(parserConfiguration.symbols().beginOutput());
     }
 
-    public Rule closeOutput () {
+    public Rule closeOutput() {
         return String(parserConfiguration.symbols().endOutput());
     }
 
-    public Rule openComment () {
+    public Rule openComment() {
         return String(parserConfiguration.symbols().beginComment());
     }
 
-    public Rule closeComment () {
+    public Rule closeComment() {
         return String(parserConfiguration.symbols().endComment());
     }
 
@@ -134,6 +134,8 @@ public class JtwigBasicParser extends BaseParser<String> {
         return FirstOf(CharRange('a', 'z'), CharRange('A', 'Z'), CharRange('0', '9'), '_', '$');
     }
 
+    StringBuilder stringBuilder;
+
     /**
      * Pushes the String (without quotes)
      *
@@ -143,25 +145,53 @@ public class JtwigBasicParser extends BaseParser<String> {
         return FirstOf(
                 Sequence(
                         '"',
+                        startBuilder(),
                         ZeroOrMore(
                                 FirstOf(
-                                        escape(),
-                                        Sequence(TestNot(AnyOf("\r\n\"\\")), ANY)
+                                        escape("\""),
+                                        Sequence(
+                                                Sequence(TestNot(AnyOf("\r\n\"\\")), ANY),
+                                                append(match())
+                                        )
                                 )
                         ).suppressSubnodes(),
-                        push(match()),
+                        push(stringBuilder.toString()),
                         '"'
                 ),
                 Sequence(
                         "'",
+                        startBuilder(),
                         ZeroOrMore(
                                 FirstOf(
-                                        escape(),
-                                        Sequence(TestNot(AnyOf("\r\n'\\")), ANY)
+                                        escape("'"),
+                                        Sequence(
+                                                Sequence(TestNot(AnyOf("\r\n'\\")), ANY),
+                                                append(match())
+                                        )
                                 )
                         ).suppressSubnodes(),
-                        push(match()),
+                        push(stringBuilder.toString()),
                         "'"
+                )
+        );
+    }
+
+    boolean startBuilder() {
+        stringBuilder = new StringBuilder();
+        return true;
+    }
+
+    boolean append(String text) {
+        stringBuilder.append(text);
+        return true;
+    }
+
+    Rule escape(String value) {
+        return FirstOf(
+                Sequence(toRule('\\'), value, append(match())),
+                Sequence(
+                        Sequence('\\', FirstOf(AnyOf("btnfr\"\'\\"), octalEscape(), unicodeEscape())),
+                        append(match())
                 )
         );
     }
