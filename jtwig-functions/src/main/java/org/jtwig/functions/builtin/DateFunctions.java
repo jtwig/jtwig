@@ -17,10 +17,11 @@ package org.jtwig.functions.builtin;
 import org.jtwig.functions.annotations.JtwigFunction;
 import org.jtwig.functions.annotations.Parameter;
 import org.jtwig.functions.exceptions.FunctionException;
+import org.joda.time.LocalDateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.regex.Matcher;
 
@@ -30,13 +31,22 @@ public class DateFunctions {
     private static final String MODIFY_PATTERN = "^([\\\\+\\\\-])([0-9]+) ([a-zA-Z]+)$";
 
     @JtwigFunction(name = "date_modify")
-    public Date modifyDate (@Parameter Date input, @Parameter String modifyString) throws FunctionException {
+    public Date modifyDate(@Parameter Date input, @Parameter String modifyString) throws FunctionException {
+        return modify(modifyString, LocalDateTime.fromDateFields(input));
+    }
 
-        Calendar instance = Calendar.getInstance();
-        instance.setTime(input);
+    @JtwigFunction(name = "date_modify")
+    public Date modifyDate(@Parameter String input, @Parameter String modifyString) throws FunctionException {
+        return modify(modifyString, LocalDateTime.parse(input));
+    }
+
+    private Date modify(String modifyString, LocalDateTime localDateTime) throws FunctionException {
+
+        LocalDateTime result;
 
         Matcher matcher = compile(MODIFY_PATTERN).matcher(modifyString);
         matcher.find();
+
         int signal = 1;
 
         if (matcher.group(1).equals("-"))
@@ -46,31 +56,41 @@ public class DateFunctions {
         String type = matcher.group(3).toLowerCase();
 
         if (type.startsWith("day"))
-            instance.add(Calendar.DAY_OF_YEAR, val);
+            result = localDateTime.plusDays(val);
         else if (type.startsWith("month"))
-            instance.add(Calendar.MONTH, val);
+            result = localDateTime.plusMonths(val);
         else if (type.startsWith("year"))
-            instance.add(Calendar.YEAR, val);
+            result = localDateTime.plusYears(val);
         else if (type.startsWith("second"))
-            instance.add(Calendar.SECOND, val);
+            result = localDateTime.plusSeconds(val);
         else if (type.startsWith("hour"))
-            instance.add(Calendar.HOUR, val);
+            result = localDateTime.plusHours(val);
         else if (type.startsWith("minute"))
-            instance.add(Calendar.MINUTE, val);
+            result = localDateTime.plusMinutes(val);
         else
-            throw new FunctionException("Unknown type "+matcher.group(3));
+            throw new FunctionException("Unknown type " + matcher.group(3));
 
-        return instance.getTime();
+        return result.toDate();
     }
 
     @JtwigFunction(name = "date")
-    public String format (@Parameter Date input, @Parameter String format) {
-        DateFormat dateFormat = new SimpleDateFormat(format);
-        return dateFormat.format(input);
+    public String format(@Parameter Date input, @Parameter String format) {
+        DateTimeFormatter formatter = DateTimeFormat.forPattern(format);
+        return LocalDateTime.fromDateFields(input).toString(formatter);
     }
 
     @JtwigFunction(name = "date")
-    public String format (@Parameter Date input) {
-        return format(input, "yyyy-MM-dd HH:mm:ss");
+    public String format(@Parameter Date input) {
+        return LocalDateTime.fromDateFields(input).toString(ISODateTimeFormat.dateHourMinuteSecond());
+    }
+
+    @JtwigFunction(name = "date")
+    public String format(@Parameter String input) {
+        return format(LocalDateTime.parse(input).toDate());
+    }
+
+    @JtwigFunction(name = "date")
+    public String format(@Parameter String input, @Parameter String format) {
+        return format(LocalDateTime.parse(input).toDate(), format);
     }
 }
