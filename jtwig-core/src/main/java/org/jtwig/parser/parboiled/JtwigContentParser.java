@@ -305,9 +305,12 @@ public class JtwigContentParser extends JtwigBaseParser<Compilable> {
                 keyword(INCLUDE),
                 mandatory(
                         Sequence(
-                                basicParser.stringLiteral(),
+                                FirstOf(
+                                        expressionParser.constant(),
+                                        expressionParser.expression()
+                                ),
                                 basicParser.spacing(),
-                                push(new Include(currentPosition(), basicParser.pop())),
+                                push(new Include(currentPosition(), expressionParser.pop())),
                                 action(beforeBeginTrim()),
                                 Optional(
                                         keyword(JtwigKeyword.IGNORE_MISSING),
