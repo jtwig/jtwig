@@ -15,8 +15,6 @@
 package org.jtwig.unit.content.model;
 
 import org.jtwig.compile.CompileContext;
-import org.jtwig.compile.config.CompileConfiguration;
-import org.jtwig.content.api.Compilable;
 import org.jtwig.content.api.Renderable;
 import org.jtwig.content.model.compilable.Include;
 import org.jtwig.exception.CalculateException;
@@ -25,45 +23,33 @@ import org.jtwig.exception.RenderException;
 import org.jtwig.exception.ResourceException;
 import org.jtwig.expressions.api.CompilableExpression;
 import org.jtwig.expressions.api.Expression;
-import org.jtwig.parser.JtwigParser;
 import org.jtwig.render.RenderContext;
-import org.jtwig.resource.JtwigResource;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import org.jtwig.content.model.BasicTemplate;
+import org.jtwig.content.model.Template;
+import org.jtwig.unit.AbstractUnitTest;
 
 import static org.mockito.Mockito.*;
 
-public class IncludeTest {
-    private final RenderContext renderContext = mock(RenderContext.class);
-    private CompileContext context;
-    private JtwigResource jtwigResource;
-    private JtwigParser jtwigParser;
-
+public class IncludeTest extends AbstractUnitTest {
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
-
-    @Before
-    public void setUp () {
-        jtwigResource = mock(JtwigResource.class);
-        jtwigParser = mock(JtwigParser.class);
-        context = spy(new CompileContext(jtwigResource, jtwigParser, mock(CompileConfiguration.class)));
-    }
 
     @Test
     public void includeShouldCompileRelativePathResource() throws Exception {
         Renderable renderable = mock(Renderable.class);
 
         Include include = new Include(null, "test");
-        when(context.retrieve("test")).thenReturn(jtwigResource);
-        when(context.clone()).thenReturn(context);
-        when(context.parse(jtwigResource)).thenReturn(toRender(renderable));
+        when(compileContext.retrieve("test")).thenReturn(resource);
+        when(compileContext.clone()).thenReturn(compileContext);
+        when(compileContext.parse(resource)).thenReturn(toTemplate(renderable));
 
-        include.compile(context).render(renderContext);
+        include.compile(compileContext).render(renderContext);
 
         verify(renderable).render(renderContext);
     }
@@ -77,26 +63,26 @@ public class IncludeTest {
 
         Include include = new Include(null, "test").with(expression);
 
-        when(expression.compile(context)).thenReturn(withExpression);
-        when(context.retrieve("test")).thenReturn(jtwigResource);
-        when(context.clone()).thenReturn(context);
-        when(context.parse(jtwigResource)).thenReturn(toRender(renderable));
+        when(expression.compile(compileContext)).thenReturn(withExpression);
+        when(compileContext.retrieve("test")).thenReturn(resource);
+        when(compileContext.clone()).thenReturn(compileContext);
+        when(compileContext.parse(resource)).thenReturn(toTemplate(renderable));
         when(withExpression.calculate(any(RenderContext.class))).thenThrow(CalculateException.class);
 
         doThrow(IOException.class)
                 .when(renderContext)
                 .write(any(byte[].class));
 
-        include.compile(context)
+        include.compile(compileContext)
                 .render(renderContext);
     }
 
     @Test(expected = CompileException.class)
     public void compileWhenResourceException() throws Exception {
         Include include = new Include(null, "test");
-        when(context.retrieve("test")).thenThrow(ResourceException.class);
+        when(compileContext.retrieve("test")).thenThrow(ResourceException.class);
 
-        include.compile(context);
+        include.compile(compileContext);
     }
 
     @Test
@@ -107,10 +93,10 @@ public class IncludeTest {
 
         Include include = new Include(null, "test").with(expression);
 
-        when(expression.compile(context)).thenReturn(withExpression);
-        when(context.retrieve("test")).thenReturn(jtwigResource);
-        when(context.clone()).thenReturn(context);
-        when(context.parse(jtwigResource)).thenReturn(toRender(renderable));
+        when(expression.compile(compileContext)).thenReturn(withExpression);
+        when(compileContext.retrieve("test")).thenReturn(resource);
+        when(compileContext.clone()).thenReturn(compileContext);
+        when(compileContext.parse(resource)).thenReturn(toTemplate(renderable));
         when(withExpression.calculate(any(RenderContext.class))).thenReturn(new ArrayList<>());
 
         doThrow(IOException.class)
@@ -120,15 +106,20 @@ public class IncludeTest {
         expectedException.expect(RenderException.class);
         expectedException.expectMessage(endsWith("Include 'with' must be given a map."));
 
-        include.compile(context)
+        include.compile(compileContext)
                 .render(renderContext);
     }
 
-    private Compilable toRender(final Renderable elementRender) {
-        return new Compilable() {
+    private Template toTemplate(final Renderable elementRender) {
+        return new BasicTemplate(null) {
+            private CompiledBasicTemplate compiled;
             @Override
-            public Renderable compile(CompileContext context) throws CompileException {
-                return elementRender;
+            public CompiledBasicTemplate compile(CompileContext context) throws CompileException {
+                return compiled = new CompiledBasicTemplate(null, null, null, elementRender);
+            }
+            @Override
+            public Template.CompiledTemplate getCachedCompiledTemplate() {
+                return compiled;
             }
         };
     }

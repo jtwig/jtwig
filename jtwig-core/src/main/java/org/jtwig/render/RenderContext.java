@@ -42,6 +42,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Stack;
+import org.jtwig.content.model.Template;
 
 import static org.jtwig.types.Undefined.UNDEFINED;
 
@@ -70,12 +72,27 @@ public class RenderContext {
     private final JtwigModelMap modelMap;
 
     private final RenderStream renderStream;
+    
+    private Stack<Template.CompiledTemplate> renderingTemplateStack = new Stack<>();
 
-    private RenderContext(RenderConfiguration configuration, JtwigModelMap modelMap, FunctionResolver functionResolver, RenderStream renderStream) {
+    private RenderContext(
+            RenderConfiguration configuration,
+            JtwigModelMap modelMap,
+            FunctionResolver functionResolver,
+            RenderStream renderStream) {
         this.configuration = configuration;
         this.modelMap = modelMap;
         this.renderStream = renderStream;
         this.functionResolver = functionResolver;
+    }
+    private RenderContext(
+            RenderConfiguration configuration,
+            JtwigModelMap modelMap,
+            FunctionResolver functionResolver,
+            RenderStream renderStream,
+            Stack<Template.CompiledTemplate> renderingTemplateStack) {
+        this(configuration, modelMap, functionResolver, renderStream);
+        this.renderingTemplateStack = renderingTemplateStack;
     }
 
     public void write(byte[] bytes) throws IOException {
@@ -87,11 +104,28 @@ public class RenderContext {
     }
 
     public RenderContext newRenderContext(OutputStream outputStream) {
-        return new RenderContext(configuration, modelMap, functionResolver, new RenderStream(outputStream, configuration.renderThreadingConfig()));
+        return new RenderContext(configuration, modelMap, functionResolver,
+                new RenderStream(outputStream,
+                        configuration.renderThreadingConfig()),
+                renderingTemplateStack);
     }
 
     public RenderConfiguration configuration() {
         return configuration;
+    }
+    
+    public Template.CompiledTemplate getRenderingTemplate() {
+        return renderingTemplateStack.peek();
+    }
+    
+    public RenderContext pushRenderingTemplate(final Template.CompiledTemplate renderingTemplate) {
+        this.renderingTemplateStack.push(renderingTemplate);
+        return this;
+    }
+    
+    public RenderContext popRenderingTemplate() {
+        this.renderingTemplateStack.pop();
+        return this;
     }
 
     public void renderConcurrent(Renderable content) throws IOException, RenderException {
@@ -99,11 +133,13 @@ public class RenderContext {
     }
 
     private RenderContext fork() throws IOException {
-        return new RenderContext(configuration, modelMap, functionResolver, renderStream.fork());
+        return new RenderContext(configuration, modelMap, functionResolver,
+                renderStream.fork(), renderingTemplateStack);
     }
 
     public RenderContext isolatedModel() {
-        return new RenderContext(configuration, modelMap.clone(), functionResolver, renderStream);
+        return new RenderContext(configuration, modelMap.clone(),
+                functionResolver, renderStream, renderingTemplateStack);
     }
 
     public RenderContext with(Map calculate) {

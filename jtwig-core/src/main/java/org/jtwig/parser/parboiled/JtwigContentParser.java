@@ -43,6 +43,9 @@ import java.nio.charset.Charset;
 import java.util.Collection;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
+import org.jtwig.content.model.BasicTemplate;
+import org.jtwig.content.model.ExtendsTemplate;
+import org.jtwig.content.model.Template;
 import static org.jtwig.parser.model.JtwigKeyword.*;
 import static org.jtwig.parser.model.JtwigSymbol.*;
 import static org.jtwig.parser.model.JtwigTagProperty.Trim;
@@ -56,12 +59,12 @@ public class JtwigContentParser extends JtwigBaseParser<Compilable> {
         return createParser(JtwigContentParser.class, resource, configuration);
     }
 
-    public static Compilable parse(JtwigContentParser parser, JtwigResource input) throws ParseException {
+    public static Template parse(JtwigContentParser parser, JtwigResource input) throws ParseException {
         try {
             ReportingParseRunner<Compilable> runner = new ReportingParseRunner<>(parser.start());
             ParsingResult<Compilable> result = runner.run(
                     FileUtils.readAllText(input.retrieve(), Charset.defaultCharset()));
-            return result.resultValue;
+            return (Template)result.resultValue;
         } catch (ParserRuntimeException e) {
             if (e.getCause() instanceof ParseBypassException) {
                 ParseException innerException = ((ParseBypassException) e.getCause()).getInnerException();
@@ -127,14 +130,18 @@ public class JtwigContentParser extends JtwigBaseParser<Compilable> {
                         mandatory(
                                 Sequence(
                                         expressionParser.expression(),
-                                        push(new Extends(expressionParser.pop())),
+                                        push(new ExtendsTemplate(currentPosition(), expressionParser.pop())),
                                         basicParser.spacing(),
                                         basicParser.closeCode(),
                                         
                                         ZeroOrMore(
                                                 basicParser.spacing(),
-                                                block(),
-                                                action(peek(1, Extends.class).add(pop(Block.class)))
+                                                FirstOf(
+                                                        addToCurrentTemplate(block(), true),
+                                                        addToCurrentTemplate(comment(), true),
+                                                        addToCurrentTemplate(macro(), true),
+                                                        addToCurrentTemplate(set(), true)
+                                                )
                                         ),
                                         basicParser.spacing(),
                                         EOI
@@ -147,7 +154,9 @@ public class JtwigContentParser extends JtwigBaseParser<Compilable> {
 
     Rule normalTemplate() {
         return Sequence(
+                push(new BasicTemplate(currentPosition())),
                 content(),
+                action(peek(1, Template.class).add(pop(Sequence.class))),
                 EOI
         );
     }
@@ -158,10 +167,10 @@ public class JtwigContentParser extends JtwigBaseParser<Compilable> {
                 ZeroOrMore(
                         FirstOf(
                                 addToContent(output()),
-                                addToContent(block()),
+                                addToContent(addToCurrentTemplate(block())),
                                 addToContent(include()),
                                 addToContent(embed()),
-                                addToContent(macro()),
+                                addToCurrentTemplate(macro(), true),
                                 addToContent(importTemplate()),
                                 addToContent(fromImportTemplate()),
 //                                addToContent(filter()),
@@ -259,6 +268,15 @@ public class JtwigContentParser extends JtwigBaseParser<Compilable> {
                 action(peek(1, Sequence.class).add(pop()))
         );
     }
+    Rule addToCurrentTemplate(Rule innerRule) {
+        return addToCurrentTemplate(innerRule, false);
+    }
+    Rule addToCurrentTemplate(Rule innerRule, boolean pop) {
+        return Sequence(
+                innerRule,
+                action(currentTemplate().track(pop ? pop() : peek()))
+        );
+    }
 
     Rule block() {
         return Sequence(
@@ -267,7 +285,7 @@ public class JtwigContentParser extends JtwigBaseParser<Compilable> {
                 mandatory(
                         Sequence(
                                 expressionParser.identifierAsString(),
-                                push(new Block(expressionParser.popIdentifierAsString())),
+                                push(new Block(currentPosition(), expressionParser.popIdentifierAsString())),
                                 action(beforeBeginTrim()),
                                 closeCode(),
                                 action(afterBeginTrim()),
@@ -339,11 +357,10 @@ public class JtwigContentParser extends JtwigBaseParser<Compilable> {
                                 basicParser.stringLiteral(),
                                 basicParser.spacing(),
                                 closeCode(),
-                                push(new Extends(basicParser.pop())),
+                                push(new ExtendsTemplate(currentPosition(), new Constant<>(basicParser.pop()))),
                                 ZeroOrMore(
                                         basicParser.spacing(),
-                                        block(),
-                                        action(peek(1, Extends.class).add(pop(Block.class)))
+                                        addToCurrentTemplate(block(), true)
                                 ),
                                 basicParser.spacing(),
                                 openCode(),
@@ -767,6 +784,5 @@ public class JtwigContentParser extends JtwigBaseParser<Compilable> {
     WhiteSpaceControl beforeBeginTrim() {
         return beforeBeginTrim(0);
     }
-
 
 }

@@ -15,26 +15,19 @@
 package org.jtwig.compile;
 
 import org.jtwig.compile.config.CompileConfiguration;
-import org.jtwig.content.api.Compilable;
-import org.jtwig.content.api.Renderable;
-import org.jtwig.content.model.compilable.Macro;
 import org.jtwig.content.model.compilable.Sequence;
-import org.jtwig.content.model.renderable.Replacement;
 import org.jtwig.exception.ParseException;
 import org.jtwig.exception.ResourceException;
 import org.jtwig.parser.JtwigParser;
 import org.jtwig.resource.JtwigResource;
 
-import java.util.HashMap;
-import java.util.Map;
+import org.jtwig.content.model.Template;
 
 public class CompileContext {
     private JtwigResource resource;
     private final JtwigParser parser;
     private final CompileConfiguration configuration;
     private Sequence parent;
-    private Map<String, Renderable> replacements = new HashMap<>();
-    private Map<JtwigResource, Map<String, Macro.Compiled>> macros = new HashMap<>();
 
     public CompileContext(JtwigResource resource, JtwigParser parser, CompileConfiguration configuration) {
         this.resource = resource;
@@ -56,62 +49,17 @@ public class CompileContext {
         return parent;
     }
 
-    public CompileContext withReplacement(String name, Renderable replacement) {
-        if (replacements.containsKey(name)) {
-            // already contains, nested replacement
-            replacements.put(name, new Replacement(replacements.get(name), replacement));
-        } else {
-            replacements.put(name, replacement);
-        }
-        return this;
-    }
-
-    public CompileContext withReplacement(Map<String, Renderable> replacements) {
-        this.replacements.putAll(replacements);
-        return this;
-    }
-
-    public boolean hasReplacement(String name) {
-        return replacements.containsKey(name);
-    }
-
-    public Renderable replacement(String name) {
-        return replacements.get(name);
-    }
-    
-    public CompileContext withMacro(JtwigResource resource, String name, Macro.Compiled macro) {
-        if (!macros.containsKey(resource)) {
-            macros.put(resource, new HashMap<String, Macro.Compiled>());
-        }
-        macros.get(resource).put(name, macro);
-        return this;
-    }
-    
-    public Map<JtwigResource, Map<String, Macro.Compiled>> macros() {
-        return macros;
-    }
-    
-    public Map<String, Macro.Compiled> macros(JtwigResource resource) {
-        if (macros.containsKey(resource)) {
-            return macros.get(resource);
-        }
-        return null;
-    }
-
     public JtwigResource retrieve(String relativePath) throws ResourceException {
         return resource.resolve(relativePath);
     }
 
-    public Compilable parse (JtwigResource resource) throws ParseException {
+    public Template parse (JtwigResource resource) throws ParseException {
         return parser.parse(resource);
     }
 
     public CompileContext clone() {
         CompileContext compileContext = new CompileContext(resource, parser, configuration);
-        compileContext
-                .withParent(parent)
-                .withReplacement(replacements);
-        compileContext.macros = this.macros;
+        compileContext.withParent(parent);
         return compileContext;
     }
 

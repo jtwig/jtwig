@@ -15,7 +15,6 @@
 package org.jtwig.expressions.model;
 
 import org.jtwig.compile.CompileContext;
-import org.jtwig.content.model.compilable.Macro;
 import org.jtwig.exception.CalculateException;
 import org.jtwig.exception.CompileException;
 import org.jtwig.exception.RenderException;
@@ -27,16 +26,16 @@ import org.jtwig.parser.model.JtwigPosition;
 import org.jtwig.render.RenderContext;
 import org.jtwig.util.ObjectExtractor;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import org.jtwig.content.api.ability.ExecutionAware;
 
 import static org.jtwig.functions.parameters.input.InputParameters.parameters;
 
 public class FunctionElement extends AbstractCompilableExpression {
-    private String name;
-    private List<CompilableExpression> arguments = new ArrayList<>();
+    private final String name;
+    private final List<CompilableExpression> arguments = new ArrayList<>();
 
     public FunctionElement(JtwigPosition position, String name) {
         super(position);
@@ -79,8 +78,8 @@ public class FunctionElement extends AbstractCompilableExpression {
         @Override
         public Object calculate(RenderContext context) throws CalculateException {
             try {
-                if (context.map(name) instanceof Macro.Compiled) {
-                    return ((Macro.Compiled)context.map(name)).execute(context, calculateArguments(context));
+                if (context.map(name) instanceof ExecutionAware) {
+                    return ((ExecutionAware)context.map(name)).execute(context, null, calculateArguments(context));
                 }
                 
                 try {
@@ -88,7 +87,7 @@ public class FunctionElement extends AbstractCompilableExpression {
                 } catch (FunctionNotFoundException e) {
                     throw new CalculateException(position + ": " + e.getMessage(), e);
                 }
-            } catch (FunctionException | IOException | RenderException e) {
+            } catch (FunctionException | RenderException e) {
                 throw new CalculateException(e);
             }
         }

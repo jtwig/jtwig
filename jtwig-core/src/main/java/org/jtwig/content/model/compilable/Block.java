@@ -16,13 +16,17 @@ package org.jtwig.content.model.compilable;
 
 import org.jtwig.compile.CompileContext;
 import org.jtwig.content.api.Renderable;
-import org.jtwig.content.model.renderable.Replacement;
 import org.jtwig.exception.CompileException;
+import org.jtwig.exception.RenderException;
+import org.jtwig.parser.model.JtwigPosition;
+import org.jtwig.render.RenderContext;
 
 public class Block extends Content<Block> {
+    private final JtwigPosition position;
     private final String name;
 
-    public Block(String name) {
+    public Block(final JtwigPosition position, final String name) {
+        this.position = position;
         this.name = name;
     }
 
@@ -31,10 +35,25 @@ public class Block extends Content<Block> {
     }
 
     @Override
-    public Renderable compile(CompileContext context) throws CompileException {
-        Renderable render = super.compile(context);
-        if (context.hasReplacement(name()))
-            return new Replacement(context.replacement(name()), render);
-        return render;
+    public Renderable compile(final CompileContext context) throws CompileException {
+        return new CompiledBlock(position, name(), super.compile(context));
+    }
+    
+    public static class CompiledBlock implements Renderable {
+        private final JtwigPosition position;
+        private final String name;
+        private final Renderable content;
+        
+        public CompiledBlock(final JtwigPosition position, final String name, final Renderable content) {
+            this.position = position;
+            this.name = name;
+            this.content = content;
+        }
+        @Override
+        public void render(final RenderContext context) throws RenderException {
+            CompiledBlock b = position.getTemplate().getCachedCompiledTemplate().block(name);
+            b.content.render(context);
+        }
+        
     }
 }

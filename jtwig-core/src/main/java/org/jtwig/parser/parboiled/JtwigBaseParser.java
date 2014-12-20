@@ -14,6 +14,7 @@
 
 package org.jtwig.parser.parboiled;
 
+import org.jtwig.content.model.Template;
 import org.jtwig.exception.ParseBypassException;
 import org.jtwig.exception.ParseException;
 import org.jtwig.parser.model.JtwigPosition;
@@ -35,9 +36,19 @@ public class JtwigBaseParser<V> extends BaseParser<V> {
     public JtwigPosition currentPosition () {
         return new JtwigPosition(
                 resource,
+                currentTemplate(),
                 position().line,
                 position().column
         );
+    }
+    
+    Template currentTemplate() {
+        for (Object obj : this.getContext().getValueStack()) {
+            if (obj instanceof Template) {
+                return (Template)obj;
+            }
+        }
+        return null;
     }
 
     public JtwigResource getResource() {

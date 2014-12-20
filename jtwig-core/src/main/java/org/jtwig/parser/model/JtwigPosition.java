@@ -14,10 +14,12 @@
 
 package org.jtwig.parser.model;
 
+import org.jtwig.content.model.Template;
 import org.jtwig.resource.JtwigResource;
 
 public class JtwigPosition {
     private JtwigResource resource;
+    private Template template;
     private int row;
     private int column;
 
@@ -26,9 +28,24 @@ public class JtwigPosition {
         this.row = row;
         this.column = column;
     }
+    public JtwigPosition(JtwigResource resource, Template template, int row, int column) {
+        this(resource, row, column);
+        this.template = template;
+    }
 
     public JtwigResource getResource() {
         return resource;
+    }
+    
+    /**
+     * The template is only available to elements that were built using
+     * JtwigContentParser, such as Tags. Expressions and other elements built by
+     * other parsers do not have access to the template in which they were
+     * created.
+     * @return 
+     */
+    public Template getTemplate() {
+        return template;
     }
 
     public int getRow() {

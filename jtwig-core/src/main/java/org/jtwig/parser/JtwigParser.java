@@ -14,18 +14,12 @@
 
 package org.jtwig.parser;
 
-import org.jtwig.compile.CompileContext;
-import org.jtwig.content.api.Compilable;
-import org.jtwig.content.api.Renderable;
-import org.jtwig.exception.CompileException;
 import org.jtwig.exception.ParseException;
-import org.jtwig.exception.RenderException;
 import org.jtwig.parser.config.ParserConfiguration;
 import org.jtwig.parser.parboiled.JtwigContentParser;
-import org.jtwig.render.RenderContext;
 import org.jtwig.resource.JtwigResource;
 
-import java.io.IOException;
+import org.jtwig.content.model.Template;
 
 public class JtwigParser {
     private final ParserConfiguration configuration;
@@ -34,43 +28,10 @@ public class JtwigParser {
         this.configuration = configuration;
     }
 
-    public Compilable parse(JtwigResource resource) throws ParseException {
+    public Template parse(JtwigResource resource) throws ParseException {
         JtwigContentParser parser = JtwigContentParser
                 .newParser(resource, configuration);
 
-        return new Document(JtwigContentParser.parse(parser, resource));
-    }
-
-    private static class Document implements Compilable {
-        private final Compilable content;
-
-        private Document(Compilable content) {
-            this.content = content;
-        }
-
-        @Override
-        public Renderable compile(CompileContext context) throws CompileException {
-            return new CompiledDocument(content.compile(context));
-        }
-    }
-
-    private static class CompiledDocument implements Renderable {
-        private final Renderable renderable;
-
-        private CompiledDocument(Renderable renderable) {
-            this.renderable = renderable;
-        }
-
-        @Override
-        public void render(RenderContext context) throws RenderException {
-            try {
-                renderable.render(context);
-                context.renderStream().waitForExecutorCompletion();
-                context.renderStream().close();
-                context.renderStream().merge();
-            } catch (IOException e) {
-                throw new RenderException(e);
-            }
-        }
+        return JtwigContentParser.parse(parser, resource);
     }
 }

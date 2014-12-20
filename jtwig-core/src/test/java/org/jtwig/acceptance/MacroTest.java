@@ -22,19 +22,19 @@ import org.junit.Test;
 
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
+import org.jtwig.content.model.Template;
 import static org.jtwig.util.SyntacticSugar.then;
 
 public class MacroTest extends AbstractJtwigTest {
     @Test
-    public void ensureMacrosAreAddedToContext() throws Exception {
+    public void ensureMacrosAreAddedToTemplate() throws Exception {
         JtwigResource resource = templateResource("templates/acceptance/macro/macro.twig");
         JtwigConfiguration configuration = new JtwigConfiguration();
         JtwigParser parser = new JtwigParser(configuration.parse());
         CompileContext ctx = new CompileContext(resource, parser, configuration.compile());
-        parser.parse(resource)
+        Template.CompiledTemplate t = parser.parse(resource)
                 .compile(ctx);
-        then(ctx.macros().size(), is(equalTo(1)));
-        then(ctx.macros(resource).size(), is(equalTo(2)));
+        then(t.macros().size(), is(equalTo(2)));
     }
     
     @Test
@@ -43,10 +43,9 @@ public class MacroTest extends AbstractJtwigTest {
         JtwigConfiguration configuration = new JtwigConfiguration();
         JtwigParser parser = new JtwigParser(configuration.parse());
         CompileContext ctx = new CompileContext(resource, parser, configuration.compile());
-        parser.parse(resource)
+        Template.CompiledTemplate t = parser.parse(resource)
                 .compile(ctx);
-        then(ctx.macros().size(), is(equalTo(1)));
-        then(ctx.macros(resource).size(), is(equalTo(1)));
-        then(ctx.macros(resource).entrySet().iterator().next().getValue().arguments().size(), is(equalTo(1)));
+        then(t.macros().size(), is(equalTo(1)));
+        then(t.macros().entrySet().iterator().next().getValue().arguments().size(), is(equalTo(1)));
     }
 }
