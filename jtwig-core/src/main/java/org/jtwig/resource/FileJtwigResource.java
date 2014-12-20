@@ -23,7 +23,7 @@ import java.io.InputStream;
 
 public class FileJtwigResource implements JtwigResource {
     private static final String PREFIX = "file://";
-    private File file;
+    private final File file;
 
     public FileJtwigResource (String file) {
         if (file.startsWith(PREFIX))

@@ -36,19 +36,9 @@ public class JtwigBaseParser<V> extends BaseParser<V> {
     public JtwigPosition currentPosition () {
         return new JtwigPosition(
                 resource,
-                currentTemplate(),
                 position().line,
                 position().column
         );
-    }
-    
-    Template currentTemplate() {
-        for (Object obj : this.getContext().getValueStack()) {
-            if (obj instanceof Template) {
-                return (Template)obj;
-            }
-        }
-        return null;
     }
 
     public JtwigResource getResource() {
@@ -75,6 +65,15 @@ public class JtwigBaseParser<V> extends BaseParser<V> {
 
     <T> T pop(Class<T> typeClass) {
         return pop(0, typeClass);
+    }
+    
+    <T> T last(Class<T> cls) {
+        for (Object obj : this.getContext().getValueStack()) {
+            if (cls.isAssignableFrom(obj.getClass())) {
+                return cls.cast(obj);
+            }
+        }
+        return null;
     }
 
     public Rule mandatory(Rule rule, ParseException exception) {

@@ -31,6 +31,7 @@ import java.util.HashMap;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsNull.notNullValue;
+import org.jtwig.cache.impl.ExecutionCache;
 import static org.jtwig.types.Undefined.UNDEFINED;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -49,7 +50,7 @@ public class MapSelectionTest {
         Expression compiled = selection.compile(context);
 
         assertThat(compiled, notNullValue(Expression.class));
-        assertEquals("value", compiled.calculate(RenderContext.create(new RenderConfiguration(), new JtwigModelMap(), null)));
+        assertEquals("value", compiled.calculate(ctx()));
     }
 
     @Test(expected = CalculateException.class)
@@ -64,7 +65,7 @@ public class MapSelectionTest {
         Expression compiled = selection.compile(context);
 
         assertThat(compiled, notNullValue(Expression.class));
-        compiled.calculate(RenderContext.create(new RenderConfiguration(), new JtwigModelMap(), null));
+        compiled.calculate(ctx());
     }
 
 
@@ -85,7 +86,7 @@ public class MapSelectionTest {
         Expression compiled = selection.compile(context);
 
         assertThat(compiled, notNullValue(Expression.class));
-        compiled.calculate(RenderContext.create(new RenderConfiguration(), new JtwigModelMap(), null));
+        compiled.calculate(ctx());
     }
 
     private Expression mapExpression(final String key, final String value) {
@@ -97,5 +98,8 @@ public class MapSelectionTest {
                 return map;
             }
         };
+    }
+    private RenderContext ctx() {
+        return RenderContext.create(new RenderConfiguration(new ExecutionCache()), new JtwigModelMap(), null);
     }
 }

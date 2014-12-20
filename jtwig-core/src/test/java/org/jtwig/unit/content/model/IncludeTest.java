@@ -112,14 +112,9 @@ public class IncludeTest extends AbstractUnitTest {
 
     private Template toTemplate(final Renderable elementRender) {
         return new BasicTemplate(null) {
-            private CompiledBasicTemplate compiled;
             @Override
             public CompiledBasicTemplate compile(CompileContext context) throws CompileException {
-                return compiled = new CompiledBasicTemplate(null, null, null, elementRender);
-            }
-            @Override
-            public Template.CompiledTemplate getCachedCompiledTemplate() {
-                return compiled;
+                return new CompiledBasicTemplate(null, null, null, elementRender);
             }
         };
     }

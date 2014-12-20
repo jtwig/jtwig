@@ -15,6 +15,7 @@
 package org.jtwig.unit.expressions.model;
 
 import org.jtwig.JtwigModelMap;
+import org.jtwig.cache.impl.ExecutionCache;
 import org.jtwig.compile.CompileContext;
 import org.jtwig.exception.CompileException;
 import org.jtwig.expressions.api.CompilableExpression;
@@ -46,7 +47,7 @@ public class OperationBinaryTest {
                 .add(Operator.ADD)
                 .add(expression(right))
                 .compile(null)
-                .calculate(RenderContext.create(new RenderConfiguration(), context, null));
+                .calculate(RenderContext.create(new RenderConfiguration(new ExecutionCache()), context, null));
 
         assertEquals(2, result);
     }
@@ -62,7 +63,7 @@ public class OperationBinaryTest {
                 .add(Operator.COMPOSITION)
                 .add(right)
                 .compile(null)
-                .calculate(RenderContext.create(new RenderConfiguration(), context, null));
+                .calculate(RenderContext.create(new RenderConfiguration(new ExecutionCache()), context, null));
 
         assertEquals(true, result);
     }

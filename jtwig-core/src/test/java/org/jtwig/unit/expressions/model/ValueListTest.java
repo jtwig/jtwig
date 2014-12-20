@@ -29,6 +29,7 @@ import java.util.List;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
+import org.jtwig.cache.impl.ExecutionCache;
 import static org.jtwig.expressions.model.ValueList.create;
 import static org.mockito.Mockito.mock;
 
@@ -41,7 +42,7 @@ public class ValueListTest {
         CompileContext context = mock(CompileContext.class);
         JtwigModelMap modelMap = new JtwigModelMap();
 
-        Object result = list.compile(context).calculate(RenderContext.create(new RenderConfiguration(), modelMap, null));
+        Object result = list.compile(context).calculate(RenderContext.create(new RenderConfiguration(new ExecutionCache()), modelMap, null));
 
         assertThat(result, is(instanceOf(List.class)));
     }

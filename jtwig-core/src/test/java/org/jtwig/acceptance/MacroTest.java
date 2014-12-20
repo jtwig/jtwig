@@ -22,6 +22,7 @@ import org.junit.Test;
 
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
+import org.jtwig.cache.impl.ExecutionCache;
 import org.jtwig.content.model.Template;
 import static org.jtwig.util.SyntacticSugar.then;
 
@@ -29,7 +30,7 @@ public class MacroTest extends AbstractJtwigTest {
     @Test
     public void ensureMacrosAreAddedToTemplate() throws Exception {
         JtwigResource resource = templateResource("templates/acceptance/macro/macro.twig");
-        JtwigConfiguration configuration = new JtwigConfiguration();
+        JtwigConfiguration configuration = new JtwigConfiguration(new ExecutionCache());
         JtwigParser parser = new JtwigParser(configuration.parse());
         CompileContext ctx = new CompileContext(resource, parser, configuration.compile());
         Template.CompiledTemplate t = parser.parse(resource)
@@ -40,7 +41,7 @@ public class MacroTest extends AbstractJtwigTest {
     @Test
     public void ensureLastMacroDefinedWithSameNameIsUsed() throws Exception {
         JtwigResource resource = templateResource("templates/acceptance/macro/overloading.twig");
-        JtwigConfiguration configuration = new JtwigConfiguration();
+        JtwigConfiguration configuration = new JtwigConfiguration(new ExecutionCache());
         JtwigParser parser = new JtwigParser(configuration.parse());
         CompileContext ctx = new CompileContext(resource, parser, configuration.compile());
         Template.CompiledTemplate t = parser.parse(resource)

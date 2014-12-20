@@ -24,6 +24,7 @@ import org.jtwig.render.config.RenderConfiguration;
 import org.junit.Test;
 
 import java.util.Map;
+import org.jtwig.cache.impl.ExecutionCache;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -40,7 +41,7 @@ public class ValueMapTest {
         Expression expression = underTest.compile(context);
         assertNotNull(expression);
 
-        Map map = (Map) expression.calculate(RenderContext.create(new RenderConfiguration(), new JtwigModelMap(), null));
+        Map map = (Map) expression.calculate(RenderContext.create(new RenderConfiguration(new ExecutionCache()), new JtwigModelMap(), null));
         assertTrue(map.containsKey("key"));
     }
 }

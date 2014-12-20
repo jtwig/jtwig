@@ -43,6 +43,8 @@ import java.nio.charset.Charset;
 import java.util.Collection;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
+import org.jtwig.content.api.ability.ElementList;
+import org.jtwig.content.api.ability.ElementTracker;
 import org.jtwig.content.model.BasicTemplate;
 import org.jtwig.content.model.ExtendsTemplate;
 import org.jtwig.content.model.Template;
@@ -124,23 +126,35 @@ public class JtwigContentParser extends JtwigBaseParser<Compilable> {
         return Sequence(
                 basicParser.spacing(),
                 Sequence(
+                        // Permit pre-extension declarations
+                        push(new ExtendsTemplate(currentPosition())),
+                        ZeroOrMore(
+                                basicParser.spacing(),
+                                FirstOf(
+                                        addToElementTracker(block(), true),
+                                        addToElementList(comment(), true),
+                                        addToElementTracker(macro(), true),
+                                        addToElementList(set(), true)
+                                )
+                        ),
+                        
                         basicParser.openCode(),
                         basicParser.spacing(),
                         keyword(EXTENDS),
                         mandatory(
                                 Sequence(
                                         expressionParser.expression(),
-                                        push(new ExtendsTemplate(currentPosition(), expressionParser.pop())),
+                                        action(peek(1, ExtendsTemplate.class).extend(expressionParser.pop())),
                                         basicParser.spacing(),
                                         basicParser.closeCode(),
                                         
                                         ZeroOrMore(
                                                 basicParser.spacing(),
                                                 FirstOf(
-                                                        addToCurrentTemplate(block(), true),
-                                                        addToCurrentTemplate(comment(), true),
-                                                        addToCurrentTemplate(macro(), true),
-                                                        addToCurrentTemplate(set(), true)
+                                                        addToElementTracker(block(), true),
+                                                        addToElementList(comment(), true),
+                                                        addToElementTracker(macro(), true),
+                                                        addToElementList(set(), true)
                                                 )
                                         ),
                                         basicParser.spacing(),
@@ -167,10 +181,10 @@ public class JtwigContentParser extends JtwigBaseParser<Compilable> {
                 ZeroOrMore(
                         FirstOf(
                                 addToContent(output()),
-                                addToContent(addToCurrentTemplate(block())),
+                                addToContent(addToElementTracker(block())),
                                 addToContent(include()),
                                 addToContent(embed()),
-                                addToCurrentTemplate(macro(), true),
+                                addToElementTracker(macro(), true),
                                 addToContent(importTemplate()),
                                 addToContent(fromImportTemplate()),
 //                                addToContent(filter()),
@@ -268,13 +282,22 @@ public class JtwigContentParser extends JtwigBaseParser<Compilable> {
                 action(peek(1, Sequence.class).add(pop()))
         );
     }
-    Rule addToCurrentTemplate(Rule innerRule) {
-        return addToCurrentTemplate(innerRule, false);
+    Rule addToElementTracker(Rule innerRule) {
+        return addToElementTracker(innerRule, false);
     }
-    Rule addToCurrentTemplate(Rule innerRule, boolean pop) {
+    Rule addToElementTracker(Rule innerRule, boolean pop) {
         return Sequence(
                 innerRule,
-                action(currentTemplate().track(pop ? pop() : peek()))
+                action(lastElementTracker().track(pop ? pop() : peek()))
+        );
+    }
+    Rule addToElementList(Rule innerRule) {
+        return addToElementList(innerRule, false);
+    }
+    Rule addToElementList(Rule innerRule, boolean pop) {
+        return Sequence(
+                innerRule,
+                action(lastElementList().add(pop ? pop() : peek()))
         );
     }
 
@@ -357,10 +380,10 @@ public class JtwigContentParser extends JtwigBaseParser<Compilable> {
                                 basicParser.stringLiteral(),
                                 basicParser.spacing(),
                                 closeCode(),
-                                push(new ExtendsTemplate(currentPosition(), new Constant<>(basicParser.pop()))),
+                                push(new ExtendsTemplate(currentPosition()).extend(new Constant<>(basicParser.pop()))),
                                 ZeroOrMore(
                                         basicParser.spacing(),
-                                        addToCurrentTemplate(block(), true)
+                                        addToElementTracker(block(), true)
                                 ),
                                 basicParser.spacing(),
                                 openCode(),
@@ -785,4 +808,14 @@ public class JtwigContentParser extends JtwigBaseParser<Compilable> {
         return beforeBeginTrim(0);
     }
 
+    //~ Helpers ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ElementList lastElementList() {
+        return last(ElementList.class);
+    }
+    ElementTracker lastElementTracker() {
+        return last(ElementTracker.class);
+    }
+    Template lastTemplate() {
+        return last(Template.class);
+    }
 }

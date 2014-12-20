@@ -23,11 +23,12 @@ import java.util.HashMap;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import org.jtwig.cache.impl.ExecutionCache;
 
 public class MapSelectionTest extends AbstractJtwigTest {
     @Test
     public void testTrue() throws Exception {
-        JtwigTemplate template = new JtwigTemplate("{{ test['abc'] }}", new JtwigConfiguration());
+        JtwigTemplate template = new JtwigTemplate("{{ test['abc'] }}", new JtwigConfiguration(new ExecutionCache()));
         JtwigModelMap context = new JtwigModelMap();
         context.add("test", new HashMap<String, String>() {{
             put("abc", "a");

@@ -20,6 +20,7 @@ import org.jtwig.functions.repository.api.FunctionRepository;
 import org.jtwig.functions.repository.impl.MapFunctionRepository;
 
 import java.nio.charset.Charset;
+import org.jtwig.cache.TemplateCache;
 
 public class RenderConfiguration {
 
@@ -29,17 +30,26 @@ public class RenderConfiguration {
     private final JsonConfiguration jsonConfiguration;
     private final FunctionRepository functionRepository;
     private final RenderThreadingConfig mRenderThreadingConfig;
+    private final TemplateCache templateCache;
 
-    public RenderConfiguration(FunctionRepository functionRepository) {
-        this.functionRepository = functionRepository;
-        this.jsonConfiguration = new JsonConfiguration();
-        this.mRenderThreadingConfig = new RenderThreadingConfig();
-    }
 
-    public RenderConfiguration() {
+    public RenderConfiguration(TemplateCache templateCache) {
         this.jsonConfiguration = new JsonConfiguration();
         this.mRenderThreadingConfig = new RenderThreadingConfig();
         this.functionRepository = new MapFunctionRepository(jsonConfiguration);
+        this.templateCache = templateCache;
+    }
+    
+    public RenderConfiguration(FunctionRepository functionRepository,
+            TemplateCache templateCache) {
+        this.functionRepository = functionRepository;
+        this.jsonConfiguration = new JsonConfiguration();
+        this.mRenderThreadingConfig = new RenderThreadingConfig();
+        this.templateCache = templateCache;
+    }
+    
+    public TemplateCache cache() {
+        return templateCache;
     }
 
     public boolean strictMode() {

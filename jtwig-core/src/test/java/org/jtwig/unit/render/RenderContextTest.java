@@ -11,14 +11,13 @@ import org.jtwig.render.config.RenderConfiguration;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
+import org.jtwig.cache.impl.ExecutionCache;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
 public class RenderContextTest {
     private FunctionResolver functionResolver = mock(FunctionResolver.class);
-    private RenderContext underTest = RenderContext.create(new RenderConfiguration(), new JtwigModelMap(), functionResolver, new ByteArrayOutputStream());
+    private RenderContext underTest = RenderContext.create(new RenderConfiguration(new ExecutionCache()), new JtwigModelMap(), functionResolver, new ByteArrayOutputStream());
 
     @Test(expected = FunctionException.class)
     public void testInvocationTargetException () throws Exception {

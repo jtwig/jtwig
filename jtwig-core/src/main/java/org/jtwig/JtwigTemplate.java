@@ -29,10 +29,11 @@ import org.jtwig.resource.StringJtwigResource;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.OutputStream;
+import org.jtwig.cache.impl.ExecutionCache;
 
 public class JtwigTemplate {
     public static JtwigTemplate fromString (String template) {
-        return new JtwigTemplate(template, new JtwigConfiguration());
+        return new JtwigTemplate(template, new JtwigConfiguration(new ExecutionCache()));
     }
 
     private final JtwigResource resource;

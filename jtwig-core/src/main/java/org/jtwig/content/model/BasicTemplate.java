@@ -13,7 +13,6 @@
  */
 package org.jtwig.content.model;
 
-import java.io.IOException;
 import java.util.Map;
 import org.jtwig.compile.CompileContext;
 import org.jtwig.content.api.Renderable;
@@ -25,7 +24,6 @@ import org.jtwig.parser.model.JtwigPosition;
 import org.jtwig.render.RenderContext;
 
 public class BasicTemplate extends Template {
-    private CompiledBasicTemplate compiled;
     
     public BasicTemplate(final JtwigPosition position) {
         super(position);
@@ -35,21 +33,13 @@ public class BasicTemplate extends Template {
 
     //~ Compilable impl ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     @Override
-    public CompiledBasicTemplate compile(final CompileContext context)
+    public CompiledBasicTemplate doCompile(final CompileContext context)
             throws CompileException {
-        if (compiled != null) {
-            return compiled;
-        }
-        return compiled = new CompiledBasicTemplate(
+        return new CompiledBasicTemplate(
                 position,
                 compileBlocks(context),
                 compileMacros(context),
                 content.compile(context));
-    }
-
-    @Override
-    public CompiledTemplate getCachedCompiledTemplate() {
-        return compiled;
     }
     
     public static class CompiledBasicTemplate extends CompiledTemplate {

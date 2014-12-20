@@ -15,6 +15,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import java.util.Arrays;
+import org.jtwig.cache.impl.ExecutionCache;
 
 import static org.jtwig.types.Undefined.UNDEFINED;
 import static org.junit.Assert.assertEquals;
@@ -32,7 +33,7 @@ public class SelectionOperationTest {
 
     @Before
     public void setUp() throws Exception {
-        when(renderContext.configuration()).thenReturn(new RenderConfiguration().strictMode(true));
+        when(renderContext.configuration()).thenReturn(config().strictMode(true));
         when(left.calculate(renderContext)).thenReturn(null);
     }
 
@@ -48,7 +49,7 @@ public class SelectionOperationTest {
     public void accessPropertyOfNullWithoutStrictMode() throws Exception {
         Expression right = new Variable.Compiled(position, "variable");
 
-        when(renderContext.configuration()).thenReturn(new RenderConfiguration().strictMode(false));
+        when(renderContext.configuration()).thenReturn(config().strictMode(false));
 
         Object result = operation.apply(renderContext, position, left, right);
         assertEquals(UNDEFINED, result);
@@ -63,7 +64,7 @@ public class SelectionOperationTest {
     @Test
     public void accessMethodOfNullWithoutStrictMode() throws Exception {
         Expression right = new FunctionElement.Compiled(position, "variable", Arrays.<Expression>asList());
-        when(renderContext.configuration()).thenReturn(new RenderConfiguration().strictMode(false));
+        when(renderContext.configuration()).thenReturn(config().strictMode(false));
 
         Object result = operation.apply(renderContext, position, left, right);
         assertEquals(UNDEFINED, result);
@@ -78,7 +79,7 @@ public class SelectionOperationTest {
     @Test
     public void accessPropertyOfUndefinedWithoutStrictMode() throws Exception {
         Expression right = new Variable.Compiled(position, "variable");
-        when(renderContext.configuration()).thenReturn(new RenderConfiguration().strictMode(false));
+        when(renderContext.configuration()).thenReturn(config().strictMode(false));
         when(left.calculate(renderContext)).thenReturn(UNDEFINED);
 
         Object result = operation.apply(renderContext, position, left, right);
@@ -89,7 +90,7 @@ public class SelectionOperationTest {
     public void accessMethodOfUndefinedWithStrictMode() throws Exception {
         Expression right = new FunctionElement.Compiled(position, "variable", Arrays.<Expression>asList());
         when(left.calculate(renderContext)).thenReturn(UNDEFINED);
-        when(renderContext.configuration()).thenReturn(new RenderConfiguration().strictMode(true));
+        when(renderContext.configuration()).thenReturn(config().strictMode(true));
 
         operation.apply(renderContext, position, left, right);
     }
@@ -97,7 +98,7 @@ public class SelectionOperationTest {
     @Test
     public void accessMethodOfUndefinedWithoutStrictMode() throws Exception {
         Expression right = new FunctionElement.Compiled(position, "variable", Arrays.<Expression>asList());
-        when(renderContext.configuration()).thenReturn(new RenderConfiguration().strictMode(false));
+        when(renderContext.configuration()).thenReturn(config().strictMode(false));
         when(left.calculate(renderContext)).thenReturn(UNDEFINED);
 
         Object result = operation.apply(renderContext, position, left, right);
@@ -106,7 +107,7 @@ public class SelectionOperationTest {
 
     @Test(expected = CalculateException.class)
     public void operationShouldFailIfRightHandSideIsNotAFunctionNeitherAVariable() throws Exception {
-        when(renderContext.configuration()).thenReturn(new RenderConfiguration().strictMode(false));
+        when(renderContext.configuration()).thenReturn(config().strictMode(false));
         when(left.calculate(renderContext)).thenReturn("hello");
 
         operation.apply(renderContext, position, left, null);
@@ -126,5 +127,8 @@ public class SelectionOperationTest {
                 throw new ObjectExtractor.ExtractException("Test");
             }
         };
+    }
+    private RenderConfiguration config() {
+        return new RenderConfiguration(new ExecutionCache());
     }
 }

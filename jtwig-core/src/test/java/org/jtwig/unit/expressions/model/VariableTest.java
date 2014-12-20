@@ -15,6 +15,7 @@
 package org.jtwig.unit.expressions.model;
 
 import org.jtwig.JtwigModelMap;
+import org.jtwig.cache.impl.ExecutionCache;
 import org.jtwig.expressions.model.Variable;
 import org.jtwig.render.RenderContext;
 import org.jtwig.render.config.RenderConfiguration;
@@ -30,6 +31,6 @@ public class VariableTest {
         JtwigModelMap modelMap = new JtwigModelMap()
                 .withModelAttribute("variable", "one")
                 ;
-        assertEquals("one", underTest.compile(null).calculate(RenderContext.create(new RenderConfiguration(), modelMap, null)));
+        assertEquals("one", underTest.compile(null).calculate(RenderContext.create(new RenderConfiguration(new ExecutionCache()), modelMap, null)));
     }
 }

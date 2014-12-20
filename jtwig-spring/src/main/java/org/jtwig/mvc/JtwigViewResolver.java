@@ -15,6 +15,7 @@
 package org.jtwig.mvc;
 
 import org.jtwig.cache.JtwigTemplateCacheSystem;
+import org.jtwig.cache.impl.ExecutionCache;
 import org.jtwig.cache.impl.PersistentTemplateCacheSystem;
 import org.jtwig.configuration.JtwigConfiguration;
 import org.jtwig.functions.SpringFunctions;
@@ -48,7 +49,7 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
     private boolean useThemeInViewPath = false;
 
     private JtwigResourceResolver loader;
-    private JtwigConfiguration configuration = new JtwigConfiguration();
+    private JtwigConfiguration configuration = new JtwigConfiguration(new ExecutionCache());
     private SpringFunctions springFunctions = null;
     private CompoundParameterResolver parameterResolver = new CompoundParameterResolver();
     private CompoundFunctionResolver functionResolver = new CompoundFunctionResolver()

@@ -71,4 +71,12 @@ public class JtwigTemplateTest extends AbstractUnitTest {
         
         assertThat(theResult(), is("second"));
     }
+    
+    @Test
+    public void testSetVariableDuringExtends() throws Exception {
+        withPrimaryResource("{% extends 'test' %} {% set value = \"open\" %} {% block testblock %}{{ value }}{% endblock %}");
+        attachResource("test", "{% block testblock %}{{ value }}{% endblock %}");
+        
+        assertThat(theResult(), is("open"));
+    }
 }

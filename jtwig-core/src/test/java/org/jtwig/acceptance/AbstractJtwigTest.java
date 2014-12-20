@@ -28,9 +28,10 @@ import org.jtwig.resource.JtwigResource;
 import org.jtwig.resource.StringJtwigResource;
 
 import java.io.ByteArrayOutputStream;
+import org.jtwig.cache.impl.ExecutionCache;
 
 public class AbstractJtwigTest {
-    private JtwigConfiguration configuration = new JtwigConfiguration();
+    private JtwigConfiguration configuration = new JtwigConfiguration(new ExecutionCache());
     private JtwigParser parser = new JtwigParser(configuration.parse());
     private JtwigModelMap model = new JtwigModelMap();
     private String output;

@@ -43,6 +43,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+import org.jtwig.cache.TemplateCache;
 import org.jtwig.content.model.Template;
 
 import static org.jtwig.types.Undefined.UNDEFINED;
@@ -112,6 +113,10 @@ public class RenderContext {
 
     public RenderConfiguration configuration() {
         return configuration;
+    }
+    
+    public TemplateCache cache() {
+        return configuration.cache();
     }
     
     public Template.CompiledTemplate getRenderingTemplate() {

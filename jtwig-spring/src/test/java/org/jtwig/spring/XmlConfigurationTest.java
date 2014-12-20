@@ -14,6 +14,7 @@ import javax.annotation.Nullable;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
+import org.jtwig.cache.impl.ExecutionCache;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.eq;
@@ -27,7 +28,7 @@ public class XmlConfigurationTest {
     @Before
     public void setUp() throws Exception {
         functionRepository = mock(FunctionRepository.class);
-        underTest = new XmlConfiguration(functionRepository);
+        underTest = new XmlConfiguration(functionRepository, new ExecutionCache());
     }
 
     @Test

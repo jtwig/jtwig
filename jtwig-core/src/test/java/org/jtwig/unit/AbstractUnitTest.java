@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.jtwig.JtwigModelMap;
 import org.jtwig.JtwigTemplate;
+import org.jtwig.cache.impl.ExecutionCache;
 import org.jtwig.compile.CompileContext;
 import org.jtwig.compile.config.CompileConfiguration;
 import org.jtwig.configuration.JtwigConfiguration;
@@ -55,7 +56,7 @@ public abstract class AbstractUnitTest {
         compileContext = spy(new CompileContext(resource, parser, mock(CompileConfiguration.class)));
         renderContext = mock(RenderContext.class);
         when(renderContext.renderStream()).thenReturn(mock(RenderStream.class));
-        underTest = new JtwigTemplate(resource, new JtwigConfiguration());
+        underTest = new JtwigTemplate(resource, new JtwigConfiguration(new ExecutionCache()));
     }
     
     protected void withPrimaryResource(final String contents) throws ResourceException {
@@ -64,6 +65,7 @@ public abstract class AbstractUnitTest {
     protected void withPrimaryResource(final String name, final String contents) throws ResourceException {
         when(compileContext.retrieve(name)).thenReturn(resource);
         when(resource.retrieve()).thenReturn(new ByteArrayInputStream(contents.getBytes()));
+        when(resource.path()).thenReturn(name);
         resources.put(name, resource);
     }
     protected void attachResource(final String name, final String contents) throws ResourceException {
@@ -71,8 +73,9 @@ public abstract class AbstractUnitTest {
     }
     protected void attachResource(final String to, final String name, final String contents) throws ResourceException {
         JtwigResource tmp = mock(JtwigResource.class);
-        when(resources.get(to).resolve(name)).thenReturn(tmp);
         when(tmp.retrieve()).thenReturn(new ByteArrayInputStream(contents.getBytes()));
+        when(tmp.path()).thenReturn(name);
+        when(resources.get(to).resolve(name)).thenReturn(tmp);
         resources.put(name, tmp);
     }
     

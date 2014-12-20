@@ -13,7 +13,6 @@
  */
 package org.jtwig.content.model;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 import org.jtwig.compile.CompileContext;
@@ -36,13 +35,15 @@ import org.jtwig.render.RenderContext;
 import org.jtwig.resource.JtwigResource;
 
 public class ExtendsTemplate extends Template {
-    private final CompilableExpression expr;
-    private CompiledExtendsTemplate compiled;
+    private CompilableExpression expr;
     
-    public ExtendsTemplate(final JtwigPosition position,
-            final CompilableExpression expr) {
+    public ExtendsTemplate(final JtwigPosition position) {
         super(position);
+    }
+    
+    public ExtendsTemplate extend(final CompilableExpression expr) {
         this.expr = expr;
+        return this;
     }
 
     //~ Template impl ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -60,23 +61,14 @@ public class ExtendsTemplate extends Template {
 
     //~ Compilable impl ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     @Override
-    public CompiledExtendsTemplate compile(final CompileContext context) throws CompileException {
-        if (compiled != null) {
-            return compiled;
-        }
-        
-        return compiled = new CompiledExtendsTemplate(
+    public CompiledExtendsTemplate doCompile(final CompileContext context) throws CompileException {
+        return new CompiledExtendsTemplate(
                 position,
                 expr.compile(context),
                 compileBlocks(context),
                 compileMacros(context),
                 content.compile(context),
                 context);
-    }
-
-    @Override
-    public CompiledTemplate getCachedCompiledTemplate() {
-        return compiled;
     }
     
     public static class CompiledExtendsTemplate extends CompiledTemplate {

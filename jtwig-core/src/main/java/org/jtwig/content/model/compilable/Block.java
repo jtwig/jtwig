@@ -20,6 +20,7 @@ import org.jtwig.exception.CompileException;
 import org.jtwig.exception.RenderException;
 import org.jtwig.parser.model.JtwigPosition;
 import org.jtwig.render.RenderContext;
+import org.jtwig.resource.FileJtwigResource;
 
 public class Block extends Content<Block> {
     private final JtwigPosition position;
@@ -51,7 +52,7 @@ public class Block extends Content<Block> {
         }
         @Override
         public void render(final RenderContext context) throws RenderException {
-            CompiledBlock b = position.getTemplate().getCachedCompiledTemplate().block(name);
+            CompiledBlock b = position.getCompiledTemplate(context).block(name);
             b.content.render(context);
         }
         

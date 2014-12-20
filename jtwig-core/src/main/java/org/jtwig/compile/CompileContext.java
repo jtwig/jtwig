@@ -14,6 +14,7 @@
 
 package org.jtwig.compile;
 
+import org.jtwig.cache.TemplateCache;
 import org.jtwig.compile.config.CompileConfiguration;
 import org.jtwig.content.model.compilable.Sequence;
 import org.jtwig.exception.ParseException;
@@ -47,6 +48,10 @@ public class CompileContext {
 
     public Sequence parent () {
         return parent;
+    }
+    
+    public TemplateCache cache() {
+        return configuration.cache();
     }
 
     public JtwigResource retrieve(String relativePath) throws ResourceException {

@@ -172,10 +172,10 @@ public abstract class Import {
                     CompileException,
                     CalculateException {
         if (from instanceof Variable && ((Variable)from).name().equals("_self")) {
-            return position.getTemplate().compile(compileContext);
+            return position.getCompiledTemplate(renderContext);
         }
         if (from instanceof SelfReference) {
-            return position.getTemplate().compile(compileContext);
+            return position.getCompiledTemplate(renderContext);
         }
         JtwigResource resource = compileContext.retrieve((String)from.calculate(renderContext));
         return compileContext.parse(resource).compile(compileContext);

@@ -7,11 +7,15 @@ import org.jtwig.functions.repository.api.FunctionRepository;
 import org.jtwig.parser.config.TagSymbols;
 
 import java.nio.charset.Charset;
+import org.jtwig.cache.TemplateCache;
 
 public class XmlConfiguration extends JtwigConfiguration {
-    public XmlConfiguration() {}
-    public XmlConfiguration (FunctionRepository functionRepository) {
-        super(functionRepository);
+    public XmlConfiguration(TemplateCache templateCache) {
+        super(templateCache);
+    }
+    public XmlConfiguration (FunctionRepository functionRepository,
+            TemplateCache templateCache) {
+        super(functionRepository, templateCache);
     }
 
     public void setRenderStrictMode (boolean activate) {

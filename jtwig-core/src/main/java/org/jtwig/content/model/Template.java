@@ -19,6 +19,8 @@ import java.util.Map;
 import org.jtwig.compile.CompileContext;
 import org.jtwig.content.api.Compilable;
 import org.jtwig.content.api.Renderable;
+import org.jtwig.content.api.ability.ElementList;
+import org.jtwig.content.api.ability.ElementTracker;
 import org.jtwig.content.api.ability.ExecutionAware;
 import org.jtwig.content.model.compilable.Block;
 import org.jtwig.content.model.compilable.Macro;
@@ -28,7 +30,7 @@ import org.jtwig.exception.RenderException;
 import org.jtwig.parser.model.JtwigPosition;
 import org.jtwig.render.RenderContext;
 
-public abstract class Template implements Compilable {
+public abstract class Template implements Compilable, ElementList<Compilable>, ElementTracker<Compilable> {
     protected final JtwigPosition position;
     protected final Map<String, Block> blocks = new HashMap<>();
     protected final Map<String, Macro> macros = new HashMap<>();
@@ -52,11 +54,13 @@ public abstract class Template implements Compilable {
         return content;
     }
     
+    @Override
     public Template add(Compilable compilable) {
         content.add(compilable);
         return this;
     }
     
+    @Override
     public Template track(final Compilable compilable) {
         if (compilable instanceof Macro) {
             macros.put(((Macro)compilable).name(), (Macro)compilable);
@@ -76,8 +80,17 @@ public abstract class Template implements Compilable {
 
     //~ Compilable impl ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     @Override
-    public abstract CompiledTemplate compile(CompileContext context) throws CompileException;
-    public abstract CompiledTemplate getCachedCompiledTemplate();
+    public CompiledTemplate compile(final CompileContext context) throws CompileException {
+        CompiledTemplate template = context.cache().getCompiled(position.getResource().path());
+        if (template != null) {
+            return template;
+        }
+        
+        template = doCompile(context);
+        context.cache().addCompiled(position.getResource().path(), template);
+        return template;
+    }
+    public abstract CompiledTemplate doCompile(CompileContext context) throws CompileException;
     
     //~ Helpers ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     /**
