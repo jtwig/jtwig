@@ -129,13 +129,13 @@ public class JtwigContentParser extends JtwigBaseParser<Compilable> {
                         // Permit pre-extension declarations
                         push(new ExtendsTemplate(currentPosition())),
                         ZeroOrMore(
-                                basicParser.spacing(),
                                 FirstOf(
                                         addToElementTracker(block(), true),
                                         addToElementList(comment(), true),
                                         addToElementTracker(macro(), true),
                                         addToElementList(set(), true)
-                                )
+                                ),
+                                basicParser.spacing()
                         ),
                         
                         basicParser.openCode(),
