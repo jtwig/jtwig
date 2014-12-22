@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import org.jtwig.content.model.BasicTemplate;
 import org.jtwig.content.model.Template;
+import org.jtwig.expressions.model.Constant;
 import org.jtwig.unit.AbstractUnitTest;
 
 import static org.mockito.Mockito.*;
@@ -44,7 +45,7 @@ public class IncludeTest extends AbstractUnitTest {
     public void includeShouldCompileRelativePathResource() throws Exception {
         Renderable renderable = mock(Renderable.class);
 
-        Include include = new Include(null, "test");
+        Include include = new Include(null, new Constant("test"));
         when(compileContext.retrieve("test")).thenReturn(resource);
         when(compileContext.clone()).thenReturn(compileContext);
         when(compileContext.parse(resource)).thenReturn(toTemplate(renderable));
@@ -61,7 +62,7 @@ public class IncludeTest extends AbstractUnitTest {
         Expression withExpression = mock(Expression.class);
         CompilableExpression expression = mock(CompilableExpression.class);
 
-        Include include = new Include(null, "test").with(expression);
+        Include include = new Include(null, new Constant("test")).with(expression);
 
         when(expression.compile(compileContext)).thenReturn(withExpression);
         when(compileContext.retrieve("test")).thenReturn(resource);
@@ -79,7 +80,7 @@ public class IncludeTest extends AbstractUnitTest {
 
     @Test(expected = CompileException.class)
     public void compileWhenResourceException() throws Exception {
-        Include include = new Include(null, "test");
+        Include include = new Include(null, new Constant("test"));
         when(compileContext.retrieve("test")).thenThrow(ResourceException.class);
 
         include.compile(compileContext);
@@ -91,7 +92,7 @@ public class IncludeTest extends AbstractUnitTest {
         Expression withExpression = mock(Expression.class);
         CompilableExpression expression = mock(CompilableExpression.class);
 
-        Include include = new Include(null, "test").with(expression);
+        Include include = new Include(null, new Constant("test")).with(expression);
 
         when(expression.compile(compileContext)).thenReturn(withExpression);
         when(compileContext.retrieve("test")).thenReturn(resource);
