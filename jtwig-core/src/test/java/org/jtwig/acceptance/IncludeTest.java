@@ -62,4 +62,11 @@ public class IncludeTest extends AbstractJtwigTest {
         when(jtwigRenders(templateResource("templates/acceptance/include/ignore-missing-working.twig")));
         then(theRenderedTemplate(), is(equalTo("start--end")));
     }
+    
+    @Test
+    public void includeUsingTernaryExpression() throws Exception {
+        given(aModel().add("var", false));
+        when(jtwigRenders(templateResource("templates/acceptance/include/include-ternary.twig")));
+        then(theRenderedTemplate(), is(equalTo("two")));
+    }
 }

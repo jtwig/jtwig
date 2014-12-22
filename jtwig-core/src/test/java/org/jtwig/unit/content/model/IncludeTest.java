@@ -35,6 +35,7 @@ import org.junit.rules.ExpectedException;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import org.jtwig.expressions.model.Constant;
 
 import static org.mockito.Mockito.*;
 
@@ -58,7 +59,7 @@ public class IncludeTest {
     public void includeShouldCompileRelativePathResource() throws Exception {
         Renderable renderable = mock(Renderable.class);
 
-        Include include = new Include(null, "test");
+        Include include = new Include(null, new Constant("test"));
         when(context.retrieve("test")).thenReturn(jtwigResource);
         when(context.clone()).thenReturn(context);
         when(context.parse(jtwigResource)).thenReturn(toRender(renderable));
@@ -75,7 +76,7 @@ public class IncludeTest {
         Expression withExpression = mock(Expression.class);
         CompilableExpression expression = mock(CompilableExpression.class);
 
-        Include include = new Include(null, "test").with(expression);
+        Include include = new Include(null, new Constant("test")).with(expression);
 
         when(expression.compile(context)).thenReturn(withExpression);
         when(context.retrieve("test")).thenReturn(jtwigResource);
@@ -93,7 +94,7 @@ public class IncludeTest {
 
     @Test(expected = CompileException.class)
     public void compileWhenResourceException() throws Exception {
-        Include include = new Include(null, "test");
+        Include include = new Include(null, new Constant("test"));
         when(context.retrieve("test")).thenThrow(ResourceException.class);
 
         include.compile(context);
@@ -105,7 +106,7 @@ public class IncludeTest {
         Expression withExpression = mock(Expression.class);
         CompilableExpression expression = mock(CompilableExpression.class);
 
-        Include include = new Include(null, "test").with(expression);
+        Include include = new Include(null, new Constant("test")).with(expression);
 
         when(expression.compile(context)).thenReturn(withExpression);
         when(context.retrieve("test")).thenReturn(jtwigResource);
