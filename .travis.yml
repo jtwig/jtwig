@@ -7,3 +7,6 @@ env:
 after_success:
   - mvn compile -Pmerge-reports -N
   - mvn coveralls:report
+  
+notifications:
+  slack: jtwig:BHkhGZvVL7Bsg6HhoY0A3CZu
