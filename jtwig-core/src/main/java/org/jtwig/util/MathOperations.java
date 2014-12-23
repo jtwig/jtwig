@@ -57,9 +57,9 @@ public class MathOperations {
 
     public static boolean areDouble(Object... list) {
         for (Object obj : list)
-            if (obj instanceof Double)
-                return true;
+            if (!(obj instanceof Double))
+                return false;
 
-        return false;
+        return true;
     }
 }
