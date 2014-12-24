@@ -16,3 +16,7 @@
 **Changes**: [CHANGELOG.md](CHANGELOG.md)
 
 **License**: [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0)
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/jtwig/jtwig/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
