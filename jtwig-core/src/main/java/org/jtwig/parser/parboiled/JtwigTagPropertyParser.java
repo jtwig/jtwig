@@ -14,20 +14,18 @@
 
 package org.jtwig.parser.parboiled;
 
-import org.jtwig.parser.config.ParserConfiguration;
+import org.jtwig.Environment;
 import org.jtwig.parser.model.JtwigSymbol;
 import org.jtwig.parser.model.JtwigTagProperty;
 import org.parboiled.BaseParser;
 import org.parboiled.Rule;
 
-import static org.parboiled.Parboiled.createParser;
-
 public class JtwigTagPropertyParser extends BaseParser<JtwigTagProperty> {
     JtwigTagProperty property = JtwigTagProperty.None;
     final JtwigBasicParser basicParser;
 
-    public JtwigTagPropertyParser(ParserConfiguration configuration) {
-        basicParser = createParser(JtwigBasicParser.class, configuration);
+    public JtwigTagPropertyParser(Environment env) {
+        basicParser = env.getBasicParser();
     }
 
     Rule property() {

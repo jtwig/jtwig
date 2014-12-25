@@ -15,13 +15,13 @@
 package org.jtwig.addons.spaceless;
 
 import com.google.common.base.Function;
+import org.jtwig.Environment;
 import org.jtwig.addons.tag.TagAddon;
-import org.jtwig.parser.config.ParserConfiguration;
-import org.jtwig.resource.JtwigResource;
+import org.jtwig.loader.Loader;
 
 public class SpacelessAddon extends TagAddon {
-    public SpacelessAddon(JtwigResource resource, ParserConfiguration configuration) {
-        super(resource, configuration);
+    public SpacelessAddon(Loader.Resource resource, Environment env) {
+        super(resource, env);
     }
 
     @Override

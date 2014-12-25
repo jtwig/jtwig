@@ -15,15 +15,15 @@
 
 package org.jtwig.addons.concurrent;
 
+import org.jtwig.Environment;
 import org.jtwig.addons.Addon;
 import org.jtwig.addons.AddonModel;
-import org.jtwig.parser.config.ParserConfiguration;
-import org.jtwig.resource.JtwigResource;
+import org.jtwig.loader.Loader;
 
 public class ConcurrentAddon extends Addon {
 
-    public ConcurrentAddon(JtwigResource resource, ParserConfiguration configuration) {
-        super(resource, configuration);
+    public ConcurrentAddon(Loader.Resource resource, Environment env) {
+        super(resource, env);
     }
 
     @Override

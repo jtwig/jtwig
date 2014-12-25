@@ -14,7 +14,7 @@
 
 package org.jtwig.acceptance.functions;
 
-import org.jtwig.acceptance.AbstractJtwigTest;
+import org.jtwig.AbstractJtwigTest;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -25,23 +25,23 @@ import static org.jtwig.util.SyntacticSugar.when;
 public class MathFunctionsTest extends AbstractJtwigTest {
     @Test
     public void absTest() throws Exception {
-        when(jtwigRenders(template("{{ abs(-1) }}")));
-        then(theRenderedTemplate(), is(equalTo("1")));
+        withResource("{{ abs(-1) }}");
+        then(theResult(), is(equalTo("1")));
     }
 
     @Test
     public void roundTest() throws Exception {
-        when(jtwigRenders(template("{{ round(1.12) }}")));
-        then(theRenderedTemplate(), is(equalTo("1")));
+        withResource("{{ round(1.12) }}");
+        then(theResult(), is(equalTo("1")));
     }
     @Test
     public void roundCeilTest() throws Exception {
-        when(jtwigRenders(template("{{ round(1.12, 'ceil') }}")));
-        then(theRenderedTemplate(), is(equalTo("2")));
+        withResource("{{ round(1.12, 'ceil') }}");
+        then(theResult(), is(equalTo("2")));
     }
     @Test
     public void roundFloorTest() throws Exception {
-        when(jtwigRenders(template("{{ round(1.62, 'floor') }}")));
-        then(theRenderedTemplate(), is(equalTo("1")));
+        withResource("{{ round(1.62, 'floor') }}");
+        then(theResult(), is(equalTo("1")));
     }
 }

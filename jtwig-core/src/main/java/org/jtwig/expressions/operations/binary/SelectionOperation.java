@@ -29,7 +29,7 @@ public class SelectionOperation implements BinaryOperation {
     public Object apply(RenderContext context, JtwigPosition position, Expression left, Expression right) throws CalculateException {
         Object calculate = left.calculate(context);
         if (calculate == null) {
-            if (context.configuration().strictMode()) {
+            if (context.environment().isStrictMode()) {
                 if (right instanceof Variable.Compiled) {
                     String propertyName = ((Variable.Compiled) right).name();
                     throw new CalculateException(String.format(position + ": Impossible to access attribute/method '%s' on null", propertyName));
@@ -39,7 +39,7 @@ public class SelectionOperation implements BinaryOperation {
                 }
             } else return Undefined.UNDEFINED;
         } else if (calculate == Undefined.UNDEFINED) {
-            if (context.configuration().strictMode()) {
+            if (context.environment().isStrictMode()) {
                 if (right instanceof Variable.Compiled) {
                     String propertyName = ((Variable.Compiled) right).name();
                     throw new CalculateException(String.format(position + ": Impossible to access attribute/method '%s' on undefined", propertyName));

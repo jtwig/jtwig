@@ -14,37 +14,35 @@
 
 package org.jtwig.acceptance;
 
-import org.junit.Test;
-
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import org.jtwig.AbstractJtwigTest;
 import static org.jtwig.parser.config.TagSymbols.JAVASCRIPT_COLLISION_FREE;
-import static org.jtwig.util.SyntacticSugar.after;
-import static org.jtwig.util.SyntacticSugar.given;
+import org.junit.Test;
 
 public class CustomTagsTest extends AbstractJtwigTest {
     @Test
     public void javascriptOutputTag() throws Exception {
-        given(theConfiguration().parse().withSymbols(JAVASCRIPT_COLLISION_FREE));
+        env.setSymbols(JAVASCRIPT_COLLISION_FREE);
 
-        after(jtwigRenders(template("@> 1 <@")));
-        assertThat(theRenderedTemplate(), is(equalTo("1")));
+        withResource("@> 1 <@");
+        assertThat(theResult(), is(equalTo("1")));
     }
 
     @Test
     public void javascriptCodeTag() throws Exception {
-        given(theConfiguration().parse().withSymbols(JAVASCRIPT_COLLISION_FREE));
+        env.setSymbols(JAVASCRIPT_COLLISION_FREE);
 
-        after(jtwigRenders(template("<# if (true) #>Hello<# endif #>")));
-        assertThat(theRenderedTemplate(), is(equalTo("Hello")));
+        withResource("<# if (true) #>Hello<# endif #>");
+        assertThat(theResult(), is(equalTo("Hello")));
     }
 
     @Test
     public void javascriptComment() throws Exception {
-        given(theConfiguration().parse().withSymbols(JAVASCRIPT_COLLISION_FREE));
+        env.setSymbols(JAVASCRIPT_COLLISION_FREE);
 
-        after(jtwigRenders(template("<$ if (true) #>Hello<# endif $>")));
-        assertThat(theRenderedTemplate(), is(equalTo("")));
+        withResource("<$ if (true) #>Hello<# endif $>");
+        assertThat(theResult(), is(equalTo("")));
     }
 }

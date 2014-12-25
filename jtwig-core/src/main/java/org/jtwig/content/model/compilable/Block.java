@@ -14,13 +14,17 @@
 
 package org.jtwig.content.model.compilable;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.jtwig.compile.CompileContext;
 import org.jtwig.content.api.Renderable;
+import org.jtwig.content.model.Template;
 import org.jtwig.exception.CompileException;
+import org.jtwig.exception.ParseException;
 import org.jtwig.exception.RenderException;
+import org.jtwig.exception.ResourceException;
 import org.jtwig.parser.model.JtwigPosition;
 import org.jtwig.render.RenderContext;
-import org.jtwig.resource.FileJtwigResource;
 
 public class Block extends Content<Block> {
     private final JtwigPosition position;
@@ -52,9 +56,14 @@ public class Block extends Content<Block> {
         }
         @Override
         public void render(final RenderContext context) throws RenderException {
-            CompiledBlock b = position.getCompiledTemplate(context).block(name);
-            b.content.render(context);
+            try {
+                String path = position.getResource().relativePath();
+                Template.CompiledTemplate t = context.environment().compile(path);
+                CompiledBlock b = t.block(name);
+                b.content.render(context);
+            } catch (CompileException | ParseException | ResourceException ex) {
+                throw new RenderException(ex);
+            }
         }
-        
     }
 }

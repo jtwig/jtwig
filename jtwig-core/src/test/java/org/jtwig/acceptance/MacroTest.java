@@ -14,38 +14,25 @@
 
 package org.jtwig.acceptance;
 
-import org.jtwig.compile.CompileContext;
-import org.jtwig.configuration.JtwigConfiguration;
-import org.jtwig.parser.JtwigParser;
-import org.jtwig.resource.JtwigResource;
-import org.junit.Test;
-
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
-import org.jtwig.cache.impl.ExecutionCache;
+import org.jtwig.AbstractJtwigTest;
 import org.jtwig.content.model.Template;
 import static org.jtwig.util.SyntacticSugar.then;
+import org.junit.Test;
 
 public class MacroTest extends AbstractJtwigTest {
     @Test
     public void ensureMacrosAreAddedToTemplate() throws Exception {
-        JtwigResource resource = templateResource("templates/acceptance/macro/macro.twig");
-        JtwigConfiguration configuration = new JtwigConfiguration(new ExecutionCache());
-        JtwigParser parser = new JtwigParser(configuration.parse());
-        CompileContext ctx = new CompileContext(resource, parser, configuration.compile());
-        Template.CompiledTemplate t = parser.parse(resource)
-                .compile(ctx);
-        then(t.macros().size(), is(equalTo(2)));
+        withResource(classpathResource("templates/acceptance/macro/macro.twig"));
+        Template.CompiledTemplate ct = theEnvironment().compile(resource);
+        then(ct.macros().size(), is(equalTo(2)));
     }
     
     @Test
     public void ensureLastMacroDefinedWithSameNameIsUsed() throws Exception {
-        JtwigResource resource = templateResource("templates/acceptance/macro/overloading.twig");
-        JtwigConfiguration configuration = new JtwigConfiguration(new ExecutionCache());
-        JtwigParser parser = new JtwigParser(configuration.parse());
-        CompileContext ctx = new CompileContext(resource, parser, configuration.compile());
-        Template.CompiledTemplate t = parser.parse(resource)
-                .compile(ctx);
+        withResource(classpathResource("templates/acceptance/macro/overloading.twig"));
+        Template.CompiledTemplate t = theEnvironment().compile(resource);
         then(t.macros().size(), is(equalTo(1)));
         then(t.macros().entrySet().iterator().next().getValue().arguments().size(), is(equalTo(1)));
     }

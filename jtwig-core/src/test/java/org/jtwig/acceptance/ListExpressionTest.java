@@ -14,40 +14,31 @@
 
 package org.jtwig.acceptance;
 
-import org.jtwig.JtwigModelMap;
-import org.jtwig.JtwigTemplate;
-import org.jtwig.exception.CompileException;
-import org.jtwig.exception.ParseException;
-import org.jtwig.exception.RenderException;
-import org.junit.Test;
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import org.jtwig.AbstractJtwigTest;
+import org.junit.Test;
 
 public class ListExpressionTest extends AbstractJtwigTest {
     @Test
-    public void integerListByComprehension () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = JtwigTemplate.fromString("{{ (1..5) | join(',') }}");
-        JtwigModelMap context = new JtwigModelMap();
-        assertThat(template.output(context), is("1,2,3,4,5"));
+    public void integerListByComprehension () throws Exception {
+        withResource("{{ (1..5) | join(',') }}");
+        assertThat(theResult(), is("1,2,3,4,5"));
     }
     @Test
-    public void integerListByComprehensionReverse () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = JtwigTemplate.fromString("{{ (5..1) | join(',') }}");
-        JtwigModelMap context = new JtwigModelMap();
-        assertThat(template.output(context), is("5,4,3,2,1"));
+    public void integerListByComprehensionReverse () throws Exception {
+        withResource("{{ (5..1) | join(',') }}");
+        assertThat(theResult(), is("5,4,3,2,1"));
     }
 
     @Test
-    public void characterListByComprehension () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = JtwigTemplate.fromString("{{ ('a'..'c') | join }}");
-        JtwigModelMap context = new JtwigModelMap();
-        assertThat(template.output(context), is("abc"));
+    public void characterListByComprehension () throws Exception {
+        withResource("{{ ('a'..'c') | join }}");
+        assertThat(theResult(), is("abc"));
     }
     @Test
-    public void characterListByComprehensionReverse () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = JtwigTemplate.fromString("{{ ('c'.. 'a') | join }}");
-        JtwigModelMap context = new JtwigModelMap();
-        assertThat(template.output(context), is("cba"));
+    public void characterListByComprehensionReverse () throws Exception {
+        withResource("{{ ('c'.. 'a') | join }}");
+        assertThat(theResult(), is("cba"));
     }
 }

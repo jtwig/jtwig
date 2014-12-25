@@ -14,23 +14,21 @@
 
 package org.jtwig.acceptance.issues;
 
-import org.jtwig.acceptance.AbstractJtwigTest;
-import org.junit.Test;
-
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
+import org.jtwig.AbstractJtwigTest;
 import static org.jtwig.util.SyntacticSugar.then;
-import static org.jtwig.util.SyntacticSugar.when;
+import org.junit.Test;
 
 public class Issue97Test extends AbstractJtwigTest {
     @Test
     public void testDecimalResult() throws Exception {
-        when(jtwigRenders(template("{{ 1 / 10 }}")));
-        then(theRenderedTemplate(), is(equalTo("0.1")));
+        withResource("{{ 1 / 10 }}");
+        then(theResult(), is(equalTo("0.1")));
     }
     @Test
     public void testIntegerDivision() throws Exception {
-        when(jtwigRenders(template("{{ 1 // 10 }}")));
-        then(theRenderedTemplate(), is(equalTo("0")));
+        withResource("{{ 1 // 10 }}");
+        then(theResult(), is(equalTo("0")));
     }
 }

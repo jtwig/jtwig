@@ -14,49 +14,51 @@
 
 package org.jtwig.acceptance;
 
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsEqual.equalTo;
+import org.jtwig.AbstractJtwigTest;
 import org.jtwig.exception.ParseException;
 import org.jtwig.functions.annotations.JtwigFunction;
 import org.jtwig.functions.annotations.Parameter;
+import static org.jtwig.util.SyntacticSugar.given;
+import static org.jtwig.util.SyntacticSugar.then;
 import org.junit.Test;
-
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.jtwig.util.SyntacticSugar.*;
 
 public class ImportTest extends AbstractJtwigTest {
     @Test
     public void basicExample() throws Exception {
-        when(jtwigRenders(templateResource("templates/acceptance/import/import.twig")));
-        then(theRenderedTemplate().trim(), is(equalTo("text (test)\n\n\npassword (pass)\n\n\npassword (password)")));
+        withResource(classpathResource("templates/acceptance/import/import.twig"));
+        then(theResult().trim(), is(equalTo("text (test)\n\n\npassword (pass)\n\n\npassword (password)")));
     }
     
     @Test(expected = ParseException.class)
     public void ensureInvalidImportStatementThrowsException() throws Exception {
-        when(jtwigRenders(templateResource("templates/acceptance/import/multiple-import-as.twig")));
+        withResource(classpathResource("templates/acceptance/import/multiple-import-as.twig"));
+        render();
     }
     
     @Test
     public void ensureImportSelfWorks() throws Exception {
-        when(jtwigRenders(templateResource("templates/acceptance/import/import-self.twig")));
-        then(theRenderedTemplate().trim(), is(equalTo("jtwig")));
+        withResource(classpathResource("templates/acceptance/import/import-self.twig"));
+        then(theResult().trim(), is(equalTo("jtwig")));
     }
     
     @Test
     public void ensureNestedSelfImportWorks() throws Exception {
-        when(jtwigRenders(templateResource("templates/acceptance/import/nested-import-self-test.twig")));
-        then(theRenderedTemplate().trim(), is(equalTo("<input type=\"password\" name=\"jtwig\">")));
+        withResource(classpathResource("templates/acceptance/import/nested-import-self-test.twig"));
+        then(theResult().trim(), is(equalTo("<input type=\"password\" name=\"jtwig\">")));
     }
     
     @Test
     public void ensureMacrosCanUseCustomFunctions() throws Exception {
-        given(theConfiguration()).render().functionRepository().include(new TypeFunction());
-        when(jtwigRenders(templateResource("templates/acceptance/import/macro-can-use-functions.twig")));
-        then(theRenderedTemplate().trim(), is(equalTo("java.lang.String")));
+        given(theEnvironment()).getFunctionRepository().include(new TypeFunction());
+        withResource(classpathResource("templates/acceptance/import/macro-can-use-functions.twig"));
+        then(theResult().trim(), is(equalTo("java.lang.String")));
     }
     
 //    @Test(expected = CompileException.class)
 //    public void ensureInvalidFromStatementThrowsException() throws Exception {
-//        when(jtwigRenders(templateResource("templates/acceptance/import/import-string-name.twig")));
+//        withResource("templates/acceptance/import/import-string-name.twig")));
 //    }
     
     public static class TypeFunction {

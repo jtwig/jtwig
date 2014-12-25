@@ -37,6 +37,13 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 import org.springframework.web.servlet.theme.FixedThemeResolver;
 
 import java.io.IOException;
+import java.util.Arrays;
+import javax.servlet.ServletContext;
+import org.jtwig.Environment;
+import org.jtwig.functions.SpringFunctions;
+import org.jtwig.loader.impl.ChainLoader;
+import org.jtwig.loader.impl.ClasspathLoader;
+import org.jtwig.loader.impl.WebResourceLoader;
 
 public abstract class AbstractJtwigAcceptanceTest {
     private HttpClient httpClient = httpClient();
@@ -45,7 +52,7 @@ public abstract class AbstractJtwigAcceptanceTest {
 
     private GetMethod getResult;
     private void startServer () throws Exception {
-        jetty = new Server(0);
+        jetty = new Server(9090);
 
         final AnnotationConfigWebApplicationContext applicationContext = new AnnotationConfigWebApplicationContext();
         applicationContext.register(ConfigClass.class, getClass());
@@ -114,12 +121,29 @@ public abstract class AbstractJtwigAcceptanceTest {
 
         @Bean
         public ViewResolver viewResolver () {
-            JtwigViewResolver jtwigViewResolver = new JtwigViewResolver();
+            JtwigViewResolver jtwigViewResolver = new JtwigViewResolver(environment());
             jtwigViewResolver.setPrefix("/WEB-INF/views/");
             jtwigViewResolver.setSuffix(".twig.html");
             jtwigViewResolver.setThemeResolver(themeResolver());
             jtwigViewResolver.setUseThemeInViewPath(true);
             return jtwigViewResolver;
+        }
+        
+        @Bean
+        public Environment environment (/*ServletContext ctx*/) {
+            ClasspathLoader classpath = new ClasspathLoader();
+//            ChainLoader chainLoader = new ChainLoader(Arrays.asList(web, classpath));
+            
+            Environment env = new Environment();
+            env.setLoader(classpath);
+            
+//            env.getFunctionRepository().include(springFunctions());
+            return env;
+        }
+        
+        @Bean
+        public SpringFunctions springFunctions () {
+            return new SpringFunctions();
         }
     }
 

@@ -3,7 +3,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,17 +12,22 @@
  * limitations under the License.
  */
 
-package org.jtwig.unit.resource;
+package org.jtwig.unit.loader.impl;
 
 import org.jtwig.exception.ResourceException;
-import org.jtwig.resource.StringJtwigResource;
+import org.jtwig.loader.impl.StringLoader;
+import org.junit.Assert;
 import org.junit.Test;
 
-public class StringJtwigResourceTest {
-    private StringJtwigResource resource = new StringJtwigResource("");
-
+public class StringLoaderTest {
+    public void buildsResource() throws Exception {
+        StringLoader loader = new StringLoader("hello, world!");
+        Assert.assertEquals("hello, world!", loader.get("").source());
+    }
+    
     @Test(expected = ResourceException.class)
-    public void stringCannotResolveRelativeResources() throws Exception {
-        resource.resolve("");
+    public void cannotResolveRelativeResources() throws Exception {
+        StringLoader loader = new StringLoader("hello, world!");
+        loader.get("").resolve("../test.twig");
     }
 }

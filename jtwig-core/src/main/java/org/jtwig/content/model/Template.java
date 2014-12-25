@@ -80,17 +80,7 @@ public abstract class Template implements Compilable, ElementList<Compilable>, E
 
     //~ Compilable impl ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     @Override
-    public CompiledTemplate compile(final CompileContext context) throws CompileException {
-        CompiledTemplate template = context.cache().getCompiled(position.getResource().path());
-        if (template != null) {
-            return template;
-        }
-        
-        template = doCompile(context);
-        context.cache().addCompiled(position.getResource().path(), template);
-        return template;
-    }
-    public abstract CompiledTemplate doCompile(CompileContext context) throws CompileException;
+    public abstract CompiledTemplate compile(final CompileContext context) throws CompileException;
     
     //~ Helpers ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     /**

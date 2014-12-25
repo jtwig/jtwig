@@ -22,63 +22,31 @@ import org.jtwig.content.api.Compilable;
 import org.jtwig.content.api.Tag;
 import org.jtwig.content.model.compilable.*;
 import org.jtwig.content.model.tag.WhiteSpaceControl;
-import org.jtwig.exception.ParseBypassException;
 import org.jtwig.exception.ParseException;
-import org.jtwig.exception.ResourceException;
 import org.jtwig.expressions.model.Constant;
 import org.jtwig.expressions.model.Variable;
-import org.jtwig.parser.config.ParserConfiguration;
 import org.jtwig.parser.model.JtwigKeyword;
 import org.jtwig.parser.model.JtwigSymbol;
-import org.jtwig.resource.JtwigResource;
 import org.parboiled.BaseParser;
 import org.parboiled.Rule;
-import org.parboiled.common.FileUtils;
-import org.parboiled.errors.ParserRuntimeException;
-import org.parboiled.parserunners.ReportingParseRunner;
-import org.parboiled.support.ParsingResult;
 
 import javax.annotation.Nullable;
-import java.nio.charset.Charset;
 import java.util.Collection;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
+import org.jtwig.Environment;
 import org.jtwig.content.api.ability.ElementList;
 import org.jtwig.content.api.ability.ElementTracker;
 import org.jtwig.content.model.BasicTemplate;
 import org.jtwig.content.model.ExtendsTemplate;
 import org.jtwig.content.model.Template;
+import org.jtwig.loader.Loader;
 import static org.jtwig.parser.model.JtwigKeyword.*;
 import static org.jtwig.parser.model.JtwigSymbol.*;
 import static org.jtwig.parser.model.JtwigTagProperty.Trim;
 import static org.parboiled.Parboiled.createParser;
 
 public class JtwigContentParser extends JtwigBaseParser<Compilable> {
-    public static JtwigContentParser newParser(
-            JtwigResource resource,
-            ParserConfiguration configuration
-    ) {
-        return createParser(JtwigContentParser.class, resource, configuration);
-    }
-
-    public static Template parse(JtwigContentParser parser, JtwigResource input) throws ParseException {
-        try {
-            ReportingParseRunner<Compilable> runner = new ReportingParseRunner<>(parser.start());
-            ParsingResult<Compilable> result = runner.run(
-                    FileUtils.readAllText(input.retrieve(), Charset.defaultCharset()));
-            return (Template)result.resultValue;
-        } catch (ParserRuntimeException e) {
-            if (e.getCause() instanceof ParseBypassException) {
-                ParseException innerException = ((ParseBypassException) e.getCause()).getInnerException();
-                innerException.setExpression(e.getMessage());
-                throw innerException;
-            } else {
-                throw new ParseException(e);
-            }
-        } catch (ResourceException e) {
-            throw new ParseException(e);
-        }
-    }
 
     final JtwigBasicParser basicParser;
     final JtwigExpressionParser expressionParser;
@@ -86,22 +54,22 @@ public class JtwigContentParser extends JtwigBaseParser<Compilable> {
 
     Addon[] contentAddonParsers;
     Collection<Class<? extends BaseParser>> contentAddons;
-    ParserConfiguration configuration;
+    Environment env;
 
-    public JtwigContentParser(JtwigResource resource, ParserConfiguration configuration) {
+    public JtwigContentParser(Loader.Resource resource, Environment env) {
         super(resource);
-        basicParser = createParser(JtwigBasicParser.class, configuration);
-        tagPropertyParser = createParser(JtwigTagPropertyParser.class, configuration);
-        expressionParser = createParser(JtwigExpressionParser.class, resource, configuration);
+        basicParser = env.getBasicParser();
+        tagPropertyParser = env.getTagPropertyParser();
+        expressionParser = createParser(JtwigExpressionParser.class, resource, env);
 
-        this.contentAddons = Collections2.transform(configuration.addons().list(), toBaseParser());
-        this.configuration = configuration;
+        this.contentAddons = Collections2.transform(env.getAddonParserList().list(), toBaseParser());
+        this.env = env;
 
         contentAddonParsers = new Addon[contentAddons.size()];
 
         int i = 0;
         for (Class<? extends BaseParser> contentAddon : contentAddons) {
-            contentAddonParsers[i++] = (Addon) createParser(contentAddon, resource, configuration);
+            contentAddonParsers[i++] = (Addon) createParser(contentAddon, resource, env);
         }
     }
 

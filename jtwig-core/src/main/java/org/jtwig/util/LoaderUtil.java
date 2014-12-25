@@ -3,7 +3,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,15 +12,15 @@
  * limitations under the License.
  */
 
-package org.jtwig.resource;
+package org.jtwig.util;
 
-import org.jtwig.exception.ResourceException;
+import org.apache.commons.lang3.StringUtils;
 
-import java.io.InputStream;
-
-public interface JtwigResource {
-    boolean exists ();
-    String path ();
-    InputStream retrieve () throws ResourceException;
-    JtwigResource resolve (String relativePath) throws ResourceException;
+public class LoaderUtil {
+    public static String getCacheKey(String relative) {
+        if (StringUtils.isBlank(relative)) {
+            return null;
+        }
+        return StringUtils.strip(relative, "/").replaceAll("/+", "_");
+    }
 }

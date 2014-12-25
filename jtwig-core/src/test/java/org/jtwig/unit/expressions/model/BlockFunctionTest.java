@@ -14,18 +14,19 @@
 
 package org.jtwig.unit.expressions.model;
 
+import org.jtwig.AbstractJtwigTest;
 import org.jtwig.content.model.BasicTemplate;
 import org.jtwig.content.model.Template;
 import org.jtwig.exception.CompileException;
 import org.jtwig.expressions.model.BlockFunction;
 import org.jtwig.expressions.model.Constant;
-import org.jtwig.unit.AbstractUnitTest;
+import org.jtwig.MultiresourceUnitTest;
 import org.junit.Assert;
 import org.junit.Test;
 
 import static org.mockito.Mockito.*;
 
-public class BlockFunctionTest extends AbstractUnitTest {
+public class BlockFunctionTest extends AbstractJtwigTest {
     
     @Test
     public void complainsOnLackOfArgument() throws Exception {
@@ -42,7 +43,7 @@ public class BlockFunctionTest extends AbstractUnitTest {
     public void expressionCalculationQueriesContext() throws Exception {
         Template.CompiledTemplate template = mock(BasicTemplate.CompiledBasicTemplate.class);
         when(template.getPrimordial()).thenReturn(template);
-        when(renderContext.getRenderingTemplate()).thenReturn(template);
+        doReturn(template).when(renderContext).getRenderingTemplate();
         BlockFunction block = new BlockFunction(null);
         block.add(new Constant<>("title"));
         block.compile(compileContext)

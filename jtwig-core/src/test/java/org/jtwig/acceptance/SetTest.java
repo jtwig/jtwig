@@ -14,21 +14,15 @@
 
 package org.jtwig.acceptance;
 
-import org.jtwig.JtwigModelMap;
-import org.jtwig.JtwigTemplate;
-import org.jtwig.exception.CompileException;
-import org.jtwig.exception.ParseException;
-import org.jtwig.exception.RenderException;
-import org.junit.Test;
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import org.jtwig.AbstractJtwigTest;
+import org.junit.Test;
 
 public class SetTest extends AbstractJtwigTest {
     @Test
-    public void testShouldChangeTheContext() throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = JtwigTemplate.fromString("{% set a = 1 %}{{ a }}");
-        JtwigModelMap context = new JtwigModelMap();
-        assertThat(template.output(context), is("1"));
+    public void testShouldChangeTheContext() throws Exception {
+        withResource("{% set a = 1 %}{{ a }}");
+        assertThat(theResult(), is("1"));
     }
 }

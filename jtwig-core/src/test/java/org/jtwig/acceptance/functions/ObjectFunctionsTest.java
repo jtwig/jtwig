@@ -14,7 +14,7 @@
 
 package org.jtwig.acceptance.functions;
 
-import org.jtwig.acceptance.AbstractJtwigTest;
+import org.jtwig.AbstractJtwigTest;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -25,98 +25,98 @@ public class ObjectFunctionsTest extends AbstractJtwigTest {
 
     @Test
     public void defaultFunctionTest() throws Exception {
-        when(jtwigRenders(template("{{ default(null, 1) }}")));
-        then(theRenderedTemplate(), is(equalTo("1")));
+        withResource("{{ default(null, 1) }}");
+        then(theResult(), is(equalTo("1")));
     }
 
     @Test
     public void defaultUndefinedVariableTest() throws Exception {
-        when(jtwigRenders(template("{{ default(a, 1) }}")));
-        then(theRenderedTemplate(), is(equalTo("1")));
+        withResource("{{ default(a, 1) }}");
+        then(theResult(), is(equalTo("1")));
     }
 
     @Test
     public void defaultUndefinedMethodOrFieldTest() throws Exception {
-        given(aModel().withModelAttribute("a", new Object()));
-        when(jtwigRenders(template("{{ default(a.call, 1) }}")));
-        then(theRenderedTemplate(), is(equalTo("1")));
+        given(theModel().withModelAttribute("a", new Object()));
+        withResource("{{ default(a.call, 1) }}");
+        then(theResult(), is(equalTo("1")));
     }
 
     @Test
     public void jsonEncode() throws Exception {
-        when(jtwigRenders(template("{{ json_encode({one: 'hello'}) }}")));
-        then(theRenderedTemplate(), is(equalTo("{\"one\":\"hello\"}")));
+        withResource("{{ json_encode({one: 'hello'}) }}");
+        then(theResult(), is(equalTo("{\"one\":\"hello\"}")));
     }
 
     @Test
     public void mapLength() throws Exception {
-        when(jtwigRenders(template("{{ length({one: 'hello'}) }}")));
-        then(theRenderedTemplate(), is(equalTo("1")));
+        withResource("{{ length({one: 'hello'}) }}");
+        then(theResult(), is(equalTo("1")));
     }
 
     @Test
     public void listLength() throws Exception {
-        when(jtwigRenders(template("{{ length([1,2]) }}")));
-        then(theRenderedTemplate(), is(equalTo("2")));
+        withResource("{{ length([1,2]) }}");
+        then(theResult(), is(equalTo("2")));
     }
 
     @Test
     public void stringLength() throws Exception {
-        when(jtwigRenders(template("{{ length('Hello') }}")));
-        then(theRenderedTemplate(), is(equalTo("5")));
+        withResource("{{ length('Hello') }}");
+        then(theResult(), is(equalTo("5")));
     }
 
     @Test
     public void mapFirst() throws Exception {
-        when(jtwigRenders(template("{{ first({one: 'hello'}) }}")));
-        then(theRenderedTemplate(), is(equalTo("hello")));
+        withResource("{{ first({one: 'hello'}) }}");
+        then(theResult(), is(equalTo("hello")));
     }
 
     @Test
     public void listFirst() throws Exception {
-        when(jtwigRenders(template("{{ first([1,2]) }}")));
-        then(theRenderedTemplate(), is(equalTo("1")));
+        withResource("{{ first([1,2]) }}");
+        then(theResult(), is(equalTo("1")));
     }
 
     @Test
     public void stringFirst() throws Exception {
-        when(jtwigRenders(template("{{ first('Hello') }}")));
-        then(theRenderedTemplate(), is(equalTo("H")));
+        withResource("{{ first('Hello') }}");
+        then(theResult(), is(equalTo("H")));
     }
 
     @Test
     public void mapLast() throws Exception {
-        when(jtwigRenders(template("{{ last({one: 'hello'}) }}")));
-        then(theRenderedTemplate(), is(equalTo("hello")));
+        withResource("{{ last({one: 'hello'}) }}");
+        then(theResult(), is(equalTo("hello")));
     }
 
     @Test
     public void listLast() throws Exception {
-        when(jtwigRenders(template("{{ last([1,2]) }}")));
-        then(theRenderedTemplate(), is(equalTo("2")));
+        withResource("{{ last([1,2]) }}");
+        then(theResult(), is(equalTo("2")));
     }
 
     @Test
     public void arrayLast() throws Exception {
-        given(aModel().withModelAttribute("array", new int[]{1,2}));
-        when(jtwigRenders(template("{{ last(array) }}")));
-        then(theRenderedTemplate(), is(equalTo("2")));
+        given(theModel().withModelAttribute("array", new int[]{1,2}));
+        withResource("{{ last(array) }}");
+        then(theResult(), is(equalTo("2")));
     }
 
     @Test
     public void stringLast() throws Exception {
-        when(jtwigRenders(template("{{ last('Hello') }}")));
-        then(theRenderedTemplate(), is(equalTo("o")));
+        withResource("{{ last('Hello') }}");
+        then(theResult(), is(equalTo("o")));
     }
 
     @Test
     public void reserveTest() throws Exception {
-        when(jtwigRenders(template("{{ reverse('Hello') }}")));
-        then(theRenderedTemplate(), is(equalTo("olleH")));
+        withResource("{{ reverse('Hello') }}");
+        then(theResult(), is(equalTo("olleH")));
     }
     @Test
     public void reserveListTest() throws Exception {
-        when(jtwigRenders(template("{{ reverse([1,2]) }}")));
-        then(theRenderedTemplate(), is(equalTo("[2, 1]")));
+        withResource("{{ reverse([1,2]) }}");
+        then(theResult(), is(equalTo("[2, 1]")));
     }
 }

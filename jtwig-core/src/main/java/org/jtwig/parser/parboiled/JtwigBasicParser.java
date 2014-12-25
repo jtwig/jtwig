@@ -14,7 +14,7 @@
 
 package org.jtwig.parser.parboiled;
 
-import org.jtwig.parser.config.ParserConfiguration;
+import org.jtwig.Environment;
 import org.jtwig.parser.model.JtwigKeyword;
 import org.jtwig.parser.model.JtwigSymbol;
 import org.parboiled.BaseParser;
@@ -26,10 +26,10 @@ import org.parboiled.annotations.SuppressNode;
 import static org.jtwig.parser.model.JtwigSymbol.QUOTE;
 
 public class JtwigBasicParser extends BaseParser<String> {
-    final ParserConfiguration parserConfiguration;
+    final Environment env;
 
-    public JtwigBasicParser(ParserConfiguration parserConfiguration) {
-        this.parserConfiguration = parserConfiguration;
+    public JtwigBasicParser(Environment env) {
+        this.env = env;
     }
 
     @SuppressNode
@@ -47,27 +47,27 @@ public class JtwigBasicParser extends BaseParser<String> {
     }
 
     public Rule closeCode() {
-        return String(parserConfiguration.symbols().endTag());
+        return String(env.getSymbols().endTag());
     }
 
     public Rule openCode() {
-        return String(parserConfiguration.symbols().beginTag());
+        return String(env.getSymbols().beginTag());
     }
 
     public Rule openOutput() {
-        return String(parserConfiguration.symbols().beginOutput());
+        return String(env.getSymbols().beginOutput());
     }
 
     public Rule closeOutput() {
-        return String(parserConfiguration.symbols().endOutput());
+        return String(env.getSymbols().endOutput());
     }
 
     public Rule openComment() {
-        return String(parserConfiguration.symbols().beginComment());
+        return String(env.getSymbols().beginComment());
     }
 
     public Rule closeComment() {
-        return String(parserConfiguration.symbols().endComment());
+        return String(env.getSymbols().endComment());
     }
 
     @MemoMismatches

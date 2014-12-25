@@ -1,14 +1,14 @@
 package org.jtwig.addons.tag;
 
 import com.google.common.base.Function;
+import org.jtwig.Environment;
 import org.jtwig.addons.Addon;
 import org.jtwig.addons.AddonModel;
-import org.jtwig.parser.config.ParserConfiguration;
-import org.jtwig.resource.JtwigResource;
+import org.jtwig.loader.Loader;
 
 public abstract class TagAddon extends Addon {
-    public TagAddon(JtwigResource resource, ParserConfiguration configuration) {
-        super(resource, configuration);
+    public TagAddon(Loader.Resource resource, Environment env) {
+        super(resource, env);
     }
 
     @Override

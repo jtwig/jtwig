@@ -14,31 +14,27 @@
 
 package org.jtwig.acceptance;
 
-import org.jtwig.JtwigModelMap;
-import org.jtwig.JtwigTemplate;
-import org.junit.Test;
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import org.jtwig.AbstractJtwigTest;
+import org.junit.Test;
 
 public class TernaryOperatorTest extends AbstractJtwigTest {
     @Test
     public void testTrue() throws Exception {
-        JtwigTemplate template = JtwigTemplate.fromString("{{ true ? 1 : 2 }}");
-        String result = template.output(new JtwigModelMap());
-        assertThat(result, is("1"));
+        withResource("{{ true ? 1 : 2 }}");
+        assertThat(theResult(), is("1"));
     }
 
     @Test
     public void testTemplateTrue() throws Exception {
-        JtwigTemplate template = JtwigTemplate.fromString("{{ value ? '1' : '2' }}");
-        String result = template.output(new JtwigModelMap().withModelAttribute("value", true));
-        assertThat(result, is("1"));
+        model.withModelAttribute("value", true);
+        withResource("{{ value ? '1' : '2' }}");
+        assertThat(theResult(), is("1"));
     }
     @Test
      public void testFalse() throws Exception {
-        JtwigTemplate template = JtwigTemplate.fromString("{{ false ? 1 : 2 }}");
-        String result = template.output(new JtwigModelMap());
-        assertThat(result, is("2"));
+        withResource("{{ false ? 1 : 2 }}");
+        assertThat(theResult(), is("2"));
     }
 }

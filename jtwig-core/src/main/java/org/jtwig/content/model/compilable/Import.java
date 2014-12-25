@@ -22,11 +22,11 @@ import org.jtwig.expressions.api.CompilableExpression;
 import org.jtwig.expressions.api.Expression;
 import org.jtwig.parser.model.JtwigPosition;
 import org.jtwig.render.RenderContext;
-import org.jtwig.resource.JtwigResource;
 import java.util.HashMap;
 import java.util.Map;
 import org.jtwig.content.model.Template;
 import org.jtwig.expressions.model.Variable;
+import org.jtwig.loader.Loader;
 
 public abstract class Import {
     /**
@@ -141,13 +141,13 @@ public abstract class Import {
      * reference was made is always known.
      */
     public static class SelfReference implements CompilableExpression, Expression {
-        private final JtwigResource resource;
+        private final Loader.Resource resource;
         
         public SelfReference(final JtwigPosition position) {
             this.resource = position.getResource();
         }
         
-        public JtwigResource resource() {
+        public Loader.Resource resource() {
             return resource;
         }
 
@@ -177,7 +177,8 @@ public abstract class Import {
         if (from instanceof SelfReference) {
             return position.getCompiledTemplate(renderContext);
         }
-        JtwigResource resource = compileContext.retrieve((String)from.calculate(renderContext));
-        return compileContext.parse(resource).compile(compileContext);
+        String path = position.getResource().resolve((String)from.calculate(renderContext));
+        Loader.Resource resource = compileContext.environment().load(path);
+        return compileContext.environment().compile(resource, compileContext);
     }
 }

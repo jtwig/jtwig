@@ -22,11 +22,10 @@ import org.jtwig.expressions.api.CompilableExpression;
 import org.jtwig.expressions.api.Expression;
 import org.jtwig.parser.model.JtwigPosition;
 import org.jtwig.render.RenderContext;
-import org.jtwig.resource.JtwigResource;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.jtwig.content.model.Template;
 import org.jtwig.expressions.model.Constant;
+import org.jtwig.loader.Loader;
 
 public class Include extends AbstractElement {
     private final CompilableExpression expr;
@@ -61,9 +60,10 @@ public class Include extends AbstractElement {
         // make sure it exists
         try {
             if (expr instanceof Constant) {
-                JtwigResource resource = context.retrieve(((Constant)expr).getValue().toString());
-                if (!resource.exists() && !ignoreMissing) {
-                    resource.retrieve();
+                String path = position.getResource().resolve(((Constant)expr).getValue().toString());
+                Loader.Resource resource = context.environment().load(path);
+                if (resource == null && !ignoreMissing) {
+                    throw new ResourceException("Resource "+path+" not found");
                 }
             }
         } catch (ResourceException ex) {
@@ -103,12 +103,13 @@ public class Include extends AbstractElement {
         public void render(RenderContext context) throws RenderException {
             try {
                 // Build the renderable
-                JtwigResource resource = compileContext.retrieve(expr.calculate(context).toString());
-                if (!resource.exists() && ignoreMissing) {
+                String path = position.getResource().resolve(expr.calculate(context).toString());
+                Loader.Resource resource = context.environment().load(path);
+                if (resource == null && ignoreMissing) {
                     return;
                 }
                 CompileContext compileCtx = compileContext.clone().withResource(resource);
-                Renderable renderable = compileCtx.parse(resource).compile(compileCtx);
+                Template.CompiledTemplate compiled = context.environment().compile(resource, compileCtx);
 
                 // Isolate the render context if needed
                 RenderContext usedContext = context;
@@ -121,13 +122,15 @@ public class Include extends AbstractElement {
                     try {
                         Object calculate = withExpression.calculate(context);
                         if (calculate instanceof Map) {
-                            renderable.render(usedContext.with((Map) calculate));
-                        } else throw new RenderException(position+": Include 'with' must be given a map.");
+                            compiled.render(usedContext.with((Map)calculate));
+                        } else {
+                            throw new RenderException(position+": Include 'with' must be given a map.");
+                        }
                     } catch (CalculateException e) {
                         throw new RenderException(e);
                     }
                 } else {
-                    renderable.render(usedContext);
+                    compiled.render(usedContext);
                 }
             } catch (CalculateException | CompileException | ParseException | ResourceException ex) {
                 throw new RenderException(ex);

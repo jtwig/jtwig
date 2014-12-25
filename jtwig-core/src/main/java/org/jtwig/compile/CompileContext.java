@@ -14,26 +14,20 @@
 
 package org.jtwig.compile;
 
+import org.jtwig.Environment;
 import org.jtwig.cache.TemplateCache;
-import org.jtwig.compile.config.CompileConfiguration;
 import org.jtwig.content.model.compilable.Sequence;
-import org.jtwig.exception.ParseException;
-import org.jtwig.exception.ResourceException;
-import org.jtwig.parser.JtwigParser;
-import org.jtwig.resource.JtwigResource;
 
-import org.jtwig.content.model.Template;
+import org.jtwig.loader.Loader;
 
 public class CompileContext {
-    private JtwigResource resource;
-    private final JtwigParser parser;
-    private final CompileConfiguration configuration;
+    private Loader.Resource resource;
+    private final Environment env;
     private Sequence parent;
 
-    public CompileContext(JtwigResource resource, JtwigParser parser, CompileConfiguration configuration) {
+    public CompileContext(Loader.Resource resource, Environment env) {
         this.resource = resource;
-        this.parser = parser;
-        this.configuration = configuration;
+        this.env = env;
         this.parent = null;
     }
 
@@ -50,25 +44,21 @@ public class CompileContext {
         return parent;
     }
     
+    public Environment environment() {
+        return env;
+    }
+    
     public TemplateCache cache() {
-        return configuration.cache();
-    }
-
-    public JtwigResource retrieve(String relativePath) throws ResourceException {
-        return resource.resolve(relativePath);
-    }
-
-    public Template parse (JtwigResource resource) throws ParseException {
-        return parser.parse(resource);
+        return env.getCache();
     }
 
     public CompileContext clone() {
-        CompileContext compileContext = new CompileContext(resource, parser, configuration);
+        CompileContext compileContext = new CompileContext(resource, env);
         compileContext.withParent(parent);
         return compileContext;
     }
 
-    public CompileContext withResource(JtwigResource retrieve) {
+    public CompileContext withResource(Loader.Resource retrieve) {
         this.resource = retrieve;
         return this;
     }

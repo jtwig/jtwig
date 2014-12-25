@@ -45,7 +45,6 @@ public class SmokePerformanceTest extends AbstractJtwigAcceptanceTest {
     @Test
     public void canHandleMultipleRequestsAtOnce() throws Exception {
         serverReceivesGetRequest("/performance");
-//        System.out.println(theGetResult().getResponseBodyAsString());
         System.out.println("Starting...");
         DateTime startDate = now();
 

@@ -14,36 +14,25 @@
 
 package org.jtwig.unit.expressions.model;
 
-import org.jtwig.JtwigModelMap;
-import org.jtwig.compile.CompileContext;
-import org.jtwig.exception.ParseBypassException;
-import org.jtwig.expressions.model.Constant;
-import org.jtwig.expressions.model.ValueList;
-import org.jtwig.parser.model.JtwigPosition;
-import org.jtwig.render.RenderContext;
-import org.jtwig.render.config.RenderConfiguration;
-import org.junit.Test;
-
 import java.util.List;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
-import org.jtwig.cache.impl.ExecutionCache;
+import org.jtwig.AbstractJtwigTest;
+import org.jtwig.exception.ParseBypassException;
+import org.jtwig.expressions.model.Constant;
+import org.jtwig.expressions.model.ValueList;
 import static org.jtwig.expressions.model.ValueList.create;
-import static org.mockito.Mockito.mock;
+import org.jtwig.parser.model.JtwigPosition;
+import org.junit.Test;
 
-public class ValueListTest {
+public class ValueListTest extends AbstractJtwigTest {
     private static final JtwigPosition POSITION = new JtwigPosition(null, 1, 1);
 
     @Test
     public void resultIsAList() throws Exception {
         ValueList list = create(null, new Constant(1), new Constant(2));
-        CompileContext context = mock(CompileContext.class);
-        JtwigModelMap modelMap = new JtwigModelMap();
-
-        Object result = list.compile(context).calculate(RenderContext.create(new RenderConfiguration(new ExecutionCache()), modelMap, null));
-
+        Object result = list.compile(compileContext).calculate(renderContext);
         assertThat(result, is(instanceOf(List.class)));
     }
 

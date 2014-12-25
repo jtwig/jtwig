@@ -15,6 +15,7 @@ package org.jtwig.content.model;
 
 import java.util.Collection;
 import java.util.Map;
+import org.jtwig.Environment;
 import org.jtwig.compile.CompileContext;
 import org.jtwig.content.api.Compilable;
 import org.jtwig.content.api.Renderable;
@@ -30,9 +31,9 @@ import org.jtwig.exception.RenderException;
 import org.jtwig.exception.ResourceException;
 import org.jtwig.expressions.api.CompilableExpression;
 import org.jtwig.expressions.api.Expression;
+import org.jtwig.loader.Loader;
 import org.jtwig.parser.model.JtwigPosition;
 import org.jtwig.render.RenderContext;
-import org.jtwig.resource.JtwigResource;
 
 public class ExtendsTemplate extends Template {
     private CompilableExpression expr;
@@ -61,7 +62,7 @@ public class ExtendsTemplate extends Template {
 
     //~ Compilable impl ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     @Override
-    public CompiledExtendsTemplate doCompile(final CompileContext context) throws CompileException {
+    public CompiledExtendsTemplate compile(final CompileContext context) throws CompileException {
         return new CompiledExtendsTemplate(
                 position,
                 expr.compile(context),
@@ -95,15 +96,15 @@ public class ExtendsTemplate extends Template {
             
             try {
                 // Now get the template
-                JtwigResource extendedResource = resolveExtendedResource(expr.calculate(context));
+                Loader.Resource extendedResource = resolveExtendedResource(expr.calculate(context), context.environment());
                 if (extendedResource == null) {
                     throw new ResourceException("Resource not found");
                 }
                 
                 // Handle the context, replace the blocks, and render
                 CompileContext localContext = compileContext.clone().withResource(extendedResource);
-                Template parsed = localContext.parse(extendedResource);
-                CompiledTemplate r = parsed.compile(localContext);
+                Template parsed = context.environment().parse(extendedResource);
+                CompiledTemplate r = context.environment().compile(parsed, extendedResource, localContext);
                 r.withChildTemplate(this);
                 r.render(context);
             } catch (CalculateException | CompileException | ParseException | ResourceException ex) {
@@ -111,25 +112,24 @@ public class ExtendsTemplate extends Template {
             }
         }
         
-        protected JtwigResource resolveExtendedResource(final Object obj) throws ResourceException {
+        protected Loader.Resource resolveExtendedResource(final Object obj, final Environment env) throws ResourceException {
             // If we've been given a collection, the first template found is
             // used
             if (obj instanceof Collection) {
                 Collection col = (Collection)obj;
                 for (Object o : col) {
-                    JtwigResource extendedResource;
                     try {
-                        extendedResource = position.getResource().resolve(o.toString());
-                    } catch (ResourceException e) {
-                        continue;
-                    }
-                    if (extendedResource != null) {
-                        return extendedResource;
-                    }
+                        String path = position.getResource().resolve(o.toString());
+                        Loader.Resource extendedResource = env.load(path);
+                        if (extendedResource != null) {
+                            return extendedResource;
+                        }
+                    } catch (ResourceException e) {}
                 }
             }
             if (obj instanceof String) {
-                return position.getResource().resolve(obj.toString());
+                String path = position.getResource().resolve(obj.toString());
+                return env.load(path);
             }
             throw new ResourceException("Invalid resource name: "+obj);
         }

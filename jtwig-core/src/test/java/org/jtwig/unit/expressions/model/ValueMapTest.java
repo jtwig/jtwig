@@ -14,34 +14,25 @@
 
 package org.jtwig.unit.expressions.model;
 
-import org.jtwig.JtwigModelMap;
-import org.jtwig.compile.CompileContext;
+import java.util.Map;
+import org.jtwig.AbstractJtwigTest;
 import org.jtwig.expressions.api.Expression;
 import org.jtwig.expressions.model.Constant;
 import org.jtwig.expressions.model.ValueMap;
-import org.jtwig.render.RenderContext;
-import org.jtwig.render.config.RenderConfiguration;
-import org.junit.Test;
-
-import java.util.Map;
-import org.jtwig.cache.impl.ExecutionCache;
-
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
+import org.junit.Test;
 
-public class ValueMapTest {
+public class ValueMapTest extends AbstractJtwigTest {
     @Test
     public void test() throws Exception {
         ValueMap underTest = new ValueMap(null)
                 .add("key", new Constant<>(null));
 
-        CompileContext context = mock(CompileContext.class);
-
-        Expression expression = underTest.compile(context);
+        Expression expression = underTest.compile(compileContext);
         assertNotNull(expression);
 
-        Map map = (Map) expression.calculate(RenderContext.create(new RenderConfiguration(new ExecutionCache()), new JtwigModelMap(), null));
+        Map map = (Map) expression.calculate(renderContext);
         assertTrue(map.containsKey("key"));
     }
 }

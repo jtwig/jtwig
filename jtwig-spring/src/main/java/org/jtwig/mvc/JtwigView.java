@@ -14,15 +14,13 @@
 
 package org.jtwig.mvc;
 
+import java.net.MalformedURLException;
 import org.jtwig.JtwigModelMap;
-import org.jtwig.JtwigTemplate;
 import org.jtwig.beans.BeanResolver;
-import org.jtwig.configuration.JtwigConfiguration;
 import org.jtwig.content.api.Renderable;
 import org.jtwig.exception.CompileException;
 import org.jtwig.exception.ParseException;
 import org.jtwig.render.RenderContext;
-import org.jtwig.resource.JtwigResource;
 import org.jtwig.types.Undefined;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanInitializationException;
@@ -36,17 +34,25 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.jtwig.Environment;
+import org.jtwig.compile.CompileContext;
+import org.jtwig.content.model.Template;
+import org.jtwig.exception.ResourceException;
+import org.jtwig.loader.Loader;
 
 import static org.springframework.web.servlet.support.RequestContextUtils.getTheme;
 
 public class JtwigView extends AbstractTemplateView {
     private static final String SPRING_CSRF = "org.springframework.security.web.csrf.CsrfToken";
+    
     protected String getEncoding() {
         return getViewResolver().getEncoding();
     }
 
-    protected JtwigConfiguration getConfiguration() {
-        return getViewResolver().configuration();
+    protected Environment getEnvironment() {
+        return getViewResolver().getEnvironment();
     }
 
     private JtwigViewResolver getViewResolver() {
@@ -66,7 +72,6 @@ public class JtwigView extends AbstractTemplateView {
     @Override
     protected void renderMergedTemplateModel(Map<String, Object> model, HttpServletRequest request,
                                              HttpServletResponse response) throws Exception {
-
         // Adding model information
         JtwigModelMap modelMap = new JtwigModelMap()
                 .add(model)
@@ -85,7 +90,7 @@ public class JtwigView extends AbstractTemplateView {
             response.setCharacterEncoding(this.getEncoding());
         }
 
-        getContent().render(RenderContext.create(getConfiguration().render(), modelMap, getViewResolver().functionResolver(), response.getOutputStream()));
+        getCompiledJtwigTemplate().render(RenderContext.create(getEnvironment(), modelMap, getViewResolver().functionResolver(), response.getOutputStream()));
 
         response.getOutputStream().flush();
         response.getOutputStream().close();
@@ -98,24 +103,24 @@ public class JtwigView extends AbstractTemplateView {
         return theme.getName();
     }
 
-    public Renderable getContent() throws CompileException, ParseException {
-        return getViewResolver().cache().get(getUrl(), new Callable<Renderable>() {
-            @Override
-            public Renderable call() throws Exception {
-                return getCompiledJtwigTemplate();
-            }
-        });
+//    public Renderable getContent() throws CompileException, ParseException {
+//        return getEnvironment().compile(SPRING_CSRF)
+//        return getViewResolver().cache().get(getUrl(), new Callable<Renderable>() {
+//            @Override
+//            public Renderable call() throws Exception {
+//                return getCompiledJtwigTemplate();
+//            }
+//        });
+//    }
+
+    private Template.CompiledTemplate getCompiledJtwigTemplate() throws ResourceException, ParseException, CompileException {
+        return getEnvironment().compile(getUrl());
     }
 
-    private Renderable getCompiledJtwigTemplate() throws ParseException, CompileException {
-        return new JtwigTemplate(getResource(), getConfiguration()).compile();
-    }
-
-    private JtwigResource getResource() {
-        return getViewResolver()
-                .resourceLoader()
-                .resolve(getUrl());
-    }
+//    private Loader.Resource getResource() throws ResourceException {
+//        return getEnvironment()
+//                .load(getUrl());
+//    }
 
     @SuppressWarnings("serial")
     private static class GenericServletAdapter extends GenericServlet {

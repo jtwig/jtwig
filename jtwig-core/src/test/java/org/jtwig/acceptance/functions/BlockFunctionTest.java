@@ -14,7 +14,7 @@
 
 package org.jtwig.acceptance.functions;
 
-import org.jtwig.acceptance.AbstractJtwigTest;
+import org.jtwig.AbstractJtwigTest;
 import org.junit.Test;
 
 import static org.hamcrest.core.Is.is;
@@ -24,14 +24,14 @@ import static org.jtwig.util.SyntacticSugar.*;
 public class BlockFunctionTest extends AbstractJtwigTest {
     @Test
     public void ensureBlockFunctionWorksWithVariables() throws Exception {
-        given(aModel().withModelAttribute("var", "title"));
-        when(jtwigRenders(templateResource("templates/acceptance/block/tested.twig")));
-        then(theRenderedTemplate(), is(equalTo("title!")));
+        given(theModel().withModelAttribute("var", "title"));
+        withResource(classpathResource("templates/acceptance/block/tested.twig"));
+        then(theResult(), is(equalTo("title!")));
     }
     @Test
     public void ensureBlockFunctionWorksWithVariables2() throws Exception {
-        given(aModel().withModelAttribute("var", "body"));
-        when(jtwigRenders(templateResource("templates/acceptance/block/tested.twig")));
-        then(theRenderedTemplate(), is(equalTo("body!")));
+        given(theModel().withModelAttribute("var", "body"));
+        withResource(classpathResource("templates/acceptance/block/tested.twig"));
+        then(theResult(), is(equalTo("body!")));
     }
 }

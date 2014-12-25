@@ -14,18 +14,16 @@
 
 package org.jtwig.acceptance.issues;
 
-import org.jtwig.acceptance.AbstractJtwigTest;
-import org.junit.Test;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.StringContains.containsString;
-import static org.jtwig.util.SyntacticSugar.after;
+import org.jtwig.AbstractJtwigTest;
+import org.junit.Test;
 
 public class Issue61Test extends AbstractJtwigTest {
 
     @Test
     public void issue61() throws Exception {
-        after(jtwigRenders(templateResource("templates/issue61/final.twig")));
-        assertThat(theRenderedTemplate(), containsString("some content"));
+        withResource(classpathResource("templates/issue61/final.twig"));
+        assertThat(theResult(), containsString("some content"));
     }
 }

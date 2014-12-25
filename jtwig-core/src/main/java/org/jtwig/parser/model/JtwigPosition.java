@@ -16,38 +16,38 @@ package org.jtwig.parser.model;
 
 import org.jtwig.compile.CompileContext;
 import org.jtwig.content.model.Template;
+import org.jtwig.loader.Loader;
 import org.jtwig.render.RenderContext;
-import org.jtwig.resource.JtwigResource;
 
 public class JtwigPosition {
-    private final JtwigResource resource;
+    private final Loader.Resource resource;
     private final int row;
     private final int column;
 
-    public JtwigPosition(JtwigResource resource, int row, int column) {
+    public JtwigPosition(Loader.Resource resource, int row, int column) {
         this.resource = resource;
         this.row = row;
         this.column = column;
     }
 
-    public JtwigResource getResource() {
+    public Loader.Resource getResource() {
         return resource;
     }
     
     public Template getTemplate(CompileContext compileContext) {
-        return compileContext.cache().getParsed(resource.path());
+        return compileContext.cache().getParsed(resource.getCacheKey());
     }
     
     public Template.CompiledTemplate getCompiledTemplate(CompileContext compileContext) {
-        return compileContext.cache().getCompiled(resource.path());
+        return compileContext.cache().getCompiled(resource.getCacheKey());
     }
     
     public Template getTemplate(RenderContext renderContext) {
-        return renderContext.cache().getParsed(resource.path());
+        return renderContext.cache().getParsed(resource.getCacheKey());
     }
     
     public Template.CompiledTemplate getCompiledTemplate(RenderContext renderContext) {
-        return renderContext.cache().getCompiled(resource.path());
+        return renderContext.cache().getCompiled(resource.getCacheKey());
     }
 
     public int getRow() {

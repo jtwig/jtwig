@@ -14,12 +14,12 @@
 
 package org.jtwig.addons;
 
-import org.jtwig.parser.config.ParserConfiguration;
+import org.jtwig.Environment;
+import org.jtwig.loader.Loader;
 import org.jtwig.parser.parboiled.JtwigBaseParser;
 import org.jtwig.parser.parboiled.JtwigBasicParser;
 import org.jtwig.parser.parboiled.JtwigExpressionParser;
 import org.jtwig.parser.parboiled.JtwigTagPropertyParser;
-import org.jtwig.resource.JtwigResource;
 import org.parboiled.Parboiled;
 import org.parboiled.Rule;
 
@@ -28,11 +28,11 @@ public abstract class Addon extends JtwigBaseParser<AddonModel> {
     final JtwigExpressionParser expressionParser;
     final JtwigTagPropertyParser tagPropertyParser;
 
-    public Addon(JtwigResource resource, ParserConfiguration configuration) {
+    public Addon(Loader.Resource resource, Environment env) {
         super(resource);
-        basicParser = Parboiled.createParser(JtwigBasicParser.class, configuration);
-        expressionParser = Parboiled.createParser(JtwigExpressionParser.class, resource, configuration);
-        tagPropertyParser = Parboiled.createParser(JtwigTagPropertyParser.class, configuration);
+        basicParser = env.getBasicParser();
+        expressionParser = Parboiled.createParser(JtwigExpressionParser.class, resource, env);
+        tagPropertyParser = env.getTagPropertyParser();
     }
 
     public JtwigBasicParser basicParser() {

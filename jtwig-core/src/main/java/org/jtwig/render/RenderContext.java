@@ -32,7 +32,6 @@ import org.jtwig.functions.resolver.api.FunctionResolver;
 import org.jtwig.functions.resolver.impl.CompoundFunctionResolver;
 import org.jtwig.functions.resolver.impl.DelegateFunctionResolver;
 import org.jtwig.functions.resolver.model.Executable;
-import org.jtwig.render.config.RenderConfiguration;
 import org.jtwig.render.stream.RenderStream;
 
 import java.io.IOException;
@@ -43,6 +42,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+import org.jtwig.Environment;
 import org.jtwig.cache.TemplateCache;
 import org.jtwig.content.model.Template;
 
@@ -54,21 +54,21 @@ public class RenderContext {
     /**
      * NOTE: This method should only be used once (in JtwigTemplate)
      */
-    public static RenderContext create(RenderConfiguration configuration, JtwigModelMap modelMap, OutputStream output) {
-        return new RenderContext(configuration, modelMap, new CompoundFunctionResolver()
-                .withResolver(new DelegateFunctionResolver(configuration.functionRepository(),
+    public static RenderContext create(Environment env, JtwigModelMap modelMap, OutputStream output) {
+        return new RenderContext(env, modelMap, new CompoundFunctionResolver()
+                .withResolver(new DelegateFunctionResolver(env.getFunctionRepository(),
                         new InputDelegateMethodParametersResolver(annotationWithoutConversion())))
-                .withResolver(new DelegateFunctionResolver(configuration.functionRepository(),
-                        new InputDelegateMethodParametersResolver(annotationWithConversion()))), new RenderStream(output, configuration.renderThreadingConfig()));
+                .withResolver(new DelegateFunctionResolver(env.getFunctionRepository(),
+                        new InputDelegateMethodParametersResolver(annotationWithConversion()))), new RenderStream(output, env));
     }
 
-    public static RenderContext create(RenderConfiguration configuration, JtwigModelMap modelMap, FunctionResolver functionResolver, OutputStream output) {
-        return new RenderContext(configuration, modelMap, functionResolver, new RenderStream(output, configuration.renderThreadingConfig()));
+    public static RenderContext create(Environment env, JtwigModelMap modelMap, FunctionResolver functionResolver, OutputStream output) {
+        return new RenderContext(env, modelMap, functionResolver, new RenderStream(output, env));
     }
 
     private final FunctionResolver functionResolver;
 
-    private final RenderConfiguration configuration;
+    private final Environment env;
 
     private final JtwigModelMap modelMap;
 
@@ -77,22 +77,22 @@ public class RenderContext {
     private Stack<Template.CompiledTemplate> renderingTemplateStack = new Stack<>();
 
     private RenderContext(
-            RenderConfiguration configuration,
+            Environment env,
             JtwigModelMap modelMap,
             FunctionResolver functionResolver,
             RenderStream renderStream) {
-        this.configuration = configuration;
+        this.env = env;
         this.modelMap = modelMap;
         this.renderStream = renderStream;
         this.functionResolver = functionResolver;
     }
     private RenderContext(
-            RenderConfiguration configuration,
+            Environment env,
             JtwigModelMap modelMap,
             FunctionResolver functionResolver,
             RenderStream renderStream,
             Stack<Template.CompiledTemplate> renderingTemplateStack) {
-        this(configuration, modelMap, functionResolver, renderStream);
+        this(env, modelMap, functionResolver, renderStream);
         this.renderingTemplateStack = renderingTemplateStack;
     }
 
@@ -105,18 +105,17 @@ public class RenderContext {
     }
 
     public RenderContext newRenderContext(OutputStream outputStream) {
-        return new RenderContext(configuration, modelMap, functionResolver,
-                new RenderStream(outputStream,
-                        configuration.renderThreadingConfig()),
+        return new RenderContext(env, modelMap, functionResolver,
+                new RenderStream(outputStream, env),
                 renderingTemplateStack);
     }
 
-    public RenderConfiguration configuration() {
-        return configuration;
+    public Environment environment() {
+        return env;
     }
     
     public TemplateCache cache() {
-        return configuration.cache();
+        return env.getCache();
     }
     
     public Template.CompiledTemplate getRenderingTemplate() {
@@ -138,12 +137,12 @@ public class RenderContext {
     }
 
     private RenderContext fork() throws IOException {
-        return new RenderContext(configuration, modelMap, functionResolver,
+        return new RenderContext(env, modelMap, functionResolver,
                 renderStream.fork(), renderingTemplateStack);
     }
 
     public RenderContext isolatedModel() {
-        return new RenderContext(configuration, modelMap.clone(),
+        return new RenderContext(env, modelMap.clone(),
                 functionResolver, renderStream, renderingTemplateStack);
     }
 

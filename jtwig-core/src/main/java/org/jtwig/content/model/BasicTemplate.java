@@ -29,11 +29,9 @@ public class BasicTemplate extends Template {
         super(position);
     }
 
-    //~ Template impl ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
     //~ Compilable impl ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     @Override
-    public CompiledBasicTemplate doCompile(final CompileContext context)
+    public CompiledBasicTemplate compile(final CompileContext context)
             throws CompileException {
         return new CompiledBasicTemplate(
                 position,

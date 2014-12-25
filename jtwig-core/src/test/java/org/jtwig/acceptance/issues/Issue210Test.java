@@ -1,6 +1,4 @@
-/*
- * Copyright 2014 thomas.
- *
+/**
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,7 +14,7 @@
 
 package org.jtwig.acceptance.issues;
 
-import org.jtwig.acceptance.AbstractJtwigTest;
+import org.jtwig.AbstractJtwigTest;
 import org.junit.Test;
 
 import java.nio.charset.Charset;
@@ -31,15 +29,15 @@ import static org.jtwig.util.SyntacticSugar.*;
 public class Issue210Test extends AbstractJtwigTest {
     @Test
     public void testNonUTFEncoding() throws Exception {
-        theConfiguration().render().charset(Charset.forName("ISO-8859-1"));
-        given(aModel().withModelAttribute("text", "tête de bou  간편한 설치 및 사용"));
-        when(jtwigRenders(template("{{ text }}")));
-        then(theRenderedTemplate(), is(equalTo("t�te de bou  ??? ?? ? ??")));
+        theEnvironment().setCharset(Charset.forName("ISO-8859-1"));
+        given(theModel().withModelAttribute("text", "tête de bou  간편한 설치 및 사용"));
+        withResource("{{ text }}");
+        then(theResult(), is(equalTo("t�te de bou  ??? ?? ? ??")));
     }
     @Test
     public void testUTFEncoding() throws Exception {
-        given(aModel().withModelAttribute("text", "tête de bou  간편한 설치 및 사용"));
-        when(jtwigRenders(template("{{ text }}")));
-        then(theRenderedTemplate(), is(equalTo("tête de bou  간편한 설치 및 사용")));
+        given(theModel().withModelAttribute("text", "tête de bou  간편한 설치 및 사용"));
+        withResource("{{ text }}");
+        then(theResult(), is(equalTo("tête de bou  간편한 설치 및 사용")));
     }
 }

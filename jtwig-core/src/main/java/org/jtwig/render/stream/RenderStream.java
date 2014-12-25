@@ -17,7 +17,6 @@ package org.jtwig.render.stream;
 import org.jtwig.content.api.Renderable;
 import org.jtwig.exception.RenderException;
 import org.jtwig.render.RenderContext;
-import org.jtwig.render.config.RenderThreadingConfig;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -25,15 +24,16 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import org.jtwig.Environment;
 
 public class RenderStream {
 
     private static ExecutorService sExecutor = null;
 
-    private static void initExecutorService(RenderThreadingConfig renderConfiguration) {
+    private static void initExecutorService(Environment env) {
         if (sExecutor == null) {
-            sExecutor = new ThreadPoolExecutor(renderConfiguration.minThreads(), renderConfiguration.maxThreads(),
-                                               renderConfiguration.keepAliveTime(), TimeUnit.SECONDS,
+            sExecutor = new ThreadPoolExecutor(env.getMinThreads(), env.getMaxThreads(),
+                                               env.getKeepAliveTime(), TimeUnit.SECONDS,
                                                new SynchronousQueue<Runnable>());
         }
     }
@@ -41,17 +41,17 @@ public class RenderStream {
     private final OutputStream mRootOutputStream;
     private final MultiOuputStream mMultiStream;
     private final RenderControl mControl;
-    private final RenderThreadingConfig mRenderConfiguration;
+    private final Environment env;
     private RenderIndex mIndex;
 
     private RenderStream(MultiOuputStream multiStream, OutputStream stream, RenderIndex dIndex,
-                         RenderControl renderControl, RenderThreadingConfig renderConfiguration) {
+                         RenderControl renderControl, Environment env) {
         mMultiStream = multiStream;
         mRootOutputStream = stream;
         mIndex = dIndex;
         mControl = renderControl;
-        mRenderConfiguration = renderConfiguration;
-        initExecutorService(mRenderConfiguration);
+        this.env = env;
+        initExecutorService(env);
 
         if (mIndex != null) {
             SingleOuputStream.Builder builder = SingleOuputStream.builder().withInheritedStream(true);
@@ -66,9 +66,9 @@ public class RenderStream {
         }
     }
 
-    public RenderStream(OutputStream outputStream, RenderThreadingConfig renderConfiguration) {
+    public RenderStream(OutputStream outputStream, Environment env) {
         this(new MultiOuputStream(), outputStream, null,
-             new RenderControl(), renderConfiguration);
+             new RenderControl(), env);
     }
 
     public RenderStream renderConcurrent(final Renderable content, final RenderContext context) {
@@ -132,7 +132,7 @@ public class RenderStream {
         mMultiStream.addStream(mIndex);
 
         RenderStream forkedStream = new RenderStream(mMultiStream, getRootOutputStream(), forkedIndex, mControl,
-                                                     mRenderConfiguration);
+                                                     env);
         mControl.unlockChange();
         return forkedStream;
     }
@@ -168,6 +168,11 @@ public class RenderStream {
                 }
                 index = previous;
                 previous = index.previous();
+            }
+            if (getRootOutputStream() == null) {
+                mMultiStream.merged(toMerge);
+                mControl.unlockChange();
+                throw new IOException("Output stream not available");
             }
             getRootOutputStream().write(mMultiStream.get(toMerge).toByteArray());
             mMultiStream.merged(toMerge);

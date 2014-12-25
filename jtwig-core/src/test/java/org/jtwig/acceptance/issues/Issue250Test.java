@@ -1,17 +1,14 @@
 package org.jtwig.acceptance.issues;
 
-import org.jtwig.JtwigModelMap;
-import org.jtwig.JtwigTemplate;
+import static org.hamcrest.core.Is.is;
+import org.jtwig.AbstractJtwigTest;
+import static org.junit.Assert.assertThat;
 import org.junit.Test;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
-
-public class Issue250Test {
+public class Issue250Test extends AbstractJtwigTest {
     @Test
     public void numberFormatShouldHandleNullAsZero() throws Exception {
-        JtwigTemplate template = JtwigTemplate.fromString("{{ null | number_format(2, ',', '.') }}");
-        JtwigModelMap context = new JtwigModelMap();
-        assertThat(template.output(context), is("0,00"));
+        withResource("{{ null | number_format(2, ',', '.') }}");
+        assertThat(theResult(), is("0,00"));
     }
 }

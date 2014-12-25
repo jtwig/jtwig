@@ -14,21 +14,22 @@
 
 package org.jtwig.acceptance.issues;
 
-import org.jtwig.acceptance.AbstractJtwigTest;
-import org.jtwig.exception.RenderException;
-import org.junit.Test;
-
 import static org.hamcrest.core.StringContains.containsString;
 import static org.hamcrest.core.StringStartsWith.startsWith;
-import static org.jtwig.util.SyntacticSugar.*;
+import org.jtwig.AbstractJtwigTest;
+import org.jtwig.exception.RenderException;
+import static org.jtwig.util.SyntacticSugar.given;
+import static org.jtwig.util.SyntacticSugar.then;
 import static org.junit.Assert.fail;
+import org.junit.Test;
 
 public class Issue76Test extends AbstractJtwigTest {
 
     @Test
     public void shouldGiveNiceExplanationForNonExistingFunctionsWithParams() throws Exception {
         try {
-            when(jtwigRenders(templateResource("templates/issue76/test3.twig")));
+            withResource(classpathResource("templates/issue76/test3.twig"));
+            render();
             fail();
         } catch (RenderException e) {
             then(e.getCause().getMessage(), containsString("templates/issue76/test3.twig -> Line 1, column 24: Unable to find function with name 'nonExistingFunction', and parameters: java.lang.String, java.lang.String, java.lang.Integer"));
@@ -38,7 +39,8 @@ public class Issue76Test extends AbstractJtwigTest {
     @Test
     public void shouldGiveNiceExplanationForNonExistingFunctions() throws Exception {
         try {
-            when(jtwigRenders(templateResource("templates/issue76/test1.twig")));
+            withResource(classpathResource("templates/issue76/test1.twig"));
+            render();
             fail();
         } catch (RenderException e) {
             then(e.getCause().getMessage(), containsString("templates/issue76/test1.twig -> Line 1, column 24: Unable to find function with name 'nonExistingFunction'"));
@@ -48,8 +50,9 @@ public class Issue76Test extends AbstractJtwigTest {
     @Test
     public void shouldGiveNiceExplanationForNonExistingVariables() throws Exception {
         try {
-            given(theConfiguration().render().strictMode(true));
-            when(jtwigRenders(templateResource("templates/issue76/test2.twig")));
+            given(theEnvironment().setStrictMode(true));
+            withResource(classpathResource("templates/issue76/test2.twig"));
+            render();
             fail();
         } catch (RenderException e) {
             then(e.getCause().getMessage(), startsWith("templates/issue76/test2.twig -> Line 1, column 23:"));
