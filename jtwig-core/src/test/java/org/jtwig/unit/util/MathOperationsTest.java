@@ -14,10 +14,15 @@
 
 package org.jtwig.unit.util;
 
-import org.junit.Test;
-
-import static org.jtwig.util.MathOperations.*;
+import static org.jtwig.util.MathOperations.areDouble;
+import static org.jtwig.util.MathOperations.intDiv;
+import static org.jtwig.util.MathOperations.mod;
+import static org.jtwig.util.MathOperations.sum;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Test;
 
 public class MathOperationsTest {
     @Test
@@ -31,5 +36,22 @@ public class MathOperationsTest {
     @Test
     public void intDivDoubleTest() throws Exception {
         assertEquals(1, intDiv(2.0, 2.0));
+    }
+    @Test
+    public void areDoubleTest() {
+    	assertTrue(areDouble(1.0,2.0));
+    }
+    @Test
+    public void areDoubleWithStringAndDoubleTest() {
+    	assertFalse(areDouble("1.0",2.0));
+    }
+    @Test
+    public void areDoubleEmptyParameterListTest() {
+    	assertFalse(areDouble());
+    }
+    @Test
+    public void areDoubleNullParameterListTest() {
+    	Object[] parameterList = null;
+    	assertFalse(areDouble(parameterList));
     }
 }
