@@ -34,6 +34,7 @@ import org.jtwig.expressions.api.Expression;
 import org.jtwig.loader.Loader;
 import org.jtwig.parser.model.JtwigPosition;
 import org.jtwig.render.RenderContext;
+import org.slf4j.LoggerFactory;
 
 public class ExtendsTemplate extends Template {
     private CompilableExpression expr;
@@ -98,7 +99,7 @@ public class ExtendsTemplate extends Template {
                 // Now get the template
                 Loader.Resource extendedResource = resolveExtendedResource(expr.calculate(context), context.environment());
                 if (extendedResource == null) {
-                    throw new ResourceException("Resource not found");
+                    throw new ResourceException("Resource not found: "+expr.calculate(context)+" from "+position.getResource().canonicalPath());
                 }
                 
                 // Handle the context, replace the blocks, and render
