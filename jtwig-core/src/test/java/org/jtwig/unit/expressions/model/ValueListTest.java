@@ -14,36 +14,55 @@
 
 package org.jtwig.unit.expressions.model;
 
-import org.jtwig.JtwigModelMap;
-import org.jtwig.compile.CompileContext;
-import org.jtwig.exception.ParseBypassException;
-import org.jtwig.expressions.model.Constant;
-import org.jtwig.expressions.model.ValueList;
-import org.jtwig.parser.model.JtwigPosition;
-import org.jtwig.render.RenderContext;
-import org.jtwig.render.config.RenderConfiguration;
-import org.junit.Test;
-
 import java.util.List;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
+import org.jtwig.AbstractJtwigTest;
+import org.jtwig.exception.ParseBypassException;
+import org.jtwig.expressions.model.Constant;
+import org.jtwig.expressions.model.ValueList;
 import static org.jtwig.expressions.model.ValueList.create;
-import static org.mockito.Mockito.mock;
+import org.jtwig.parser.model.JtwigPosition;
+import org.junit.Test;
 
-public class ValueListTest {
+import static org.junit.Assert.*;
+
+public class ValueListTest extends AbstractJtwigTest {
     private static final JtwigPosition POSITION = new JtwigPosition(null, 1, 1);
 
     @Test
     public void resultIsAList() throws Exception {
         ValueList list = create(null, new Constant(1), new Constant(2));
-        CompileContext context = mock(CompileContext.class);
-        JtwigModelMap modelMap = new JtwigModelMap();
-
-        Object result = list.compile(context).calculate(RenderContext.create(new RenderConfiguration(), modelMap, null));
-
+        Object result = list.compile(compileContext).calculate(renderContext);
         assertThat(result, is(instanceOf(List.class)));
+    }
+    
+    @Test
+    public void ensureCharacterLimitsWork() throws Exception {
+        ValueList list = create(null, new Constant('a'), new Constant('c'));
+        List result = (List)list.compile(compileContext).calculate(renderContext);
+        assertEquals('a', result.get(0));
+        assertEquals('b', result.get(1));
+        assertEquals('c', result.get(2));
+    }
+    
+    @Test
+    public void ensureInvertedNumericLimitsWork() throws Exception {
+        ValueList list = create(null, new Constant(5), new Constant(1));
+        List result = (List)list.compile(compileContext).calculate(renderContext);
+        assertEquals(5, result.get(0));
+        assertEquals(3, result.get(2));
+        assertEquals(1, result.get(4));
+    }
+    
+    @Test
+    public void ensureInvertedCharacterLimitsWork() throws Exception {
+        ValueList list = create(null, new Constant('e'), new Constant('a'));
+        List result = (List)list.compile(compileContext).calculate(renderContext);
+        assertEquals('e', result.get(0));
+        assertEquals('c', result.get(2));
+        assertEquals('a', result.get(4));
     }
 
     @Test(expected = ParseBypassException.class)
@@ -57,5 +76,9 @@ public class ValueListTest {
     @Test(expected = ParseBypassException.class)
     public void invalidLimitTypes3() throws Exception {
         create(POSITION, new Constant("a"), new Constant("b"));
+    }
+    @Test(expected = ParseBypassException.class)
+    public void invalidLimitTypes4() throws Exception {
+        create(POSITION, new Constant(new Object()), new Constant(new Object()));
     }
 }

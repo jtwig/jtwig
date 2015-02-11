@@ -14,7 +14,7 @@
 
 package org.jtwig.acceptance.addons;
 
-import org.jtwig.acceptance.AbstractJtwigTest;
+import org.jtwig.AbstractJtwigTest;
 
 public abstract class AbstractAddonTest extends AbstractJtwigTest {
 }

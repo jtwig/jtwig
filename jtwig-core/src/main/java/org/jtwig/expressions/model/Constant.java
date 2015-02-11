@@ -21,7 +21,7 @@ import org.jtwig.expressions.api.CompilableExpression;
 import org.jtwig.expressions.api.Expression;
 import org.jtwig.render.RenderContext;
 
-public class Constant<T> implements CompilableExpression {
+public class Constant<T> implements CompilableExpression, Expression {
     private T value;
 
     public Constant(T value) {
@@ -46,19 +46,11 @@ public class Constant<T> implements CompilableExpression {
 
     @Override
     public Expression compile(CompileContext context) throws CompileException {
-        return new Compiled(value);
+        return this;
     }
-
-    public static class Compiled implements Expression {
-        private final Object value;
-
-        public Compiled(Object value) {
-            this.value = value;
-        }
-
-        @Override
-        public Object calculate(RenderContext context) throws CalculateException {
-            return value;
-        }
+    
+    @Override
+    public Object calculate(RenderContext context) throws CalculateException {
+        return value;
     }
 }

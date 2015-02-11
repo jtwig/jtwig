@@ -14,7 +14,7 @@
 
 package org.jtwig.acceptance.issues;
 
-import org.jtwig.acceptance.AbstractJtwigTest;
+import org.jtwig.AbstractJtwigTest;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -27,14 +27,14 @@ import static org.jtwig.util.SyntacticSugar.*;
 public class Issue238Test extends AbstractJtwigTest {
     @Test
     public void canConcatenateConstants() throws Exception {
-        when(jtwigRenders(template("{{ 'hello' ~ 'world' }}")));
-        then(theRenderedTemplate(), is(equalTo("helloworld")));
+        withResource("{{ 'hello' ~ 'world' }}");
+        then(theResult(), is(equalTo("helloworld")));
     }
     @Test
     public void canConcatenateVariables() throws Exception {
-        given(aModel()).withModelAttribute("a", "hello")
+        given(theModel()).withModelAttribute("a", "hello")
                 .withModelAttribute("b", "world");
-        when(jtwigRenders(template("{{ a ~ b }}")));
-        then(theRenderedTemplate(), is(equalTo("helloworld")));
+        withResource("{{ a ~ b }}");
+        then(theResult(), is(equalTo("helloworld")));
     }
 }

@@ -14,148 +14,134 @@
 
 package org.jtwig.acceptance;
 
-import org.jtwig.JtwigModelMap;
-import org.jtwig.JtwigTemplate;
-import org.jtwig.configuration.JtwigConfiguration;
-import org.jtwig.exception.CompileException;
-import org.jtwig.exception.ParseException;
-import org.jtwig.exception.RenderException;
-import org.junit.Test;
-
-import java.util.ArrayList;
-
+import java.util.Arrays;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import org.jtwig.AbstractJtwigTest;
+import org.jtwig.exception.ParseException;
+import org.junit.Test;
 
 public class BinaryBooleanOperatorTest extends AbstractJtwigTest {
 
     @Test(expected = ParseException.class)
-    public void AndBadSyntax () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = new JtwigTemplate("{% if (items && true) %}Hi{% endif %}", new JtwigConfiguration());
-        JtwigModelMap modelMap = new JtwigModelMap();
-        template.output(modelMap);
+    public void AndBadSyntax () throws Exception {
+        withResource("{% if (items && true) %}Hi{% endif %}");
+        render();
     }
 
     @Test
-    public void AndGoodSyntax () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = new JtwigTemplate("{% if (items and true) %}Hi{% endif %}", new JtwigConfiguration());
-        JtwigModelMap modelMap = new JtwigModelMap();
-        ArrayList<String> value = new ArrayList<String>();
-        value.add("a");
-        modelMap.add("items", value);
-        assertThat(template.output(modelMap), is("Hi"));
+    public void AndGoodSyntax () throws Exception {
+        withResource("{% if (items and true) %}Hi{% endif %}");
+        model.add("items", Arrays.asList("a"));
+        assertThat(theResult(), is("Hi"));
     }
 
     @Test(expected = ParseException.class)
-    public void OrBadSyntax () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = new JtwigTemplate("{% if (items || true) %}Hi{% endif %}", new JtwigConfiguration());
-        JtwigModelMap modelMap = new JtwigModelMap();
-        template.output(modelMap);
+    public void OrBadSyntax () throws Exception {
+        withResource("{% if (items || true) %}Hi{% endif %}");
+        render();
     }
 
     @Test
-    public void OrGoodSyntax () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = new JtwigTemplate("{% if (false or items) %}Hi{% endif %}", new JtwigConfiguration());
-        JtwigModelMap modelMap = new JtwigModelMap();
-        ArrayList<String> value = new ArrayList<String>();
-        value.add("a");
-        modelMap.add("items", value);
-        assertThat(template.output(modelMap), is("Hi"));
+    public void OrGoodSyntax () throws Exception {
+        withResource("{% if (false or items) %}Hi{% endif %}");
+        model.add("items", Arrays.asList("a"));
+        assertThat(theResult(), is("Hi"));
     }
 
     @Test
-    public void StartsWith () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = new JtwigTemplate("{% if ('Hello' starts with 'H') %}Hi{% endif %}", new JtwigConfiguration());
-        assertThat(template.output(new JtwigModelMap()), is("Hi"));
+    public void StartsWith () throws Exception {
+        withResource("{% if ('Hello' starts with 'H') %}Hi{% endif %}");
+        assertThat(theResult(), is("Hi"));
     }
 
     @Test
-    public void StartsWithFail () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = new JtwigTemplate("{% if ('Hello' starts with 'e') %}Hi{% endif %}", new JtwigConfiguration());
-        assertThat(template.output(new JtwigModelMap()), is(""));
+    public void StartsWithFail () throws Exception {
+        withResource("{% if ('Hello' starts with 'e') %}Hi{% endif %}");
+        assertThat(theResult(), is(""));
     }
 
     @Test
-    public void EndsWith () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = new JtwigTemplate("{% if ('Hello' ends with 'llo') %}Hi{% endif %}", new JtwigConfiguration());
-        assertThat(template.output(new JtwigModelMap()), is("Hi"));
+    public void EndsWith () throws Exception {
+        withResource("{% if ('Hello' ends with 'llo') %}Hi{% endif %}");
+        assertThat(theResult(), is("Hi"));
     }
 
     @Test
-    public void EndsWithFail () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = new JtwigTemplate("{% if ('Hello' ends with 'a') %}Hi{% endif %}", new JtwigConfiguration());
-        assertThat(template.output(new JtwigModelMap()), is(""));
+    public void EndsWithFail () throws Exception {
+        withResource("{% if ('Hello' ends with 'a') %}Hi{% endif %}");
+        assertThat(theResult(), is(""));
     }
 
     @Test
-    public void Matches () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = new JtwigTemplate("{% if ('Hello' matches 'H.*') %}Hi{% endif %}", new JtwigConfiguration());
-        assertThat(template.output(new JtwigModelMap()), is("Hi"));
+    public void Matches () throws Exception {
+        withResource("{% if ('Hello' matches 'H.*') %}Hi{% endif %}");
+        assertThat(theResult(), is("Hi"));
     }
 
     @Test
-    public void MatchesFail () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = new JtwigTemplate("{% if ('Hello' matches '^A.*') %}Hi{% endif %}", new JtwigConfiguration());
-        assertThat(template.output(new JtwigModelMap()), is(""));
+    public void MatchesFail () throws Exception {
+        withResource("{% if ('Hello' matches '^A.*') %}Hi{% endif %}");
+        assertThat(theResult(), is(""));
     }
 
     @Test
-    public void MatchesFail_withNull () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = new JtwigTemplate("{% if (null matches '^A.*') %}Hi{% endif %}", new JtwigConfiguration());
-        assertThat(template.output(new JtwigModelMap()), is(""));
+    public void MatchesFail_withNull () throws Exception {
+        withResource("{% if (null matches '^A.*') %}Hi{% endif %}");
+        assertThat(theResult(), is(""));
     }
 
     @Test
-    public void Contains () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = new JtwigTemplate("{% if ('a' in 'abc') %}Hi{% endif %}", new JtwigConfiguration());
-        assertThat(template.output(new JtwigModelMap()), is("Hi"));
+    public void Contains () throws Exception {
+        withResource("{% if ('a' in 'abc') %}Hi{% endif %}");
+        assertThat(theResult(), is("Hi"));
     }
 
     @Test
-    public void ContainsFail () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = new JtwigTemplate("{% if ('a' in ['b','c']) %}Hi{% endif %}", new JtwigConfiguration());
-        assertThat(template.output(new JtwigModelMap()), is(""));
+    public void ContainsFail () throws Exception {
+        withResource("{% if ('a' in ['b','c']) %}Hi{% endif %}");
+        assertThat(theResult(), is(""));
     }
 
     @Test
-    public void lessOrEqualTo () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = new JtwigTemplate("{% if (2 <= 2) %}Hi{% endif %}", new JtwigConfiguration());
-        assertThat(template.output(new JtwigModelMap()), is("Hi"));
+    public void lessOrEqualTo () throws Exception {
+        withResource("{% if (2 <= 2) %}Hi{% endif %}");
+        assertThat(theResult(), is("Hi"));
     }
 
     @Test
-    public void lessThan () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = new JtwigTemplate("{% if (2 < 2) %}Hi{% endif %}", new JtwigConfiguration());
-        assertThat(template.output(new JtwigModelMap()), is(""));
+    public void lessThan () throws Exception {
+        withResource("{% if (2 < 2) %}Hi{% endif %}");
+        assertThat(theResult(), is(""));
     }
 
     @Test
-    public void greaterThan () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = new JtwigTemplate("{% if (2 > 2) %}Hi{% endif %}", new JtwigConfiguration());
-        assertThat(template.output(new JtwigModelMap()), is(""));
+    public void greaterThan () throws Exception {
+        withResource("{% if (2 > 2) %}Hi{% endif %}");
+        assertThat(theResult(), is(""));
     }
 
     @Test
-    public void greaterOrEqualThan () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = new JtwigTemplate("{% if (2 >= 2) %}Hi{% endif %}", new JtwigConfiguration());
-        assertThat(template.output(new JtwigModelMap()), is("Hi"));
+    public void greaterOrEqualThan () throws Exception {
+        withResource("{% if (2 >= 2) %}Hi{% endif %}");
+        assertThat(theResult(), is("Hi"));
     }
 
     @Test
-    public void modOperator () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = new JtwigTemplate("{{ 4 % 2 }}", new JtwigConfiguration());
-        assertThat(template.output(new JtwigModelMap()), is("0"));
+    public void modOperator () throws Exception {
+        withResource("{{ 4 % 2 }}");
+        assertThat(theResult(), is("0"));
     }
 
     @Test
-    public void endsWithNull () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = new JtwigTemplate("{{ null ends with 'tree' }}", new JtwigConfiguration());
-        assertThat(template.output(new JtwigModelMap()), is("0"));
+    public void endsWithNull () throws Exception {
+        withResource("{{ null ends with 'tree' }}");
+        assertThat(theResult(), is("0"));
     }
 
     @Test
-    public void startsWithNull () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = new JtwigTemplate("{{ null starts with 'tree' }}", new JtwigConfiguration());
-        assertThat(template.output(new JtwigModelMap()), is("0"));
+    public void startsWithNull () throws Exception {
+        withResource("{{ null starts with 'tree' }}");
+        assertThat(theResult(), is("0"));
     }
 }

@@ -14,17 +14,17 @@
 
 package org.jtwig.addons.filter;
 
+import org.jtwig.Environment;
 import org.jtwig.addons.Addon;
 import org.jtwig.addons.AddonModel;
 import org.jtwig.exception.ParseException;
 import org.jtwig.expressions.model.Operator;
-import org.jtwig.parser.config.ParserConfiguration;
-import org.jtwig.resource.JtwigResource;
+import org.jtwig.loader.Loader;
 import org.parboiled.Rule;
 
 public class FilterAddon extends Addon {
-    public FilterAddon(JtwigResource resource, ParserConfiguration configuration) {
-        super(resource, configuration);
+    public FilterAddon(Loader.Resource resource, Environment env) {
+        super(resource, env);
     }
 
     @Override

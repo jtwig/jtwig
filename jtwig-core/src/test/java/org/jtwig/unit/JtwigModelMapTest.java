@@ -14,6 +14,7 @@
 
 package org.jtwig.unit;
 
+import java.util.Collections;
 import org.jtwig.JtwigModelMap;
 import org.junit.Test;
 
@@ -34,4 +35,11 @@ public class JtwigModelMapTest {
 
         assertThat(jtwigModelMap.get("test"), is((Object)"test"));
     }
+    
+    @Test
+    public void constructorConsumesAllMapValues() {
+        JtwigModelMap jtwigModelMap = new JtwigModelMap(Collections.singletonMap("test1", (Object)"test2"));
+        assertThat(jtwigModelMap.get("test1"), is((Object)"test2"));
+    }
+    
 }

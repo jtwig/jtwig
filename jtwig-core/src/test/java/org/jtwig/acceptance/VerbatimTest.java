@@ -14,22 +14,16 @@
 
 package org.jtwig.acceptance;
 
-import org.jtwig.JtwigModelMap;
-import org.jtwig.JtwigTemplate;
-import org.jtwig.exception.CompileException;
-import org.jtwig.exception.ParseException;
-import org.jtwig.exception.RenderException;
-import org.junit.Test;
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import org.jtwig.AbstractJtwigTest;
+import org.junit.Test;
 
 public class VerbatimTest extends AbstractJtwigTest {
     @Test
-    public void verbatimDoesntTryToResolveExpressions() throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = JtwigTemplate.fromString("{% verbatim %}{{ name }}{% endverbatim %}");
-        JtwigModelMap context = new JtwigModelMap();
-        assertThat(template.output(context), is("{{ name }}"));
+    public void verbatimDoesntTryToResolveExpressions() throws Exception {
+        withResource("{% verbatim %}{{ name }}{% endverbatim %}");
+        assertThat(theResult(), is("{{ name }}"));
     }
 
 }

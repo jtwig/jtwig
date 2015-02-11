@@ -14,39 +14,36 @@
 
 package org.jtwig.unit.expressions.model;
 
-import org.jtwig.JtwigModelMap;
+import org.jtwig.AbstractJtwigTest;
 import org.jtwig.compile.CompileContext;
 import org.jtwig.exception.CompileException;
 import org.jtwig.expressions.api.CompilableExpression;
 import org.jtwig.expressions.api.Expression;
 import org.jtwig.expressions.model.OperationBinary;
 import org.jtwig.expressions.model.Operator;
+import static org.jtwig.expressions.model.Operator.UNKNOWN;
 import org.jtwig.expressions.model.Variable;
 import org.jtwig.parser.model.JtwigPosition;
 import org.jtwig.render.RenderContext;
-import org.jtwig.render.config.RenderConfiguration;
-import org.junit.Test;
-
-import static org.jtwig.expressions.model.Operator.UNKNOWN;
 import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class OperationBinaryTest {
+public class OperationBinaryTest extends AbstractJtwigTest {
     @Test
     public void addOperator() throws Exception {
         Expression left = mock(Expression.class);
         when(left.calculate(any(RenderContext.class))).thenReturn(1);
         Expression right = mock(Expression.class);
         when(right.calculate(any(RenderContext.class))).thenReturn(1);
-        JtwigModelMap context = mock(JtwigModelMap.class);
 
         Object result = new OperationBinary(null, expression(left))
                 .add(Operator.ADD)
                 .add(expression(right))
                 .compile(null)
-                .calculate(RenderContext.create(new RenderConfiguration(), context, null));
+                .calculate(renderContext);
 
         assertEquals(2, result);
     }
@@ -56,13 +53,12 @@ public class OperationBinaryTest {
         Expression left = mock(Expression.class);
         when(left.calculate(any(RenderContext.class))).thenReturn(1);
         Variable right = new Variable(null, "defined");
-        JtwigModelMap context = new JtwigModelMap();
 
         Object result = new OperationBinary(null, expression(left))
                 .add(Operator.COMPOSITION)
                 .add(right)
                 .compile(null)
-                .calculate(RenderContext.create(new RenderConfiguration(), context, null));
+                .calculate(renderContext);
 
         assertEquals(true, result);
     }
@@ -71,7 +67,7 @@ public class OperationBinaryTest {
     public void unknownOperation() throws Exception {
         new OperationBinary(new JtwigPosition(null, 1, 1), mock(CompilableExpression.class))
                 .add(UNKNOWN)
-                .add(mock(CompilableExpression.class)).compile(mock(CompileContext.class));
+                .add(mock(CompilableExpression.class)).compile(compileContext);
     }
 
     private CompilableExpression expression(final Expression expression) {

@@ -15,71 +15,94 @@
 
 package org.jtwig.acceptance.addons.concurrent;
 
-import org.jtwig.JtwigModelMap;
-import org.jtwig.JtwigTemplate;
-import org.jtwig.acceptance.addons.AbstractAddonTest;
-import org.junit.Test;
-
-import java.util.ArrayList;
-
+import java.io.ByteArrayOutputStream;
+import java.lang.reflect.Field;
 import static java.util.Arrays.asList;
+import java.util.concurrent.ExecutorService;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import org.jtwig.acceptance.addons.AbstractAddonTest;
+import org.jtwig.addons.concurrent.Concurrent;
+import org.jtwig.content.api.Renderable;
+import org.jtwig.content.model.compilable.Sequence;
+import org.jtwig.exception.RenderException;
+import org.jtwig.render.RenderContext;
+import org.jtwig.render.stream.RenderStream;
+import org.junit.Test;
+import static org.mockito.Mockito.*;
 
 public class ConcurrentTest extends AbstractAddonTest {
+    
+    @Test(expected = RenderException.class)
+    public void concurrentWithNoOutputStream() throws Exception {
+        output = null;
+        renderContext = spy(RenderContext.create(env, model, null));
+        resource = stringResource("{% concurrent %}a{% endconcurrent %}b");
+        render();
+    }
 
     @Test
     public void concurrentWithStaticContent() throws Exception {
-        JtwigTemplate template = JtwigTemplate.fromString("{% concurrent %}a{% endconcurrent %}b");
-        JtwigModelMap context = new JtwigModelMap();
-        assertThat(template.output(context), is("ab"));
+        resource = stringResource("{% concurrent %}a{% endconcurrent %}b");
+        assertThat(theResult(), is("ab"));
     }
 
     @Test
     public void concurrentWithConditionalContent() throws Exception {
-        JtwigTemplate template = JtwigTemplate.fromString("{% concurrent %}{% if true %}a{% endif %}{% endconcurrent %}b");
-        JtwigModelMap context = new JtwigModelMap();
-        assertThat(template.output(context), is("ab"));
+        resource = stringResource("{% concurrent %}{% if true %}a{% endif %}{% endconcurrent %}b");
+        assertThat(theResult(), is("ab"));
     }
 
     @Test
     public void doubleConcurrentWithStaticContent() throws Exception {
-        JtwigTemplate template = JtwigTemplate.fromString("{% concurrent %}a{% endconcurrent %}"
+        resource = stringResource("{% concurrent %}a{% endconcurrent %}"
                 +"{% concurrent %}b{% endconcurrent %}"
                 +"c");
-        JtwigModelMap context = new JtwigModelMap();
-        assertThat(template.output(context), is("abc"));
+        assertThat(theResult(), is("abc"));
     }
 
     @Test
     public void concurrentWithDynamicContent() throws Exception {
-        JtwigTemplate template = JtwigTemplate.fromString("{% concurrent %}{% for item in list %}{{ item }}{% endfor %}{% endconcurrent %}");
-        JtwigModelMap context = new JtwigModelMap()
-                .withModelAttribute("list", asList("a", "b", "c", "d"));
-        assertThat(template.output(context), is("abcd"));
+        model.withModelAttribute("list", asList("a", "b", "c", "d"));
+        resource = stringResource("{% concurrent %}{% for item in list %}{{ item }}{% endfor %}{% endconcurrent %}");
+        assertThat(theResult(), is("abcd"));
     }
 
     @Test
     public void test_concurrent_1() throws Exception {
-        JtwigTemplate template = JtwigTemplate.fromString("{% concurrent %}{% for item in list %}" +
+        model.withModelAttribute("list", asList("a", "b", "c", "d", "e"));
+        resource = stringResource("{% concurrent %}{% for item in list %}" +
                                                            "{% if loop.first %}{% concurrent %}First {% endconcurrent %}{% elseif loop.last %}{% concurrent %}Last{% endconcurrent %}{% else %}I: {{ loop.index0 }} R: {{ loop.revindex0 }} {% endif %}" +
                                                            "{% endfor %}{% endconcurrent %}");
-        JtwigModelMap context = new JtwigModelMap();
-        ArrayList<String> value = new ArrayList<String>();
-        value.add("a");
-        value.add("b");
-        value.add("c");
-        value.add("d");
-        value.add("e");
-        context.withModelAttribute("list", value);
-        assertThat(template.output(context), is("First I: 1 R: 3 I: 2 R: 2 I: 3 R: 1 Last"));
+        assertThat(theResult(), is("First I: 1 R: 3 I: 2 R: 2 I: 3 R: 1 Last"));
     }
 
     @Test
     public void test_concurrent_2() throws Exception {
-        JtwigTemplate template2 = JtwigTemplate.fromString(
+        resource = stringResource(
                 "{% concurrent %}1{% endconcurrent %}{% concurrent %}{% concurrent %}{% concurrent %}2{% endconcurrent %}{% endconcurrent %}{% endconcurrent %}{% concurrent %}3{% endconcurrent %}{% concurrent %}{% concurrent %}{% concurrent %}{% concurrent %}{% concurrent %}{% concurrent %}4{% endconcurrent %}{% endconcurrent %}{% endconcurrent %}{% endconcurrent %}{% endconcurrent %}{% endconcurrent %}5{% concurrent %}6{% endconcurrent %}{% concurrent %}7{% endconcurrent %}");
-        JtwigModelMap context = new JtwigModelMap();
-        assertThat(template2.output(context), is("1234567"));
+
+        assertThat(theResult(), is("1234567"));
+    }
+    
+    @Test
+    public void ensureOutOfMemoryShutdown() throws Exception {
+        RenderStream rs = spy(new RenderStream(new ByteArrayOutputStream(), env));
+        when(rs.fork()).thenReturn(rs);
+        when(renderContext.renderStream()).thenReturn(rs);
+        
+        // Get the RenderStream's ExecutorService
+        Field field = RenderStream.class.getDeclaredField("sExecutor");
+        field.setAccessible(true);
+        ExecutorService sExecutor = spy((ExecutorService)field.get(null));
+        field.set(null, sExecutor);
+        doThrow(OutOfMemoryError.class).when(sExecutor).execute(any(Runnable.class));
+        
+        Concurrent concurrent = new Concurrent();
+        concurrent.withContent(new Sequence());
+        concurrent.compile(compileContext).render(renderContext);
+        verify(sExecutor, atLeastOnce()).shutdownNow();
+        
+        field.set(null, null);
     }
 }

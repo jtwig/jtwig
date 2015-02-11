@@ -14,6 +14,7 @@
 
 package org.jtwig.acceptance;
 
+import org.jtwig.AbstractJtwigTest;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -26,26 +27,26 @@ import static org.jtwig.util.SyntacticSugar.*;
 public class LoopExpressionTest extends AbstractJtwigTest {
     @Test
     public void simpleLoop() throws Exception {
-        given(aModel().withModelAttribute("list", asList("a", "b", "c")));
-        when(jtwigRenders(template("{% for item in list %}{{ item }}{% endfor %}")));
-        then(theRenderedTemplate(), is(equalTo("abc")));
+        given(theModel().withModelAttribute("list", asList("a", "b", "c")));
+        withResource("{% for item in list %}{{ item }}{% endfor %}");
+        then(theResult(), is(equalTo("abc")));
     }
     @Test
     public void simpleLoopLength() throws Exception {
-        given(aModel().withModelAttribute("list", asList("a", "b", "c")));
-        when(jtwigRenders(template("{% for item in list %}{{ loop.length }}{% endfor %}")));
-        then(theRenderedTemplate(), is(equalTo("333")));
+        given(theModel().withModelAttribute("list", asList("a", "b", "c")));
+        withResource("{% for item in list %}{{ loop.length }}{% endfor %}");
+        then(theResult(), is(equalTo("333")));
     }
     @Test
     public void simpleMapLoopWithList() throws Exception {
-        given(aModel().withModelAttribute("list", asList("a")));
-        when(jtwigRenders(template("{% for key, value in list %}{{ key }} - {{ value }}{% endfor %}")));
-        then(theRenderedTemplate(), is(equalTo("0 - a")));
+        given(theModel().withModelAttribute("list", asList("a")));
+        withResource("{% for key, value in list %}{{ key }} - {{ value }}{% endfor %}");
+        then(theResult(), is(equalTo("0 - a")));
     }
     @Test
     public void emptyMap() throws Exception {
-        given(aModel().withModelAttribute("list", new HashMap<>()));
-        when(jtwigRenders(template("{% for key, value in list %}{{ key }} - {{ value }}{% else %}Test{% endfor %}")));
-        then(theRenderedTemplate(), is(equalTo("Test")));
+        given(theModel().withModelAttribute("list", new HashMap<>()));
+        withResource("{% for key, value in list %}{{ key }} - {{ value }}{% else %}Test{% endfor %}");
+        then(theResult(), is(equalTo("Test")));
     }
 }

@@ -14,29 +14,29 @@
 
 package org.jtwig.acceptance;
 
-import org.junit.Test;
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import org.jtwig.AbstractJtwigTest;
+import org.junit.Test;
 
 public class BinaryExpressionCalculationsTest extends AbstractJtwigTest {
     @Test
     public void shouldResolveToInteger () throws Exception {
-        assertThat(theResultOfRendering(theTemplate("{{ 3 ** 2 }}")), is("6"));
+        assertThat(theResultOf(theTemplate("{{ 3 ** 2 }}")), is("6"));
     }
 
     @Test
     public void shouldResolveToDouble () throws Exception {
-        assertThat(theResultOfRendering(theTemplate("{{ 3 * 2.0 }}")), is("6.0"));
+        assertThat(theResultOf(theTemplate("{{ 3 * 2.0 }}")), is("6.0"));
     }
 
     @Test
     public void shouldResolveToBoolean () throws Exception {
-        assertThat(theResultOfRendering(theTemplate("{{ 3 and 2.0 }}")), is("1"));
+        assertThat(theResultOf(theTemplate("{{ 3 and 2.0 }}")), is("1"));
     }
 
     @Test
     public void shouldResolveToBooleanFalse () throws Exception {
-        assertThat(theResultOfRendering(theTemplate("{{ 3 and false }}")), is("0"));
+        assertThat(theResultOf(theTemplate("{{ 3 and false }}")), is("0"));
     }
 }

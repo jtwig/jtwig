@@ -23,8 +23,9 @@ import org.jtwig.render.RenderContext;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.jtwig.content.api.ability.ElementList;
 
-public class Sequence extends AbstractElement {
+public class Sequence extends AbstractElement implements ElementList<Compilable> {
     private List<Compilable> contents = new ArrayList<>();
     private Compilable parent;
     private Compilable after;
@@ -41,6 +42,7 @@ public class Sequence extends AbstractElement {
         return new Compiled(result);
     }
 
+    @Override
     public Sequence add (Compilable compilable) {
         this.contents.add(compilable);
         return this;

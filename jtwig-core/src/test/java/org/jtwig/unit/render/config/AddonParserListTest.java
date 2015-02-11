@@ -1,17 +1,16 @@
 package org.jtwig.unit.render.config;
 
+import static org.hamcrest.core.IsCollectionContaining.hasItem;
+import org.jtwig.Environment;
 import org.jtwig.addons.Addon;
 import org.jtwig.addons.AddonModel;
 import org.jtwig.addons.concurrent.ConcurrentAddon;
 import org.jtwig.addons.filter.FilterAddon;
 import org.jtwig.addons.spaceless.SpacelessAddon;
+import org.jtwig.loader.Loader;
 import org.jtwig.parser.config.AddonParserList;
-import org.jtwig.parser.config.ParserConfiguration;
-import org.jtwig.resource.JtwigResource;
-import org.junit.Test;
-
-import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.Assert.assertThat;
+import org.junit.Test;
 
 public class AddonParserListTest {
     @Test
@@ -35,8 +34,8 @@ public class AddonParserListTest {
     }
 
     public static class Sample extends Addon {
-        public Sample(JtwigResource resource, ParserConfiguration configuration) {
-            super(resource, configuration);
+        public Sample(Loader.Resource resource, Environment env) {
+            super(resource, env);
         }
 
         @Override

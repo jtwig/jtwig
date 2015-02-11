@@ -14,16 +14,16 @@
 
 package org.jtwig.acceptance;
 
-import org.junit.Test;
-
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import org.jtwig.AbstractJtwigTest;
+import org.junit.Test;
 
 public class WhitespaceControlTest extends AbstractJtwigTest {
     @Test
     public void ifSpaceControl() throws Exception {
-        assertThat(theResultOfRendering(theTemplate(
+        assertThat(theResultOf(theTemplate(
                 " {%- if true -%} A {%- endif -%} \n\t")),
                    is(equalTo("A"))
         );
@@ -31,7 +31,7 @@ public class WhitespaceControlTest extends AbstractJtwigTest {
 
     @Test
     public void elseSpaceControl() throws Exception {
-        assertThat(theResultOfRendering(theTemplate(
+        assertThat(theResultOf(theTemplate(
                 " {%- if false -%}{% else -%} A {% endif -%} \n\t")),
                    is(equalTo("A "))
         );
@@ -39,7 +39,7 @@ public class WhitespaceControlTest extends AbstractJtwigTest {
 
     @Test
     public void elseIfSpaceControl() throws Exception {
-        assertThat(theResultOfRendering(theTemplate(
+        assertThat(theResultOf(theTemplate(
                 " {%- if false -%}{% elseif true -%} A {% endif -%} \n\t")),
                    is(equalTo("A "))
         );
@@ -47,7 +47,7 @@ public class WhitespaceControlTest extends AbstractJtwigTest {
 
     @Test
     public void setTest() throws Exception {
-        assertThat(theResultOfRendering(theTemplate(
+        assertThat(theResultOf(theTemplate(
                 " {%- set a = 1 %}")),
                    is(equalTo(""))
         );
@@ -55,7 +55,7 @@ public class WhitespaceControlTest extends AbstractJtwigTest {
 
     @Test
     public void testOutput() throws Exception {
-        assertThat(theResultOfRendering(theTemplate(
+        assertThat(theResultOf(theTemplate(
                 " {{- 'hello' -}} ")),
                    is(equalTo("hello"))
         );
@@ -63,7 +63,7 @@ public class WhitespaceControlTest extends AbstractJtwigTest {
 
     @Test
     public void testComment() throws Exception {
-        assertThat(theResultOfRendering(theTemplate(
+        assertThat(theResultOf(theTemplate(
                 " {#- 'hello' -#} ")),
                    is(equalTo(""))
         );
@@ -71,7 +71,7 @@ public class WhitespaceControlTest extends AbstractJtwigTest {
 
     @Test
     public void testCommentEmpty() throws Exception {
-        assertThat(theResultOfRendering(theTemplate(
+        assertThat(theResultOf(theTemplate(
                 " {#--#} ")),
                    is(equalTo(""))
         );
@@ -79,7 +79,7 @@ public class WhitespaceControlTest extends AbstractJtwigTest {
 
     @Test
     public void testCommentRight() throws Exception {
-        assertThat(theResultOfRendering(theTemplate(
+        assertThat(theResultOf(theTemplate(
                 " {# Hola -#} ")),
                    is(equalTo(" "))
         );
@@ -87,7 +87,7 @@ public class WhitespaceControlTest extends AbstractJtwigTest {
 
     @Test
     public void testCommentLeft() throws Exception {
-        assertThat(theResultOfRendering(theTemplate(
+        assertThat(theResultOf(theTemplate(
                 " {#- Hola #} ")),
                    is(equalTo(" "))
         );

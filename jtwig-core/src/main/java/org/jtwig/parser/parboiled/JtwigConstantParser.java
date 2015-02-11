@@ -14,8 +14,8 @@
 
 package org.jtwig.parser.parboiled;
 
+import org.jtwig.Environment;
 import org.jtwig.expressions.model.Constant;
-import org.jtwig.parser.config.ParserConfiguration;
 import org.parboiled.BaseParser;
 import org.parboiled.Rule;
 
@@ -26,12 +26,11 @@ import static org.parboiled.Parboiled.createParser;
 public class JtwigConstantParser extends BaseParser<Constant> {
     final JtwigBasicParser basic;
 
-    public JtwigConstantParser(ParserConfiguration parserConfiguration) {
-        this.basic  = createParser(JtwigBasicParser.class, parserConfiguration);
-    }
-
     public JtwigConstantParser() {
-        this(new ParserConfiguration());
+        this.basic = createParser(JtwigBasicParser.class, new Environment());
+    }
+    public JtwigConstantParser(Environment env) {
+        basic = env.getBasicParser();
     }
 
     public Rule anyConstant () {

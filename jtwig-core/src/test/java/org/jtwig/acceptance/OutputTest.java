@@ -14,31 +14,23 @@
 
 package org.jtwig.acceptance;
 
-import org.jtwig.JtwigModelMap;
-import org.jtwig.JtwigTemplate;
-import org.jtwig.exception.CompileException;
-import org.jtwig.exception.ParseException;
-import org.jtwig.exception.RenderException;
-import org.junit.Test;
-
-import java.util.ArrayList;
-
+import java.util.Collections;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import org.jtwig.AbstractJtwigTest;
+import org.junit.Test;
 
-public class OutputTest {
+public class OutputTest extends AbstractJtwigTest {
     @Test
-    public void shouldAllowConcatenationOfDistinctElements () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = JtwigTemplate.fromString("{{ concat ('1', list.size ,'3') }}");
-        JtwigModelMap context = new JtwigModelMap();
-        context.withModelAttribute("list", new ArrayList<Object>());
-        assertThat(template.output(context), is("103"));
+    public void shouldAllowConcatenationOfDistinctElements () throws Exception {
+        model.withModelAttribute("list", Collections.EMPTY_LIST);
+        withResource("{{ concat ('1', list.size ,'3') }}");
+        assertThat(theResult(), is("103"));
     }
 
     @Test
-    public void shouldAllowFilters () throws ParseException, CompileException, RenderException {
-        JtwigTemplate template = JtwigTemplate.fromString("{{ ['1', '2' ,'3'] | join(',') }}");
-        JtwigModelMap context = new JtwigModelMap();
-        assertThat(template.output(context), is("1,2,3"));
+    public void shouldAllowFilters () throws Exception {
+        withResource("{{ ['1', '2' ,'3'] | join(',') }}");
+        assertThat(theResult(), is("1,2,3"));
     }
 }

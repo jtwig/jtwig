@@ -14,14 +14,13 @@
 
 package org.jtwig.parser.parboiled;
 
+import org.jtwig.Environment;
 import org.jtwig.exception.ParseBypassException;
 import org.jtwig.exception.ParseException;
 import org.jtwig.expressions.api.CompilableExpression;
 import org.jtwig.expressions.model.*;
-import org.jtwig.parser.config.ParserConfiguration;
 import org.jtwig.parser.model.JtwigKeyword;
 import org.jtwig.parser.model.JtwigSymbol;
-import org.jtwig.resource.JtwigResource;
 import org.parboiled.MatcherContext;
 import org.parboiled.Rule;
 import org.parboiled.annotations.SuppressNode;
@@ -29,21 +28,21 @@ import org.parboiled.matchers.CustomMatcher;
 import org.parboiled.support.ValueStack;
 
 import static org.jtwig.expressions.model.Operator.*;
+import org.jtwig.loader.Loader;
 import static org.jtwig.parser.model.JtwigKeyword.NULL;
 import static org.jtwig.parser.model.JtwigSymbol.*;
 import static org.jtwig.parser.model.JtwigSymbol.DIV;
-import static org.parboiled.Parboiled.createParser;
 
 public class JtwigExpressionParser extends JtwigBaseParser<CompilableExpression> {
     final JtwigBasicParser basic;
     final JtwigConstantParser constants;
-    final ParserConfiguration config;
+    final Environment env;
 
-    public JtwigExpressionParser(JtwigResource resource, ParserConfiguration parserConfiguration) {
+    public JtwigExpressionParser(Loader.Resource resource, Environment env) {
         super(resource);
-        basic = createParser(JtwigBasicParser.class, parserConfiguration);
-        constants = createParser(JtwigConstantParser.class, parserConfiguration);
-        config = parserConfiguration;
+        basic = env.getBasicParser();
+        constants = env.getConstantParser();
+        this.env = env;
     }
 
     public Rule expression() {
@@ -492,6 +491,7 @@ public class JtwigExpressionParser extends JtwigBaseParser<CompilableExpression>
         );
     }
 
+    @Override
     boolean throwException(ParseException exception) throws ParseBypassException {
         throw new ParseBypassException(exception);
     }

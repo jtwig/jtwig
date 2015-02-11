@@ -14,80 +14,76 @@
 
 package org.jtwig.acceptance;
 
-import org.jtwig.JtwigModelMap;
-import org.jtwig.JtwigTemplate;
-import org.junit.Test;
-
-import java.util.HashMap;
-
+import java.util.Collections;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import org.jtwig.AbstractJtwigTest;
+import org.junit.Test;
 
 public class IsOperatorTest extends AbstractJtwigTest {
     public static final String HELLO = "one";
-    private JtwigModelMap context = new JtwigModelMap();
-
+    
     @Test
     public void isOperatorEmptyFunction () throws Exception {
-        JtwigTemplate template = JtwigTemplate.fromString("{% if ([] is empty) %}Hi{% endif %}");
-        assertThat(template.output(context), is(equalTo("Hi")));
+        withResource("{% if ([] is empty) %}Hi{% endif %}");
+        assertThat(theResult(), is(equalTo("Hi")));
     }
 
     @Test
     public void isOperatorConstantFunction () throws Exception {
-        JtwigTemplate template = JtwigTemplate.fromString("{% if ('one' is constant('org.jtwig.acceptance.IsOperatorTest.HELLO')) %}Hi{% endif %}");
-        assertThat(template.output(context), is(equalTo("Hi")));
+        withResource("{% if ('one' is constant('org.jtwig.acceptance.IsOperatorTest.HELLO')) %}Hi{% endif %}");
+        assertThat(theResult(), is(equalTo("Hi")));
     }
 
     @Test
     public void isDefinedFunction () throws Exception {
-        JtwigTemplate template = JtwigTemplate.fromString("{% if (variable is not defined) %}Hi{% endif %}");
-        assertThat(template.output(context), is(equalTo("Hi")));
+        withResource("{% if (variable is not defined) %}Hi{% endif %}");
+        assertThat(theResult(), is(equalTo("Hi")));
     }
     @Test
     public void isEvenFunction () throws Exception {
-        JtwigTemplate template = JtwigTemplate.fromString("{% if (1 is not even) %}Hi{% endif %}");
-        assertThat(template.output(context), is(equalTo("Hi")));
+        withResource("{% if (1 is not even) %}Hi{% endif %}");
+        assertThat(theResult(), is(equalTo("Hi")));
     }
     @Test
     public void isNotOddFunction () throws Exception {
-        JtwigTemplate template = JtwigTemplate.fromString("{% if (1 is not odd) %}Hi{% endif %}");
-        assertThat(template.output(context), is(equalTo("")));
+        withResource("{% if (1 is not odd) %}Hi{% endif %}");
+        assertThat(theResult(), is(equalTo("")));
     }
     @Test
     public void isOddFunction () throws Exception {
-        JtwigTemplate template = JtwigTemplate.fromString("{% if (1 is odd) %}Hi{% endif %}");
-        assertThat(template.output(context), is(equalTo("Hi")));
+        withResource("{% if (1 is odd) %}Hi{% endif %}");
+        assertThat(theResult(), is(equalTo("Hi")));
     }
     @Test
     public void isIterableFunction () throws Exception {
-        JtwigTemplate template = JtwigTemplate.fromString("{% if ([] is iterable) %}Hi{% endif %}");
-        assertThat(template.output(context), is(equalTo("Hi")));
+        withResource("{% if ([] is iterable) %}Hi{% endif %}");
+        assertThat(theResult(), is(equalTo("Hi")));
     }
     @Test
     public void isIterableArrayFunction () throws Exception {
-        context.add("value", new Object[0]);
-        JtwigTemplate template = JtwigTemplate.fromString("{% if (value is iterable) %}Hi{% endif %}");
-        assertThat(template.output(context), is(equalTo("Hi")));
+        model.add("value", new Object[0]);
+        withResource("{% if (value is iterable) %}Hi{% endif %}");
+        assertThat(theResult(), is(equalTo("Hi")));
     }
     @Test
     public void isIterableMapFunction () throws Exception {
-        context.withModelAttribute("value", new HashMap<>());
-        JtwigTemplate template = JtwigTemplate.fromString("{% if (value is iterable) %}Hi{% endif %}");
-        assertThat(template.output(context), is(equalTo("Hi")));
+        model.withModelAttribute("value", Collections.EMPTY_MAP);
+        withResource("{% if (value is iterable) %}Hi{% endif %}");
+        assertThat(theResult(), is(equalTo("Hi")));
     }
 
     @Test
     public void isNullFunction () throws Exception {
-        context.withModelAttribute("value", null);
-        JtwigTemplate template = JtwigTemplate.fromString("{% if (value is null) %}Hi{% endif %}");
-        assertThat(template.output(context), is(equalTo("Hi")));
+        model.withModelAttribute("value", null);
+        withResource("{% if (value is null) %}Hi{% endif %}");
+        assertThat(theResult(), is(equalTo("Hi")));
     }
 
     @Test
     public void isDivisableFunction () throws Exception {
-        JtwigTemplate template = JtwigTemplate.fromString("{% if (3 is divisable by 1) %}Hi{% else %}OH{% endif %}");
-        assertThat(template.output(context), is(equalTo("Hi")));
+        withResource("{% if (3 is divisable by 1) %}Hi{% else %}OH{% endif %}");
+        assertThat(theResult(), is(equalTo("Hi")));
     }
 }

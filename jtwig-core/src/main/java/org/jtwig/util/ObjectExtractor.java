@@ -16,16 +16,20 @@ package org.jtwig.util;
 
 import com.google.common.base.Predicate;
 import org.hamcrest.Matcher;
-import org.jtwig.content.model.compilable.Import;
-import org.jtwig.exception.RenderException;
 import org.jtwig.render.RenderContext;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
+import org.jtwig.content.api.ability.ExecutionAware;
+import org.jtwig.exception.RenderException;
 import static org.jtwig.types.Undefined.UNDEFINED;
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.getAllMethods;
@@ -40,15 +44,15 @@ public class ObjectExtractor {
     }
 
     public Object extract (final String name, Object... parameters) throws ExtractException {
-        if (context instanceof Import.MacroRepository) {
+        if (context instanceof ExecutionAware) {
             try {
-                return ((Import.MacroRepository)context).execute(renderContext, name, parameters);
+                return ((ExecutionAware)context).execute(renderContext, name, parameters);
             } catch (RenderException ex) {
                 throw new ExtractException(ex);
             }
         }
         
-        List<Callable> callables = new ArrayList<Callable>();
+        List<Callable> callables = new ArrayList<>();
 
         if (parameters.length == 0) {
             callables.add(tryField());
@@ -137,8 +141,7 @@ public class ObjectExtractor {
                     methods = getAllMethods(context.getClass(), methodMatcher(equalToIgnoringCase(prefixes[i++] + name), args.length));
                 }
 
-                if (methods.isEmpty()) return new Result<>();
-                else {
+                if (!methods.isEmpty()) {
                     Iterator<Method> iterator = methods.iterator();
                     Exception thrown = null;
                     while (iterator.hasNext()) {

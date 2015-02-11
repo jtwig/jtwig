@@ -14,9 +14,9 @@
 
 package org.jtwig.mvc;
 
+import org.jtwig.Environment;
 import org.jtwig.cache.JtwigTemplateCacheSystem;
 import org.jtwig.cache.impl.PersistentTemplateCacheSystem;
-import org.jtwig.configuration.JtwigConfiguration;
 import org.jtwig.functions.SpringFunctions;
 import org.jtwig.functions.parameters.convert.DemultiplexerConverter;
 import org.jtwig.functions.parameters.convert.impl.ObjectToStringConverter;
@@ -30,16 +30,15 @@ import org.jtwig.functions.parameters.resolve.impl.ParameterAnnotationParameterR
 import org.jtwig.functions.resolver.api.FunctionResolver;
 import org.jtwig.functions.resolver.impl.CompoundFunctionResolver;
 import org.jtwig.functions.resolver.impl.DelegateFunctionResolver;
-import org.jtwig.resource.loader.DefaultResourceResolver;
-import org.jtwig.resource.loader.JtwigResourceResolver;
 import org.jtwig.services.api.url.ResourceUrlResolver;
 import org.jtwig.services.impl.url.IdentityUrlResolver;
 import org.jtwig.services.impl.url.ThemedResourceUrlResolver;
+import static org.jtwig.util.LocalThreadHolder.getServletRequest;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.ThemeResolver;
 import org.springframework.web.servlet.view.AbstractTemplateViewResolver;
 import org.springframework.web.servlet.view.AbstractUrlBasedView;
-
-import static org.jtwig.util.LocalThreadHolder.getServletRequest;
 
 public class JtwigViewResolver extends AbstractTemplateViewResolver {
 
@@ -47,22 +46,26 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
     private String encoding;
     private boolean useThemeInViewPath = false;
 
-    private JtwigResourceResolver loader;
-    private JtwigConfiguration configuration = new JtwigConfiguration();
+    private Environment env;
     private SpringFunctions springFunctions = null;
     private CompoundParameterResolver parameterResolver = new CompoundParameterResolver();
-    private CompoundFunctionResolver functionResolver = new CompoundFunctionResolver()
-            .withResolver(resolver(new DemultiplexerConverter()))
-            .withResolver(resolver(new DemultiplexerConverter().withConverter(String.class, new ObjectToStringConverter())));
+    private CompoundFunctionResolver functionResolver;
     private JtwigTemplateCacheSystem cache = new PersistentTemplateCacheSystem();
 
 
     public JtwigViewResolver() {
+        this(new Environment());
+    }
+    public JtwigViewResolver(Environment env) {
+        this.env = env;
         setViewClass(requiredViewClass());
         setContentType("text/html; charset=UTF-8");
 
         parameterResolver
                 .withResolver(new HttpRequestParameterResolver());
+        functionResolver = new CompoundFunctionResolver()
+            .withResolver(resolver(new DemultiplexerConverter()))
+            .withResolver(resolver(new DemultiplexerConverter().withConverter(String.class, new ObjectToStringConverter())));
     }
 
     @Override
@@ -91,7 +94,7 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
         if (springFunctions == null) {
             springFunctions = new SpringFunctions();
             getApplicationContext().getAutowireCapableBeanFactory().autowireBean(springFunctions);
-            configuration.render().functionRepository().include(springFunctions);
+            env.getFunctionRepository().include(springFunctions);
         }
         return functionResolver;
     }
@@ -101,12 +104,13 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
         return this;
     }
 
-    public JtwigConfiguration configuration() {
-        return configuration;
+    public Environment getEnvironment() {
+        return env;
     }
 
-    public JtwigViewResolver setConfiguration(JtwigConfiguration configuration) {
-        this.configuration = configuration;
+    @Autowired
+    public JtwigViewResolver setEnvironment(Environment env) {
+        this.env = env;
         return this;
     }
 
@@ -116,12 +120,7 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
     }
 
     public JtwigViewResolver includeFunctions(Object functionBean) {
-        configuration.render().functionRepository().include(functionBean);
-        return this;
-    }
-
-    public JtwigViewResolver setResourceLoader(JtwigResourceResolver resourceLoader) {
-        this.loader = resourceLoader;
+        env.getFunctionRepository().include(functionBean);
         return this;
     }
 
@@ -132,14 +131,6 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
 
     public boolean useThemeInViewPath() {
         return useThemeInViewPath;
-    }
-
-    // Methods only accessible to JtwigView, no need to give them to the end user
-    JtwigResourceResolver resourceLoader() {
-        if (loader == null) {
-            setResourceLoader(new DefaultResourceResolver(getServletContext()));
-        }
-        return loader;
     }
 
     String getEncoding() {
@@ -162,7 +153,7 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
     }
 
     private DelegateFunctionResolver resolver(DemultiplexerConverter converter) {
-        return new DelegateFunctionResolver(configuration.render().functionRepository(),
+        return new DelegateFunctionResolver(env.getFunctionRepository(),
                                             new InputDelegateMethodParametersResolver(
                                                     parameterResolverFactory(converter)));
     }

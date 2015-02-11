@@ -1,30 +1,32 @@
 package org.jtwig.unit.expressions.operations.binary;
 
+import java.util.Arrays;
+import org.jtwig.AbstractJtwigTest;
 import org.jtwig.exception.CalculateException;
 import org.jtwig.expressions.api.Expression;
+import org.jtwig.expressions.model.Constant;
 import org.jtwig.expressions.model.FunctionElement;
 import org.jtwig.expressions.model.Variable;
 import org.jtwig.expressions.operations.binary.SelectionOperation;
 import org.jtwig.parser.model.JtwigPosition;
 import org.jtwig.render.RenderContext;
-import org.jtwig.render.config.RenderConfiguration;
+import static org.jtwig.types.Undefined.UNDEFINED;
 import org.jtwig.util.ObjectExtractor;
+import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.internal.matchers.ThrowableCauseMatcher;
 import org.junit.rules.ExpectedException;
-
-import java.util.Arrays;
-
-import static org.jtwig.types.Undefined.UNDEFINED;
-import static org.junit.Assert.assertEquals;
+import org.mockito.Matchers;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.hamcrest.Matchers.*;
+import org.hamcrest.core.IsInstanceOf;
 
-public class SelectionOperationTest {
+public class SelectionOperationTest extends AbstractJtwigTest {
     private JtwigPosition position = new JtwigPosition(null, 1, 1);
     private Expression left = mock(Expression.class);
-    private RenderContext renderContext = mock(RenderContext.class);
     private SelectionOperation operation = new SelectionOperation();
 
     @Rule
@@ -32,13 +34,14 @@ public class SelectionOperationTest {
 
     @Before
     public void setUp() throws Exception {
-        when(renderContext.configuration()).thenReturn(new RenderConfiguration().strictMode(true));
+        super.before();
+        theEnvironment().setStrictMode(true);
+        
         when(left.calculate(renderContext)).thenReturn(null);
     }
 
     @Test(expected = CalculateException.class)
     public void accessPropertyOfNullWithStrictMode() throws Exception {
-
         Expression right = new Variable.Compiled(position, "variable");
 
         operation.apply(renderContext, position, left, right);
@@ -46,9 +49,8 @@ public class SelectionOperationTest {
 
     @Test
     public void accessPropertyOfNullWithoutStrictMode() throws Exception {
+        theEnvironment().setStrictMode(false);
         Expression right = new Variable.Compiled(position, "variable");
-
-        when(renderContext.configuration()).thenReturn(new RenderConfiguration().strictMode(false));
 
         Object result = operation.apply(renderContext, position, left, right);
         assertEquals(UNDEFINED, result);
@@ -62,8 +64,8 @@ public class SelectionOperationTest {
 
     @Test
     public void accessMethodOfNullWithoutStrictMode() throws Exception {
+        theEnvironment().setStrictMode(false);
         Expression right = new FunctionElement.Compiled(position, "variable", Arrays.<Expression>asList());
-        when(renderContext.configuration()).thenReturn(new RenderConfiguration().strictMode(false));
 
         Object result = operation.apply(renderContext, position, left, right);
         assertEquals(UNDEFINED, result);
@@ -77,8 +79,8 @@ public class SelectionOperationTest {
 
     @Test
     public void accessPropertyOfUndefinedWithoutStrictMode() throws Exception {
+        theEnvironment().setStrictMode(false);
         Expression right = new Variable.Compiled(position, "variable");
-        when(renderContext.configuration()).thenReturn(new RenderConfiguration().strictMode(false));
         when(left.calculate(renderContext)).thenReturn(UNDEFINED);
 
         Object result = operation.apply(renderContext, position, left, right);
@@ -89,15 +91,14 @@ public class SelectionOperationTest {
     public void accessMethodOfUndefinedWithStrictMode() throws Exception {
         Expression right = new FunctionElement.Compiled(position, "variable", Arrays.<Expression>asList());
         when(left.calculate(renderContext)).thenReturn(UNDEFINED);
-        when(renderContext.configuration()).thenReturn(new RenderConfiguration().strictMode(true));
 
         operation.apply(renderContext, position, left, right);
     }
 
     @Test
     public void accessMethodOfUndefinedWithoutStrictMode() throws Exception {
+        theEnvironment().setStrictMode(false);
         Expression right = new FunctionElement.Compiled(position, "variable", Arrays.<Expression>asList());
-        when(renderContext.configuration()).thenReturn(new RenderConfiguration().strictMode(false));
         when(left.calculate(renderContext)).thenReturn(UNDEFINED);
 
         Object result = operation.apply(renderContext, position, left, right);
@@ -106,7 +107,7 @@ public class SelectionOperationTest {
 
     @Test(expected = CalculateException.class)
     public void operationShouldFailIfRightHandSideIsNotAFunctionNeitherAVariable() throws Exception {
-        when(renderContext.configuration()).thenReturn(new RenderConfiguration().strictMode(false));
+        theEnvironment().setStrictMode(false);
         when(left.calculate(renderContext)).thenReturn("hello");
 
         operation.apply(renderContext, position, left, null);
@@ -114,9 +115,9 @@ public class SelectionOperationTest {
 
     @Test
     public void extractExceptionThrown() throws Exception {
-        expectedException.expect(CalculateException.class);
+        expectedException.expectCause(is(IsInstanceOf.<Throwable>instanceOf(ObjectExtractor.ExtractException.class)));
 
-        operation.apply(renderContext, position, left, variable());
+        operation.apply(renderContext, position, new Constant(new Object()), variable());
     }
 
     private Variable.Compiled variable() {

@@ -14,22 +14,18 @@
 
 package org.jtwig.unit.expressions.model;
 
-import org.jtwig.JtwigModelMap;
+import org.jtwig.AbstractJtwigTest;
 import org.jtwig.expressions.model.Variable;
-import org.jtwig.render.RenderContext;
-import org.jtwig.render.config.RenderConfiguration;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class VariableTest {
+public class VariableTest extends AbstractJtwigTest {
     private Variable underTest = new Variable(null, "variable");
 
     @Test
     public void resolveValueTest() throws Exception {
-        JtwigModelMap modelMap = new JtwigModelMap()
-                .withModelAttribute("variable", "one")
-                ;
-        assertEquals("one", underTest.compile(null).calculate(RenderContext.create(new RenderConfiguration(), modelMap, null)));
+        model.withModelAttribute("variable", "one");
+        assertEquals("one", underTest.compile(null).calculate(renderContext));
     }
 }

@@ -14,7 +14,7 @@
 
 package org.jtwig.acceptance.issues;
 
-import org.jtwig.acceptance.AbstractJtwigTest;
+import org.jtwig.AbstractJtwigTest;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -25,24 +25,24 @@ public class Issue86Test extends AbstractJtwigTest {
 
     @Test
     public void issue86() throws Exception {
-        when(jtwigRenders(template("{{ -1 }}")));
-        then(theRenderedTemplate(), is(equalTo("-1")));
+        withResource("{{ -1 }}");
+        then(theResult(), is(equalTo("-1")));
     }
     @Test
     public void issue86WithConstant() throws Exception {
-        when(jtwigRenders(template("{{ 1-1 }}")));
-        then(theRenderedTemplate(), is(equalTo("0")));
+        withResource("{{ 1-1 }}");
+        then(theResult(), is(equalTo("0")));
     }
     @Test
     public void issue86WithVariable() throws Exception {
-        given(aModel().withModelAttribute("value", 1));
-        when(jtwigRenders(template("{{ value-1 }}")));
-        then(theRenderedTemplate(), is(equalTo("0")));
+        given(theModel().withModelAttribute("value", 1));
+        withResource("{{ value-1 }}");
+        then(theResult(), is(equalTo("0")));
     }
     @Test
     public void issue86WithVariableUnary() throws Exception {
-        given(aModel().withModelAttribute("value", -1));
-        when(jtwigRenders(template("{{ -value }}")));
-        then(theRenderedTemplate(), is(equalTo("1")));
+        given(theModel().withModelAttribute("value", -1));
+        withResource("{{ -value }}");
+        then(theResult(), is(equalTo("1")));
     }
 }

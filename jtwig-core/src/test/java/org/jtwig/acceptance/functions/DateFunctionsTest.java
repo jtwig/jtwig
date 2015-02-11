@@ -14,37 +14,38 @@
 
 package org.jtwig.acceptance.functions;
 
-import org.jtwig.acceptance.AbstractJtwigTest;
-import org.jtwig.exception.RenderException;
-import org.junit.Test;
-
 import java.util.Date;
-
+import org.jtwig.AbstractJtwigTest;
+import org.jtwig.exception.RenderException;
 import static org.jtwig.util.SyntacticSugar.given;
-import static org.jtwig.util.SyntacticSugar.when;
+import org.junit.Test;
 
 public class DateFunctionsTest extends AbstractJtwigTest {
     @Test
     public void dateFormatWithDate() throws Exception {
-        given(aModel().withModelAttribute("time", new Date()));
-        when(jtwigRenders(template("{{ date(time, 'yyyy') }}")));
+        given(theModel().withModelAttribute("time", new Date()));
+        withResource("{{ date(time, 'yyyy') }}");
+        render();
     }
 
     @Test
     public void dateFormat() throws Exception {
-        given(aModel().withModelAttribute("time", new Date()));
-        when(jtwigRenders(template("{{ date(time) }}")));
+        given(theModel().withModelAttribute("time", new Date()));
+        withResource("{{ date(time) }}");
+        render();
     }
 
     @Test
     public void dateModify() throws Exception {
-        given(aModel().withModelAttribute("time", new Date()));
-        when(jtwigRenders(template("{{ date(time, '+1 day') }}")));
+        given(theModel().withModelAttribute("time", new Date()));
+        withResource("{{ date(time, '+1 day') }}");
+        render();
     }
 
     @Test(expected = RenderException.class)
     public void dateModifyWithWrongFormat() throws Exception {
-        given(aModel().withModelAttribute("time", new Date()));
-        when(jtwigRenders(template("{{ date(time, '+1 unknown') }}")));
+        given(theModel().withModelAttribute("time", new Date()));
+        withResource("{{ date(time, '+1 unknown') }}");
+        render();
     }
 }

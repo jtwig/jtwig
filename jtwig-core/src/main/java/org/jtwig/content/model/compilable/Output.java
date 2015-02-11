@@ -50,8 +50,9 @@ public class Output extends AbstractElement {
         public void render(RenderContext context) throws RenderException {
             try {
                 Object calculate = expression.calculate(context);
-                if (calculate != null)
-                    context.write(toTwig(calculate).getBytes(context.configuration().charset()));
+                if (calculate != null) {
+                    context.write(toTwig(calculate).getBytes(context.environment().getCharset()));
+                }
             } catch (IOException | CalculateException e) {
                 throw new RenderException(e);
             }

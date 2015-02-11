@@ -28,24 +28,14 @@ public class SelectionOperation implements BinaryOperation {
     @Override
     public Object apply(RenderContext context, JtwigPosition position, Expression left, Expression right) throws CalculateException {
         Object calculate = left.calculate(context);
-        if (calculate == null) {
-            if (context.configuration().strictMode()) {
+        if (calculate == null || calculate == Undefined.UNDEFINED) {
+            if (context.environment().isStrictMode()) {
                 if (right instanceof Variable.Compiled) {
                     String propertyName = ((Variable.Compiled) right).name();
-                    throw new CalculateException(String.format(position + ": Impossible to access attribute/method '%s' on null", propertyName));
+                    throw new CalculateException(String.format(position + ": Impossible to access attribute/method '%s' on %s", propertyName, getName(calculate)));
                 } else if (right instanceof FunctionElement.Compiled) {
                     String propertyName = ((FunctionElement.Compiled) right).name();
-                    throw new CalculateException(String.format(position + ": Impossible to access attribute/method '%s' on null", propertyName));
-                }
-            } else return Undefined.UNDEFINED;
-        } else if (calculate == Undefined.UNDEFINED) {
-            if (context.configuration().strictMode()) {
-                if (right instanceof Variable.Compiled) {
-                    String propertyName = ((Variable.Compiled) right).name();
-                    throw new CalculateException(String.format(position + ": Impossible to access attribute/method '%s' on undefined", propertyName));
-                } else if (right instanceof FunctionElement.Compiled) {
-                    String propertyName = ((FunctionElement.Compiled) right).name();
-                    throw new CalculateException(String.format(position + ": Impossible to access attribute/method '%s' on undefined", propertyName));
+                    throw new CalculateException(String.format(position + ": Impossible to access attribute/method '%s' on %s", propertyName, getName(calculate)));
                 }
             } else return Undefined.UNDEFINED;
         }
@@ -59,5 +49,15 @@ public class SelectionOperation implements BinaryOperation {
         } catch (ObjectExtractor.ExtractException e) {
             throw new CalculateException(e);
         }
+    }
+    
+    protected static String getName(final Object calculate) {
+        if (calculate == null) {
+            return "null";
+        }
+        if (calculate == Undefined.UNDEFINED) {
+            return "undefined";
+        }
+        return "unknown";
     }
 }

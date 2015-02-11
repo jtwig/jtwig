@@ -14,37 +14,33 @@
 
 package org.jtwig.acceptance;
 
-import org.jtwig.exception.CompileException;
-import org.jtwig.exception.ParseException;
-import org.jtwig.exception.RenderException;
-import org.junit.Test;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.StringContains.containsString;
-import static org.jtwig.util.SyntacticSugar.after;
+import org.jtwig.AbstractJtwigTest;
+import org.junit.Test;
 
 public class EmbedTest extends AbstractJtwigTest {
     @Test
-    public void emptyEmbed() throws ParseException, CompileException, RenderException {
-        after(jtwigRenders(templateResource("templates/embed/empty.twig")));
-        assertThat(theRenderedTemplate(), containsString("1/1"));
+    public void emptyEmbed() throws Exception {
+        withResource(classpathResource("templates/embed/empty.twig"));
+        assertThat(theResult(), containsString("1/1"));
     }
 
     @Test
-    public void partialOverrideEmbed() throws ParseException, CompileException, RenderException {
-        after(jtwigRenders(templateResource("templates/embed/partialOverride.twig")));
-        assertThat(theRenderedTemplate(), containsString("1/2"));
+    public void partialOverrideEmbed() throws Exception {
+        withResource(classpathResource("templates/embed/partialOverride.twig"));
+        assertThat(theResult(), containsString("1/2"));
     }
 
     @Test
-    public void fullOverrideEmbed() throws ParseException, CompileException, RenderException {
-        after(jtwigRenders(templateResource("templates/embed/fullOverride.twig")));
-        assertThat(theRenderedTemplate(), containsString("2/2"));
+    public void fullOverrideEmbed() throws Exception {
+        withResource(classpathResource("templates/embed/fullOverride.twig"));
+        assertThat(theResult(), containsString("2/2"));
     }
 
     @Test
-    public void nestedOverrideEmbed() throws ParseException, CompileException, RenderException {
-        after(jtwigRenders(templateResource("templates/embed/nestedOverride.twig")));
-        assertThat(theRenderedTemplate(), containsString("1/(4/2)"));
+    public void nestedOverrideEmbed() throws Exception {
+        withResource(classpathResource("templates/embed/nestedOverride.twig"));
+        assertThat(theResult(), containsString("1/(4/2)"));
     }
 }

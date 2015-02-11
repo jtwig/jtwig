@@ -14,7 +14,7 @@
 
 package org.jtwig.acceptance.issues;
 
-import org.jtwig.acceptance.AbstractJtwigTest;
+import org.jtwig.AbstractJtwigTest;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -24,17 +24,17 @@ import static org.jtwig.util.SyntacticSugar.*;
 public class Issue142Test extends AbstractJtwigTest {
     @Test
     public void longFirstArgEvaluation() throws Exception {
-        given(aModel().withModelAttribute("var", 5L));
-        when(jtwigRenders(template("{{ var == 5 }}")));
-        then(theRenderedTemplate(), is(equalTo("1")));
+        given(theModel().withModelAttribute("var", 5L));
+        withResource("{{ var == 5 }}");
+        then(theResult(), is(equalTo("1")));
     }
 
 
 
     @Test
     public void longSecondArgEvaluation() throws Exception {
-        given(aModel().withModelAttribute("var", 5L));
-        when(jtwigRenders(template("{{ 5 == var }}")));
-        then(theRenderedTemplate(), is(equalTo("1")));
+        given(theModel().withModelAttribute("var", 5L));
+        withResource("{{ 5 == var }}");
+        then(theResult(), is(equalTo("1")));
     }
 }

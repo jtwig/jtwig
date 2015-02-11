@@ -1,6 +1,6 @@
 package org.jtwig.acceptance.config;
 
-import org.jtwig.acceptance.AbstractJtwigTest;
+import org.jtwig.AbstractJtwigTest;
 import org.jtwig.parser.config.Symbols;
 import org.jtwig.parser.config.TagSymbols;
 import org.junit.Test;
@@ -11,7 +11,7 @@ import static org.hamcrest.core.IsEqual.equalTo;
 public class SymbolConfigurationTest extends AbstractJtwigTest {
     @Test
     public void symbolsShouldAdjustToTheDefinedOnes() throws Exception {
-        theConfiguration().parse().withSymbols(new Symbols() {
+        theEnvironment().setSymbols(new Symbols() {
             @Override
             public String beginOutput() {
                 return "[[";
@@ -43,8 +43,8 @@ public class SymbolConfigurationTest extends AbstractJtwigTest {
             }
         });
 
-        jtwigRenders(template("[[ 'two' ]]"));
+        withResource("[[ 'two' ]]");
 
-        assertThat(theRenderedTemplate(), equalTo("two"));
+        assertThat(theResult(), equalTo("two"));
     }
 }

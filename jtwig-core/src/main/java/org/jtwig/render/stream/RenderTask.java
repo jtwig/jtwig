@@ -35,9 +35,11 @@ class RenderTask implements Runnable {
     public void run() {
         try {
             content.render(context);
-            context.renderStream().close().merge().notifyTaskFinished();
+            context.renderStream().close().merge();
         } catch (Exception e) {
             logger.error("[Concurrent Beta] Rendering failed", e);
+        } finally {
+            context.renderStream().notifyTaskFinished();
         }
     }
 }

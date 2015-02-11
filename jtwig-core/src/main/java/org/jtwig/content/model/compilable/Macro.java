@@ -29,12 +29,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import org.jtwig.content.api.ability.ExecutionAware;
 
 public class Macro extends Content<Macro> {
     private static final Logger LOG = LoggerFactory.getLogger(Macro.class);
     private final JtwigPosition position;
     private final String name;
-    private List<String> arguments = new ArrayList<>();
+    private final List<String> arguments = new ArrayList<>();
 
     public Macro(JtwigPosition position, String name) {
         this.position = position;
@@ -52,15 +53,10 @@ public class Macro extends Content<Macro> {
 
     @Override
     public Renderable compile(CompileContext context) throws CompileException {
-        context.withMacro(position.getResource(), name, new Compiled(name, arguments, super.compile(context)));
-        
-        return new Renderable() {
-            @Override
-            public void render(RenderContext context) throws RenderException {}
-        };
+        return new Compiled(name, arguments, super.compile(context));
     }
     
-    public static class Compiled implements Renderable {
+    public static class Compiled implements ExecutionAware, Renderable {
         private final String name;
         private final List<String> argumentNames;
         private final Renderable content;
@@ -80,10 +76,11 @@ public class Macro extends Content<Macro> {
             content.render(context);
         }
         
-        public String execute(final RenderContext ctx, final Object...parameters) throws IOException, RenderException {
+        @Override
+        public String execute(final RenderContext ctx, final String name, final Object...parameters) throws RenderException {
             return execute(ctx, Arrays.asList(parameters));
         }
-        public String execute(final RenderContext ctx, final List<Object> parameters) throws IOException, RenderException {
+        public String execute(final RenderContext ctx, final List<Object> parameters) throws RenderException {
             // Build the model
             RenderContext isolated = ctx.isolatedModel();
             ((Map)isolated.map("model")).clear();
@@ -92,10 +89,9 @@ public class Macro extends Content<Macro> {
                     isolated.with(arguments().get(i), parameters.get(i));
                 }
             }
-            try (ByteArrayOutputStream buf = new ByteArrayOutputStream()) {
-                render(isolated);
-                return buf.toString();
-            }
+            ByteArrayOutputStream buf = new ByteArrayOutputStream();
+            render(isolated);
+            return buf.toString();
         }
         
     }

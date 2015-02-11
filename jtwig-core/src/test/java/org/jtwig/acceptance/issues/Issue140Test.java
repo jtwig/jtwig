@@ -14,7 +14,7 @@
 
 package org.jtwig.acceptance.issues;
 
-import org.jtwig.acceptance.AbstractJtwigTest;
+import org.jtwig.AbstractJtwigTest;
 import org.jtwig.exception.CalculateException;
 import org.junit.Rule;
 import org.junit.Test;
@@ -37,8 +37,9 @@ public class Issue140Test extends AbstractJtwigTest {
     @Test
     public void undefinedVarThrowsExceptionOnEvaluation() throws Exception {
         expectedException.expect(exception().withInnerException(exception().ofType(CalculateException.class)));
-        given(theConfiguration().render().strictMode(true));
-        when(jtwigRenders(template("{{ var is null }}")));
+        given(theEnvironment().setStrictMode(true));
+        withResource("{{ var is null }}");
+        render();
     }
 
     /**
@@ -48,9 +49,8 @@ public class Issue140Test extends AbstractJtwigTest {
      */
     @Test
     public void outputNonexistentVarThrowsException() throws Exception {
-        given(theConfiguration().render().strictMode(false));
-        String str = jtwigRenders(template("{{ var is null }}"));
-        when(str);
-        then(theRenderedTemplate(), is(equalTo("1")));
+        given(theEnvironment().setStrictMode(false));
+        withResource("{{ var is null }}");
+        then(theResult(), is(equalTo("1")));
     }
 }

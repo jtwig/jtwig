@@ -14,54 +14,52 @@
 
 package org.jtwig.acceptance.functions;
 
-import org.jtwig.acceptance.AbstractJtwigTest;
-import org.junit.Test;
-
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
+import org.jtwig.AbstractJtwigTest;
 import static org.jtwig.util.SyntacticSugar.then;
-import static org.jtwig.util.SyntacticSugar.when;
+import org.junit.Test;
 
 public class NumberFunctionsTest extends AbstractJtwigTest {
     @Test
     public void testDefaultBehaviorWithoutSeparators() throws Exception {
-        when(jtwigRenders(template("{{ number_format(100000.1) }}")));
-        then(theRenderedTemplate(), is(equalTo("100000.1")));
+        withResource("{{ number_format(100000.1) }}");
+        then(theResult(), is(equalTo("100000.1")));
     }
 
     @Test
     public void testWithTwoDecimalDigits() throws Exception {
-        when(jtwigRenders(template("{{ number_format(100000.1, 2) }}")));
-        then(theRenderedTemplate(), is(equalTo("100000.10")));
+        withResource("{{ number_format(100000.1, 2) }}");
+        then(theResult(), is(equalTo("100000.10")));
     }
     @Test
     public void testWithCommaSeparatingDecimal() throws Exception {
-        when(jtwigRenders(template("{{ number_format(100000.1, 2, ',') }}")));
-        then(theRenderedTemplate(), is(equalTo("100000,10")));
+        withResource("{{ number_format(100000.1, 2, ',') }}");
+        then(theResult(), is(equalTo("100000,10")));
     }
     @Test
     public void testWithThousandsSeparator() throws Exception {
-        when(jtwigRenders(template("{{ number_format(100000.1, 2, ',', ' ') }}")));
-        then(theRenderedTemplate(), is(equalTo("100 000,10")));
+        withResource("{{ number_format(100000.1, 2, ',', ' ') }}");
+        then(theResult(), is(equalTo("100 000,10")));
     }
     @Test
     public void rangeTest() throws Exception {
-        when(jtwigRenders(template("{{ range(1,3) }}")));
-        then(theRenderedTemplate(), is(equalTo("[1, 2, 3]")));
+        withResource("{{ range(1,3) }}");
+        then(theResult(), is(equalTo("[1, 2, 3]")));
     }
     @Test
     public void rangeStepTest() throws Exception {
-        when(jtwigRenders(template("{{ range(1, 3, 2) }}")));
-        then(theRenderedTemplate(), is(equalTo("[1, 3]")));
+        withResource("{{ range(1, 3, 2) }}");
+        then(theResult(), is(equalTo("[1, 3]")));
     }
     @Test
     public void rangeCharTest() throws Exception {
-        when(jtwigRenders(template("{{ range('a', 'c') }}")));
-        then(theRenderedTemplate(), is(equalTo("[a, b, c]")));
+        withResource("{{ range('a', 'c') }}");
+        then(theResult(), is(equalTo("[a, b, c]")));
     }
     @Test
     public void rangeStringTest() throws Exception {
-        when(jtwigRenders(template("{{ range(\"AA\", \"BZ\") }}")));
-        then(theRenderedTemplate(), is(equalTo("[A, B]")));
+        withResource("{{ range(\"AA\", \"BZ\") }}");
+        then(theResult(), is(equalTo("[A, B]")));
     }
 }

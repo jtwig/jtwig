@@ -14,7 +14,7 @@
 
 package org.jtwig.acceptance.functions;
 
-import org.jtwig.acceptance.AbstractJtwigTest;
+import org.jtwig.AbstractJtwigTest;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -24,104 +24,104 @@ import static org.jtwig.util.SyntacticSugar.*;
 public class StringFunctionsTest extends AbstractJtwigTest {
     @Test
     public void capitalize() throws Exception {
-        when(jtwigRenders(template("{{ capitalize('joao') }}")));
-        then(theRenderedTemplate(), is(equalTo("Joao")));
+        withResource("{{ capitalize('joao') }}");
+        then(theResult(), is(equalTo("Joao")));
     }
 
     @Test
     public void convertEncoding() throws Exception {
-        when(jtwigRenders(template("{{ convert_encoding('joao', 'UTF-8', 'ASCII') }}")));
-        then(theRenderedTemplate(), is(equalTo("joao")));
+        withResource("{{ convert_encoding('joao', 'UTF-8', 'ASCII') }}");
+        then(theResult(), is(equalTo("joao")));
     }
 
     @Test
     public void escape() throws Exception {
-        when(jtwigRenders(template("{{ escape('joão') }}")));
-        then(theRenderedTemplate(), is(equalTo("jo&atilde;o")));
+        withResource("{{ escape('joão') }}");
+        then(theResult(), is(equalTo("jo&atilde;o")));
     }
 
     @Test
     public void escapeJavascript() throws Exception {
-        when(jtwigRenders(template("{{ escape('\"', 'js') }}")));
-        then(theRenderedTemplate(), is(equalTo("\\\"")));
+        withResource("{{ escape('\"', 'js') }}");
+        then(theResult(), is(equalTo("\\\"")));
     }
 
     @Test
     public void formatFunctionTest() throws Exception {
-        when(jtwigRenders(template("{{ format('Hello %s', 'Joao') }}")));
-        then(theRenderedTemplate(), is(equalTo("Hello Joao")));
+        withResource("{{ format('Hello %s', 'Joao') }}");
+        then(theResult(), is(equalTo("Hello Joao")));
     }
 
     @Test
     public void formatFunctionDoubleTest() throws Exception {
-        when(jtwigRenders(template("{{ format('Hello %s %s', 'Joao', 'One') }}")));
-        then(theRenderedTemplate(), is(equalTo("Hello Joao One")));
+        withResource("{{ format('Hello %s %s', 'Joao', 'One') }}");
+        then(theResult(), is(equalTo("Hello Joao One")));
     }
 
     @Test
     public void lowerFunctionTest() throws Exception {
-        when(jtwigRenders(template("{{ lower('Hi') }}")));
-        then(theRenderedTemplate(), is(equalTo("hi")));
+        withResource("{{ lower('Hi') }}");
+        then(theResult(), is(equalTo("hi")));
     }
 
     @Test
     public void upperFunctionTest() throws Exception {
-        when(jtwigRenders(template("{{ upper('Hi') }}")));
-        then(theRenderedTemplate(), is(equalTo("HI")));
+        withResource("{{ upper('Hi') }}");
+        then(theResult(), is(equalTo("HI")));
     }
 
     @Test
     public void nl2brTest() throws Exception {
-        given(aModel().withModelAttribute("var", "Hi\n\n"));
-        when(jtwigRenders(template("{{ nl2br(var) }}")));
-        then(theRenderedTemplate(), is(equalTo("Hi<br /><br />")));
+        given(theModel().withModelAttribute("var", "Hi\n\n"));
+        withResource("{{ nl2br(var) }}");
+        then(theResult(), is(equalTo("Hi<br /><br />")));
     }
 
     @Test
     public void replaceTest() throws Exception {
-        when(jtwigRenders(template("{{ replace('Hi var', { var: 'Joao' }) }}")));
-        then(theRenderedTemplate(), is(equalTo("Hi Joao")));
+        withResource("{{ replace('Hi var', { var: 'Joao' }) }}");
+        then(theResult(), is(equalTo("Hi Joao")));
     }
 
     @Test
     public void splitTest() throws Exception {
-        when(jtwigRenders(template("{{ split('one, two, three', ',').get(0) }}")));
-        then(theRenderedTemplate(), is(equalTo("one")));
+        withResource("{{ split('one, two, three', ',').get(0) }}");
+        then(theResult(), is(equalTo("one")));
     }
 
     @Test
     public void stripTagsTest() throws Exception {
-        when(jtwigRenders(template("{{ striptags('<p>Hi Joao</p>') }}")));
-        then(theRenderedTemplate(), is(equalTo("Hi Joao")));
+        withResource("{{ striptags('<p>Hi Joao</p>') }}");
+        then(theResult(), is(equalTo("Hi Joao")));
     }
 
     @Test
     public void stripTagsWithAllowedTest() throws Exception {
-        when(jtwigRenders(template("{{ striptags('<a><p>Hi Joao</p></a>', 'p') }}")));
-        then(theRenderedTemplate(), is(equalTo("<p>Hi Joao</p>")));
+        withResource("{{ striptags('<a><p>Hi Joao</p></a>', 'p') }}");
+        then(theResult(), is(equalTo("<p>Hi Joao</p>")));
     }
 
     @Test
     public void titleTest() throws Exception {
-        when(jtwigRenders(template("{{ title('hi joao') }}")));
-        then(theRenderedTemplate(), is(equalTo("Hi Joao")));
+        withResource("{{ title('hi joao') }}");
+        then(theResult(), is(equalTo("Hi Joao")));
     }
 
     @Test
     public void trimTest() throws Exception {
-        when(jtwigRenders(template("{{ trim(' joao ') }}")));
-        then(theRenderedTemplate(), is(equalTo("joao")));
+        withResource("{{ trim(' joao ') }}");
+        then(theResult(), is(equalTo("joao")));
     }
 
     @Test
     public void urlEncodeTest() throws Exception {
-        when(jtwigRenders(template("{{ url_encode('ã') }}")));
-        then(theRenderedTemplate(), is(equalTo("%C3%A3")));
+        withResource("{{ url_encode('ã') }}");
+        then(theResult(), is(equalTo("%C3%A3")));
     }
 
     @Test
     public void urlEncodeMapTest() throws Exception {
-        when(jtwigRenders(template("{{ url_encode({ one: 1, two: 2 }) }}")));
-        then(theRenderedTemplate(), is(equalTo("one=1&two=2")));
+        withResource("{{ url_encode({ one: 1, two: 2 }) }}");
+        then(theResult(), is(equalTo("one=1&two=2")));
     }
 }

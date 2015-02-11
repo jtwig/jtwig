@@ -14,39 +14,30 @@
 
 package org.jtwig.unit.content.model;
 
+import java.io.IOException;
+import org.jtwig.AbstractJtwigTest;
 import org.jtwig.compile.CompileContext;
-import org.jtwig.compile.config.CompileConfiguration;
 import org.jtwig.content.api.Renderable;
 import org.jtwig.content.model.compilable.Content;
 import org.jtwig.content.model.compilable.Sequence;
 import org.jtwig.content.model.compilable.Text;
 import org.jtwig.content.model.tag.TagInformation;
 import org.jtwig.exception.RenderException;
-import org.jtwig.parser.JtwigParser;
 import org.jtwig.render.RenderContext;
-import org.jtwig.resource.JtwigResource;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.io.IOException;
-
 import static org.junit.Assert.assertNull;
+import org.junit.Test;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-public class TextTest {
+public class TextTest extends AbstractJtwigTest {
     private Text underTest = new Text(" Hello ");
-    private CompileContext context;
-    private RenderContext renderContext = mock(RenderContext.class);
-
-    @Before
-    public void setUp () {
-        context = new CompileContext(mock(JtwigResource.class), mock(JtwigParser.class), mock(CompileConfiguration.class));
-    }
 
     @Test
     public void noChangesInTextWithoutSurroundingElements() throws Exception {
-        underTest.compile(context).render(renderContext);
+        underTest.compile(compileContext).render(renderContext);
 
         verify(renderContext).write(" Hello ".getBytes());
     }
@@ -62,7 +53,7 @@ public class TextTest {
         new Sequence()
                 .add(before)
                 .add(underTest)
-                .compile(context)
+                .compile(compileContext)
                 .render(renderContext);
 
         verify(renderContext).write("Hello ".getBytes());
@@ -79,7 +70,7 @@ public class TextTest {
         new Sequence()
                 .add(underTest)
                 .add(after)
-                .compile(context)
+                .compile(compileContext)
                 .render(renderContext);
 
         verify(renderContext).write(" Hello".getBytes());
@@ -91,7 +82,7 @@ public class TextTest {
                 .when(renderContext)
                 .write(any(byte[].class));
 
-        underTest.compile(context)
+        underTest.compile(compileContext)
                 .render(renderContext);
     }
 
@@ -121,7 +112,7 @@ public class TextTest {
                 .add(before)
                 .add(underTest)
                 .add(after)
-                .compile(context)
+                .compile(compileContext)
                 .render(renderContext);
 
         verify(renderContext).write("Hello".getBytes());

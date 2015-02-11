@@ -14,18 +14,16 @@
 
 package org.jtwig.acceptance.issues;
 
-import org.jtwig.acceptance.AbstractJtwigTest;
-import org.junit.Test;
-
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
+import org.jtwig.AbstractJtwigTest;
 import static org.jtwig.util.SyntacticSugar.then;
-import static org.jtwig.util.SyntacticSugar.when;
+import org.junit.Test;
 
 public class Issue82Test extends AbstractJtwigTest {
     @Test
     public void issue82() throws Exception {
-        when(jtwigRenders(template("{{ notice }}")));
-        then(theRenderedTemplate(), is(equalTo("")));
+        withResource("{{ notice }}");
+        then(theResult(), is(equalTo("")));
     }
 }

@@ -16,15 +16,15 @@ package org.jtwig.parser.parboiled;
 
 import org.jtwig.exception.ParseBypassException;
 import org.jtwig.exception.ParseException;
+import org.jtwig.loader.Loader;
 import org.jtwig.parser.model.JtwigPosition;
-import org.jtwig.resource.JtwigResource;
 import org.parboiled.BaseParser;
 import org.parboiled.Rule;
 
 public class JtwigBaseParser<V> extends BaseParser<V> {
-    final JtwigResource resource;
+    final Loader.Resource resource;
 
-    public JtwigBaseParser(JtwigResource resource) {
+    public JtwigBaseParser(Loader.Resource resource) {
         this.resource = resource;
     }
 
@@ -40,7 +40,7 @@ public class JtwigBaseParser<V> extends BaseParser<V> {
         );
     }
 
-    public JtwigResource getResource() {
+    public Loader.Resource getResource() {
         return resource;
     }
 
@@ -64,6 +64,15 @@ public class JtwigBaseParser<V> extends BaseParser<V> {
 
     <T> T pop(Class<T> typeClass) {
         return pop(0, typeClass);
+    }
+    
+    <T> T last(Class<T> cls) {
+        for (Object obj : this.getContext().getValueStack()) {
+            if (cls.isAssignableFrom(obj.getClass())) {
+                return cls.cast(obj);
+            }
+        }
+        return null;
     }
 
     public Rule mandatory(Rule rule, ParseException exception) {

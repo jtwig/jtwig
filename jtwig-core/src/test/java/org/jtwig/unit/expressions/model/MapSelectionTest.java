@@ -14,8 +14,11 @@
 
 package org.jtwig.unit.expressions.model;
 
-import org.jtwig.JtwigModelMap;
-import org.jtwig.compile.CompileContext;
+import java.util.ArrayList;
+import java.util.HashMap;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsNull.notNullValue;
+import org.jtwig.AbstractJtwigTest;
 import org.jtwig.exception.CalculateException;
 import org.jtwig.expressions.api.CompilableExpression;
 import org.jtwig.expressions.api.Expression;
@@ -23,48 +26,39 @@ import org.jtwig.expressions.model.Constant;
 import org.jtwig.expressions.model.MapSelection;
 import org.jtwig.expressions.model.Variable;
 import org.jtwig.render.RenderContext;
-import org.jtwig.render.config.RenderConfiguration;
-import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.IsNull.notNullValue;
 import static org.jtwig.types.Undefined.UNDEFINED;
 import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class MapSelectionTest {
+public class MapSelectionTest extends AbstractJtwigTest {
     @Test
     public void selection() throws Exception {
         Variable variable = mock(Variable.class);
         CompilableExpression key = new Constant<>("test");
-        CompileContext context = mock(CompileContext.class);
 
-        when(variable.compile(context)).thenReturn(mapExpression("test", "value"));
+        when(variable.compile(compileContext)).thenReturn(mapExpression("test", "value"));
 
         MapSelection selection = new MapSelection(null, variable, key);
-        Expression compiled = selection.compile(context);
+        Expression compiled = selection.compile(compileContext);
 
         assertThat(compiled, notNullValue(Expression.class));
-        assertEquals("value", compiled.calculate(RenderContext.create(new RenderConfiguration(), new JtwigModelMap(), null)));
+        assertEquals("value", compiled.calculate(renderContext));
     }
 
     @Test(expected = CalculateException.class)
     public void undefinedKey() throws Exception {
         Variable variable = mock(Variable.class);
         CompilableExpression key = new Constant<>(UNDEFINED);
-        CompileContext context = mock(CompileContext.class);
 
-        when(variable.compile(context)).thenReturn(mapExpression("test", "value"));
+        when(variable.compile(compileContext)).thenReturn(mapExpression("test", "value"));
 
         MapSelection selection = new MapSelection(null, variable, key);
-        Expression compiled = selection.compile(context);
+        Expression compiled = selection.compile(compileContext);
 
         assertThat(compiled, notNullValue(Expression.class));
-        compiled.calculate(RenderContext.create(new RenderConfiguration(), new JtwigModelMap(), null));
+        compiled.calculate(renderContext);
     }
 
 
@@ -72,9 +66,8 @@ public class MapSelectionTest {
     public void nonMapVariable() throws Exception {
         Variable variable = mock(Variable.class);
         CompilableExpression key = new Constant<>("test");
-        CompileContext context = mock(CompileContext.class);
 
-        when(variable.compile(context)).thenReturn(new Expression() {
+        when(variable.compile(compileContext)).thenReturn(new Expression() {
             @Override
             public Object calculate(RenderContext context) throws CalculateException {
                 return new ArrayList<>();
@@ -82,10 +75,10 @@ public class MapSelectionTest {
         });
 
         MapSelection selection = new MapSelection(null, variable, key);
-        Expression compiled = selection.compile(context);
+        Expression compiled = selection.compile(compileContext);
 
         assertThat(compiled, notNullValue(Expression.class));
-        compiled.calculate(RenderContext.create(new RenderConfiguration(), new JtwigModelMap(), null));
+        compiled.calculate(renderContext);
     }
 
     private Expression mapExpression(final String key, final String value) {

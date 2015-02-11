@@ -14,125 +14,78 @@
 
 package org.jtwig.unit;
 
-import org.jtwig.JtwigModelMap;
-import org.jtwig.JtwigTemplate;
-import org.jtwig.configuration.JtwigConfiguration;
-import org.jtwig.resource.JtwigResource;
+import org.jtwig.MultiresourceUnitTest;
 import org.junit.Test;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
-public class JtwigTemplateTest {
-    private JtwigResource resource = mock(JtwigResource.class);
-    private JtwigModelMap context = new JtwigModelMap();
-    private JtwigTemplate underTest = new JtwigTemplate(resource, new JtwigConfiguration());
-    private ByteArrayOutputStream outputStream;
-
+public class JtwigTemplateTest extends MultiresourceUnitTest {
     @Test
     public void testRootDocument() throws Exception {
-        when(resource.retrieve()).thenReturn(new ByteArrayInputStream("joao".getBytes()));
-        underTest.output(toTheOutputStream(), context);
-
-        assertThat(theOutput(), is("joao"));
+        withResource("joao");
+        assertThat(theResult(), is("joao"));
     }
 
     @Test
     public void testSingleHierarchy() throws Exception {
-        JtwigResource joaoResource = mock(JtwigResource.class);
+        withResource("{% extends 'test' %}{% block joao %}joao{% endblock %}");
+        withResource("test", "I am {% block joao %}no one{% endblock %}");
 
-        when(resource.retrieve()).thenReturn(new ByteArrayInputStream(("{% extends 'test' %}" +
-                "{% block joao %}joao{% endblock %}").getBytes()));
-        when(resource.resolve("test")).thenReturn(joaoResource);
-        when(joaoResource.retrieve()).thenReturn(new ByteArrayInputStream("I am {% block joao %}no one{% endblock %}".getBytes()));
-
-        underTest.output(toTheOutputStream(), context);
-
-        assertThat(theOutput(), is("I am joao"));
+        assertThat(theResult(), is("I am joao"));
     }
 
     @Test
     public void testTwoLevelHierarchy() throws Exception {
-        JtwigResource oneResource = mock(JtwigResource.class);
-        JtwigResource twoResource = mock(JtwigResource.class);
-
-        when(resource.retrieve()).thenReturn(new ByteArrayInputStream(("{% extends 'level-1' %}" +
-                "{% block two %}two{% endblock %}").getBytes()));
-
-        when(resource.resolve("level-1")).thenReturn(oneResource);
-        when(oneResource.retrieve()).thenReturn(new ByteArrayInputStream(("{% extends 'root' %}" +
-                "{% block one %}one{% endblock %}").getBytes()));
-
-        when(oneResource.resolve("root")).thenReturn(twoResource);
-        when(twoResource.retrieve()).thenReturn(new ByteArrayInputStream("Block {% block one %}1{% endblock %} and {% block two %}2{% endblock %}".getBytes()));
-
-        underTest.output(toTheOutputStream(), context);
-
-        assertThat(theOutput(), is("Block one and two"));
+        withResource("{% extends 'level-1' %}{% block two %}two{% endblock %}");
+        withResource("level-1", "{% extends 'root' %}{% block one %}one{% endblock %}");
+        withResource("root", "Block {% block one %}1{% endblock %} and {% block two %}2{% endblock %}");
+        
+        assertThat(theResult(), is("Block one and two"));
     }
     
     @Test
     public void testExtendsVariableDefinedTemplate() throws Exception {
-        JtwigResource oneResource = mock(JtwigResource.class);
-        JtwigResource twoResource = mock(JtwigResource.class);
+        withResource("{% extends var %}");
+        withResource("num-one", "first");
+        withResource("num-two", "second");
         
-        when(resource.resolve("num-one")).thenReturn(oneResource);
-        when(resource.resolve("num-two")).thenReturn(twoResource);
-        
-        when(oneResource.retrieve()).thenReturn(new ByteArrayInputStream("first".getBytes()));
-        when(twoResource.retrieve()).thenReturn(new ByteArrayInputStream("second".getBytes()));
-        
-        when(resource.retrieve()).thenReturn(new ByteArrayInputStream("{% extends var %}".getBytes()));
-
-        context.withModelAttribute("var", "num-two");
-        underTest.output(toTheOutputStream(), context);
-        assertThat(theOutput(), is("second"));
+        model.withModelAttribute("var", "num-two");
+        assertThat(theResult(), is("second"));
     }
     
     @Test
     public void testExtendsExpression() throws Exception {
-        JtwigResource oneResource = mock(JtwigResource.class);
-        JtwigResource twoResource = mock(JtwigResource.class);
+        withResource("{% extends var ? 'num-one' : 'num-two' %}");
+        withResource("num-one", "first");
+        withResource("num-two", "second");
         
-        when(resource.resolve("num-one")).thenReturn(oneResource);
-        when(resource.resolve("num-two")).thenReturn(twoResource);
-        
-        when(oneResource.retrieve()).thenReturn(new ByteArrayInputStream("first".getBytes()));
-        when(twoResource.retrieve()).thenReturn(new ByteArrayInputStream("second".getBytes()));
-        
-        when(resource.retrieve()).thenReturn(new ByteArrayInputStream("{% extends var ? 'num-one' : 'num-two' %}".getBytes()));
-
-        context.withModelAttribute("var", false);
-        underTest.output(toTheOutputStream(), context);
-        assertThat(theOutput(), is("second"));
+        model.withModelAttribute("var", false);
+        assertThat(theResult(), is("second"));
     }
     
     @Test
     public void testExtendsWithArrayOfTemplates() throws Exception {
-        JtwigResource twoResource = mock(JtwigResource.class);
+        withResource("{% extends ['num-one','num-two','num-three'] %}");
+        withResource("num-two", "second");
         
-        when(resource.resolve("num-two")).thenReturn(twoResource);
-        
-        when(twoResource.retrieve()).thenReturn(new ByteArrayInputStream("second".getBytes()));
-        
-        when(resource.retrieve()).thenReturn(new ByteArrayInputStream("{% extends ['num-one','num-two','num-three'] %}".getBytes()));
-
-        underTest.output(toTheOutputStream(), context);
-        assertThat(theOutput(), is("second"));
+        assertThat(theResult(), is("second"));
     }
-
-    private String theOutput() {
-        return outputStream.toString();
+    
+    @Test
+    public void testSetVariableBeforeExtends() throws Exception {
+        withResource("{% set value = \"open\" %} {% extends 'test' %} {% block testblock %}{{ value }}{% endblock %}");
+        withResource("test", "{% block testblock %}{{ value }}{% endblock %}");
+        
+        assertThat(theResult(), is("open"));
     }
-
-    private OutputStream toTheOutputStream() {
-        outputStream = new ByteArrayOutputStream();
-        return outputStream;
+    
+    @Test
+    public void testSetVariableAfterExtends() throws Exception {
+        withResource("{% extends 'test' %} {% set value = \"open\" %} {% block testblock %}{{ value }}{% endblock %}");
+        withResource("test", "{% block testblock %}{{ value }}{% endblock %}");
+        
+        assertThat(theResult(), is("open"));
     }
 }

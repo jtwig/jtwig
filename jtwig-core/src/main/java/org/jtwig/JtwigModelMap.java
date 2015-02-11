@@ -18,6 +18,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class JtwigModelMap extends HashMap<String, Object> {
+    public JtwigModelMap() {}
+    public JtwigModelMap(final Map<String, Object> model) {
+        super(model);
+    }
+    
     public JtwigModelMap add (String key, Object object) {
         put(key, object);
         return this;

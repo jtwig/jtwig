@@ -14,63 +14,62 @@
 
 package org.jtwig.acceptance.functions;
 
-import org.jtwig.acceptance.AbstractJtwigTest;
+import org.jtwig.AbstractJtwigTest;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.jtwig.util.SyntacticSugar.then;
-import static org.jtwig.util.SyntacticSugar.when;
 
 public class ListFunctionsTest extends AbstractJtwigTest {
     @Test
     public void batch() throws Exception {
-        when(jtwigRenders(template("{{ batch([1,2,3,4], 3) }}")));
-        then(theRenderedTemplate(), is(equalTo("[[1, 2, 3], [4]]")));
+        withResource("{{ batch([1,2,3,4], 3) }}");
+        then(theResult(), is(equalTo("[[1, 2, 3], [4]]")));
     }
 
     @Test
     public void batchWithPadding() throws Exception {
-        when(jtwigRenders(template("{{ batch([1,2,3,4], 3, 1) }}")));
-        then(theRenderedTemplate(), is(equalTo("[[1, 2, 3], [4, 1, 1]]")));
+        withResource("{{ batch([1,2,3,4], 3, 1) }}");
+        then(theResult(), is(equalTo("[[1, 2, 3], [4, 1, 1]]")));
     }
 
     @Test
     public void concatenate() throws Exception {
-        when(jtwigRenders(template("{{ concatenate(1, 2, 3) }}")));
-        then(theRenderedTemplate(), is(equalTo("123")));
+        withResource("{{ concatenate(1, 2, 3) }}");
+        then(theResult(), is(equalTo("123")));
     }
 
     @Test
     public void join() throws Exception {
-        when(jtwigRenders(template("{{ join([1, 2, 3]) }}")));
-        then(theRenderedTemplate(), is(equalTo("123")));
+        withResource("{{ join([1, 2, 3]) }}");
+        then(theResult(), is(equalTo("123")));
     }
 
     @Test
     public void joinWithCustomSeparator() throws Exception {
-        when(jtwigRenders(template("{{ join([1, 2, 3], ' - ') }}")));
-        then(theRenderedTemplate(), is(equalTo("1 - 2 - 3")));
+        withResource("{{ join([1, 2, 3], ' - ') }}");
+        then(theResult(), is(equalTo("1 - 2 - 3")));
     }
 
     @Test
     public void merge() throws Exception {
-        when(jtwigRenders(template("{{ merge([1, 2, 3], [4]) }}")));
-        then(theRenderedTemplate(), is(equalTo("[1, 2, 3, 4]")));
+        withResource("{{ merge([1, 2, 3], [4]) }}");
+        then(theResult(), is(equalTo("[1, 2, 3, 4]")));
     }
     @Test
     public void mergeMultipleArgs() throws Exception {
-        when(jtwigRenders(template("{{ merge([1, 2, 3], [4], [5, 6]) }}")));
-        then(theRenderedTemplate(), is(equalTo("[1, 2, 3, 4, 5, 6]")));
+        withResource("{{ merge([1, 2, 3], [4], [5, 6]) }}");
+        then(theResult(), is(equalTo("[1, 2, 3, 4, 5, 6]")));
     }
     @Test
     public void slice() throws Exception {
-        when(jtwigRenders(template("{{ slice('abc', 1, 2) }}")));
-        then(theRenderedTemplate(), is(equalTo("bc")));
+        withResource("{{ slice('abc', 1, 2) }}");
+        then(theResult(), is(equalTo("bc")));
     }
     @Test
     public void sort() throws Exception {
-        when(jtwigRenders(template("{{ sort([2, 1, 3]) }}")));
-        then(theRenderedTemplate(), is(equalTo("[1, 2, 3]")));
+        withResource("{{ sort([2, 1, 3]) }}");
+        then(theResult(), is(equalTo("[1, 2, 3]")));
     }
 }

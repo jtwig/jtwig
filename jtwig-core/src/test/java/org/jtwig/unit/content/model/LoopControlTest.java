@@ -14,6 +14,8 @@
 
 package org.jtwig.unit.content.model;
 
+import static java.util.Arrays.asList;
+import org.jtwig.AbstractJtwigTest;
 import org.jtwig.compile.CompileContext;
 import org.jtwig.content.api.Compilable;
 import org.jtwig.content.api.Renderable;
@@ -24,20 +26,18 @@ import org.jtwig.expressions.api.CompilableExpression;
 import org.jtwig.expressions.api.Expression;
 import org.jtwig.render.RenderContext;
 import org.junit.Test;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-import static java.util.Arrays.asList;
-import static org.mockito.Mockito.*;
-
-public class LoopControlTest {
+public class LoopControlTest extends AbstractJtwigTest {
     @Test
     public void forLoopTest() throws Exception {
         Renderable content = mock(Renderable.class);
         Expression expression = mock(Expression.class);
-        RenderContext renderContext = mock(RenderContext.class);
-
         when(expression.calculate(any(RenderContext.class))).thenReturn(asList(1, 2));
-
-        CompileContext compileContext = new CompileContext(null, null, null);
 
         For loopControl = new For("variable", toCalculate(expression)).withContent(toRender(content));
         loopControl.compile(compileContext).render(renderContext);
