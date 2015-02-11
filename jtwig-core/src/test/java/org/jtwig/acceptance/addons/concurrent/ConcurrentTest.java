@@ -15,14 +15,21 @@
 
 package org.jtwig.acceptance.addons.concurrent;
 
+import java.io.ByteArrayOutputStream;
+import java.lang.reflect.Field;
 import static java.util.Arrays.asList;
+import java.util.concurrent.ExecutorService;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import org.jtwig.acceptance.addons.AbstractAddonTest;
+import org.jtwig.addons.concurrent.Concurrent;
+import org.jtwig.content.api.Renderable;
+import org.jtwig.content.model.compilable.Sequence;
 import org.jtwig.exception.RenderException;
 import org.jtwig.render.RenderContext;
+import org.jtwig.render.stream.RenderStream;
 import org.junit.Test;
-import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.*;
 
 public class ConcurrentTest extends AbstractAddonTest {
     
@@ -76,5 +83,26 @@ public class ConcurrentTest extends AbstractAddonTest {
                 "{% concurrent %}1{% endconcurrent %}{% concurrent %}{% concurrent %}{% concurrent %}2{% endconcurrent %}{% endconcurrent %}{% endconcurrent %}{% concurrent %}3{% endconcurrent %}{% concurrent %}{% concurrent %}{% concurrent %}{% concurrent %}{% concurrent %}{% concurrent %}4{% endconcurrent %}{% endconcurrent %}{% endconcurrent %}{% endconcurrent %}{% endconcurrent %}{% endconcurrent %}5{% concurrent %}6{% endconcurrent %}{% concurrent %}7{% endconcurrent %}");
 
         assertThat(theResult(), is("1234567"));
+    }
+    
+    @Test
+    public void ensureOutOfMemoryShutdown() throws Exception {
+        RenderStream rs = spy(new RenderStream(new ByteArrayOutputStream(), env));
+        when(rs.fork()).thenReturn(rs);
+        when(renderContext.renderStream()).thenReturn(rs);
+        
+        // Get the RenderStream's ExecutorService
+        Field field = RenderStream.class.getDeclaredField("sExecutor");
+        field.setAccessible(true);
+        ExecutorService sExecutor = spy((ExecutorService)field.get(null));
+        field.set(null, sExecutor);
+        doThrow(OutOfMemoryError.class).when(sExecutor).execute(any(Runnable.class));
+        
+        Concurrent concurrent = new Concurrent();
+        concurrent.withContent(new Sequence());
+        concurrent.compile(compileContext).render(renderContext);
+        verify(sExecutor, atLeastOnce()).shutdownNow();
+        
+        field.set(null, null);
     }
 }

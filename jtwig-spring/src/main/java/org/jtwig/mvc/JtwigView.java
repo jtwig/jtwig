@@ -14,10 +14,8 @@
 
 package org.jtwig.mvc;
 
-import java.net.MalformedURLException;
 import org.jtwig.JtwigModelMap;
 import org.jtwig.beans.BeanResolver;
-import org.jtwig.content.api.Renderable;
 import org.jtwig.exception.CompileException;
 import org.jtwig.exception.ParseException;
 import org.jtwig.render.RenderContext;
@@ -33,14 +31,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.jtwig.Environment;
-import org.jtwig.compile.CompileContext;
 import org.jtwig.content.model.Template;
 import org.jtwig.exception.ResourceException;
-import org.jtwig.loader.Loader;
 
 import static org.springframework.web.servlet.support.RequestContextUtils.getTheme;
 
@@ -59,14 +52,23 @@ public class JtwigView extends AbstractTemplateView {
         return this.getApplicationContext().getBean(JtwigViewResolver.class);
     }
 
+    @Override
     protected void initApplicationContext() throws BeansException {
         super.initApplicationContext();
-        GenericServlet servlet = new GenericServletAdapter();
+        GenericServlet servlet = getGenericServlet();
         try {
-            servlet.init(new DelegatingServletConfig());
+            servlet.init(getServletConfig());
         } catch (ServletException ex) {
             throw new BeanInitializationException("Initialization of GenericServlet adapter failed", ex);
         }
+    }
+    
+    protected GenericServlet getGenericServlet() {
+        return new GenericServletAdapter();
+    }
+    
+    protected ServletConfig getServletConfig() {
+        return new DelegatingServletConfig();
     }
 
     @Override
@@ -125,6 +127,7 @@ public class JtwigView extends AbstractTemplateView {
     @SuppressWarnings("serial")
     private static class GenericServletAdapter extends GenericServlet {
 
+        @Override
         public void service(ServletRequest servletRequest, ServletResponse servletResponse) {
             // no-op
         }
@@ -132,19 +135,23 @@ public class JtwigView extends AbstractTemplateView {
 
     private class DelegatingServletConfig implements ServletConfig {
 
+        @Override
         public String getServletName() {
             return JtwigView.this.getBeanName();
         }
 
+        @Override
         public ServletContext getServletContext() {
             return JtwigView.this.getServletContext();
         }
 
+        @Override
         public String getInitParameter(String paramName) {
             return null;
         }
 
         @SuppressWarnings({"unchecked", "rawtypes"})
+        @Override
         public Enumeration getInitParameterNames() {
             return Collections.enumeration(Collections.EMPTY_SET);
         }

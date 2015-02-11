@@ -4,6 +4,7 @@ import java.util.Arrays;
 import org.jtwig.AbstractJtwigTest;
 import org.jtwig.exception.CalculateException;
 import org.jtwig.expressions.api.Expression;
+import org.jtwig.expressions.model.Constant;
 import org.jtwig.expressions.model.FunctionElement;
 import org.jtwig.expressions.model.Variable;
 import org.jtwig.expressions.operations.binary.SelectionOperation;
@@ -15,9 +16,13 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.internal.matchers.ThrowableCauseMatcher;
 import org.junit.rules.ExpectedException;
+import org.mockito.Matchers;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.hamcrest.Matchers.*;
+import org.hamcrest.core.IsInstanceOf;
 
 public class SelectionOperationTest extends AbstractJtwigTest {
     private JtwigPosition position = new JtwigPosition(null, 1, 1);
@@ -110,9 +115,9 @@ public class SelectionOperationTest extends AbstractJtwigTest {
 
     @Test
     public void extractExceptionThrown() throws Exception {
-        expectedException.expect(CalculateException.class);
+        expectedException.expectCause(is(IsInstanceOf.<Throwable>instanceOf(ObjectExtractor.ExtractException.class)));
 
-        operation.apply(renderContext, position, left, variable());
+        operation.apply(renderContext, position, new Constant(new Object()), variable());
     }
 
     private Variable.Compiled variable() {
