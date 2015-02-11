@@ -27,10 +27,13 @@ import org.jtwig.loader.Loader;
 import org.jtwig.util.LoaderUtil;
 
 public class FileLoader extends Loader {
-    private static final String PREFIX = "file://";
+    private static final String PREFIX = "file:";
     private final File[] paths;
     
     public FileLoader(final String[] paths) {
+        if (paths == null || paths.length == 0) {
+            throw new IllegalArgumentException("FileLoader requires at least one path.");
+        }
         List<File> files = new ArrayList<>();
         for (String path : paths) {
             if (path.startsWith(PREFIX)) {
@@ -41,6 +44,9 @@ public class FileLoader extends Loader {
         this.paths = files.toArray(new File[]{});
     }
     public FileLoader(final File[] paths) {
+        if (paths == null || paths.length == 0) {
+            throw new IllegalArgumentException("FileLoader requires at least one path.");
+        }
         this.paths = paths;
     }
 
@@ -48,10 +54,6 @@ public class FileLoader extends Loader {
     public boolean exists(String name) throws ResourceException {
         name = normalizeName(name);
         validateName(name);
-        
-        if (paths.length == 0) {
-            throw new IllegalStateException("There are no registered paths to search.");
-        }
         
         for (File path : paths) {
             if (new File(path, name).exists()) {
