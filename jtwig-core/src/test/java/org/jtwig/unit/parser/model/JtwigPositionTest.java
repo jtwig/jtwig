@@ -46,6 +46,8 @@ public class JtwigPositionTest {
         JtwigPosition position = new JtwigPosition(resource, 1, 1);
         assertEquals(tpl, position.getTemplate(compileCtx));
         assertEquals(compiledTpl, position.getCompiledTemplate(compileCtx));
+        assertEquals(tpl, position.getTemplate(renderCtx));
+        assertEquals(compiledTpl, position.getCompiledTemplate(renderCtx));
     }
     
 }

@@ -141,8 +141,7 @@ public class ObjectExtractor {
                     methods = getAllMethods(context.getClass(), methodMatcher(equalToIgnoringCase(prefixes[i++] + name), args.length));
                 }
 
-                if (methods.isEmpty()) return new Result<>();
-                else {
+                if (!methods.isEmpty()) {
                     Iterator<Method> iterator = methods.iterator();
                     Exception thrown = null;
                     while (iterator.hasNext()) {

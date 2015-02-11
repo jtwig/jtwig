@@ -21,6 +21,10 @@ import org.jtwig.exception.CompileException;
 import org.jtwig.expressions.model.BlockFunction;
 import org.jtwig.expressions.model.Constant;
 import org.jtwig.MultiresourceUnitTest;
+import org.jtwig.content.model.compilable.Block;
+import org.jtwig.exception.CalculateException;
+import org.jtwig.exception.RenderException;
+import org.jtwig.render.RenderContext;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -50,5 +54,20 @@ public class BlockFunctionTest extends AbstractJtwigTest {
                 .calculate(renderContext);
 
         verify(template).block(eq("title"));
+    }
+    
+    @Test(expected = CalculateException.class)
+    public void calculateCapturesRenderException() throws Exception {
+        Block.CompiledBlock block = mock(Block.CompiledBlock.class);
+        doThrow(RenderException.class).when(block).render(any(RenderContext.class));
+        Template.CompiledTemplate template = mock(BasicTemplate.CompiledBasicTemplate.class);
+        when(template.block(anyString())).thenReturn(block);
+        when(template.getPrimordial()).thenReturn(template);
+        doReturn(template).when(renderContext).getRenderingTemplate();
+        
+        BlockFunction function = new BlockFunction(null);
+        function.add(new Constant<>("title"));
+        function.compile(compileContext)
+                .calculate(renderContext);
     }
 }

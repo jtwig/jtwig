@@ -25,6 +25,7 @@ import org.jtwig.render.RenderContext;
 import java.util.HashMap;
 import java.util.Map;
 import org.jtwig.content.model.Template;
+import org.jtwig.expressions.model.Constant;
 import org.jtwig.expressions.model.Variable;
 import org.jtwig.loader.Loader;
 
@@ -171,10 +172,10 @@ public abstract class Import {
                     ParseException,
                     CompileException,
                     CalculateException {
-        if (from instanceof Variable && ((Variable)from).name().equals("_self")) {
-            return position.getCompiledTemplate(renderContext);
-        }
-        if (from instanceof SelfReference) {
+            System.out.println("From: "+from.getClass().getName());
+        if ((from instanceof Variable && "_self".equals(((Variable)from).name()))
+                || (from instanceof Constant && "_self".equals(((Constant)from).getValue()))
+                || from instanceof SelfReference) {
             return position.getCompiledTemplate(renderContext);
         }
         String path = position.getResource().resolve((String)from.calculate(renderContext));
