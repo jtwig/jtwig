@@ -70,7 +70,8 @@ public class BlockFunction extends AbstractCompilableExpression {
         @Override
         public Object calculate(RenderContext context) throws CalculateException {
             // Clone the RenderContext so that we can isolate the renderstream
-            try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            try {
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 RenderContext isolated = context.newRenderContext(baos);
                 Template.CompiledTemplate template = context.getRenderingTemplate();
                 Renderable block = template.getPrimordial().block(getFirstArgument().calculate(isolated).toString());
@@ -78,11 +79,9 @@ public class BlockFunction extends AbstractCompilableExpression {
                     block.render(isolated);
                 }
                 return baos.toString();
-            } catch (IOException e) {
             } catch (RenderException e) {
                 throw new CalculateException("Unable to render the block.", e);
             }
-            return null;
         }
 
         public Expression getFirstArgument() {

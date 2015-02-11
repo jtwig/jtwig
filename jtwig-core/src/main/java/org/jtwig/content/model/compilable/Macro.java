@@ -67,10 +67,6 @@ public class Macro extends Content<Macro> {
             this.content = content;
         }
         
-        public String name() {
-            return name;
-        }
-        
         public List<String> arguments() {
             return argumentNames;
         }
@@ -82,13 +78,9 @@ public class Macro extends Content<Macro> {
         
         @Override
         public String execute(final RenderContext ctx, final String name, final Object...parameters) throws RenderException {
-            try {
-                return execute(ctx, Arrays.asList(parameters));
-            } catch (IOException ex) {
-                throw new RenderException(ex);
-            }
+            return execute(ctx, Arrays.asList(parameters));
         }
-        public String execute(final RenderContext ctx, final List<Object> parameters) throws IOException, RenderException {
+        public String execute(final RenderContext ctx, final List<Object> parameters) throws RenderException {
             // Build the model
             RenderContext isolated = ctx.isolatedModel();
             ((Map)isolated.map("model")).clear();
@@ -97,10 +89,9 @@ public class Macro extends Content<Macro> {
                     isolated.with(arguments().get(i), parameters.get(i));
                 }
             }
-            try (ByteArrayOutputStream buf = new ByteArrayOutputStream()) {
-                render(isolated);
-                return buf.toString();
-            }
+            ByteArrayOutputStream buf = new ByteArrayOutputStream();
+            render(isolated);
+            return buf.toString();
         }
         
     }
