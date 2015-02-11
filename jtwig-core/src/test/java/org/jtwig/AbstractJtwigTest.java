@@ -34,6 +34,10 @@ public abstract class AbstractJtwigTest {
     protected Loader.Resource resource;
     protected OutputStream output;
     
+    enum E {
+        A,B,C
+    }
+    
     @Before
     public void before() throws Exception {
         output = new ByteArrayOutputStream();

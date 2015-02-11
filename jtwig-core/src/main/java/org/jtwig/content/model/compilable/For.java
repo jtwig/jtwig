@@ -90,7 +90,7 @@ public class For extends Content<For> {
                 }
                 
                 if(resolved.getClass().isArray()) {
-                    resolved = Arrays.asList(resolved);
+                    resolved = Arrays.asList(((Object[])resolved));
                 }
                 if(resolved instanceof Map) {
                     handleMap((Map)resolved, context);
