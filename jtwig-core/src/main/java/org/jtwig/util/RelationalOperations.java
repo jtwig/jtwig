@@ -14,28 +14,53 @@
 
 package org.jtwig.util;
 
+import org.apache.commons.lang3.ObjectUtils;
 import static org.jtwig.util.MathOperations.*;
 
 public class RelationalOperations {
     public static boolean gt (Object a, Object b) {
-        if (areDouble(a, b))
+        if (isNumeric(a) && isNumeric(b)) {
             return toDouble(a) > toDouble(b);
-        return toInt(a) > toInt(b);
+        }
+        if ((a.getClass().isAssignableFrom(b.getClass())
+                || b.getClass().isAssignableFrom(a.getClass()))
+                && a instanceof Comparable && b instanceof Comparable) {
+            return ObjectUtils.compare((Comparable)a, (Comparable)b) > 0;
+        }
+        return false;
     }
     public static boolean gte (Object a, Object b) {
-        if (areDouble(a, b))
+        if (isNumeric(a) && isNumeric(b)) {
             return toDouble(a) >= toDouble(b);
-        return toInt(a) >= toInt(b);
+        }
+        if ((a.getClass().isAssignableFrom(b.getClass())
+                || b.getClass().isAssignableFrom(a.getClass()))
+                && a instanceof Comparable && b instanceof Comparable) {
+            return ObjectUtils.compare((Comparable)a, (Comparable)b) >= 0;
+        }
+        return false;
     }
     public static boolean lt (Object a, Object b) {
-        if (areDouble(a, b))
+        if (isNumeric(a) && isNumeric(b)) {
             return toDouble(a) < toDouble(b);
-        return toInt(a) < toInt(b);
+        }
+        if ((a.getClass().isAssignableFrom(b.getClass())
+                || b.getClass().isAssignableFrom(a.getClass()))
+                && a instanceof Comparable && b instanceof Comparable) {
+            return ObjectUtils.compare((Comparable)a, (Comparable)b) < 0;
+        }
+        return false;
     }
     public static boolean lte (Object a, Object b) {
-        if (areDouble(a, b))
+        if (isNumeric(a) && isNumeric(b)) {
             return toDouble(a) <= toDouble(b);
-        return toInt(a) <= toInt(b);
+        }
+        if ((a.getClass().isAssignableFrom(b.getClass())
+                || b.getClass().isAssignableFrom(a.getClass()))
+                && a instanceof Comparable && b instanceof Comparable) {
+            return ObjectUtils.compare((Comparable)a, (Comparable)b) <= 0;
+        }
+        return false;
     }
 
     public static boolean eq (Object a, Object b) {
