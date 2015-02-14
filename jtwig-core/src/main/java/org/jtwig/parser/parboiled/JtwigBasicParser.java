@@ -136,10 +136,8 @@ public class JtwigBasicParser extends BaseParser<String> {
 
     StringBuilder stringBuilder;
 
-    /**
+    /*
      * Pushes the String (without quotes)
-     *
-     * @return
      */
     protected Rule stringLiteral() {
         return FirstOf(
