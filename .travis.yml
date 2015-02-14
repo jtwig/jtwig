@@ -3,9 +3,8 @@ language: java
 env:
    global:
         - secure: "JI6RwImFT05GUsoBY4D1PWZPkmdsZ34xkWVVm2HMmZpvURUmeHpUyVZw1o5bZE2UpfVPCIj9/z94Zo6o+lhXO0KY2qDr1KOFZUuJWU/B74zUL+bRUqb0A2XK3h4u+a/eeESL74gCsHtzaiMIZ6v6UEyNu8jywSs3B+PiKetrbfU="
-        - secure: ﻿"Oi3OdgwgSJ4TQYWkyAKG0OzI5NOfajwWE+7uoZv5drKlkD5MKhk8OkGavOBIDo2uwJcspErSqmUJDyR5Yyz6CTCpRY/5n6emRohh2KAYS/pMdTv+eX8nSXB3K/Uov+e5W8lt0nRgUxzsiyQMOy3cTpprA5224k/RLTviGsV+Tbg="
-        - secure: ﻿"Ju9O6URnKo4SoKKnKFiIwITjfwmoAWURut5ou9UULKD412eh0VoyGPg+P3vBRRk2pjgEofRo9fxiX9hMkJyINTM8c8m+X8wJCSBEigFFcCALsQSvWzW3OCoMcfKh/nijvI05S4HNOE5hI0E/Qx8AJBhkzhXEMoUFDmn6WwrkB0s="
-
+        - secure: ﻿"INItszn6E5GF/mKAQfHrXIHbt/cCsX8fHBKXjfjYV3pN9VxF8lqfP4kSzkQ4zYXOToAUt3JG20tIoxRZy1TO9csSAqvsfg9BxvH2XT3UuyPEdxwbmb/OpbPpW9aW0833D29IvmsHvt1l919DkF8ZhUuASKm83zU34uVRdkZx57c="
+        - secure: ﻿"XlVNVTOa3BBWM1/PQXXGP+iiJfMzYeeh13s1f77pWX3sptNqDEeNgP6TfbTaNz2Qah9VZGJ2f3lvvSGje93my/aa+mgrlhASV1ev2wSYob44zri3P9E5xYgOxrJCXz3H3F2A7lCZX28CriJycJSk5GxXpwCSvDy58JvewXgqTJQ="
 
 after_success:
   - gradle bintrayUpload tagRelease
