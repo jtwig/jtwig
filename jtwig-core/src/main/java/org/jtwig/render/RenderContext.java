@@ -51,7 +51,7 @@ import static org.jtwig.types.Undefined.UNDEFINED;
 public class RenderContext {
     private static final String MODEL = "model";
 
-    /**
+    /*
      * NOTE: This method should only be used once (in JtwigTemplate)
      */
     public static RenderContext create(Environment env, JtwigModelMap modelMap, OutputStream output) {
