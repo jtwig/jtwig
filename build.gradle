@@ -19,18 +19,18 @@ def isDryRun = calculateDryRun()
 
 
 def getCurrentTag () {
-    return getVariable("TRAVIS_TAG")
+    return getVariable("TRAVIS_TAG", "")
 }
 def getCurrentBranch () {
-    return getVariable("TRAVIS_BRANCH")
+    return getVariable("TRAVIS_BRANCH", "")
 }
 
 def getGitHubPassword () {
-    return getVariable("GITHUB_PASSWORD")
+    return getVariable("GITHUB_PASSWORD", "")
 }
 
 def getBintrayApiKey () {
-    return getVariable("BINTRAY_API_KEY")
+    return getVariable("BINTRAY_API_KEY", "")
 }
 
 def getVariable (String name, String defaultValue) {
