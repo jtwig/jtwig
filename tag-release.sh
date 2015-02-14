@@ -2,7 +2,7 @@
 
 VERSION=`head -n 1 tag.version`
 
-if [ "$TRAVIS_TAG" != n"" ]; then
+if [ "$TRAVIS_TAG" != "" ]; then
     echo "Not releasing when tag"
     exit
 fi
