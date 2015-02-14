@@ -14,6 +14,11 @@
 
 package org.jtwig.loader.impl;
 
+import org.apache.commons.lang3.StringUtils;
+import org.jtwig.exception.ResourceException;
+import org.jtwig.loader.Loader;
+import org.jtwig.util.LoaderUtil;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -21,10 +26,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.commons.lang3.StringUtils;
-import org.jtwig.exception.ResourceException;
-import org.jtwig.loader.Loader;
-import org.jtwig.util.LoaderUtil;
 
 public class FileLoader extends Loader {
     private static final String PREFIX = "file:";
@@ -68,7 +69,6 @@ public class FileLoader extends Loader {
         if (!exists(name)) {
             return null;
         }
-        
         for (File path : paths) {
             File f = new File(path, name);
             if (f.exists()) {

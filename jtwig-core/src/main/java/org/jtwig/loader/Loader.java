@@ -26,14 +26,14 @@ public abstract class Loader {
      * Determines whether or not the loader can find the request template.
      * @param name The name of the template to find
      * @return True if exists, false otherwise
-     * @throws org.jtwig.exception.ResourceException
+     * @throws org.jtwig.exception.ResourceException  Resource Exception
      */
     public abstract boolean exists(String name) throws ResourceException;
     /**
      * Retrieves a representation of the requested template.
      * @param name The name of the template to retrieve
      * @return The template representation if the template exists, or null
-     * @throws org.jtwig.exception.ResourceException
+     * @throws org.jtwig.exception.ResourceException  Resource Exception
      */
     public abstract Resource get(String name) throws ResourceException;
     
@@ -41,7 +41,7 @@ public abstract class Loader {
      * A loader resource implementation provides a means by which to retrieve
      * the source and other information of a template.
      */
-    public static abstract class Resource {
+    public abstract static class Resource {
         /**
          * Retrieves or builds the key used to retrieve the given template from
          * the cache.
@@ -49,27 +49,27 @@ public abstract class Loader {
          */
         public abstract String getCacheKey();
         /**
-         * Returns the absolute path of the resource.
-         * @return 
+         *
+         * @return the absolute path of the resource.
          */
         public abstract String canonicalPath();
         /**
-         * Returns the path of the resource relative to the loader root.
-         * @return 
+         *
+         * @return the path of the resource relative to the loader root.
          */
         public abstract String relativePath();
         /**
          * Retrieve the source code of the template as an input stream.
          * @return The source of the template
-         * @throws ResourceException 
+         * @throws ResourceException  Resource Exception
          */
         public abstract InputStream source() throws ResourceException;
         /**
          * Creates a path, relative to the loader root, from the given relative
          * path. The returned path should be usable by other loaders.
-         * @param relative
-         * @return
-         * @throws ResourceException 
+         * @param relative Relative path
+         * @return Usable path
+         * @throws ResourceException Resource Exception
          */
         public abstract String resolve(String relative) throws ResourceException;
 

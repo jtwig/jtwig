@@ -1,6 +1,12 @@
 # Build files
 *.class
 target/
+build/
+
+# Gradle
+.gradle
+gradle/
+gradlew*
 
 # Release files
 release.properties
