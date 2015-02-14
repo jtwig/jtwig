@@ -111,6 +111,13 @@ public class ForExpressionTest extends AbstractJtwigTest {
         assertThat(theResult(), is("bcdefghijkl"));
     }
     
+    @Test
+    public void iterateOnEnumArray () throws Exception {
+        model.withModelAttribute("values", TestEnum.values());
+        withResource("{% for v in values %}{{ v }}{% endfor %}");
+        assertThat(theResult(), is("ABC"));
+    }
+    
     public static class Obj {
         private final List<String> list = new ArrayList<String>(){{
             add("a");
@@ -120,5 +127,8 @@ public class ForExpressionTest extends AbstractJtwigTest {
         public List<String> getList(String name) {
             return list;
         }
+    }
+    enum TestEnum {
+        A, B, C
     }
 }
