@@ -83,12 +83,6 @@ public abstract class Template implements Compilable, ElementList<Compilable>, E
     public abstract CompiledTemplate compile(final CompileContext context) throws CompileException;
     
     //~ Helpers ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    /**
-     * 
-     * @param ctx
-     * @return 
-     * @throws org.jtwig.exception.CompileException 
-     */
     protected Map<String, Macro.Compiled> compileMacros(
             final CompileContext ctx)
             throws CompileException {

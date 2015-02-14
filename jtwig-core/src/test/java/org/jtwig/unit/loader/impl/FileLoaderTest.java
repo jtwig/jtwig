@@ -15,6 +15,9 @@
 package org.jtwig.unit.loader.impl;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.StringEndsWith.endsWith;
@@ -30,43 +33,54 @@ import static org.mockito.Mockito.*;
 public class FileLoaderTest {
     @Test
     public void fileResource() throws Exception {
-        FileLoader loader = new FileLoader(new File[]{new File(getClass().getResource("/").toURI())});
+        FileLoader loader = new FileLoader(new File[]{new File(getResourceDirectory().toURI())});
         FileLoader.FileResource file = loader.get("/templates/unit/sample.twig");
         
         assertThat(FileUtils.readAllText(file.source()), notNullValue());
         assertThat(file.canonicalPath(), endsWith("/templates/unit/sample.twig"));
         assertThat(file.resolve("other.jtwig"), endsWith("/templates/unit/other.jtwig"));
     }
-    
+
     @Test
     public void ensureExistsMethodWorksProperly() throws Exception {
-        FileLoader loader = new FileLoader(new String[]{getClass().getResource("/").toExternalForm()});
+        FileLoader loader = new FileLoader(new String[]{getResourceDirectory().toExternalForm()});
         assertThat(loader.exists("/templates/unit/sample.twig"), equalTo(true));
         assertThat(loader.exists("invalid.twig"), equalTo(false));
     }
-    
+
     @Test
     public void retrievingNonExistingResourceReturnsNull() throws Exception {
-        FileLoader loader = new FileLoader(new String[]{getClass().getResource("/").toExternalForm()});
+        FileLoader loader = new FileLoader(new String[]{getResourceDirectory().toExternalForm()});
         assertNull(loader.get("/nonexistent.twig"));
     }
-    
+
     @Test
     public void ensureThatScrewedUpExistsCallReturnsNull() throws Exception {
-        FileLoader loader = spy(new FileLoader(new String[]{getClass().getResource("/").toExternalForm()}));
+        FileLoader loader = spy(new FileLoader(new String[]{getResourceDirectory().toExternalForm()}));
         when(loader.exists("/nonexistent.twig")).thenReturn(Boolean.TRUE);
         assertNull(loader.get("/nonexistent.twig"));
     }
-    
+
     @Test
     public void ensurePathNormalizationWorks() throws Exception {
-        FileLoader loader = new FileLoader(new String[]{getClass().getResource("/").toExternalForm()});
+        FileLoader loader = new FileLoader(new String[]{getResourceDirectory().toExternalForm()});
         assertNotNull(loader.get("./templates/unit/../unit/sample.twig"));
     }
-    
+
     @Test(expected = ResourceException.class)
     public void ensurePathNormalizationCatchesOutOfHierarchyLoading() throws Exception {
-        FileLoader loader = new FileLoader(new String[]{getClass().getResource("/").toExternalForm()});
+        FileLoader loader = new FileLoader(new String[]{getResourceDirectory().toExternalForm()});
         loader.get("../sample.twig");
+    }
+
+    private URL getResourceDirectory() {
+        String existingResource = "templates/unit/sample.twig";
+        URL resource = getClass().getResource(String.format("/%s", existingResource));
+
+        try {
+            return new URL(resource.toExternalForm().replace(existingResource, ""));
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Fix me!");
+        }
     }
 }
