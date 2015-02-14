@@ -32,8 +32,8 @@ def getGitHubPassword () {
     return getVariable("GITHUB_PASSWORD", "")
 }
 
-def getGitHubApiKey () {
-    return getVariable("GITHUB_API_KEY", "")
+def getGpgPassphrase () {
+    return getVariable("GPG_PASSPHRASE", "")
 }
 
 def getBintrayApiKey () {
@@ -107,6 +107,10 @@ allprojects {
                 name = determineVersion(globalVersion)
                 desc = 'Jtwig : Modern Template Engine for Java'
                 vcsTag = "jtwig-" + determineVersion(globalVersion)
+                gpg {
+                    sign = true
+                    passphrase = getGpgPassphrase()
+                }
             }
         }
     }
