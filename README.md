@@ -23,4 +23,4 @@ Jtwig uses [bintray](http://bintray.com) for snapshot releasing.
 
 **How to include in your project?**
 
-(Check here)[http://jmelo.lyncode.com/jtwig-snapshot-repository/]
+[Check here](http://jmelo.lyncode.com/jtwig-snapshot-repository/)
