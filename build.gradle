@@ -119,7 +119,7 @@ task tagRelease << {
         println "Releasing new tag to jtwig repository"
         def file = new File("tag.version");
         def writer = new PrintWriter(file);
-        writer.println("jtwig-${globalVersion}")
+        writer.println("${globalVersion}")
         writer.close()
     } else {
         println "TRAVIS_BRANCH variable missing - Not releasing new Tag"
