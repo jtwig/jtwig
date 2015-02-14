@@ -107,11 +107,39 @@ public class BinaryBooleanOperatorTest extends AbstractJtwigTest {
     public void lessOrEqualTo () throws Exception {
         withResource("{% if (2 <= 2) %}Hi{% endif %}");
         assertThat(theResult(), is("Hi"));
+        // Strings?
+        withResource("{% if (\"test1\" <= \"test2\") %}Hi{% endif %}");
+        assertThat(theResult(), is("Hi"));
+        withResource("{% if (\"test2\" <= \"test1\") %}Hi{% endif %}");
+        assertThat(theResult(), is(""));
+        withResource("{% if (\"test1\" <= \"test1\") %}Hi{% endif %}");
+        assertThat(theResult(), is("Hi"));
+        // Dates?
+        withResource("{% if (date('2014-12-12') <= date('2015-01-01')) %}Hi{% endif %}");
+        assertThat(theResult(), is("Hi"));
+        withResource("{% if (date('2015-01-01') <= date('2014-12-12')) %}Hi{% endif %}");
+        assertThat(theResult(), is(""));
+        withResource("{% if (date('2015-01-01') <= date('2015-01-01')) %}Hi{% endif %}");
+        assertThat(theResult(), is("Hi"));
     }
 
     @Test
     public void lessThan () throws Exception {
         withResource("{% if (2 < 2) %}Hi{% endif %}");
+        assertThat(theResult(), is(""));
+        // Strings?
+        withResource("{% if (\"test1\" < \"test2\") %}Hi{% endif %}");
+        assertThat(theResult(), is("Hi"));
+        withResource("{% if (\"test2\" < \"test1\") %}Hi{% endif %}");
+        assertThat(theResult(), is(""));
+        withResource("{% if (\"test1\" < \"test1\") %}Hi{% endif %}");
+        assertThat(theResult(), is(""));
+        // Dates?
+        withResource("{% if (date('2014-12-12') < date('2015-01-01')) %}Hi{% endif %}");
+        assertThat(theResult(), is("Hi"));
+        withResource("{% if (date('2015-01-01') < date('2014-12-12')) %}Hi{% endif %}");
+        assertThat(theResult(), is(""));
+        withResource("{% if (date('2015-01-01') < date('2015-01-01')) %}Hi{% endif %}");
         assertThat(theResult(), is(""));
     }
 
@@ -119,11 +147,39 @@ public class BinaryBooleanOperatorTest extends AbstractJtwigTest {
     public void greaterThan () throws Exception {
         withResource("{% if (2 > 2) %}Hi{% endif %}");
         assertThat(theResult(), is(""));
+        // Strings?
+        withResource("{% if (\"test1\" > \"test2\") %}Hi{% endif %}");
+        assertThat(theResult(), is(""));
+        withResource("{% if (\"test2\" > \"test1\") %}Hi{% endif %}");
+        assertThat(theResult(), is("Hi"));
+        withResource("{% if (\"test1\" > \"test1\") %}Hi{% endif %}");
+        assertThat(theResult(), is(""));
+        // Dates?
+        withResource("{% if (date('2014-12-12') > date('2015-01-01')) %}Hi{% endif %}");
+        assertThat(theResult(), is(""));
+        withResource("{% if (date('2015-01-01') > date('2014-12-12')) %}Hi{% endif %}");
+        assertThat(theResult(), is("Hi"));
+        withResource("{% if (date('2015-01-01') > date('2015-01-01')) %}Hi{% endif %}");
+        assertThat(theResult(), is(""));
     }
 
     @Test
     public void greaterOrEqualThan () throws Exception {
         withResource("{% if (2 >= 2) %}Hi{% endif %}");
+        assertThat(theResult(), is("Hi"));
+        // Strings?
+        withResource("{% if (\"test1\" >= \"test2\") %}Hi{% endif %}");
+        assertThat(theResult(), is(""));
+        withResource("{% if (\"test2\" >= \"test1\") %}Hi{% endif %}");
+        assertThat(theResult(), is("Hi"));
+        withResource("{% if (\"test1\" >= \"test1\") %}Hi{% endif %}");
+        assertThat(theResult(), is("Hi"));
+        // Dates?
+        withResource("{% if (date('2014-12-12') >= date('2015-01-01')) %}Hi{% endif %}");
+        assertThat(theResult(), is(""));
+        withResource("{% if (date('2015-01-01') >= date('2014-12-12')) %}Hi{% endif %}");
+        assertThat(theResult(), is("Hi"));
+        withResource("{% if (date('2015-01-01') >= date('2015-01-01')) %}Hi{% endif %}");
         assertThat(theResult(), is("Hi"));
     }
 

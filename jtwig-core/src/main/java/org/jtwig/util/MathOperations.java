@@ -65,4 +65,8 @@ public class MathOperations {
 
         return true;
     }
+    
+    public static boolean isNumeric(Object o) {
+        return o instanceof Number;
+    }
 }
