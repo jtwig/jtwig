@@ -7,8 +7,11 @@ buildscript {
     dependencies {
         classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:0.6"
         classpath 'org.ajoberstar:gradle-git:0.13.0'
+        classpath "org._10ne.gradle:rest-gradle-plugin:0.3.1"
     }
 }
+
+apply plugin: "org.10ne.rest"
 
 import java.text.SimpleDateFormat
 import org.ajoberstar.grgit.Grgit
@@ -27,6 +30,10 @@ def getCurrentBranch () {
 
 def getGitHubPassword () {
     return getVariable("GITHUB_PASSWORD", "")
+}
+
+def getGitHubApiKey () {
+    return getVariable("GITHUB_API_KEY", "")
 }
 
 def getBintrayApiKey () {
@@ -110,11 +117,10 @@ ext.repo = Grgit.open(project.file('.'), new Credentials(github_username, getGit
 task tagRelease << {
     if (!getCurrentBranch().isEmpty()) {
         println "Releasing new tag to jtwig repository"
-        repo.tag.add {
-            name = "jtwig-${globalVersion}"
-            message = "Release of Jtwig v${globalVersion}"
-        }
-        repo.push(tags: true)
+        def file = new File("tag.version");
+        def writer = new PrintWriter(file);
+        writer.println("jtwig-${globalVersion}")
+        writer.close()
     } else {
         println "TRAVIS_BRANCH variable missing - Not releasing new Tag"
     }
