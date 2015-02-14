@@ -6,6 +6,7 @@ env:
         - secure: "INItszn6E5GF/mKAQfHrXIHbt/cCsX8fHBKXjfjYV3pN9VxF8lqfP4kSzkQ4zYXOToAUt3JG20tIoxRZy1TO9csSAqvsfg9BxvH2XT3UuyPEdxwbmb/OpbPpW9aW0833D29IvmsHvt1l919DkF8ZhUuASKm83zU34uVRdkZx57c="
         - secure: "XlVNVTOa3BBWM1/PQXXGP+iiJfMzYeeh13s1f77pWX3sptNqDEeNgP6TfbTaNz2Qah9VZGJ2f3lvvSGje93my/aa+mgrlhASV1ev2wSYob44zri3P9E5xYgOxrJCXz3H3F2A7lCZX28CriJycJSk5GxXpwCSvDy58JvewXgqTJQ="
         - secure: "UP2xtd/BBgzVSFucoZG9SaK+XoCXMadL0dte6IBgGpY3yNDiav001GpVzpH2s1RL44d8zRuwQR4nJ6/dGvGUC2eFjt3UEh78g6ndj/SnwPbEQFEPRP4wsQpWLGR9rUH7OPPgzytKwL0fCYI+55HXzXO4SURwqldSNVx8JP326R4="
+        - secure: "LPRNwhczeiE4SHaeoLJDcJLpbj2XQU5FF8R1zN9yDtyDn5/O3rYQMbNQ3Dg7M41p9OGCMff9CgUF+Tu7V+QIA4WkVFMrbWtknVjD42EUcNHK61+2BjTw4W6Fq5EqrTHBZs1oyXnDNc6JZMLwTyeI45Gyukp2w8tmvq/6txXIFSo="
 
 after_success:
   - gradle bintrayUpload tagRelease
