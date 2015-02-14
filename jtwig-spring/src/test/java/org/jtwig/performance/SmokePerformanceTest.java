@@ -11,6 +11,7 @@ import org.joda.time.Period;
 import org.joda.time.Seconds;
 import org.jtwig.acceptance.AbstractJtwigAcceptanceTest;
 import org.jtwig.acceptance.functions.TranslateTest;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
@@ -37,6 +38,7 @@ import static org.joda.time.DateTime.now;
  * us to go to the next level in terms of evaluating Jtwig performance.
  */
 @Controller
+@Ignore // We probably should have a separate module just for non-functional tests
 public class SmokePerformanceTest extends AbstractJtwigAcceptanceTest {
     private static final int CALLS = 1000;
     private CountDownLatch counter = new CountDownLatch(CALLS);
@@ -65,9 +67,15 @@ public class SmokePerformanceTest extends AbstractJtwigAcceptanceTest {
 
         System.out.println("Jobs queued... waiting to finish...");
         counter.await();
-        Seconds seconds = new Period(startDate, DateTime.now()).toStandardSeconds();
+        Seconds seconds = new Period(startDate, now()).toStandardSeconds();
         System.out.println(String.format("Finished in %s seconds (Speed: %d requests per second)",
-                seconds.toString(), CALLS / seconds.get(DurationFieldType.seconds())));
+                seconds.toString(), requestsPerSecond(seconds)));
+    }
+
+    private int requestsPerSecond(Seconds seconds) {
+        int value = seconds.get(DurationFieldType.seconds());
+        if (value == 0) return Integer.MAX_VALUE;
+        return CALLS / value;
     }
 
     @RequestMapping("/performance")
