@@ -17,4 +17,10 @@
 
 **License**: [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0)
 
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/jtwig/jtwig/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+### Snapshot Releasing
+
+Jtwig uses [bintray](http://bintray.com) for snapshot releasing.
+
+**How to include in your project?**
+
+(Check here)[http://jmelo.lyncode.com/jtwig-snapshot-repository/]
