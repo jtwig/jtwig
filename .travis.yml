@@ -6,6 +6,9 @@ env:
         - secure: ﻿"INItszn6E5GF/mKAQfHrXIHbt/cCsX8fHBKXjfjYV3pN9VxF8lqfP4kSzkQ4zYXOToAUt3JG20tIoxRZy1TO9csSAqvsfg9BxvH2XT3UuyPEdxwbmb/OpbPpW9aW0833D29IvmsHvt1l919DkF8ZhUuASKm83zU34uVRdkZx57c="
         - secure: ﻿"XlVNVTOa3BBWM1/PQXXGP+iiJfMzYeeh13s1f77pWX3sptNqDEeNgP6TfbTaNz2Qah9VZGJ2f3lvvSGje93my/aa+mgrlhASV1ev2wSYob44zri3P9E5xYgOxrJCXz3H3F2A7lCZX28CriJycJSk5GxXpwCSvDy58JvewXgqTJQ="
 
+script:
+  - gradle checkVariables
+
 after_success:
   - gradle bintrayUpload tagRelease
   - mvn install

@@ -32,14 +32,14 @@ def getGitHubPassword () {
     return (string == null || string.isEmpty()) ? "" : string
 }
 
-def getGpgPassphrase () {
-    def string = System.getenv('GPG_PASSPHRASE')
-    return (string == null || string.isEmpty()) ? "" : string
-}
-
 def getBintrayApiKey () {
     def string = System.getenv('BINTRAY_API_KEY')
     return (string == null || string.isEmpty()) ? "" : string
+}
+
+task checkVariables << {
+    assert !getGitHubPassword().isEmpty(), "Github Password undefined"
+    assert !getBintrayApiKey().isEmpty(), "Bintray API Key undefined"
 }
 
 def calculateDryRun() {
