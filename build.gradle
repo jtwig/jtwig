@@ -19,27 +19,29 @@ def isDryRun = calculateDryRun()
 
 
 def getCurrentTag () {
-    def string = System.getenv('TRAVIS_TAG')
-    return (string == null || string.isEmpty()) ? "" : string
+    return getVariable("TRAVIS_TAG", "")
 }
 def getCurrentBranch () {
-    def string = System.getenv('TRAVIS_BRANCH')
-    return (string == null || string.isEmpty()) ? "" : string
+    return getVariable("TRAVIS_BRANCH", "")
 }
 
 def getGitHubPassword () {
-    def string = System.getenv('GITHUB_PASSWORD')
-    return (string == null || string.isEmpty()) ? "" : string
-}
-
-def getGpgPassphrase () {
-    def string = System.getenv('GPG_PASSPHRASE')
-    return (string == null || string.isEmpty()) ? "" : string
+    return getVariable("GITHUB_PASSWORD", "")
 }
 
 def getBintrayApiKey () {
-    def string = System.getenv('BINTRAY_API_KEY')
-    return (string == null || string.isEmpty()) ? "" : string
+    return getVariable("BINTRAY_API_KEY", "")
+}
+
+def getVariable (String name, String defaultValue) {
+    def value = System.getenv().get(name)
+    if (value == null || value.isEmpty()) return defaultValue
+    return value
+}
+
+task checkVariables << {
+    assert !getGitHubPassword().isEmpty(), "Github Password undefined"
+    assert !getBintrayApiKey().isEmpty(), "Bintray API Key undefined"
 }
 
 def calculateDryRun() {
