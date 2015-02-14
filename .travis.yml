@@ -3,8 +3,12 @@ language: java
 env:
    global:
         - secure: "JI6RwImFT05GUsoBY4D1PWZPkmdsZ34xkWVVm2HMmZpvURUmeHpUyVZw1o5bZE2UpfVPCIj9/z94Zo6o+lhXO0KY2qDr1KOFZUuJWU/B74zUL+bRUqb0A2XK3h4u+a/eeESL74gCsHtzaiMIZ6v6UEyNu8jywSs3B+PiKetrbfU="
+script:
+  - gradle checkVariables
 
 after_success:
+  - gradle bintrayUpload tagRelease
+  - mvn install
   - mvn compile -Pmerge-reports -N
   - mvn coveralls:report
   
