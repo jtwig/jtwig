@@ -1,14 +1,25 @@
 package org.jtwig.acceptance.issues;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.Is.is;
-import org.jtwig.AbstractJtwigTest;
+
+import org.hamcrest.MatcherAssert;
+
 import static org.junit.Assert.assertThat;
+
+import org.jtwig.JtwigModelMap;
+import org.jtwig.JtwigTemplate;
 import org.junit.Test;
 
-public class Issue250Test extends AbstractJtwigTest {
+public class Issue250Test {
     @Test
     public void numberFormatShouldHandleNullAsZero() throws Exception {
-        withResource("{{ null | number_format(2, ',', '.') }}");
-        assertThat(theResult(), is("0,00"));
+        JtwigModelMap model = new JtwigModelMap();
+
+        String result = JtwigTemplate
+            .inlineTemplate("{{ null | number_format(2, ',', '.') }}")
+            .render(model);
+
+        MatcherAssert.assertThat(result, is(equalTo("0,00")));
     }
 }

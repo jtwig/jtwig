@@ -14,7 +14,6 @@
 
 package org.jtwig.unit;
 
-import org.jtwig.MultiresourceUnitTest;
 import org.junit.Test;
 
 

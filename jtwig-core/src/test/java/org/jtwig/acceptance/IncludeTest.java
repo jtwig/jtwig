@@ -14,61 +14,92 @@
 
 package org.jtwig.acceptance;
 
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsEqual.equalTo;
-import org.jtwig.AbstractJtwigTest;
-import org.jtwig.exception.CompileException;
-import static org.jtwig.util.SyntacticSugar.given;
-import static org.jtwig.util.SyntacticSugar.then;
-import org.junit.Assert;
+import org.jtwig.JtwigModelMap;
+import org.jtwig.JtwigTemplate;
+import org.jtwig.exception.RenderException;
+import org.jtwig.exception.ResourceException;
 import org.junit.Test;
 
-public class IncludeTest extends AbstractJtwigTest {
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsEqual.equalTo;
+
+public class IncludeTest {
     @Test
     public void basicExample() throws Exception {
-        withResource(classpathResource("templates/acceptance/include/main.twig"));
-        then(theResult(), is(equalTo("test")));
+        JtwigModelMap model = new JtwigModelMap();
+
+        String result = JtwigTemplate
+            .classpathTemplate("templates/acceptance/include/main.twig")
+            .render(model);
+
+        assertThat(result, is(equalTo("test")));
     }
     
     @Test
     public void includeWithVars() throws Exception {
-        withResource(classpathResource("templates/acceptance/include/main-vars.twig"));
-        then(theResult(), is(equalTo("hello, world")));
+        JtwigModelMap model = new JtwigModelMap();
+
+        String result = JtwigTemplate
+            .classpathTemplate("templates/acceptance/include/main-vars.twig")
+            .render(model);
+
+        assertThat(result, is(equalTo("hello, world")));
     }
     
     @Test
     public void includeOnlyCannotAccessContext() throws Exception {
-        given(theModel().add("variable", "test"));
-        withResource(classpathResource("templates/acceptance/include/include-only.twig"));
-        then(theResult(), is(equalTo("")));
+        JtwigModelMap model = new JtwigModelMap();
+        model.withModelAttribute("variable", "test");
+
+        String result = JtwigTemplate
+            .classpathTemplate("templates/acceptance/include/include-only.twig")
+            .render(model);
+
+        assertThat(result, is(equalTo("")));
     }
     
     @Test
     public void includeWithOnlyCannotAccessContext() throws Exception {
-        given(theModel().add("variable", "pink"));
-        withResource(classpathResource("templates/acceptance/include/include-with-only.twig"));
-        then(theResult(), is(equalTo("pink-purple-")));
+        JtwigModelMap model = new JtwigModelMap();
+        model.withModelAttribute("variable", "pink");
+
+        String result = JtwigTemplate
+            .classpathTemplate("templates/acceptance/include/include-with-only.twig")
+            .render(model);
+
+        assertThat(result, is(equalTo("pink-purple-")));
     }
     
-    @Test
+    @Test(expected = RenderException.class)
     public void includeMissingWithoutFlagShouldThrowException() throws Exception {
-        try {
-            withResource(classpathResource("templates/acceptance/include/ignore-missing-exception.twig"));
-            render();
-            Assert.fail("Should have received a compile exception stating that the resource could not be found.");
-        } catch (CompileException e) {}
+        JtwigModelMap model = new JtwigModelMap();
+
+        JtwigTemplate
+            .classpathTemplate("templates/acceptance/include/ignore-missing-exception.twig")
+            .render(model);
     }
     
     @Test
     public void includeMissingWithFlagShouldNotThrowException() throws Exception {
-        withResource(classpathResource("templates/acceptance/include/ignore-missing-working.twig"));
-        then(theResult(), is(equalTo("start--end")));
+        JtwigModelMap model = new JtwigModelMap();
+
+        String result = JtwigTemplate
+            .classpathTemplate("templates/acceptance/include/ignore-missing-working.twig")
+            .render(model);
+
+        assertThat(result, is(equalTo("start--end")));
     }
     
     @Test
     public void includeUsingTernaryExpression() throws Exception {
-        given(theModel().add("var", false));
-        withResource(classpathResource("templates/acceptance/include/include-ternary.twig"));
-        then(theResult(), is(equalTo("two")));
+        JtwigModelMap model = new JtwigModelMap();
+        model.withModelAttribute("var", false);
+
+        String result = JtwigTemplate
+            .classpathTemplate("templates/acceptance/include/include-ternary.twig")
+            .render(model);
+
+        assertThat(result, is(equalTo("two")));
     }
 }

@@ -180,6 +180,6 @@ public abstract class Import {
         }
         String path = position.getResource().resolve((String)from.calculate(renderContext));
         Loader.Resource resource = compileContext.environment().load(path);
-        return compileContext.environment().compile(resource, compileContext);
+        return compileContext.environment().compile(resource);
     }
 }

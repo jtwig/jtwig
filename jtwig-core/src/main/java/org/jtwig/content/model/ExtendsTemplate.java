@@ -32,6 +32,7 @@ import org.jtwig.exception.ResourceException;
 import org.jtwig.expressions.api.CompilableExpression;
 import org.jtwig.expressions.api.Expression;
 import org.jtwig.loader.Loader;
+import org.jtwig.loader.impl.EmptyLoader;
 import org.jtwig.parser.model.JtwigPosition;
 import org.jtwig.render.RenderContext;
 import org.slf4j.LoggerFactory;
@@ -98,7 +99,7 @@ public class ExtendsTemplate extends Template {
             try {
                 // Now get the template
                 Loader.Resource extendedResource = resolveExtendedResource(expr.calculate(context), context.environment());
-                if (extendedResource == null) {
+                if (extendedResource == null || extendedResource instanceof EmptyLoader.NoResource) {
                     throw new ResourceException("Resource not found: "+expr.calculate(context)+" from "+position.getResource().canonicalPath());
                 }
                 
@@ -113,7 +114,7 @@ public class ExtendsTemplate extends Template {
             }
         }
         
-        protected Loader.Resource resolveExtendedResource(final Object obj, final Environment env) throws ResourceException {
+        protected Loader.Resource resolveExtendedResource(Object obj, Environment env) throws ResourceException {
             // If we've been given a collection, the first template found is
             // used
             if (obj instanceof Collection) {
@@ -122,7 +123,7 @@ public class ExtendsTemplate extends Template {
                     try {
                         String path = position.getResource().resolve(o.toString());
                         Loader.Resource extendedResource = env.load(path);
-                        if (extendedResource != null) {
+                        if (extendedResource != null && !(extendedResource instanceof EmptyLoader.NoResource)) {
                             return extendedResource;
                         }
                     } catch (ResourceException e) {}

@@ -14,25 +14,35 @@
 
 package org.jtwig.acceptance.issues;
 
-import org.jtwig.AbstractJtwigTest;
+import org.jtwig.JtwigModelMap;
+import org.jtwig.JtwigTemplate;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.jtwig.util.SyntacticSugar.given;
 
-public class Issue79Test extends AbstractJtwigTest {
+public class Issue79Test {
     @Test
     public void notDefinedVariable() throws Exception {
-        withResource("{% if a is not defined %}A{% endif %}");
-        assertThat(theResult(), is(equalTo("A")));
+        JtwigModelMap model = new JtwigModelMap();
+
+        String result = JtwigTemplate
+            .inlineTemplate("{% if a is not defined %}A{% endif %}")
+            .render(model);
+
+        assertThat(result, is(equalTo("A")));
     }
 
     @Test
     public void notDefinedMethod() throws Exception {
-        given(theModel().withModelAttribute("a", "test"));
-        withResource("{% if (a.check) is not defined %}A{% endif %}");
-        assertThat(theResult(), is(equalTo("A")));
+        JtwigModelMap model = new JtwigModelMap();
+        model.withModelAttribute("a", "test");
+
+        String result = JtwigTemplate
+            .inlineTemplate("{% if (a.check) is not defined %}A{% endif %}")
+            .render(model);
+
+        assertThat(result, is(equalTo("A")));
     }
 }

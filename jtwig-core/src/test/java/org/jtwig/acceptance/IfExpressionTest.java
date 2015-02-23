@@ -18,45 +18,61 @@ import java.util.Arrays;
 import java.util.Collections;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import org.jtwig.AbstractJtwigTest;
+
+import org.jtwig.JtwigModelMap;
+import org.jtwig.JtwigTemplate;
 import org.junit.Test;
 
-public class IfExpressionTest extends AbstractJtwigTest {
+public class IfExpressionTest {
     @Test
     public void ifWithEmptyListShouldBeTheSameAsFalse () throws Exception {
-        model.withModelAttribute("list", Collections.EMPTY_LIST);
-        withResource("{% if (list) %}not empty{% else %}empty{% endif %}");
-        assertThat(theResult(), is("empty"));
+        JtwigModelMap model = new JtwigModelMap().withModelAttribute("list", Collections.EMPTY_LIST);
+
+        String result = JtwigTemplate
+            .inlineTemplate("{% if (list) %}not empty{% else %}empty{% endif %}")
+            .render(model);
+
+        assertThat(result, is("empty"));
     }
 
     @Test
     public void ifInOperator () throws Exception {
-        withResource("{% if (1 in [1, 2]) %}ok{% else %}ko{% endif %}");
-        assertThat(theResult(), is("ok"));
+        String result = JtwigTemplate
+            .inlineTemplate("{% if (1 in [1, 2]) %}ok{% else %}ko{% endif %}")
+            .render(new JtwigModelMap());
+
+        assertThat(result, is("ok"));
     }
 
     @Test
     public void ifNotInOperator () throws Exception {
-        withResource("{% if (1 not in [3, 2]) %}ok{% else %}ko{% endif %}");
-        assertThat(theResult(), is("ok"));
+        String result = JtwigTemplate
+            .inlineTemplate("{% if (1 not in [3, 2]) %}ok{% else %}ko{% endif %}")
+            .render(new JtwigModelMap());
+
+        assertThat(result, is("ok"));
     }
 
     @Test
     public void ifWithNonEmptyListShouldBeTheSameAsTrue () throws Exception {
-        model.withModelAttribute("list", Arrays.asList("a"));
-        withResource("{% if (list) %}not empty{% else %}empty{% endif %}");
-        assertThat(theResult(), is("not empty"));
+        String result = JtwigTemplate
+            .inlineTemplate("{% if (list) %}not empty{% else %}empty{% endif %}")
+            .render(new JtwigModelMap().withModelAttribute("list", Arrays.asList("a")));
+
+        assertThat(result, is("not empty"));
     }
 
     @Test
     public void IfWithContentInside () throws Exception {
-        model.withModelAttribute("items", Arrays.asList("a"));
-        withResource("{% if (items) %}" +
-                "Items: "+
-                "{% for item in items %}" +
-                "{{ item }}" +
-                "{% endfor %}" +
-                "{% endif %}");
-        assertThat(theResult(), is("Items: a"));
+        String result = JtwigTemplate
+            .inlineTemplate("{% if (items) %}" +
+                            "Items: "+
+                            "{% for item in items %}" +
+                            "{{ item }}" +
+                            "{% endfor %}" +
+                            "{% endif %}")
+            .render(new JtwigModelMap().withModelAttribute("items", Arrays.asList("a")));
+
+        assertThat(result, is("Items: a"));
     }
 }

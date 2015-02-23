@@ -51,7 +51,7 @@ public class Output extends AbstractElement {
             try {
                 Object calculate = expression.calculate(context);
                 if (calculate != null) {
-                    context.write(toTwig(calculate).getBytes(context.environment().getCharset()));
+                    context.write(toTwig(calculate).getBytes(context.environment().getConfiguration().getCharset()));
                 }
             } catch (IOException | CalculateException e) {
                 throw new RenderException(e);

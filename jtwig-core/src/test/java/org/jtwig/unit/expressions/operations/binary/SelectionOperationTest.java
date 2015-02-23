@@ -1,7 +1,9 @@
 package org.jtwig.unit.expressions.operations.binary;
 
 import java.util.Arrays;
-import org.jtwig.AbstractJtwigTest;
+
+import org.jtwig.configuration.JtwigConfigurationBuilder;
+import org.jtwig.unit.AbstractJtwigTest;
 import org.jtwig.exception.CalculateException;
 import org.jtwig.expressions.api.Expression;
 import org.jtwig.expressions.model.Constant;
@@ -9,16 +11,16 @@ import org.jtwig.expressions.model.FunctionElement;
 import org.jtwig.expressions.model.Variable;
 import org.jtwig.expressions.operations.binary.SelectionOperation;
 import org.jtwig.parser.model.JtwigPosition;
-import org.jtwig.render.RenderContext;
+
+import static org.jtwig.configuration.JtwigConfigurationBuilder.newConfiguration;
 import static org.jtwig.types.Undefined.UNDEFINED;
 import org.jtwig.util.ObjectExtractor;
 import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.internal.matchers.ThrowableCauseMatcher;
 import org.junit.rules.ExpectedException;
-import org.mockito.Matchers;
+
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.hamcrest.Matchers.*;
@@ -35,7 +37,9 @@ public class SelectionOperationTest extends AbstractJtwigTest {
     @Before
     public void setUp() throws Exception {
         super.before();
-        theEnvironment().setStrictMode(true);
+        when(theEnvironment().getConfiguration()).thenReturn(newConfiguration()
+                                                                 .withStrictMode(true)
+                                                                 .build());
         
         when(left.calculate(renderContext)).thenReturn(null);
     }
@@ -49,7 +53,9 @@ public class SelectionOperationTest extends AbstractJtwigTest {
 
     @Test
     public void accessPropertyOfNullWithoutStrictMode() throws Exception {
-        theEnvironment().setStrictMode(false);
+        when(theEnvironment().getConfiguration()).thenReturn(newConfiguration()
+                                                                 .withStrictMode(false)
+                                                                 .build());
         Expression right = new Variable.Compiled(position, "variable");
 
         Object result = operation.apply(renderContext, position, left, right);
@@ -64,7 +70,9 @@ public class SelectionOperationTest extends AbstractJtwigTest {
 
     @Test
     public void accessMethodOfNullWithoutStrictMode() throws Exception {
-        theEnvironment().setStrictMode(false);
+        when(theEnvironment().getConfiguration()).thenReturn(newConfiguration()
+                                                                 .withStrictMode(false)
+                                                                 .build());
         Expression right = new FunctionElement.Compiled(position, "variable", Arrays.<Expression>asList());
 
         Object result = operation.apply(renderContext, position, left, right);
@@ -79,7 +87,9 @@ public class SelectionOperationTest extends AbstractJtwigTest {
 
     @Test
     public void accessPropertyOfUndefinedWithoutStrictMode() throws Exception {
-        theEnvironment().setStrictMode(false);
+        when(theEnvironment().getConfiguration()).thenReturn(newConfiguration()
+                                                                 .withStrictMode(false)
+                                                                 .build());
         Expression right = new Variable.Compiled(position, "variable");
         when(left.calculate(renderContext)).thenReturn(UNDEFINED);
 
@@ -97,7 +107,9 @@ public class SelectionOperationTest extends AbstractJtwigTest {
 
     @Test
     public void accessMethodOfUndefinedWithoutStrictMode() throws Exception {
-        theEnvironment().setStrictMode(false);
+        when(theEnvironment().getConfiguration()).thenReturn(newConfiguration()
+                                                                 .withStrictMode(false)
+                                                                 .build());
         Expression right = new FunctionElement.Compiled(position, "variable", Arrays.<Expression>asList());
         when(left.calculate(renderContext)).thenReturn(UNDEFINED);
 
@@ -107,7 +119,9 @@ public class SelectionOperationTest extends AbstractJtwigTest {
 
     @Test(expected = CalculateException.class)
     public void operationShouldFailIfRightHandSideIsNotAFunctionNeitherAVariable() throws Exception {
-        theEnvironment().setStrictMode(false);
+        when(theEnvironment().getConfiguration()).thenReturn(newConfiguration()
+                                                                 .withStrictMode(false)
+                                                                 .build());
         when(left.calculate(renderContext)).thenReturn("hello");
 
         operation.apply(renderContext, position, left, null);

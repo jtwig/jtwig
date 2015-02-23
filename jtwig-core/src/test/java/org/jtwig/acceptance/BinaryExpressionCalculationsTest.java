@@ -16,27 +16,53 @@ package org.jtwig.acceptance;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import org.jtwig.AbstractJtwigTest;
+
+import org.jtwig.JtwigModelMap;
+import org.jtwig.JtwigTemplate;
 import org.junit.Test;
 
-public class BinaryExpressionCalculationsTest extends AbstractJtwigTest {
+public class BinaryExpressionCalculationsTest {
     @Test
     public void shouldResolveToInteger () throws Exception {
-        assertThat(theResultOf(theTemplate("{{ 3 ** 2 }}")), is("6"));
+        JtwigModelMap model = new JtwigModelMap();
+
+        String result = JtwigTemplate
+            .inlineTemplate("{{ 3 ** 2 }}")
+            .render(model);
+
+        assertThat(result, is("6"));
     }
 
     @Test
     public void shouldResolveToDouble () throws Exception {
-        assertThat(theResultOf(theTemplate("{{ 3 * 2.0 }}")), is("6.0"));
+        JtwigModelMap model = new JtwigModelMap();
+
+        String result = JtwigTemplate
+            .inlineTemplate("{{ 3 * 2.0 }}")
+            .render(model);
+
+        assertThat(result, is("6.0"));
     }
 
     @Test
     public void shouldResolveToBoolean () throws Exception {
-        assertThat(theResultOf(theTemplate("{{ 3 and 2.0 }}")), is("1"));
+        JtwigModelMap model = new JtwigModelMap();
+
+        String result = JtwigTemplate
+            .inlineTemplate("{{ 3 and 2.0 }}")
+            .render(model);
+
+        assertThat(result, is("1"));
     }
 
     @Test
     public void shouldResolveToBooleanFalse () throws Exception {
-        assertThat(theResultOf(theTemplate("{{ 3 and false }}")), is("0"));
+        JtwigModelMap model = new JtwigModelMap();
+
+        String result = JtwigTemplate
+            .inlineTemplate("{{ 3 and false }}")
+            .render(model);
+
+        assertThat(result, is("0"));
     }
 }

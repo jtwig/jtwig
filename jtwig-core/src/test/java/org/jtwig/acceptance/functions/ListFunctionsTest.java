@@ -14,62 +14,109 @@
 
 package org.jtwig.acceptance.functions;
 
-import org.jtwig.AbstractJtwigTest;
+import org.jtwig.JtwigModelMap;
+import org.jtwig.JtwigTemplate;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
-import static org.jtwig.util.SyntacticSugar.then;
+import static org.hamcrest.MatcherAssert.assertThat;
 
-public class ListFunctionsTest extends AbstractJtwigTest {
+public class ListFunctionsTest {
     @Test
     public void batch() throws Exception {
-        withResource("{{ batch([1,2,3,4], 3) }}");
-        then(theResult(), is(equalTo("[[1, 2, 3], [4]]")));
+        JtwigModelMap model = new JtwigModelMap();
+
+        String result = JtwigTemplate
+            .inlineTemplate("{{ batch([1,2,3,4], 3) }}")
+            .render(model);
+
+        assertThat(result, is(equalTo("[[1, 2, 3], [4]]")));
     }
 
     @Test
     public void batchWithPadding() throws Exception {
-        withResource("{{ batch([1,2,3,4], 3, 1) }}");
-        then(theResult(), is(equalTo("[[1, 2, 3], [4, 1, 1]]")));
+        JtwigModelMap model = new JtwigModelMap();
+
+        String result = JtwigTemplate
+            .inlineTemplate("{{ batch([1,2,3,4], 3, 1) }}")
+            .render(model);
+
+        assertThat(result, is(equalTo("[[1, 2, 3], [4, 1, 1]]")));
     }
 
     @Test
     public void concatenate() throws Exception {
-        withResource("{{ concatenate(1, 2, 3) }}");
-        then(theResult(), is(equalTo("123")));
+        JtwigModelMap model = new JtwigModelMap();
+
+        String result = JtwigTemplate
+            .inlineTemplate("{{ concatenate(1, 2, 3) }}")
+            .render(model);
+
+        assertThat(result, is(equalTo("123")));
     }
 
     @Test
     public void join() throws Exception {
-        withResource("{{ join([1, 2, 3]) }}");
-        then(theResult(), is(equalTo("123")));
+        JtwigModelMap model = new JtwigModelMap();
+
+        String result = JtwigTemplate
+            .inlineTemplate("{{ join([1, 2, 3]) }}")
+            .render(model);
+
+        assertThat(result, is(equalTo("123")));
     }
 
     @Test
     public void joinWithCustomSeparator() throws Exception {
-        withResource("{{ join([1, 2, 3], ' - ') }}");
-        then(theResult(), is(equalTo("1 - 2 - 3")));
+        JtwigModelMap model = new JtwigModelMap();
+
+        String result = JtwigTemplate
+            .inlineTemplate("{{ join([1, 2, 3], ' - ') }}")
+            .render(model);
+
+        assertThat(result, is(equalTo("1 - 2 - 3")));
     }
 
     @Test
     public void merge() throws Exception {
-        withResource("{{ merge([1, 2, 3], [4]) }}");
-        then(theResult(), is(equalTo("[1, 2, 3, 4]")));
+        JtwigModelMap model = new JtwigModelMap();
+
+        String result = JtwigTemplate
+            .inlineTemplate("{{ merge([1, 2, 3], [4]) }}")
+            .render(model);
+
+        assertThat(result, is(equalTo("[1, 2, 3, 4]")));
     }
     @Test
     public void mergeMultipleArgs() throws Exception {
-        withResource("{{ merge([1, 2, 3], [4], [5, 6]) }}");
-        then(theResult(), is(equalTo("[1, 2, 3, 4, 5, 6]")));
+        JtwigModelMap model = new JtwigModelMap();
+
+        String result = JtwigTemplate
+            .inlineTemplate("{{ merge([1, 2, 3], [4], [5, 6]) }}")
+            .render(model);
+
+        assertThat(result, is(equalTo("[1, 2, 3, 4, 5, 6]")));
     }
     @Test
     public void slice() throws Exception {
-        withResource("{{ slice('abc', 1, 2) }}");
-        then(theResult(), is(equalTo("bc")));
+        JtwigModelMap model = new JtwigModelMap();
+
+        String result = JtwigTemplate
+            .inlineTemplate("{{ slice('abc', 1, 2) }}")
+            .render(model);
+
+        assertThat(result, is(equalTo("bc")));
     }
+
     @Test
     public void sort() throws Exception {
-        withResource("{{ sort([2, 1, 3]) }}");
-        then(theResult(), is(equalTo("[1, 2, 3]")));
+        JtwigModelMap model = new JtwigModelMap();
+
+        String result = JtwigTemplate
+            .inlineTemplate("{{ sort([2, 1, 3]) }}")
+            .render(model);
+
+        assertThat(result, is(equalTo("[1, 2, 3]")));
     }
 }

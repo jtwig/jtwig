@@ -1,50 +1,56 @@
 package org.jtwig.acceptance.config;
 
-import org.jtwig.AbstractJtwigTest;
+import org.jtwig.JtwigModelMap;
+import org.jtwig.JtwigTemplate;
 import org.jtwig.parser.config.Symbols;
 import org.jtwig.parser.config.TagSymbols;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
+import static org.jtwig.configuration.JtwigConfigurationBuilder.newConfiguration;
 
-public class SymbolConfigurationTest extends AbstractJtwigTest {
+public class SymbolConfigurationTest {
     @Test
     public void symbolsShouldAdjustToTheDefinedOnes() throws Exception {
-        theEnvironment().setSymbols(new Symbols() {
-            @Override
-            public String beginOutput() {
-                return "[[";
-            }
+        JtwigModelMap model = new JtwigModelMap();
 
-            @Override
-            public String endOutput() {
-                return "]]";
-            }
+        String result = JtwigTemplate
+            .inlineTemplate("[[ 'two' ]]", newConfiguration()
+                .withSymbols(new Symbols() {
+                    @Override
+                    public String beginOutput() {
+                        return "[[";
+                    }
 
-            @Override
-            public String beginTag() {
-                return TagSymbols.DEFAULT.beginTag();
-            }
+                    @Override
+                    public String endOutput() {
+                        return "]]";
+                    }
 
-            @Override
-            public String endTag() {
-                return TagSymbols.DEFAULT.endTag();
-            }
+                    @Override
+                    public String beginTag() {
+                        return TagSymbols.DEFAULT.beginTag();
+                    }
 
-            @Override
-            public String beginComment() {
-                return TagSymbols.DEFAULT.beginComment();
-            }
+                    @Override
+                    public String endTag() {
+                        return TagSymbols.DEFAULT.endTag();
+                    }
 
-            @Override
-            public String endComment() {
-                return TagSymbols.DEFAULT.endComment();
-            }
-        });
+                    @Override
+                    public String beginComment() {
+                        return TagSymbols.DEFAULT.beginComment();
+                    }
 
-        withResource("[[ 'two' ]]");
+                    @Override
+                    public String endComment() {
+                        return TagSymbols.DEFAULT.endComment();
+                    }
+                })
+                .build())
+            .render(model);
 
-        assertThat(theResult(), equalTo("two"));
+        assertThat(result, equalTo("two"));
     }
 }

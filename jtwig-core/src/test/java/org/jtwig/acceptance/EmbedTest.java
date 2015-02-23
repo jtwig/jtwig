@@ -14,33 +14,51 @@
 
 package org.jtwig.acceptance;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.StringContains.containsString;
-import org.jtwig.AbstractJtwigTest;
+import org.jtwig.JtwigModelMap;
+import org.jtwig.JtwigTemplate;
 import org.junit.Test;
 
-public class EmbedTest extends AbstractJtwigTest {
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.StringContains.containsString;
+
+public class EmbedTest {
     @Test
     public void emptyEmbed() throws Exception {
-        withResource(classpathResource("templates/embed/empty.twig"));
-        assertThat(theResult(), containsString("1/1"));
+        JtwigModelMap model = new JtwigModelMap();
+
+        String result = JtwigTemplate.classpathTemplate("templates/embed/empty.twig")
+            .render(model);
+
+        assertThat(result, containsString("1/1"));
     }
 
     @Test
     public void partialOverrideEmbed() throws Exception {
-        withResource(classpathResource("templates/embed/partialOverride.twig"));
-        assertThat(theResult(), containsString("1/2"));
+        JtwigModelMap model = new JtwigModelMap();
+
+        String result = JtwigTemplate.classpathTemplate("templates/embed/partialOverride.twig")
+            .render(model);
+
+        assertThat(result, containsString("1/2"));
     }
 
     @Test
     public void fullOverrideEmbed() throws Exception {
-        withResource(classpathResource("templates/embed/fullOverride.twig"));
-        assertThat(theResult(), containsString("2/2"));
+        JtwigModelMap model = new JtwigModelMap();
+
+        String result = JtwigTemplate.classpathTemplate("templates/embed/fullOverride.twig")
+            .render(model);
+
+        assertThat(result, containsString("2/2"));
     }
 
     @Test
     public void nestedOverrideEmbed() throws Exception {
-        withResource(classpathResource("templates/embed/nestedOverride.twig"));
-        assertThat(theResult(), containsString("1/(4/2)"));
+        JtwigModelMap model = new JtwigModelMap();
+
+        String result = JtwigTemplate.classpathTemplate("templates/embed/nestedOverride.twig")
+            .render(model);
+
+        assertThat(result, containsString("1/(4/2)"));
     }
 }

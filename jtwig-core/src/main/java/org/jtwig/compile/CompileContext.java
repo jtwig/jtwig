@@ -49,7 +49,7 @@ public class CompileContext {
     }
     
     public TemplateCache cache() {
-        return env.getCache();
+        return env.getConfiguration().getTemplateCache();
     }
 
     public CompileContext clone() {

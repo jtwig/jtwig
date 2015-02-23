@@ -20,6 +20,7 @@ import org.jtwig.content.api.Renderable;
 import org.jtwig.exception.*;
 import org.jtwig.expressions.api.CompilableExpression;
 import org.jtwig.expressions.api.Expression;
+import org.jtwig.loader.impl.EmptyLoader;
 import org.jtwig.parser.model.JtwigPosition;
 import org.jtwig.render.RenderContext;
 import java.util.Map;
@@ -105,11 +106,12 @@ public class Include extends AbstractElement {
                 // Build the renderable
                 String path = position.getResource().resolve(expr.calculate(context).toString());
                 Loader.Resource resource = context.environment().load(path);
-                if (resource == null && ignoreMissing) {
+                boolean isEmptyResource = resource == null || resource instanceof EmptyLoader.NoResource;
+                if (isEmptyResource && ignoreMissing) {
                     return;
                 }
                 CompileContext compileCtx = compileContext.clone().withResource(resource);
-                Template.CompiledTemplate compiled = context.environment().compile(resource, compileCtx);
+                Template.CompiledTemplate compiled = context.environment().compile(resource);
 
                 // Isolate the render context if needed
                 RenderContext usedContext = context;

@@ -15,7 +15,7 @@
 package org.jtwig.unit.expressions.model;
 
 import java.util.Map;
-import org.jtwig.AbstractJtwigTest;
+import org.jtwig.unit.AbstractJtwigTest;
 import org.jtwig.expressions.api.Expression;
 import org.jtwig.expressions.model.Constant;
 import org.jtwig.expressions.model.ValueMap;

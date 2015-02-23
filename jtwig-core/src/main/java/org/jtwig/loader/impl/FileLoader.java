@@ -143,7 +143,7 @@ public class FileLoader extends Loader {
         }
 
         @Override
-        public String resolve(final String relative) throws ResourceException {
+        public String resolve(String relative) throws ResourceException {
             try {
                 File f = new File(absolute.getParentFile(), relative);
                 String canonical = StringUtils.strip(f.getCanonicalPath(), "/");

@@ -32,8 +32,8 @@ public class RenderStream {
 
     private static void initExecutorService(Environment env) {
         if (sExecutor == null) {
-            sExecutor = new ThreadPoolExecutor(env.getMinThreads(), env.getMaxThreads(),
-                                               env.getKeepAliveTime(), TimeUnit.SECONDS,
+            sExecutor = new ThreadPoolExecutor(env.getConfiguration().getMinThreads(), env.getConfiguration().getMaxThreads(),
+                                               env.getConfiguration().getKeepAliveTime(), TimeUnit.SECONDS,
                                                new SynchronousQueue<Runnable>());
         }
     }

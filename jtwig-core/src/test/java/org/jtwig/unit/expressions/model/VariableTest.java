@@ -14,7 +14,7 @@
 
 package org.jtwig.unit.expressions.model;
 
-import org.jtwig.AbstractJtwigTest;
+import org.jtwig.unit.AbstractJtwigTest;
 import org.jtwig.expressions.model.Variable;
 import org.junit.Test;
 

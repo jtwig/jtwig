@@ -22,7 +22,7 @@ import org.jtwig.loader.Loader;
 public class StringLoader extends Loader {
     private final String source;
     
-    public StringLoader(final String source) {
+    public StringLoader(String source) {
         this.source = source;
     }
     
@@ -39,7 +39,7 @@ public class StringLoader extends Loader {
     public static class StringResource extends Resource {
         private final String source;
         
-        public StringResource(final String source) {
+        public StringResource(String source) {
             this.source = source;
         }
 
@@ -64,7 +64,7 @@ public class StringLoader extends Loader {
         }
 
         @Override
-        public String resolve(final String relative) throws ResourceException {
+        public String resolve(String relative) throws ResourceException {
             throw new ResourceException("StringResource does not support relative path resolution.");
         }
         
