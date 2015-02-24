@@ -23,7 +23,7 @@ public class ImmutableJtwigConfiguration implements JtwigConfiguration {
     private final TemplateCache templateCache;
     private final Loader loader;
 
-    ImmutableJtwigConfiguration(Charset charset, boolean strictMode, boolean logNonStrictMode, Symbols symbols, AddonParserList addonParserList, int minThreads, int maxThreads, long keepAliveTime,
+    public ImmutableJtwigConfiguration(Charset charset, boolean strictMode, boolean logNonStrictMode, Symbols symbols, AddonParserList addonParserList, int minThreads, int maxThreads, long keepAliveTime,
                                 JsonConfiguration jsonConfiguration, FunctionRepository functionRepository, TemplateCache templateCache, Loader loader) {
         this.charset = charset;
         this.strictMode = strictMode;
