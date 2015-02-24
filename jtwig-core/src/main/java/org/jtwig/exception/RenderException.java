@@ -14,7 +14,7 @@
 
 package org.jtwig.exception;
 
-public class RenderException extends Exception {
+public class RenderException extends JtwigException {
     public RenderException(String message) {
         super(message);
     }

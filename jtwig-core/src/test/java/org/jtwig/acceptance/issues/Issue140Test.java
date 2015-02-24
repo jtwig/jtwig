@@ -14,7 +14,8 @@
 
 package org.jtwig.acceptance.issues;
 
-import org.jtwig.AbstractJtwigTest;
+import org.jtwig.JtwigModelMap;
+import org.jtwig.JtwigTemplate;
 import org.jtwig.exception.CalculateException;
 import org.junit.Rule;
 import org.junit.Test;
@@ -22,10 +23,11 @@ import org.junit.rules.ExpectedException;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
-import static org.jtwig.util.SyntacticSugar.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.jtwig.configuration.JtwigConfigurationBuilder.newConfiguration;
 import static org.jtwig.util.matchers.ExceptionMatcher.exception;
 
-public class Issue140Test extends AbstractJtwigTest {
+public class Issue140Test {
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
@@ -37,9 +39,14 @@ public class Issue140Test extends AbstractJtwigTest {
     @Test
     public void undefinedVarThrowsExceptionOnEvaluation() throws Exception {
         expectedException.expect(exception().withInnerException(exception().ofType(CalculateException.class)));
-        given(theEnvironment().setStrictMode(true));
-        withResource("{{ var is null }}");
-        render();
+
+        JtwigModelMap model = new JtwigModelMap();
+
+        JtwigTemplate
+            .inlineTemplate("{{ var is null }}", newConfiguration()
+                .withStrictMode(true)
+                .build())
+            .render(model);
     }
 
     /**
@@ -49,8 +56,14 @@ public class Issue140Test extends AbstractJtwigTest {
      */
     @Test
     public void outputNonexistentVarThrowsException() throws Exception {
-        given(theEnvironment().setStrictMode(false));
-        withResource("{{ var is null }}");
-        then(theResult(), is(equalTo("1")));
+        JtwigModelMap model = new JtwigModelMap();
+
+        String result = JtwigTemplate
+            .inlineTemplate("{{ var is null }}", newConfiguration()
+                .withStrictMode(false)
+                .build())
+            .render(model);
+
+        assertThat(result, is(equalTo("1")));
     }
 }

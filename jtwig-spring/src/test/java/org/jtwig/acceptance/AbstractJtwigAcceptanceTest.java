@@ -22,6 +22,10 @@ import org.eclipse.jetty.server.session.SessionHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.resource.Resource;
+import org.jtwig.Environment;
+import org.jtwig.configuration.JtwigConfigurationBuilder;
+import org.jtwig.functions.SpringFunctions;
+import org.jtwig.loader.impl.ClasspathLoader;
 import org.jtwig.mvc.JtwigViewResolver;
 import org.junit.After;
 import org.junit.Before;
@@ -37,13 +41,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 import org.springframework.web.servlet.theme.FixedThemeResolver;
 
 import java.io.IOException;
-import java.util.Arrays;
-import javax.servlet.ServletContext;
-import org.jtwig.Environment;
-import org.jtwig.functions.SpringFunctions;
-import org.jtwig.loader.impl.ChainLoader;
-import org.jtwig.loader.impl.ClasspathLoader;
-import org.jtwig.loader.impl.WebResourceLoader;
 
 public abstract class AbstractJtwigAcceptanceTest {
     private HttpClient httpClient = httpClient();
@@ -54,12 +51,12 @@ public abstract class AbstractJtwigAcceptanceTest {
     private void startServer () throws Exception {
         jetty = new Server(9090);
 
-        final AnnotationConfigWebApplicationContext applicationContext = new AnnotationConfigWebApplicationContext();
+        AnnotationConfigWebApplicationContext applicationContext = new AnnotationConfigWebApplicationContext();
         applicationContext.register(ConfigClass.class, getClass());
         applicationContext.register(configurationClasses());
 
-        final ServletHolder servletHolder = new ServletHolder(new DispatcherServlet(applicationContext));
-        final ServletContextHandler context = new ServletContextHandler();
+        ServletHolder servletHolder = new ServletHolder(new DispatcherServlet(applicationContext));
+        ServletContextHandler context = new ServletContextHandler();
 
         context.setErrorHandler(null); // use Spring exception handler(s)
         context.setContextPath("/");
@@ -134,10 +131,10 @@ public abstract class AbstractJtwigAcceptanceTest {
             ClasspathLoader classpath = new ClasspathLoader();
 //            ChainLoader chainLoader = new ChainLoader(Arrays.asList(web, classpath));
             
-            Environment env = new Environment();
-            env.setLoader(classpath);
-            
-//            env.getFunctionRepository().include(springFunctions());
+            Environment env = new Environment(JtwigConfigurationBuilder.newConfiguration()
+                                                  .withLoader(classpath)
+                                                  .build());
+            env.getConfiguration().getFunctionRepository().include(springFunctions());
             return env;
         }
         

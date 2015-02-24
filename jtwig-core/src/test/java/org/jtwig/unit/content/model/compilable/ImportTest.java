@@ -14,17 +14,15 @@
 
 package org.jtwig.unit.content.model.compilable;
 
-import org.jtwig.AbstractJtwigTest;
+import org.jtwig.unit.AbstractJtwigTest;
 import org.jtwig.content.api.Renderable;
 import org.jtwig.content.model.compilable.Import;
 import org.jtwig.exception.ParseException;
 import org.jtwig.exception.RenderException;
 import org.jtwig.expressions.model.Constant;
-import org.jtwig.expressions.model.Variable;
 import org.jtwig.parser.model.JtwigPosition;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 public class ImportTest extends AbstractJtwigTest {

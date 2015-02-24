@@ -14,52 +14,82 @@
 
 package org.jtwig.acceptance;
 
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsEqual.equalTo;
-import org.jtwig.AbstractJtwigTest;
+import org.jtwig.JtwigModelMap;
+import org.jtwig.JtwigTemplate;
 import org.jtwig.exception.ParseException;
 import org.jtwig.functions.annotations.JtwigFunction;
 import org.jtwig.functions.annotations.Parameter;
-import static org.jtwig.util.SyntacticSugar.given;
-import static org.jtwig.util.SyntacticSugar.then;
 import org.junit.Test;
 
-public class ImportTest extends AbstractJtwigTest {
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.jtwig.configuration.JtwigConfigurationBuilder.newConfiguration;
+
+public class ImportTest {
     @Test
     public void basicExample() throws Exception {
-        withResource(classpathResource("templates/acceptance/import/import.twig"));
-        then(theResult().trim(), is(equalTo("text (test)\n\n\npassword (pass)\n\n\npassword (password)")));
+        JtwigModelMap model = new JtwigModelMap();
+
+        String result = JtwigTemplate
+            .classpathTemplate("templates/acceptance/import/import.twig")
+            .render(model);
+
+        assertThat(result, is(equalTo("\ntext (test)\n\n\npassword (pass)\n\n\npassword (password)\n")));
     }
     
     @Test(expected = ParseException.class)
     public void ensureInvalidImportStatementThrowsException() throws Exception {
-        withResource(classpathResource("templates/acceptance/import/multiple-import-as.twig"));
-        render();
+        JtwigModelMap model = new JtwigModelMap();
+
+        JtwigTemplate
+            .classpathTemplate("templates/acceptance/import/multiple-import-as.twig")
+            .render(model);
     }
     
     @Test
     public void ensureImportSelfWorks() throws Exception {
-        withResource(classpathResource("templates/acceptance/import/import-self.twig"));
-        then(theResult().trim(), is(equalTo("jtwig")));
+        JtwigModelMap model = new JtwigModelMap();
+
+        String result = JtwigTemplate
+            .classpathTemplate("templates/acceptance/import/import-self.twig")
+            .render(model);
+
+        assertThat(result, is(equalTo("\njtwig\n")));
     }
     
     @Test
     public void ensureNestedSelfImportWorks() throws Exception {
-        withResource(classpathResource("templates/acceptance/import/nested-import-self-test.twig"));
-        then(theResult().trim(), is(equalTo("<input type=\"password\" name=\"jtwig\">")));
+        JtwigModelMap model = new JtwigModelMap();
+
+        String result = JtwigTemplate
+            .classpathTemplate("templates/acceptance/import/nested-import-self-test.twig")
+            .render(model);
+
+        assertThat(result, is(equalTo("\n<input type=\"password\" name=\"jtwig\">\n\n")));
     }
     
     @Test
     public void ensureMacrosCanUseCustomFunctions() throws Exception {
-        given(theEnvironment()).getFunctionRepository().include(new TypeFunction());
-        withResource(classpathResource("templates/acceptance/import/macro-can-use-functions.twig"));
-        then(theResult().trim(), is(equalTo("java.lang.String")));
+        JtwigModelMap model = new JtwigModelMap();
+
+        String result = JtwigTemplate
+            .classpathTemplate("templates/acceptance/import/macro-can-use-functions.twig", newConfiguration()
+                .include(new TypeFunction())
+                .build())
+            .render(model);
+
+        assertThat(result, is(equalTo("\njava.lang.String\n")));
     }
     
-//    @Test(expected = CompileException.class)
-//    public void ensureInvalidFromStatementThrowsException() throws Exception {
-//        withResource("templates/acceptance/import/import-string-name.twig")));
-//    }
+    @Test(expected = ParseException.class)
+    public void ensureInvalidFromStatementThrowsException() throws Exception {
+        JtwigModelMap model = new JtwigModelMap();
+
+        JtwigTemplate
+            .classpathTemplate("templates/acceptance/import/import-string-name.twig")
+            .render(model);
+    }
     
     public static class TypeFunction {
         @JtwigFunction(name = "type")

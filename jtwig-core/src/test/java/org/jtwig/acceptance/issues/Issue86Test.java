@@ -14,35 +14,59 @@
 
 package org.jtwig.acceptance.issues;
 
-import org.jtwig.AbstractJtwigTest;
+import org.jtwig.JtwigModelMap;
+import org.jtwig.JtwigTemplate;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
-import static org.jtwig.util.SyntacticSugar.*;
+import static org.hamcrest.MatcherAssert.assertThat;
 
-public class Issue86Test extends AbstractJtwigTest {
+public class Issue86Test {
 
     @Test
     public void issue86() throws Exception {
-        withResource("{{ -1 }}");
-        then(theResult(), is(equalTo("-1")));
+        JtwigModelMap model = new JtwigModelMap();
+
+        String result = JtwigTemplate
+            .inlineTemplate("{{ -1 }}")
+            .render(model);
+
+        assertThat(result, is(equalTo("-1")));
     }
+
     @Test
     public void issue86WithConstant() throws Exception {
-        withResource("{{ 1-1 }}");
-        then(theResult(), is(equalTo("0")));
+        JtwigModelMap model = new JtwigModelMap();
+
+        String result = JtwigTemplate
+            .inlineTemplate("{{ 1-1 }}")
+            .render(model);
+
+        assertThat(result, is(equalTo("0")));
     }
+
     @Test
     public void issue86WithVariable() throws Exception {
-        given(theModel().withModelAttribute("value", 1));
-        withResource("{{ value-1 }}");
-        then(theResult(), is(equalTo("0")));
+        JtwigModelMap model = new JtwigModelMap();
+        model.withModelAttribute("value", 1);
+
+        String result = JtwigTemplate
+            .inlineTemplate("{{ value-1 }}")
+            .render(model);
+
+        assertThat(result, is(equalTo("0")));
     }
+
     @Test
     public void issue86WithVariableUnary() throws Exception {
-        given(theModel().withModelAttribute("value", -1));
-        withResource("{{ -value }}");
-        then(theResult(), is(equalTo("1")));
+        JtwigModelMap model = new JtwigModelMap();
+        model.withModelAttribute("value", -1);
+
+        String result = JtwigTemplate
+            .inlineTemplate("{{ -value }}")
+            .render(model);
+
+        assertThat(result, is(equalTo("1")));
     }
 }

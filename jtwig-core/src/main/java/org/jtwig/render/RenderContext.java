@@ -28,6 +28,7 @@ import org.jtwig.functions.parameters.resolve.api.InputParameterResolverFactory;
 import org.jtwig.functions.parameters.resolve.api.ParameterResolver;
 import org.jtwig.functions.parameters.resolve.impl.InputDelegateMethodParametersResolver;
 import org.jtwig.functions.parameters.resolve.impl.ParameterAnnotationParameterResolver;
+import org.jtwig.functions.repository.model.Function;
 import org.jtwig.functions.resolver.api.FunctionResolver;
 import org.jtwig.functions.resolver.impl.CompoundFunctionResolver;
 import org.jtwig.functions.resolver.impl.DelegateFunctionResolver;
@@ -51,14 +52,11 @@ import static org.jtwig.types.Undefined.UNDEFINED;
 public class RenderContext {
     private static final String MODEL = "model";
 
-    /*
-     * NOTE: This method should only be used once (in JtwigTemplate)
-     */
     public static RenderContext create(Environment env, JtwigModelMap modelMap, OutputStream output) {
         return new RenderContext(env, modelMap, new CompoundFunctionResolver()
-                .withResolver(new DelegateFunctionResolver(env.getFunctionRepository(),
+                .withResolver(new DelegateFunctionResolver(env.getConfiguration().getFunctionRepository(),
                         new InputDelegateMethodParametersResolver(annotationWithoutConversion())))
-                .withResolver(new DelegateFunctionResolver(env.getFunctionRepository(),
+                .withResolver(new DelegateFunctionResolver(env.getConfiguration().getFunctionRepository(),
                         new InputDelegateMethodParametersResolver(annotationWithConversion()))), new RenderStream(output, env));
     }
 
@@ -115,14 +113,14 @@ public class RenderContext {
     }
     
     public TemplateCache cache() {
-        return env.getCache();
+        return env.getConfiguration().getTemplateCache();
     }
     
     public Template.CompiledTemplate getRenderingTemplate() {
         return renderingTemplateStack.peek();
     }
     
-    public RenderContext pushRenderingTemplate(final Template.CompiledTemplate renderingTemplate) {
+    public RenderContext pushRenderingTemplate(Template.CompiledTemplate renderingTemplate) {
         this.renderingTemplateStack.push(renderingTemplate);
         return this;
     }
@@ -189,7 +187,9 @@ public class RenderContext {
 
             throw new FunctionNotFoundException(message);
 
-        } catch (InvocationTargetException | IllegalAccessException e) {
+        } catch (InvocationTargetException e) {
+            throw new FunctionException(e.getTargetException());
+        } catch (IllegalAccessException e) {
             throw new FunctionException(e);
         }
     }

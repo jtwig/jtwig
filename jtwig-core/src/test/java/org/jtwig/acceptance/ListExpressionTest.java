@@ -14,31 +14,55 @@
 
 package org.jtwig.acceptance;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import org.jtwig.AbstractJtwigTest;
+
+import org.jtwig.JtwigModelMap;
+import org.jtwig.JtwigTemplate;
 import org.junit.Test;
 
-public class ListExpressionTest extends AbstractJtwigTest {
+public class ListExpressionTest {
     @Test
     public void integerListByComprehension () throws Exception {
-        withResource("{{ (1..5) | join(',') }}");
-        assertThat(theResult(), is("1,2,3,4,5"));
+        JtwigModelMap model = new JtwigModelMap();
+
+        String result = JtwigTemplate
+            .inlineTemplate("{{ (1..5) | join(',') }}")
+            .render(model);
+
+        assertThat(result, is(equalTo("1,2,3,4,5")));
     }
     @Test
     public void integerListByComprehensionReverse () throws Exception {
-        withResource("{{ (5..1) | join(',') }}");
-        assertThat(theResult(), is("5,4,3,2,1"));
+        JtwigModelMap model = new JtwigModelMap();
+
+        String result = JtwigTemplate
+            .inlineTemplate("{{ (5..1) | join(',') }}")
+            .render(model);
+
+        assertThat(result, is(equalTo("5,4,3,2,1")));
     }
 
     @Test
     public void characterListByComprehension () throws Exception {
-        withResource("{{ ('a'..'c') | join }}");
-        assertThat(theResult(), is("abc"));
+        JtwigModelMap model = new JtwigModelMap();
+
+        String result = JtwigTemplate
+            .inlineTemplate("{{ ('a'..'c') | join }}")
+            .render(model);
+
+        assertThat(result, is(equalTo("abc")));
     }
+
     @Test
     public void characterListByComprehensionReverse () throws Exception {
-        withResource("{{ ('c'.. 'a') | join }}");
-        assertThat(theResult(), is("cba"));
+        JtwigModelMap model = new JtwigModelMap();
+
+        String result = JtwigTemplate
+            .inlineTemplate("{{ ('c'.. 'a') | join }}")
+            .render(model);
+
+        assertThat(result, is(equalTo("cba")));
     }
 }

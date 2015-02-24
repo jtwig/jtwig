@@ -14,7 +14,7 @@
 
 package org.jtwig.exception;
 
-public class ResourceException extends Exception {
+public class ResourceException extends JtwigException {
     public ResourceException(String message) {
         super(message);
     }

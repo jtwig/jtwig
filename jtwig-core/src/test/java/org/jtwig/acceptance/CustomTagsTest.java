@@ -14,35 +14,52 @@
 
 package org.jtwig.acceptance;
 
-import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import org.jtwig.AbstractJtwigTest;
 import static org.jtwig.parser.config.TagSymbols.JAVASCRIPT_COLLISION_FREE;
+
+import org.jtwig.JtwigModelMap;
+import org.jtwig.JtwigTemplate;
+import org.jtwig.configuration.JtwigConfigurationBuilder;
 import org.junit.Test;
 
-public class CustomTagsTest extends AbstractJtwigTest {
+public class CustomTagsTest {
     @Test
     public void javascriptOutputTag() throws Exception {
-        env.setSymbols(JAVASCRIPT_COLLISION_FREE);
+        JtwigModelMap model = new JtwigModelMap();
 
-        withResource("@> 1 <@");
-        assertThat(theResult(), is(equalTo("1")));
+        String result = JtwigTemplate
+            .inlineTemplate("@> 1 <@", JtwigConfigurationBuilder.newConfiguration()
+                .withSymbols(JAVASCRIPT_COLLISION_FREE)
+                .build())
+            .render(model);
+
+        assertThat(result, is("1"));
     }
 
     @Test
     public void javascriptCodeTag() throws Exception {
-        env.setSymbols(JAVASCRIPT_COLLISION_FREE);
+        JtwigModelMap model = new JtwigModelMap();
 
-        withResource("<# if (true) #>Hello<# endif #>");
-        assertThat(theResult(), is(equalTo("Hello")));
+        String result = JtwigTemplate
+            .inlineTemplate("<# if (true) #>Hello<# endif #>", JtwigConfigurationBuilder.newConfiguration()
+                .withSymbols(JAVASCRIPT_COLLISION_FREE)
+                .build())
+            .render(model);
+
+        assertThat(result, is("Hello"));
     }
 
     @Test
     public void javascriptComment() throws Exception {
-        env.setSymbols(JAVASCRIPT_COLLISION_FREE);
+        JtwigModelMap model = new JtwigModelMap();
 
-        withResource("<$ if (true) #>Hello<# endif $>");
-        assertThat(theResult(), is(equalTo("")));
+        String result = JtwigTemplate
+            .inlineTemplate("<$ if (true) #>Hello<# endif $>", JtwigConfigurationBuilder.newConfiguration()
+                .withSymbols(JAVASCRIPT_COLLISION_FREE)
+                .build())
+            .render(model);
+
+        assertThat(result, is(""));
     }
 }

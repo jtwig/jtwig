@@ -12,10 +12,13 @@
  * limitations under the License.
  */
 
-package org.jtwig;
+package org.jtwig.unit;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
+
+import org.jtwig.Environment;
+import org.jtwig.JtwigModelMap;
 import org.jtwig.compile.CompileContext;
 import org.jtwig.exception.ResourceException;
 import org.jtwig.loader.Loader;
@@ -38,13 +41,13 @@ public abstract class AbstractJtwigTest {
     public void before() throws Exception {
         output = new ByteArrayOutputStream();
         env = buildEnvironment();
-        env.setLoader(new ClasspathLoader());
+//        env.setLoader(new ClasspathLoader());
         model = new JtwigModelMap();
         resource = mock(Loader.Resource.class);
         buildContexts();
     }
     protected Environment buildEnvironment() {
-        return new Environment();
+        return spy(new Environment());
     }
     protected void buildContexts() {
         compileContext = spy(new CompileContext(resource, env));
@@ -73,7 +76,7 @@ public abstract class AbstractJtwigTest {
     
     //~ Operational ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     public void render() throws Exception {
-        env.compile(resource, compileContext)
+        env.compile(resource)
                 .render(renderContext);
     }
     public String theResult() throws Exception {

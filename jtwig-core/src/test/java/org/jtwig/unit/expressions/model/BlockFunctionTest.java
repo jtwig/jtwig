@@ -14,13 +14,12 @@
 
 package org.jtwig.unit.expressions.model;
 
-import org.jtwig.AbstractJtwigTest;
+import org.jtwig.unit.AbstractJtwigTest;
 import org.jtwig.content.model.BasicTemplate;
 import org.jtwig.content.model.Template;
 import org.jtwig.exception.CompileException;
 import org.jtwig.expressions.model.BlockFunction;
 import org.jtwig.expressions.model.Constant;
-import org.jtwig.MultiresourceUnitTest;
 import org.jtwig.content.model.compilable.Block;
 import org.jtwig.exception.CalculateException;
 import org.jtwig.exception.RenderException;

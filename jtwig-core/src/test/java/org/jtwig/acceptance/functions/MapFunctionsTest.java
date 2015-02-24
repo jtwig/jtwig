@@ -14,16 +14,23 @@
 
 package org.jtwig.acceptance.functions;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import org.jtwig.AbstractJtwigTest;
-import static org.jtwig.util.SyntacticSugar.then;
+import org.jtwig.JtwigModelMap;
+import org.jtwig.JtwigTemplate;
 import org.junit.Test;
 
-public class MapFunctionsTest extends AbstractJtwigTest {
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+
+public class MapFunctionsTest {
     @Test
     public void map() throws Exception {
-        withResource("{{ keys({ one:1, two:2 }) }}");
-        then(theResult(), is(equalTo("[one, two]")));
+        JtwigModelMap model = new JtwigModelMap();
+
+        String result = JtwigTemplate
+            .inlineTemplate("{{ keys({ one:1, two:2 }) }}")
+            .render(model);
+
+        assertThat(result, is(equalTo("[one, two]")));
     }
 }

@@ -14,26 +14,36 @@
 
 package org.jtwig.acceptance.issues;
 
-import static org.hamcrest.core.StringContains.containsString;
-import org.jtwig.AbstractJtwigTest;
-import static org.jtwig.util.SyntacticSugar.given;
-import static org.jtwig.util.SyntacticSugar.then;
+import org.jtwig.JtwigModelMap;
+import org.jtwig.JtwigTemplate;
 import org.junit.Test;
 
-public class Issue75Test extends AbstractJtwigTest {
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.StringContains.containsString;
+
+public class Issue75Test {
     @Test
     public void issue75IsNull() throws Exception {
-        given(theModel().withModelAttribute("a", new NullPointer()));
-        withResource("{% if a.value is null %}A{% else %}B{% endif %}");
-        then(theResult(), containsString("A"));
-    }
+        JtwigModelMap model = new JtwigModelMap();
+        model.withModelAttribute("a", new NullPointer());
 
+        String result = JtwigTemplate
+            .inlineTemplate("{% if a.value is null %}A{% else %}B{% endif %}")
+            .render(model);
+
+        assertThat(result, containsString("A"));
+    }
 
     @Test
     public void issue75IsNullWithParentheses() throws Exception {
-        given(theModel().withModelAttribute("a", new NullPointer()));
-        withResource("{% if (a.value) is null %}A{% else %}B{% endif %}");
-        then(theResult(), containsString("A"));
+        JtwigModelMap model = new JtwigModelMap();
+        model.withModelAttribute("a", new NullPointer());
+
+        String result = JtwigTemplate
+            .inlineTemplate("{% if (a.value) is null %}A{% else %}B{% endif %}")
+            .render(model);
+
+        assertThat(result, containsString("A"));
     }
 
     public class NullPointer {

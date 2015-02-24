@@ -14,22 +14,29 @@
 
 package org.jtwig.acceptance.issues;
 
-import static org.hamcrest.core.StringContains.containsString;
-import static org.hamcrest.core.StringStartsWith.startsWith;
-import org.jtwig.AbstractJtwigTest;
+import org.jtwig.JtwigModelMap;
+import org.jtwig.JtwigTemplate;
+import org.jtwig.configuration.JtwigConfigurationBuilder;
 import org.jtwig.exception.RenderException;
-import static org.jtwig.util.SyntacticSugar.given;
-import static org.jtwig.util.SyntacticSugar.then;
-import static org.junit.Assert.fail;
 import org.junit.Test;
 
-public class Issue76Test extends AbstractJtwigTest {
+import static org.hamcrest.core.StringContains.containsString;
+import static org.hamcrest.core.StringStartsWith.startsWith;
+import static org.jtwig.configuration.JtwigConfigurationBuilder.newConfiguration;
+import static org.jtwig.util.SyntacticSugar.then;
+import static org.junit.Assert.fail;
+
+public class Issue76Test {
 
     @Test
     public void shouldGiveNiceExplanationForNonExistingFunctionsWithParams() throws Exception {
         try {
-            withResource(classpathResource("templates/issue76/test3.twig"));
-            render();
+            JtwigModelMap model = new JtwigModelMap();
+
+            JtwigTemplate
+                .classpathTemplate("templates/issue76/test3.twig")
+                .render(model);
+
             fail();
         } catch (RenderException e) {
             then(e.getCause().getMessage(), containsString("templates/issue76/test3.twig -> Line 1, column 24: Unable to find function with name 'nonExistingFunction', and parameters: java.lang.String, java.lang.String, java.lang.Integer"));
@@ -39,8 +46,12 @@ public class Issue76Test extends AbstractJtwigTest {
     @Test
     public void shouldGiveNiceExplanationForNonExistingFunctions() throws Exception {
         try {
-            withResource(classpathResource("templates/issue76/test1.twig"));
-            render();
+            JtwigModelMap model = new JtwigModelMap();
+
+            JtwigTemplate
+                .classpathTemplate("templates/issue76/test1.twig")
+                .render(model);
+
             fail();
         } catch (RenderException e) {
             then(e.getCause().getMessage(), containsString("templates/issue76/test1.twig -> Line 1, column 24: Unable to find function with name 'nonExistingFunction'"));
@@ -50,9 +61,14 @@ public class Issue76Test extends AbstractJtwigTest {
     @Test
     public void shouldGiveNiceExplanationForNonExistingVariables() throws Exception {
         try {
-            given(theEnvironment().setStrictMode(true));
-            withResource(classpathResource("templates/issue76/test2.twig"));
-            render();
+            JtwigModelMap model = new JtwigModelMap();
+
+            JtwigTemplate
+                .classpathTemplate("templates/issue76/test2.twig", newConfiguration()
+                    .withStrictMode(true)
+                    .build())
+                .render(model);
+
             fail();
         } catch (RenderException e) {
             then(e.getCause().getMessage(), startsWith("templates/issue76/test2.twig -> Line 1, column 23:"));

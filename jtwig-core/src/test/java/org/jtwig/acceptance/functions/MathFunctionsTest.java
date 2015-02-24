@@ -14,34 +14,54 @@
 
 package org.jtwig.acceptance.functions;
 
-import org.jtwig.AbstractJtwigTest;
+import org.jtwig.JtwigModelMap;
+import org.jtwig.JtwigTemplate;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
-import static org.jtwig.util.SyntacticSugar.then;
-import static org.jtwig.util.SyntacticSugar.when;
+import static org.hamcrest.MatcherAssert.assertThat;
 
-public class MathFunctionsTest extends AbstractJtwigTest {
+public class MathFunctionsTest {
     @Test
     public void absTest() throws Exception {
-        withResource("{{ abs(-1) }}");
-        then(theResult(), is(equalTo("1")));
+        JtwigModelMap model = new JtwigModelMap();
+
+        String result = JtwigTemplate
+            .inlineTemplate("{{ abs(-1) }}")
+            .render(model);
+
+        assertThat(result, is(equalTo("1")));
     }
 
     @Test
     public void roundTest() throws Exception {
-        withResource("{{ round(1.12) }}");
-        then(theResult(), is(equalTo("1")));
+        JtwigModelMap model = new JtwigModelMap();
+
+        String result = JtwigTemplate
+            .inlineTemplate("{{ round(1.12) }}")
+            .render(model);
+
+        assertThat(result, is(equalTo("1")));
     }
     @Test
     public void roundCeilTest() throws Exception {
-        withResource("{{ round(1.12, 'ceil') }}");
-        then(theResult(), is(equalTo("2")));
+        JtwigModelMap model = new JtwigModelMap();
+
+        String result = JtwigTemplate
+            .inlineTemplate("{{ round(1.12, 'ceil') }}")
+            .render(model);
+
+        assertThat(result, is(equalTo("2")));
     }
     @Test
     public void roundFloorTest() throws Exception {
-        withResource("{{ round(1.62, 'floor') }}");
-        then(theResult(), is(equalTo("1")));
+        JtwigModelMap model = new JtwigModelMap();
+
+        String result = JtwigTemplate
+            .inlineTemplate("{{ round(1.62, 'floor') }}")
+            .render(model);
+
+        assertThat(result, is(equalTo("1")));
     }
 }

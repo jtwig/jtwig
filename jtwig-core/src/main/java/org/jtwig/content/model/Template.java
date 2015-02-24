@@ -50,10 +50,7 @@ public abstract class Template implements Compilable, ElementList<Compilable>, E
         }
         return null;
     }
-    public Sequence content() {
-        return content;
-    }
-    
+
     @Override
     public Template add(Compilable compilable) {
         content.add(compilable);
@@ -102,7 +99,7 @@ public abstract class Template implements Compilable, ElementList<Compilable>, E
         return result;
     }
     
-    public static abstract class CompiledTemplate implements ExecutionAware, Renderable {
+    public abstract static class CompiledTemplate implements ExecutionAware, Renderable {
         protected final JtwigPosition position;
         protected final Map<String, Block.CompiledBlock> blocks;
         protected final Map<String, Macro.Compiled> macros;
@@ -110,10 +107,10 @@ public abstract class Template implements Compilable, ElementList<Compilable>, E
         protected CompiledTemplate child;
         protected CompiledTemplate parent;
         
-        public CompiledTemplate(final JtwigPosition position,
-                final Map<String, Block.CompiledBlock> blocks,
-                final Map<String, Macro.Compiled> macros,
-                final Renderable content) {
+        protected CompiledTemplate(JtwigPosition position,
+                                   Map<String, Block.CompiledBlock> blocks,
+                                   Map<String, Macro.Compiled> macros,
+                                   Renderable content) {
             this.position = position;
             this.blocks = blocks;
             this.macros = macros;
@@ -125,14 +122,9 @@ public abstract class Template implements Compilable, ElementList<Compilable>, E
             child.parent = this;
             return this;
         }
-        public CompiledTemplate withParentTemplate(final CompiledTemplate parent) {
-            this.parent = parent;
-            parent.child = this;
-            return this;
-        }
-        
+
         @Override
-        public void render(final RenderContext context) throws RenderException {
+        public void render(RenderContext context) throws RenderException {
             context.pushRenderingTemplate(this);
             doRender(context);
             try {
@@ -154,12 +146,8 @@ public abstract class Template implements Compilable, ElementList<Compilable>, E
             }
             return this;
         }
-        
-        //~ Block mgmt ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        public Map<String, Block.CompiledBlock> blocks() {
-            return blocks;
-        }
-        public Block.CompiledBlock block(final String name) {
+
+        public Block.CompiledBlock block(String name) {
             if (child != null) {
                 Block.CompiledBlock block = child.block(name);
                 if (block != null) {
@@ -172,25 +160,11 @@ public abstract class Template implements Compilable, ElementList<Compilable>, E
             }
             return null;
         }
-        public Block.CompiledBlock parentBlock(final String name) {
-            if (blocks.containsKey(name)) {
-                return blocks.get(name);
-            }
-            
-            if (parent != null) {
-                Block.CompiledBlock block = parent.parentBlock(name);
-                if (block != null) {
-                    return block;
-                }
-            }
-            
-            return null;
-        }
-        
+
         public Map<String, Macro.Compiled> macros() {
             return macros;
         }
-        public Macro.Compiled macro(final String name) {
+        public Macro.Compiled macro(String name) {
             if (macros.containsKey(name)) {
                 return macros.get(name);
             }
@@ -200,20 +174,15 @@ public abstract class Template implements Compilable, ElementList<Compilable>, E
         //~ ExecutionAware impl ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         @Override
         public Object execute(
-                final RenderContext ctx,
-                final String name,
-                final Object... parameters)
+                RenderContext ctx,
+                String name,
+                Object... parameters)
                 throws RenderException {
             // Check for macros
             if (macros.containsKey(name)) {
                 return macros.get(name).execute(ctx, null, parameters);
             }
             return null;
-        }
-
-        @Override
-        public String toString() {
-            return getClass().getSimpleName()+"["+position.getResource()+"]";
         }
     }
 }

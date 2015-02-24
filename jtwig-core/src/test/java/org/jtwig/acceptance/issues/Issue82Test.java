@@ -14,16 +14,23 @@
 
 package org.jtwig.acceptance.issues;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import org.jtwig.AbstractJtwigTest;
-import static org.jtwig.util.SyntacticSugar.then;
+import org.jtwig.JtwigModelMap;
+import org.jtwig.JtwigTemplate;
 import org.junit.Test;
 
-public class Issue82Test extends AbstractJtwigTest {
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+
+public class Issue82Test {
     @Test
     public void issue82() throws Exception {
-        withResource("{{ notice }}");
-        then(theResult(), is(equalTo("")));
+        JtwigModelMap model = new JtwigModelMap();
+
+        String result = JtwigTemplate
+            .inlineTemplate("{{ notice }}")
+            .render(model);
+
+        assertThat(result, is(equalTo("")));
     }
 }

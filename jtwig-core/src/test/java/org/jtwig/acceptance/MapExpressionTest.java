@@ -18,34 +18,56 @@ import java.util.Collections;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
-import org.jtwig.AbstractJtwigTest;
-import static org.jtwig.util.SyntacticSugar.then;
+
+import org.jtwig.JtwigModelMap;
+import org.jtwig.JtwigTemplate;
 import org.junit.Test;
 
-public class MapExpressionTest extends AbstractJtwigTest {
+public class MapExpressionTest {
     @Test
     public void mapWithStringLiteralsAsKey () throws Exception {
-        withResource("{% set a = { 'test two': 'details' } %}{{ a['test two'] }}");
-        then(theResult(), is(equalTo("details")));
+        JtwigModelMap model = new JtwigModelMap();
+
+        String result = JtwigTemplate
+            .inlineTemplate("{% set a = { 'test two': 'details' } %}{{ a['test two'] }}")
+            .render(model);
+
+        assertThat(result, is(equalTo("details")));
     }
 
     @Test
     public void ifWithEmptyMapShouldBeTheSameAsFalse () throws Exception {
+        JtwigModelMap model = new JtwigModelMap();
         model.withModelAttribute("map", Collections.EMPTY_MAP);
-        withResource("{% if (map) %}not empty{% else %}empty{% endif %}");
-        assertThat(theResult(), is("empty"));
+
+        String result = JtwigTemplate
+            .inlineTemplate("{% if (map) %}not empty{% else %}empty{% endif %}")
+            .render(model);
+
+        assertThat(result, is(equalTo("empty")));
     }
 
     @Test
     public void ifNoKeyInMapTryMethods () throws Exception {
+        JtwigModelMap model = new JtwigModelMap();
         model.withModelAttribute("map", Collections.EMPTY_MAP);
-        withResource("{{ map.size }}");
-        assertThat(theResult(), is("0"));
+
+        String result = JtwigTemplate
+            .inlineTemplate("{{ map.size }}")
+            .render(model);
+
+        assertThat(result, is(equalTo("0")));
     }
+
     @Test
     public void methodsAndFieldsShouldPrevail () throws Exception {
+        JtwigModelMap model = new JtwigModelMap();
         model.withModelAttribute("map", Collections.singletonMap("size", "Hello!"));
-        withResource("{{ map.size }}");
-        assertThat(theResult(), is("1"));
+
+        String result = JtwigTemplate
+            .inlineTemplate("{{ map.size }}")
+            .render(model);
+
+        assertThat(result, is(equalTo("1")));
     }
 }

@@ -14,52 +14,95 @@
 
 package org.jtwig.acceptance.functions;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import org.jtwig.AbstractJtwigTest;
-import static org.jtwig.util.SyntacticSugar.then;
+import org.jtwig.JtwigModelMap;
+import org.jtwig.JtwigTemplate;
 import org.junit.Test;
 
-public class NumberFunctionsTest extends AbstractJtwigTest {
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+
+public class NumberFunctionsTest {
     @Test
     public void testDefaultBehaviorWithoutSeparators() throws Exception {
-        withResource("{{ number_format(100000.1) }}");
-        then(theResult(), is(equalTo("100000.1")));
+        JtwigModelMap model = new JtwigModelMap();
+
+        String result = JtwigTemplate
+            .inlineTemplate("{{ number_format(100000.1) }}")
+            .render(model);
+
+        assertThat(result, is(equalTo("100000.1")));
     }
 
     @Test
     public void testWithTwoDecimalDigits() throws Exception {
-        withResource("{{ number_format(100000.1, 2) }}");
-        then(theResult(), is(equalTo("100000.10")));
+        JtwigModelMap model = new JtwigModelMap();
+
+        String result = JtwigTemplate
+            .inlineTemplate("{{ number_format(100000.1, 2) }}")
+            .render(model);
+
+        assertThat(result, is(equalTo("100000.10")));
     }
     @Test
     public void testWithCommaSeparatingDecimal() throws Exception {
-        withResource("{{ number_format(100000.1, 2, ',') }}");
-        then(theResult(), is(equalTo("100000,10")));
+        JtwigModelMap model = new JtwigModelMap();
+
+        String result = JtwigTemplate
+            .inlineTemplate("{{ number_format(100000.1, 2, ',') }}")
+            .render(model);
+
+        assertThat(result, is(equalTo("100000,10")));
     }
     @Test
     public void testWithThousandsSeparator() throws Exception {
-        withResource("{{ number_format(100000.1, 2, ',', ' ') }}");
-        then(theResult(), is(equalTo("100 000,10")));
+        JtwigModelMap model = new JtwigModelMap();
+
+        String result = JtwigTemplate
+            .inlineTemplate("{{ number_format(100000.1, 2, ',', ' ') }}")
+            .render(model);
+
+        assertThat(result, is(equalTo("100 000,10")));
     }
     @Test
     public void rangeTest() throws Exception {
-        withResource("{{ range(1,3) }}");
-        then(theResult(), is(equalTo("[1, 2, 3]")));
+        JtwigModelMap model = new JtwigModelMap();
+
+        String result = JtwigTemplate
+            .inlineTemplate("{{ range(1,3) }}")
+            .render(model);
+
+        assertThat(result, is(equalTo("[1, 2, 3]")));
     }
     @Test
     public void rangeStepTest() throws Exception {
-        withResource("{{ range(1, 3, 2) }}");
-        then(theResult(), is(equalTo("[1, 3]")));
+        JtwigModelMap model = new JtwigModelMap();
+
+        String result = JtwigTemplate
+            .inlineTemplate("{{ range(1, 3, 2) }}")
+            .render(model);
+
+        assertThat(result, is(equalTo("[1, 3]")));
     }
+
     @Test
     public void rangeCharTest() throws Exception {
-        withResource("{{ range('a', 'c') }}");
-        then(theResult(), is(equalTo("[a, b, c]")));
+        JtwigModelMap model = new JtwigModelMap();
+
+        String result = JtwigTemplate
+            .inlineTemplate("{{ range('a', 'c') }}")
+            .render(model);
+
+        assertThat(result, is(equalTo("[a, b, c]")));
     }
     @Test
     public void rangeStringTest() throws Exception {
-        withResource("{{ range(\"AA\", \"BZ\") }}");
-        then(theResult(), is(equalTo("[A, B]")));
+        JtwigModelMap model = new JtwigModelMap();
+
+        String result = JtwigTemplate
+            .inlineTemplate("{{ range(\"AA\", \"BZ\") }}")
+            .render(model);
+
+        assertThat(result, is(equalTo("[A, B]")));
     }
 }

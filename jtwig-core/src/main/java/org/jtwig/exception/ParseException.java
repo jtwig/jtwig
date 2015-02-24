@@ -14,7 +14,7 @@
 
 package org.jtwig.exception;
 
-public class ParseException extends Exception {
+public class ParseException extends JtwigException {
     private String expression;
 
     public ParseException(Throwable cause) {

@@ -14,24 +14,35 @@
 
 package org.jtwig.acceptance.functions;
 
-import org.jtwig.AbstractJtwigTest;
+import org.jtwig.JtwigModelMap;
+import org.jtwig.JtwigTemplate;
 import org.junit.Test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
-import static org.jtwig.util.SyntacticSugar.*;
 
-public class BlockFunctionTest extends AbstractJtwigTest {
+public class BlockFunctionTest {
     @Test
     public void ensureBlockFunctionWorksWithVariables() throws Exception {
-        given(theModel().withModelAttribute("var", "title"));
-        withResource(classpathResource("templates/acceptance/block/tested.twig"));
-        then(theResult(), is(equalTo("title!")));
+        JtwigModelMap model = new JtwigModelMap();
+        model.withModelAttribute("var", "title");
+
+        String result = JtwigTemplate
+            .classpathTemplate("templates/acceptance/block/tested.twig")
+            .render(model);
+
+        assertThat(result, is(equalTo("title!")));
     }
     @Test
     public void ensureBlockFunctionWorksWithVariables2() throws Exception {
-        given(theModel().withModelAttribute("var", "body"));
-        withResource(classpathResource("templates/acceptance/block/tested.twig"));
-        then(theResult(), is(equalTo("body!")));
+        JtwigModelMap model = new JtwigModelMap();
+        model.withModelAttribute("var", "body");
+
+        String result = JtwigTemplate
+            .classpathTemplate("templates/acceptance/block/tested.twig")
+            .render(model);
+
+        assertThat(result, is(equalTo("body!")));
     }
 }

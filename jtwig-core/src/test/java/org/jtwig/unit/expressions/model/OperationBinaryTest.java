@@ -14,7 +14,7 @@
 
 package org.jtwig.unit.expressions.model;
 
-import org.jtwig.AbstractJtwigTest;
+import org.jtwig.unit.AbstractJtwigTest;
 import org.jtwig.compile.CompileContext;
 import org.jtwig.exception.CompileException;
 import org.jtwig.expressions.api.CompilableExpression;

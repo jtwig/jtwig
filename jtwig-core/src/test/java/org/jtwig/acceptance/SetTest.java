@@ -14,15 +14,23 @@
 
 package org.jtwig.acceptance;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import org.jtwig.AbstractJtwigTest;
+import org.jtwig.JtwigModelMap;
+import org.jtwig.JtwigTemplate;
 import org.junit.Test;
 
-public class SetTest extends AbstractJtwigTest {
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsEqual.equalTo;
+
+public class SetTest {
     @Test
     public void testShouldChangeTheContext() throws Exception {
-        withResource("{% set a = 1 %}{{ a }}");
-        assertThat(theResult(), is("1"));
+        JtwigModelMap model = new JtwigModelMap();
+
+        String result = JtwigTemplate
+            .inlineTemplate("{% set a = 1 %}{{ a }}")
+            .render(model);
+
+        assertThat(result, is(equalTo("1")));
     }
 }

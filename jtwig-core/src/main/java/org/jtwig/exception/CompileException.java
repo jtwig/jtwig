@@ -14,7 +14,7 @@
 
 package org.jtwig.exception;
 
-public class CompileException extends Exception {
+public class CompileException extends JtwigException {
     public CompileException(String message) {
         super(message);
     }

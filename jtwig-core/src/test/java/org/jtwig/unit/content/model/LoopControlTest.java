@@ -15,7 +15,7 @@
 package org.jtwig.unit.content.model;
 
 import static java.util.Arrays.asList;
-import org.jtwig.AbstractJtwigTest;
+import org.jtwig.unit.AbstractJtwigTest;
 import org.jtwig.compile.CompileContext;
 import org.jtwig.content.api.Compilable;
 import org.jtwig.content.api.Renderable;

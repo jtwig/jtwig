@@ -14,27 +14,38 @@
 
 package org.jtwig.acceptance.issues;
 
-import org.jtwig.AbstractJtwigTest;
+import org.jtwig.JtwigModelMap;
+import org.jtwig.JtwigTemplate;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
-import static org.jtwig.util.SyntacticSugar.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.jtwig.util.SyntacticSugar.given;
+import static org.jtwig.util.SyntacticSugar.then;
 
-public class Issue142Test extends AbstractJtwigTest {
+public class Issue142Test {
     @Test
     public void longFirstArgEvaluation() throws Exception {
-        given(theModel().withModelAttribute("var", 5L));
-        withResource("{{ var == 5 }}");
-        then(theResult(), is(equalTo("1")));
+        JtwigModelMap model = new JtwigModelMap();
+        model.withModelAttribute("var", 5L);
+
+        String result = JtwigTemplate
+            .inlineTemplate("{{ var == 5 }}")
+            .render(model);
+
+        assertThat(result, is(equalTo("1")));
     }
-
-
 
     @Test
     public void longSecondArgEvaluation() throws Exception {
-        given(theModel().withModelAttribute("var", 5L));
-        withResource("{{ 5 == var }}");
-        then(theResult(), is(equalTo("1")));
+        JtwigModelMap model = new JtwigModelMap();
+        model.withModelAttribute("var", 5L);
+
+        String result = JtwigTemplate
+            .inlineTemplate("{{ 5 == var }}")
+            .render(model);
+
+        assertThat(result, is(equalTo("1")));
     }
 }

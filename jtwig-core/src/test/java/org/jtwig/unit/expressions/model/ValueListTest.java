@@ -18,7 +18,7 @@ import java.util.List;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
-import org.jtwig.AbstractJtwigTest;
+import org.jtwig.unit.AbstractJtwigTest;
 import org.jtwig.exception.ParseBypassException;
 import org.jtwig.expressions.model.Constant;
 import org.jtwig.expressions.model.ValueList;

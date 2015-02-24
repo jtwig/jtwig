@@ -15,7 +15,7 @@ package org.jtwig.unit.content.model;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import org.jtwig.AbstractJtwigTest;
+import org.jtwig.unit.AbstractJtwigTest;
 import org.jtwig.Environment;
 import org.jtwig.compile.CompileContext;
 import org.jtwig.content.api.Renderable;

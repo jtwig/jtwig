@@ -73,6 +73,18 @@ public class FileLoaderTest {
         loader.get("../sample.twig");
     }
 
+    @Test(expected = ResourceException.class)
+    public void fileDeletedInTheMeanwhile() throws Exception {
+        File file = new File("testFile.txt");
+        file.createNewFile();
+
+        FileLoader loader = new FileLoader(new File[]{file.getParentFile()});
+        FileLoader.FileResource fileResource = loader.get("testFile.txt");
+        file.delete();
+
+        fileResource.source();
+    }
+
     private URL getResourceDirectory() {
         String existingResource = "templates/unit/sample.twig";
         URL resource = getClass().getResource(String.format("/%s", existingResource));

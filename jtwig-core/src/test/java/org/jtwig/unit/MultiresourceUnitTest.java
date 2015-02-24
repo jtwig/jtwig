@@ -12,15 +12,16 @@
  * limitations under the License.
  */
 
-package org.jtwig;
+package org.jtwig.unit;
 
 import java.io.ByteArrayInputStream;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.jtwig.Environment;
 import org.jtwig.exception.ResourceException;
 import org.jtwig.loader.Loader;
+import org.jtwig.unit.AbstractJtwigTest;
 import org.jtwig.util.LoaderUtil;
 import org.junit.Before;
 import static org.mockito.Mockito.*;
