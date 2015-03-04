@@ -14,17 +14,19 @@
 
 package org.jtwig.util.render;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.util.Collection;
 import java.util.Locale;
+
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RenderHttpServletResponse implements HttpServletResponse {
     private static Logger LOG = LoggerFactory.getLogger(RenderHttpServletResponse.class);
@@ -136,7 +138,27 @@ public class RenderHttpServletResponse implements HttpServletResponse {
         LOG.debug("You can't set the status when including. Only the main request can do that!");
     }
 
-    @Override
+	@Override public int getStatus() {
+		LOG.debug("Operation not supported on embed content");
+		return 0;
+	}
+
+	@Override public String getHeader(String name) {
+		LOG.debug("Operation not supported on embed content");
+		return null;
+	}
+
+	@Override public Collection<String> getHeaders(String name) {
+		LOG.debug("Operation not supported on embed content");
+		return null;
+	}
+
+	@Override public Collection<String> getHeaderNames() {
+		LOG.debug("Operation not supported on embed content");
+		return null;
+	}
+
+	@Override
     public String getCharacterEncoding() {
         LOG.debug("Operation not supported on embed content");
         return null;
