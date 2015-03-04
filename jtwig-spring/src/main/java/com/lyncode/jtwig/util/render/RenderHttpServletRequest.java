@@ -14,25 +14,23 @@
 
 package com.lyncode.jtwig.util.render;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.parboiled.common.StringUtils;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
+import static com.lyncode.jtwig.util.FilePath.path;
+import static com.lyncode.jtwig.util.ObjectSnapshot.snapshot;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletInputStream;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.io.*;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.security.Principal;
 import java.util.*;
 
-import static com.lyncode.jtwig.util.FilePath.path;
-import static com.lyncode.jtwig.util.ObjectSnapshot.snapshot;
+import javax.servlet.*;
+import javax.servlet.http.*;
+
+import org.parboiled.common.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 
 public class RenderHttpServletRequest implements HttpServletRequest {
     private static Logger LOG = LoggerFactory.getLogger(RenderHttpServletRequest.class);
@@ -208,7 +206,7 @@ public class RenderHttpServletRequest implements HttpServletRequest {
         else
             values = postParameters.get(name);
 
-        return values.isEmpty() ? null : values.get(0);
+        return (values == null || values.isEmpty()) ? null : values.get(0);
     }
 
     @Override
@@ -342,7 +340,27 @@ public class RenderHttpServletRequest implements HttpServletRequest {
         return isRequestedSessionIdFromURL();
     }
 
-    @Override
+	@Override public boolean authenticate(HttpServletResponse response) throws IOException, ServletException {
+		return this.initialValues.authenticate(response);
+	}
+
+	@Override public void login(String username, String password) throws ServletException {
+		this.initialValues.login(username, password);
+	}
+
+	@Override public void logout() throws ServletException {
+		this.initialValues.logout();
+	}
+
+	@Override public Collection<Part> getParts() throws IOException, ServletException {
+		return this.initialValues.getParts();
+	}
+
+	@Override public Part getPart(String name) throws IOException, ServletException {
+		return this.initialValues.getPart(name);
+	}
+
+	@Override
     public String getCharacterEncoding() {
         return initialValues.getCharacterEncoding();
     }
@@ -428,7 +446,35 @@ public class RenderHttpServletRequest implements HttpServletRequest {
         return initialValues.getLocalPort();
     }
 
-    private String encode(String value) {
+	@Override public ServletContext getServletContext() {
+		return this.initialValues.getServletContext();
+	}
+
+	@Override public AsyncContext startAsync() throws IllegalStateException {
+		return this.initialValues.startAsync();
+	}
+
+	@Override public AsyncContext startAsync(ServletRequest servletRequest, ServletResponse servletResponse) throws IllegalStateException {
+		return null;
+	}
+
+	@Override public boolean isAsyncStarted() {
+		return this.initialValues.isAsyncStarted();
+	}
+
+	@Override public boolean isAsyncSupported() {
+		return this.initialValues.isAsyncSupported();
+	}
+
+	@Override public AsyncContext getAsyncContext() {
+		return this.initialValues.getAsyncContext();
+	}
+
+	@Override public DispatcherType getDispatcherType() {
+		return this.initialValues.getDispatcherType();
+	}
+
+	private String encode(String value) {
         String encoding = Charset.defaultCharset().displayName();
         try {
             return URLEncoder.encode(value, encoding);
