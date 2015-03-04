@@ -14,23 +14,22 @@
 
 package com.lyncode.jtwig.util.render;
 
-import static com.lyncode.jtwig.util.FilePath.path;
-import static com.lyncode.jtwig.util.ObjectSnapshot.snapshot;
+import org.parboiled.common.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 
+import javax.servlet.*;
+import javax.servlet.http.*;
 import java.io.*;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.security.Principal;
 import java.util.*;
 
-import javax.servlet.*;
-import javax.servlet.http.*;
-
-import org.parboiled.common.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
+import static com.lyncode.jtwig.util.FilePath.path;
+import static com.lyncode.jtwig.util.ObjectSnapshot.snapshot;
 
 public class RenderHttpServletRequest implements HttpServletRequest {
     private static Logger LOG = LoggerFactory.getLogger(RenderHttpServletRequest.class);
@@ -184,6 +183,16 @@ public class RenderHttpServletRequest implements HttpServletRequest {
     }
 
     @Override
+    public long getContentLengthLong() {
+        try {
+            return (content == null) ? 0 : content.available();
+        } catch (IOException e) {
+            LOG.error("Can't get the content size of the content body", e);
+            return 0;
+        }
+    }
+
+    @Override
     public String getContentType() {
         return mediaType.getType();
     }
@@ -191,6 +200,27 @@ public class RenderHttpServletRequest implements HttpServletRequest {
     @Override
     public ServletInputStream getInputStream() throws IOException {
         return new ServletInputStream() {
+            ReadListener readListener;
+
+            @Override
+            public boolean isFinished() {
+                try {
+                    return content.available() != 0;
+                } catch (IOException e) {
+                    return true;
+                }
+            }
+
+            @Override
+            public boolean isReady() {
+                return !this.isFinished();
+            }
+
+            @Override
+            public void setReadListener(ReadListener readListener) {
+                this.readListener = readListener;
+            }
+
             @Override
             public int read() throws IOException {
                 return content.read();
@@ -321,6 +351,11 @@ public class RenderHttpServletRequest implements HttpServletRequest {
     }
 
     @Override
+    public String changeSessionId() {
+        return this.initialValues.changeSessionId();
+    }
+
+    @Override
     public boolean isRequestedSessionIdValid() {
         return initialValues.isRequestedSessionIdValid();
     }
@@ -360,7 +395,12 @@ public class RenderHttpServletRequest implements HttpServletRequest {
 		return this.initialValues.getPart(name);
 	}
 
-	@Override
+    @Override
+    public <T extends HttpUpgradeHandler> T upgrade(Class<T> handlerClass) throws IOException, ServletException {
+        return this.initialValues.upgrade(handlerClass);
+    }
+
+    @Override
     public String getCharacterEncoding() {
         return initialValues.getCharacterEncoding();
     }
