@@ -17,23 +17,40 @@ package org.jtwig.util.render;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.util.Collection;
 import java.util.Locale;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
+
 public class RenderHttpServletResponse implements HttpServletResponse {
+
     private static Logger LOG = LoggerFactory.getLogger(RenderHttpServletResponse.class);
 
     private int contentLength = 0;
+    private long contentLengthLong = 0;
     private OutputStream output = new ByteArrayOutputStream();
     private PrintWriter writer = new PrintWriter(output);
 
     private ServletOutputStream outputStream = new ServletOutputStream() {
+        private WriteListener writeListener;
+
+        @Override
+        public boolean isReady() {
+            return true;
+        }
+
+        @Override
+        public void setWriteListener(WriteListener writeListener) {
+            this.writeListener = writeListener;
+        }
+
         @Override
         public void write(int b) throws IOException {
             output.write(b);
@@ -137,6 +154,30 @@ public class RenderHttpServletResponse implements HttpServletResponse {
     }
 
     @Override
+    public int getStatus() {
+        LOG.debug("Operation not supported on embed content");
+        return 0;
+    }
+
+    @Override
+    public String getHeader(String name) {
+        LOG.debug("Operation not supported on embed content");
+        return null;
+    }
+
+    @Override
+    public Collection<String> getHeaders(String name) {
+        LOG.debug("Operation not supported on embed content");
+        return null;
+    }
+
+    @Override
+    public Collection<String> getHeaderNames() {
+        LOG.debug("Operation not supported on embed content");
+        return null;
+    }
+
+    @Override
     public String getCharacterEncoding() {
         LOG.debug("Operation not supported on embed content");
         return null;
@@ -166,6 +207,11 @@ public class RenderHttpServletResponse implements HttpServletResponse {
     @Override
     public void setContentLength(int len) {
         this.contentLength = len;
+    }
+
+    @Override
+    public void setContentLengthLong(long len) {
+        this.contentLengthLong = len;
     }
 
     @Override
@@ -213,5 +259,4 @@ public class RenderHttpServletResponse implements HttpServletResponse {
         LOG.debug("Operation not supported on embed content");
         return null;
     }
-
 }

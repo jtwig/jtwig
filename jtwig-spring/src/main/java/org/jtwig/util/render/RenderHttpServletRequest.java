@@ -20,16 +20,40 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletInputStream;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.security.Principal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Vector;
+
+import javax.servlet.AsyncContext;
+import javax.servlet.DispatcherType;
+import javax.servlet.ReadListener;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.ServletInputStream;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpUpgradeHandler;
+import javax.servlet.http.Part;
 
 import static org.jtwig.util.FilePath.path;
 import static org.jtwig.util.ObjectSnapshot.snapshot;
@@ -186,6 +210,16 @@ public class RenderHttpServletRequest implements HttpServletRequest {
     }
 
     @Override
+    public long getContentLengthLong() {
+        try {
+            return (content == null) ? 0 : content.available();
+        } catch (IOException e) {
+            LOG.error("Can't get the content size of the content body", e);
+            return 0;
+        }
+    }
+
+    @Override
     public String getContentType() {
         return mediaType.getType();
     }
@@ -193,6 +227,27 @@ public class RenderHttpServletRequest implements HttpServletRequest {
     @Override
     public ServletInputStream getInputStream() throws IOException {
         return new ServletInputStream() {
+            ReadListener readListener;
+
+            @Override
+            public boolean isFinished() {
+                try {
+                    return content.available() != 0;
+                } catch (IOException e) {
+                    return true;
+                }
+            }
+
+            @Override
+            public boolean isReady() {
+                return !this.isFinished();
+            }
+
+            @Override
+            public void setReadListener(ReadListener readListener) {
+                this.readListener = readListener;
+            }
+
             @Override
             public int read() throws IOException {
                 return content.read();
@@ -208,7 +263,7 @@ public class RenderHttpServletRequest implements HttpServletRequest {
         else
             values = postParameters.get(name);
 
-        return values.isEmpty() ? null : values.get(0);
+        return (values == null || values.isEmpty()) ? null : values.get(0);
     }
 
     @Override
@@ -323,6 +378,11 @@ public class RenderHttpServletRequest implements HttpServletRequest {
     }
 
     @Override
+    public String changeSessionId() {
+        return this.initialValues.changeSessionId();
+    }
+
+    @Override
     public boolean isRequestedSessionIdValid() {
         return initialValues.isRequestedSessionIdValid();
     }
@@ -340,6 +400,31 @@ public class RenderHttpServletRequest implements HttpServletRequest {
     @Override
     public boolean isRequestedSessionIdFromUrl() {
         return isRequestedSessionIdFromURL();
+    }
+
+	@Override public boolean authenticate(HttpServletResponse response) throws IOException, ServletException {
+		return this.initialValues.authenticate(response);
+	}
+
+	@Override public void login(String username, String password) throws ServletException {
+		this.initialValues.login(username, password);
+	}
+
+	@Override public void logout() throws ServletException {
+		this.initialValues.logout();
+	}
+
+	@Override public Collection<Part> getParts() throws IOException, ServletException {
+		return this.initialValues.getParts();
+	}
+
+	@Override public Part getPart(String name) throws IOException, ServletException {
+		return this.initialValues.getPart(name);
+	}
+
+    @Override
+    public <T extends HttpUpgradeHandler> T upgrade(Class<T> handlerClass) throws IOException, ServletException {
+        return this.initialValues.upgrade(handlerClass);
     }
 
     @Override
@@ -428,7 +513,35 @@ public class RenderHttpServletRequest implements HttpServletRequest {
         return initialValues.getLocalPort();
     }
 
-    private String encode(String value) {
+	@Override public ServletContext getServletContext() {
+		return this.initialValues.getServletContext();
+	}
+
+	@Override public AsyncContext startAsync() throws IllegalStateException {
+		return this.initialValues.startAsync();
+	}
+
+	@Override public AsyncContext startAsync(ServletRequest servletRequest, ServletResponse servletResponse) throws IllegalStateException {
+		return null;
+	}
+
+	@Override public boolean isAsyncStarted() {
+		return this.initialValues.isAsyncStarted();
+	}
+
+	@Override public boolean isAsyncSupported() {
+		return this.initialValues.isAsyncSupported();
+	}
+
+	@Override public AsyncContext getAsyncContext() {
+		return this.initialValues.getAsyncContext();
+	}
+
+	@Override public DispatcherType getDispatcherType() {
+		return this.initialValues.getDispatcherType();
+	}
+
+	private String encode(String value) {
         String encoding = Charset.defaultCharset().displayName();
         try {
             return URLEncoder.encode(value, encoding);
