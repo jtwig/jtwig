@@ -33,6 +33,9 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
 
 import static org.springframework.http.HttpMethod.GET;
 
@@ -107,5 +110,26 @@ public class SpringFunctions {
         } catch (ServletException | IOException e) {
             throw new FunctionException(e);
         }
+    }
+
+    @JtwigFunction(name = "render")
+    public String render(final HttpServletRequest request, @Parameter final String url, @Parameter final Map<String, String> parameters, long timeout) throws FunctionException {
+        FutureTask<String> future = new FutureTask<String>(new Callable<String>() {
+            @Override
+            public String call() throws Exception {
+                return render(request, url, parameters);
+            }
+        });
+
+        try {
+            String result = future.get(timeout, TimeUnit.MILLISECONDS);
+            if (result != null) {
+                return result;
+            }
+        } catch (Exception e){
+            future.cancel(true);
+        }
+
+        return "";
     }
 }
