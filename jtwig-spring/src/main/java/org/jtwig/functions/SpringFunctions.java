@@ -121,6 +121,8 @@ public class SpringFunctions {
             }
         });
 
+        new Thread(future).start();
+
         try {
             String result = future.get(timeout, TimeUnit.MILLISECONDS);
             if (result != null) {
