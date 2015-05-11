@@ -14,20 +14,20 @@
 
 package org.jtwig.unit.util;
 
-import org.jtwig.render.RenderContext;
-import org.jtwig.util.ObjectExtractor;
-import org.junit.Test;
-import org.mockito.Mockito;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
+import org.jtwig.render.RenderContext;
+import org.jtwig.util.ObjectExtractor;
+import org.junit.Test;
+import org.mockito.Mockito;
 
 public class ObjectExtractorTest {
     @Test
@@ -56,6 +56,20 @@ public class ObjectExtractorTest {
         assertEquals("a", underTest.extract("a"));
         assertEquals("b", underTest.extract("b"));
     }
+	
+	@Test
+	public void shouldExtractFieldByGetter() throws ObjectExtractor.ExtractException {
+		C c = new C();
+		c.setValue(2);
+		
+		ObjectExtractor underTest = new ObjectExtractor(Mockito.mock(RenderContext.class), c);
+		
+		//direct
+		assertEquals(2, underTest.extract("value"));
+		
+		//getter
+		assertEquals(2, underTest.extract("valueM"));
+	}
 
 	@Test
 	public void shouldExtractFromStaticMethod() throws ObjectExtractor.ExtractException
@@ -85,4 +99,21 @@ public class ObjectExtractorTest {
     public static class B extends A {
         public String b;
     }
+	
+	public static class C {
+		private int value;
+
+		public int getValue() {
+			return value;
+		}
+		
+		@SuppressWarnings("unused")
+		public int getValueM() {
+			return value;
+		}
+
+		public void setValue(int value) {
+			this.value = value;
+		}
+	}
 }

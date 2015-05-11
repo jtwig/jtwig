@@ -14,25 +14,22 @@
 
 package org.jtwig.util;
 
-import com.google.common.base.Predicate;
-import org.hamcrest.Matcher;
-import org.jtwig.render.RenderContext;
+import static org.jtwig.types.Undefined.UNDEFINED;
 
-import javax.annotation.Nullable;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.reflect.FieldUtils;
+import org.apache.commons.lang3.reflect.MethodUtils;
+import org.apache.commons.lang3.text.WordUtils;
 import org.jtwig.content.api.ability.ExecutionAware;
 import org.jtwig.exception.RenderException;
-import static org.jtwig.types.Undefined.UNDEFINED;
-import static org.reflections.ReflectionUtils.getAllFields;
-import static org.reflections.ReflectionUtils.getAllMethods;
+import org.jtwig.render.RenderContext;
 
 public class ObjectExtractor {
     private RenderContext renderContext;
@@ -51,7 +48,7 @@ public class ObjectExtractor {
                 throw new ExtractException(ex);
             }
         }
-        
+
         List<Callable> callables = new ArrayList<>();
 
         if (parameters.length == 0) {
@@ -88,44 +85,28 @@ public class ObjectExtractor {
     }
 
     private boolean knownType(Object context) {
-        if (context instanceof Map)
-            return true;
-        else return false;
+	    return context instanceof Map;
     }
 
     private Callable tryField() {
         return new Callable() {
             @Override
             public Result<Object> execute(String name, Object... args) {
-                Set<Field> fields = getAllFields(context.getClass(), fieldPredicate(name));
-                if (!fields.isEmpty()) {
-                    Iterator<Field> iterator = fields.iterator();
-                    while (iterator.hasNext()) {
-                        try {
-                            return new Result<Object>(iterator.next().get(context));
-                        } catch (IllegalAccessException e) {
-                            // do nothing
-                        }
-                    }
-                    return new Result<Object>();
-                } else return new Result<Object>();
+	            Field field = FieldUtils.getField(getClassForContext(context), name, true);
+
+                if (field != null) {
+	                try {
+		                return new Result<>(field.get(context));
+	                }
+	                catch(IllegalAccessException e) {
+		                return new Result<>();
+	                }
+                } else return new Result<>();
             }
         };
     }
 
-    private Predicate<Field> fieldPredicate(final String name) {
-        return new Predicate<Field>() {
-            @Override
-            public boolean apply(@Nullable Field field) {
-
-
-                if (field == null) return false;
-                return equalToIgnoringCase(name).matches(field.getName());
-            }
-        };
-    }
-
-    private Callable tryMethod() {
+	private Callable tryMethod() {
         return new Callable() {
             @Override
             public Result<Object> execute(final String name, Object... args) throws ExtractException {
@@ -135,48 +116,54 @@ public class ObjectExtractor {
                         "has"
                 };
 
-	            Class clazz = context instanceof Class ? (Class) context  : context.getClass();
+	            Class clazz = getClassForContext(context);
 
-                Set<Method> methods = getAllMethods(clazz, methodMatcher(equalToIgnoringCase(name), args.length));
-                int i = 0;
-                while (methods.isEmpty() && i < prefixes.length) {
-                    methods = getAllMethods(clazz, methodMatcher(equalToIgnoringCase(prefixes[i++] + name), args.length));
-                }
+	            Method method = MethodUtils.getMatchingAccessibleMethod(clazz, name, 
+			            getParametersClasses(args));
 
-                if (!methods.isEmpty()) {
-                    Iterator<Method> iterator = methods.iterator();
-                    Exception thrown = null;
-                    while (iterator.hasNext()) {
-                        try {
-                            return new Result<>(iterator.next().invoke(context, args));
-                        } catch (Exception e) {
-                            thrown = e;
-                        }
-                    }
+	            if(method == null) {
+		            for(String prefix : prefixes) {
+			            method = MethodUtils.getMatchingAccessibleMethod(clazz, prefix + 
+					            WordUtils.capitalize(name), getParametersClasses(args));
+			            
+			            if(method != null) 
+				            break;
+		            }
+	            }
 
-                    if (thrown != null)
-                        throw new ExtractException(thrown);
-                }
-
-                return new Result<>();
+	            if(method != null) {
+		            try {
+			            return new Result<>(method.invoke(context, args));
+		            }
+		            catch(InvocationTargetException | IllegalAccessException e) {
+			            throw new ExtractException(e);
+		            }
+	            }
+				else
+	                return new Result<>();
             }
         };
     }
+	
+	private Class getClassForContext(Object context) {
+		return context instanceof Class ? (Class) context  : context.getClass();
+	}
+	
+	private Class[] getParametersClasses(Object... args) {
+		if(ArrayUtils.isEmpty(args)) {
+			return ArrayUtils.EMPTY_CLASS_ARRAY;
+		}
+		
+		Class[] result = new Class[args.length];
+		
+		for(int i=0; i<args.length; i++) {
+			result[i] = args[i] == null ? null : args[i].getClass();
+		}
+		
+		return result;
+	}
 
-    private Predicate<Method> methodMatcher(final Matcher<? super String> nameMatcher, final int numberOfArguments) {
-        return new Predicate<Method>() {
-            @Override
-            public boolean apply(@Nullable Method method) {
-                if (method == null) return false;
-                else {
-                    return nameMatcher.matches(method.getName()) &&
-                            method.getParameterTypes().length == numberOfArguments;
-                }
-            }
-        };
-    }
-
-    private static interface Callable {
+	private static interface Callable {
         Result<Object> execute (String name, Object... args) throws ExtractException;
     }
 
