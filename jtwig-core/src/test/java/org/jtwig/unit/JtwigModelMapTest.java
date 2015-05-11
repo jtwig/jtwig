@@ -1,0 +1,45 @@
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.jtwig.unit;
+
+import java.util.Collections;
+import org.jtwig.JtwigModelMap;
+import org.junit.Test;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+
+public class JtwigModelMapTest {
+
+    @Test
+    public void shouldAddAllMapValues () {
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("test", "test");
+        JtwigModelMap jtwigModelMap = new JtwigModelMap();
+        jtwigModelMap.add(map);
+
+        assertThat(jtwigModelMap.get("test"), is((Object)"test"));
+    }
+    
+    @Test
+    public void constructorConsumesAllMapValues() {
+        JtwigModelMap jtwigModelMap = new JtwigModelMap(Collections.singletonMap("test1", (Object)"test2"));
+        assertThat(jtwigModelMap.get("test1"), is((Object)"test2"));
+    }
+    
+}

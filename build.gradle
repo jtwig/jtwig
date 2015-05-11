@@ -1,0 +1,201 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+
+    dependencies {
+        classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:0.6"
+        classpath 'org.ajoberstar:gradle-git:0.13.0'
+        classpath "org._10ne.gradle:rest-gradle-plugin:0.3.1"
+    }
+}
+
+apply plugin: "org.10ne.rest"
+
+import java.text.SimpleDateFormat
+import org.ajoberstar.grgit.Grgit
+import org.ajoberstar.grgit.Credentials
+
+def globalVersion = new Version(currentVersion)
+def isDryRun = calculateDryRun()
+
+
+def getCurrentTag () {
+    return getVariable("TRAVIS_TAG", "")
+}
+def getCurrentBranch () {
+    return getVariable("TRAVIS_BRANCH", "")
+}
+
+def getGitHubPassword () {
+    return getVariable("GITHUB_PASSWORD", "")
+}
+
+def getGpgPassphrase () {
+    return getVariable("GPG_PASSPHRASE", "")
+}
+
+def getBintrayApiKey () {
+    return getVariable("BINTRAY_API_KEY", "")
+}
+
+def getVariable (String name, String defaultValue) {
+    def value = System.getenv().get(name)
+    if (value == null || value.isEmpty()) return defaultValue
+    return value
+}
+
+task checkVariables << {
+    assert !getGitHubPassword().isEmpty(), "Github Password undefined"
+    assert !getBintrayApiKey().isEmpty(), "Bintray API Key undefined"
+}
+
+def calculateDryRun() {
+    def buildTag = getCurrentTag()
+    def hasTag = !(buildTag == null || buildTag.isEmpty())
+    if (hasTag) {
+        println 'Uploading to Bintray'
+    } else {
+        println 'TRAVIS_TAG variable not found - Not uploading to Bintray'
+    }
+    return !hasTag
+}
+
+def determineVersion (Version version) {
+    def result = version.toString()
+    def tag = getCurrentTag()
+    if (!tag.isEmpty()) {
+        result = tag.replace("jtwig-", "")
+    }
+    return result
+}
+
+allprojects {
+    repositories {
+        jcenter()
+    }
+
+    apply plugin: 'idea'
+    apply plugin: 'com.jfrog.bintray'
+    configure(subprojects.findAll { new File(it.projectDir, 'src').directory }) {
+        apply plugin: 'java'
+    }
+
+    group = 'org.jtwig'
+    version = determineVersion(globalVersion)
+
+    ext.publish = true
+    bintray {
+        user = bintray_user
+        key = getBintrayApiKey()
+        publish = true
+        configurations = ['published', 'archives']
+        dryRun = isDryRun
+        pkg {
+            repo = 'maven'
+            userOrg = 'jtwig'
+            name = 'jtwig'
+            desc = 'Jtwig : Modern Template Engine for Java'
+            websiteUrl = 'http://www.jtwig.org'
+            issueTrackerUrl = 'https://github.com/jtwig/jtwig/issues'
+            vcsUrl = 'https://github.com/jtwig/jtwig.git'
+            licenses = ['Apache-2.0']
+            labels = ['java', 'templates', 'jtwig']
+            publicDownloadNumbers = true
+            version {
+                name = determineVersion(globalVersion)
+                desc = 'Jtwig : Modern Template Engine for Java'
+                vcsTag = "jtwig-" + determineVersion(globalVersion)
+                gpg {
+                    sign = true
+                    passphrase = getGpgPassphrase()
+                }
+            }
+        }
+    }
+}
+
+ext.repo = Grgit.open(project.file('.'), new Credentials(github_username, getGitHubPassword()))
+
+task tagRelease << {
+    if (!getCurrentBranch().isEmpty()) {
+        println "Releasing new tag to jtwig repository"
+        def file = new File("tag.version");
+        def writer = new PrintWriter(file);
+        writer.println("${globalVersion}")
+        writer.close()
+    } else {
+        println "TRAVIS_BRANCH variable missing - Not releasing new Tag"
+    }
+}
+
+subprojects {
+    apply plugin: 'maven'
+
+    sourceCompatibility = 1.7
+    targetCompatibility = 1.7
+
+    repositories {
+        mavenCentral()
+    }
+
+    configurations {
+        published
+    }
+
+    task sourcesJar(type: Jar, dependsOn: classes) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
+
+    task javadocJar(type: Jar, dependsOn: javadoc) {
+        classifier = 'javadoc'
+        from javadoc.destinationDir
+    }
+
+    artifacts {
+        archives sourcesJar
+        archives javadocJar
+    }
+}
+
+
+configurations {
+    published
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.0'
+}
+
+class Version {
+    String originalVersion
+    String thisVersion
+    String status
+
+    Date buildTime
+
+    Version(String versionValue) {
+        buildTime = new Date()
+        originalVersion = versionValue
+        if (originalVersion.endsWith('-SNAPSHOT')) {
+            status = 'snapshot'
+
+            def initialVersion = originalVersion.substring(0, originalVersion.length() - 'SNAPSHOT'.length())
+            thisVersion = initialVersion + getTimestamp()
+        } else {
+            status = 'release'
+            thisVersion = versionValue
+        }
+    }
+    String getTimestamp() {
+        // Convert local file timestamp to UTC
+        def format = new SimpleDateFormat('yyyyMMddHHmmss')
+        format.setCalendar(Calendar.getInstance(TimeZone.getTimeZone('UTC')));
+        return format.format(buildTime)
+    }
+    String toString() {
+        thisVersion
+    }
+}

@@ -2,56 +2,25 @@
 
 *JTwig is a modern Java template engine designed for web development*
 
-### Build Status
+[![Build Status](https://travis-ci.org/jtwig/jtwig.png)](https://travis-ci.org/jtwig/jtwig)
+[![Coverage Status](https://coveralls.io/repos/jtwig/jtwig/badge.png?branch=master)](https://coveralls.io/r/jtwig/jtwig?branch=master)
 
-[![Build Status](https://travis-ci.org/lyncode/jtwig.png)](https://travis-ci.org/lyncode/jtwig)
+### Project Information
 
-### Official Website
+**Website**: http://jtwig.org
 
-http://jtwig.org
+**News**: [@jtwigTemplates](https://twitter.com/jtwigTemplates)
 
-### Twitter 
+**Versioning**:  [Semantic Versioning](http://semver.org/)
 
-[@jtwigTemplates](https://twitter.com/jtwigTemplates) - used to share relevant information 
+**Changes**: [CHANGELOG.md](CHANGELOG.md)
 
-## Versioning
+**License**: [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0)
 
-Jtwig uses [Semantic Versioning](http://semver.org/)
+### Snapshot Releasing
 
-## Changes
+Jtwig uses [bintray](http://bintray.com) for snapshot releasing.
 
-2.1.3 - 2.1.4 (26-Mar-2014)
+**How to include in your project?**
 
-- FIX (blocker): [#86](https://github.com/lyncode/jtwig/issues/86)
-
-2.1.2 - 2.1.3 (26-Mar-2014)
-
-- FIX (blocker): [#82](https://github.com/lyncode/jtwig/issues/82)
-
-2.1.1 - 2.1.2 (15-Mar-2014)
-
-- FIX (blocker): Fixed issue [#61](https://github.com/lyncode/jtwig/issues/61)
-
-2.1.0 - 2.1.1 (02-Mar-2014)
-
-- FIX (blocker): Fixed set expressions
-- FIX (minor): Removed redundant parser spacing rule
-
-2.0.3 - 2.1.0 (24-Feb-2014)
-
-- Function declarations brought to function itself as annotation
-- Functions in spring are now loaded to the repository function using package scan strategy.
-- IS operator added together with several related functions
-- 'model' variable made present in all templates, so it's possible to access the model using map selection.
-
-----------
-
-### License
-
-Licensed under the Apache License, Version 2.0 (the "License"); 
-you may not use this file except in compliance with the License. You may obtain a copy of the License at
-
-        http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and limitations under the License.
+[Check here](http://jmelo.lyncode.com/jtwig-snapshot-repository/)

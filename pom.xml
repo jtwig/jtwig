@@ -8,9 +8,9 @@
         <version>7</version>
     </parent>
 
-    <groupId>com.lyncode</groupId>
-    <artifactId>jtwig</artifactId>
-    <version>2.1.2-SNAPSHOT</version>
+    <groupId>org.jtwig</groupId>
+    <artifactId>jtwig-parent</artifactId>
+    <version>4.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>JTwig Root</name>
@@ -27,35 +27,35 @@
     </licenses>
 
     <scm>
-        <connection>scm:git:git@github.com:lyncode/jtwig.git</connection>
-        <developerConnection>scm:git:git@github.com:lyncode/jtwig.git</developerConnection>
-        <url>git@github.com:lyncode/jtwig.git</url>
-        <tag>HEAD</tag>
+        <connection>scm:git:git@github.org/jtwig.git</connection>
+        <developerConnection>scm:git:git@github.org/jtwig.git</developerConnection>
+        <url>git@github.org/jtwig.git</url>
     </scm>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <lyncode.builder.commons.version>1.0.2</lyncode.builder.commons.version>
 
         <spring.version>3.2.5.RELEASE</spring.version>
+        <spring-security.version>3.2.0.RELEASE</spring-security.version>
         <parboiled.version>1.1.6</parboiled.version>
         <hamcrest.version>1.3</hamcrest.version>
         <mockito.version>1.9.5</mockito.version>
         <junit.version>4.11</junit.version>
-        <servlet-api.version>2.5</servlet-api.version>
-        <log4j.version>1.2.14</log4j.version>
+        <servlet-api.version>3.1.0</servlet-api.version>
+        <slf4j.version>1.7.7</slf4j.version>
         <commons.lang3.version>3.1</commons.lang3.version>
         <jackson.version>1.9.13</jackson.version>
+        <jackson2.version>2.4.3</jackson2.version>
+        <gson.version>2.3</gson.version>
         <yatspec.version>209</yatspec.version>
+
+        <jacoco.version>0.7.2.201409121644</jacoco.version>
     </properties>
 
     <modules>
         <module>jtwig-core</module>
         <module>jtwig-functions</module>
-        <module>jtwig-core-test</module>
         <module>jtwig-spring</module>
-        <module>jtwig-spring-test</module>
-        <module>jtwig-examples</module>
     </modules>
 
 
@@ -97,6 +97,11 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>${jacoco.version}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -148,15 +153,165 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.eluder.coveralls</groupId>
+                <artifactId>coveralls-maven-plugin</artifactId>
+                <inherited>false</inherited>
+                <version>3.0.1</version>
+            </plugin>
         </plugins>
     </build>
 
-    <developers>
-        <developer>
-            <name>DSpace @ Lyncode</name>
-            <email>dspace@lyncode.com</email>
-            <organization>Lyncode</organization>
-            <organizationUrl>http://www.lyncode.com</organizationUrl>
-        </developer>
-    </developers>
+    <profiles>
+        <profile>
+            <id>merge-reports</id>
+            <build>
+                <plugins>
+                    <!-- Merge jacoco reports into one -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <inherited>false</inherited>
+                        <executions>
+                            <!-- Copy the ant tasks jar. Needed for ts.jacoco.report-ant . -->
+                            <execution>
+                                <id>jacoco-dependency-ant</id>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <phase>process-test-resources</phase>
+                                <inherited>false</inherited>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>org.jacoco</groupId>
+                                            <artifactId>org.jacoco.ant</artifactId>
+                                            <version>${jacoco.version}</version>
+                                        </artifactItem>
+                                    </artifactItems>
+                                    <stripVersion>true</stripVersion>
+                                    <outputDirectory>${basedir}/target/jacoco-jars</outputDirectory>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <inherited>false</inherited>
+                        <version>1.6</version>
+                        <executions>
+                            <execution>
+                                <id>merge</id>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <target name="merge">
+                                        <echo message="Generating JaCoCo Reports" />
+                                        <taskdef name="report" classname="org.jacoco.ant.ReportTask">
+                                            <classpath path="${basedir}/target/jacoco-jars/org.jacoco.ant.jar" />
+                                        </taskdef>
+                                        <mkdir dir="${basedir}/target/site/jacoco" />
+                                        <report>
+                                            <executiondata>
+                                                <fileset dir="jtwig-functions/target">
+                                                    <include name="jacoco.exec" />
+                                                </fileset>
+                                                <fileset dir="jtwig-core/target">
+                                                    <include name="jacoco.exec" />
+                                                </fileset>
+                                                <fileset dir="jtwig-spring/target">
+                                                    <include name="jacoco.exec" />
+                                                </fileset>
+                                            </executiondata>
+                                            <structure name="Jtwig Coverage">
+                                                <group name="jtwig-core">
+                                                    <classfiles>
+                                                        <fileset dir="jtwig-core/target/classes">
+                                                            <exclude name="**/*Parser*" />
+                                                            <exclude name="**/*Addon*" />
+                                                            <exclude name="**/parboiled/**" />
+                                                        </fileset>
+                                                    </classfiles>
+                                                    <sourcefiles encoding="UTF-8">
+                                                        <fileset dir="jtwig-core/target/generated-sources/annotations" />
+                                                    </sourcefiles>
+                                                </group>
+                                                <group name="jtwig-functions">
+                                                    <classfiles>
+                                                        <fileset dir="jtwig-functions/target/classes" />
+                                                    </classfiles>
+                                                    <sourcefiles encoding="UTF-8">
+                                                        <fileset dir="jtwig-functions/target/generated-sources/annotations" />
+                                                    </sourcefiles>
+                                                </group>
+                                                <group name="jtwig-spring">
+                                                    <classfiles>
+                                                        <fileset dir="jtwig-spring/target/classes">
+                                                            <exclude name="**/render/**" />
+                                                            <exclude name="**/SpringFunctions*" />
+                                                            <exclude name="**/BeanResolver*" />
+                                                        </fileset>
+                                                    </classfiles>
+                                                    <sourcefiles encoding="UTF-8">
+                                                        <fileset dir="jtwig-spring/target/generated-sources/annotations" />
+                                                    </sourcefiles>
+                                                </group>
+                                            </structure>
+                                            <xml destfile="${basedir}/target/site/jacoco/jacoco.xml" />
+                                            <html destdir="${basedir}/target/site/jacoco" />
+                                        </report>
+                                    </target>
+                                </configuration>
+                            </execution>
+                        </executions>
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.jacoco</groupId>
+                                <artifactId>org.jacoco.ant</artifactId>
+                                <version>${jacoco.version}</version>
+                            </dependency>
+                        </dependencies>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>doclint-java8-disable</id>
+            <activation>
+              <jdk>[1.8,)</jdk>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <configuration>
+                            <additionalparam>-Xdoclint:none</additionalparam>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

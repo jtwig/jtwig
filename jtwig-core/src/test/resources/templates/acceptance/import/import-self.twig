@@ -1,0 +1,7 @@
+{% macro test(value) %}
+{{ value }}
+{% endmacro %}
+
+{% import _self as this %}
+
+{{ this.test("jtwig") }}

@@ -1,0 +1,13 @@
+{% extends "layout.twig.html" %}
+{% block main %}
+{% for item in presentations %}
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">{{item.title}} - {{item.speakerName}}</h3>
+    </div>
+    <div class="panel-body">
+        {{summary}}
+    </div>
+</div>
+{% endfor %}
+{% endblock %}
