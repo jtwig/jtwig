@@ -57,6 +57,14 @@ public class ObjectExtractorTest {
         assertEquals("b", underTest.extract("b"));
     }
 
+	@Test
+	public void shouldExtractFromStaticMethod() throws ObjectExtractor.ExtractException
+	{
+		ObjectExtractor underTest = new ObjectExtractor(Mockito.mock(RenderContext.class), Integer.class);
+
+		assertThat(underTest.extract("toHexString", 123), is((Object) "7b"));
+	}
+
     @Test(expected = ObjectExtractor.ExtractException.class)
     public void methodException() throws Exception {
         ObjectExtractor underTest = new ObjectExtractor(Mockito.mock(RenderContext.class), new TestClass());
