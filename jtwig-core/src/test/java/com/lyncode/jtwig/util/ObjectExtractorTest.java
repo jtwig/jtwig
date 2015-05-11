@@ -14,50 +14,65 @@
 
 package com.lyncode.jtwig.util;
 
-import org.junit.Test;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
+import org.junit.Test;
 
-public class ObjectExtractorTest {
-    @Test
-    public void shouldExtractFromMap () throws ObjectExtractor.ExtractException {
-        Map<String, Object> map = new HashMap<String, Object>();
-        map.put("key", "value");
-        ObjectExtractor underTest = new ObjectExtractor(map);
+public class ObjectExtractorTest
+{
+	@Test
+	public void shouldExtractFromMap() throws ObjectExtractor.ExtractException
+	{
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("key", "value");
+		ObjectExtractor underTest = new ObjectExtractor(map);
 
-        assertThat(underTest.extract("key"), is((Object) "value"));
-    }
+		assertThat(underTest.extract("key"), is((Object) "value"));
+	}
 
-    @Test
-    public void shouldExtractFromInheritedMethod () throws ObjectExtractor.ExtractException {
-        List<String> list = new ArrayList<String>();
-        ObjectExtractor underTest = new ObjectExtractor(list);
+	@Test
+	public void shouldExtractFromInheritedMethod() throws ObjectExtractor.ExtractException
+	{
+		List<String> list = new ArrayList<String>();
+		ObjectExtractor underTest = new ObjectExtractor(list);
 
-        assertThat(underTest.extract("tostring"), is(notNullValue()));
-    }
-    @Test
-    public void shouldExtractFromInheritedField () throws ObjectExtractor.ExtractException {
-        B b = new B();
-        b.a = "a";
-        b.b = "b";
-        ObjectExtractor underTest = new ObjectExtractor(b);
+		assertThat(underTest.extract("tostring"), is(notNullValue()));
+	}
 
-        assertThat(underTest.extract("a"), is((Object) "a"));
-        assertThat(underTest.extract("b"), is((Object) "b"));
-    }
+	@Test
+	public void shouldExtractFromInheritedField() throws ObjectExtractor.ExtractException
+	{
+		B b = new B();
+		b.a = "a";
+		b.b = "b";
+		ObjectExtractor underTest = new ObjectExtractor(b);
 
-    private static class A {
-        public String a;
-    }
+		assertThat(underTest.extract("a"), is((Object) "a"));
+		assertThat(underTest.extract("b"), is((Object) "b"));
+	}
 
-    private static class B extends A {
-        public String b;
-    }
+	@Test
+	public void shouldExtractFromStaticMethod() throws ObjectExtractor.ExtractException
+	{
+		ObjectExtractor underTest = new ObjectExtractor(String.class);
+
+		assertThat(underTest.extract("valueOf", 123), is((Object) "123"));
+	}
+
+	private static class A
+	{
+		public String	a;
+	}
+
+	private static class B extends A
+	{
+		public String	b;
+	}
 }

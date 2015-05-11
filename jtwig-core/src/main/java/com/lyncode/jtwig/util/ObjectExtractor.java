@@ -118,10 +118,12 @@ public class ObjectExtractor {
                         "has"
                 };
 
-                Set<Method> methods = getAllMethods(context.getClass(), methodMatcher(equalToIgnoringCase(name), args.length));
+	            Class clazz = context instanceof Class ? (Class) context  : context.getClass();
+
+                Set<Method> methods = getAllMethods(clazz, methodMatcher(equalToIgnoringCase(name), args.length));
                 int i = 0;
                 while (methods.isEmpty() && i < prefixes.length) {
-                    methods = getAllMethods(context.getClass(), methodMatcher(equalToIgnoringCase(prefixes[i++] + name), args.length));
+                    methods = getAllMethods(clazz, methodMatcher(equalToIgnoringCase(prefixes[i++] + name), args.length));
                 }
 
                 if (methods.isEmpty()) return new Result<Object>();
