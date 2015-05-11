@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.jtwig.render.RenderContext;
+import org.jtwig.types.Undefined;
 import org.jtwig.util.ObjectExtractor;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -32,7 +33,7 @@ import org.mockito.Mockito;
 public class ObjectExtractorTest {
     @Test
     public void shouldExtractFromMap () throws ObjectExtractor.ExtractException {
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
         map.put("key", "value");
         ObjectExtractor underTest = new ObjectExtractor(Mockito.mock(RenderContext.class), map);
 
@@ -41,7 +42,7 @@ public class ObjectExtractorTest {
 
     @Test
     public void shouldExtractFromInheritedMethod () throws ObjectExtractor.ExtractException {
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         ObjectExtractor underTest = new ObjectExtractor(Mockito.mock(RenderContext.class), list);
 
         assertThat(underTest.extract("tostring"), is(notNullValue()));
@@ -72,11 +73,25 @@ public class ObjectExtractorTest {
 	}
 
 	@Test
-	public void shouldExtractFromStaticMethod() throws ObjectExtractor.ExtractException
-	{
+	public void shouldExtractFromStaticMethod() throws ObjectExtractor.ExtractException {
 		ObjectExtractor underTest = new ObjectExtractor(Mockito.mock(RenderContext.class), Integer.class);
 
 		assertThat(underTest.extract("toHexString", 123), is((Object) "7b"));
+	}
+	
+	@Test
+	public void shouldNotExtractFromPrivateMethod() throws ObjectExtractor.ExtractException {
+		ObjectExtractor underTest = new ObjectExtractor(Mockito.mock(RenderContext.class), D.class);
+
+		assertThat(underTest.extract("foo"), is((Object) Undefined.UNDEFINED));
+	}
+	
+	@Test
+	public void shouldExtractMatchingMethod() throws ObjectExtractor.ExtractException {
+		ObjectExtractor underTest = new ObjectExtractor(Mockito.mock(RenderContext.class), String.class);
+		
+		assertEquals("3", underTest.extract("valueOf", 3));
+		assertEquals("3.0", underTest.extract("valueOf", 3.));
 	}
 
     @Test(expected = ObjectExtractor.ExtractException.class)
@@ -114,6 +129,13 @@ public class ObjectExtractorTest {
 
 		public void setValue(int value) {
 			this.value = value;
+		}
+	}
+	
+	public static class D {
+		@SuppressWarnings("unused")
+		private String foo() {
+			return "bar";
 		}
 	}
 }

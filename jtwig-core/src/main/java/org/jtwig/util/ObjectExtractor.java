@@ -19,8 +19,6 @@ import static org.jtwig.types.Undefined.UNDEFINED;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -49,26 +47,23 @@ public class ObjectExtractor {
             }
         }
 
-        List<Callable> callables = new ArrayList<>();
+	    Result<Object> result = tryMethod().execute(name, parameters);
+	    if (result.hasResult()) return result.getResult();
+	    
+	    if (parameters.length == 0) {
+		    result = tryField().execute(name, parameters);
+		    if (result.hasResult()) return result.getResult();
+	    }
 
-        if (parameters.length == 0) {
-            callables.add(tryField());
-        }
-
-        callables.add(tryMethod());
-
-        if (knownType(context))
-            callables.add(tryKnownType());
-
-        for (Callable callable : callables) {
-            Result<Object> result = callable.execute(name, parameters);
-            if (result.hasResult()) return result.getResult();
+        if (knownType(context)) {
+	        result = tryKnownType().execute(name, parameters);
+	        if (result.hasResult()) return result.getResult();
         }
 
         return UNDEFINED;
     }
 
-    private Callable tryKnownType() {
+	private Callable tryKnownType() {
         return new Callable() {
             @Override
             public Result<Object> execute(String name, Object... args) throws ExtractException {
@@ -95,11 +90,16 @@ public class ObjectExtractor {
 	            Field field = FieldUtils.getField(getClassForContext(context), name, true);
 
                 if (field != null) {
+	                boolean accessible = field.isAccessible();
 	                try {
+						field.setAccessible(true);
 		                return new Result<>(field.get(context));
 	                }
 	                catch(IllegalAccessException e) {
 		                return new Result<>();
+	                } 
+	                finally {
+		                field.setAccessible(accessible);
 	                }
                 } else return new Result<>();
             }
@@ -118,13 +118,12 @@ public class ObjectExtractor {
 
 	            Class clazz = getClassForContext(context);
 
-	            Method method = MethodUtils.getMatchingAccessibleMethod(clazz, name, 
-			            getParametersClasses(args));
+	            Method method = MethodUtils.getMatchingAccessibleMethod(clazz, name, getParametersClasses(args));
 
 	            if(method == null) {
 		            for(String prefix : prefixes) {
-			            method = MethodUtils.getMatchingAccessibleMethod(clazz, prefix + 
-					            WordUtils.capitalize(name), getParametersClasses(args));
+			            method = MethodUtils.getMatchingAccessibleMethod(clazz, prefix + WordUtils.capitalize(name), 
+					            getParametersClasses(args));
 			            
 			            if(method != null) 
 				            break;
@@ -132,13 +131,18 @@ public class ObjectExtractor {
 	            }
 
 	            if(method != null) {
+		            boolean accessible = method.isAccessible();
 		            try {
+			            method.setAccessible(true);
 			            return new Result<>(method.invoke(context, args));
 		            }
 		            catch(InvocationTargetException | IllegalAccessException e) {
 			            throw new ExtractException(e);
 		            }
-	            }
+		            finally {
+			            method.setAccessible(accessible);
+		            }
+		        }
 				else
 	                return new Result<>();
             }
