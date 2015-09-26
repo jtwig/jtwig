@@ -115,7 +115,7 @@ public class JtwigView extends AbstractTemplateView {
 //        });
 //    }
 
-    private Template.CompiledTemplate getCompiledJtwigTemplate() throws ResourceException, ParseException, CompileException {
+    private Template.Compiled getCompiledJtwigTemplate() throws ResourceException, ParseException, CompileException {
         return getEnvironment().compile(getUrl());
     }
 

@@ -18,7 +18,7 @@ public class TwigTransformUtils {
     public static String toTwig (Object object) {
         if (object instanceof Boolean)
             return ((boolean)object) ? "1" : "0";
-
+        
         return String.valueOf(object);
     }
 }

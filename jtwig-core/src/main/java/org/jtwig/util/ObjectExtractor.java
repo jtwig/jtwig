@@ -88,9 +88,7 @@ public class ObjectExtractor {
     }
 
     private boolean knownType(Object context) {
-        if (context instanceof Map)
-            return true;
-        else return false;
+        return context instanceof Map;
     }
 
     private Callable tryField() {
@@ -102,13 +100,11 @@ public class ObjectExtractor {
                     Iterator<Field> iterator = fields.iterator();
                     while (iterator.hasNext()) {
                         try {
-                            return new Result<Object>(iterator.next().get(context));
-                        } catch (IllegalAccessException e) {
-                            // do nothing
-                        }
+                            return new Result<>(iterator.next().get(context));
+                        } catch (IllegalAccessException ex) {}
                     }
-                    return new Result<Object>();
-                } else return new Result<Object>();
+                }
+                return new Result<>();
             }
         };
     }
@@ -117,9 +113,8 @@ public class ObjectExtractor {
         return new Predicate<Field>() {
             @Override
             public boolean apply(@Nullable Field field) {
-
-
-                if (field == null) return false;
+                if (field == null)
+                    return false;
                 return equalToIgnoringCase(name).matches(field.getName());
             }
         };
@@ -152,8 +147,9 @@ public class ObjectExtractor {
                         }
                     }
 
-                    if (thrown != null)
+                    if (thrown != null) {
                         throw new ExtractException(thrown);
+                    }
                 }
 
                 return new Result<>();
@@ -165,11 +161,11 @@ public class ObjectExtractor {
         return new Predicate<Method>() {
             @Override
             public boolean apply(@Nullable Method method) {
-                if (method == null) return false;
-                else {
-                    return nameMatcher.matches(method.getName()) &&
-                            method.getParameterTypes().length == numberOfArguments;
+                if (method == null) {
+                    return false;
                 }
+                return nameMatcher.matches(method.getName()) &&
+                        method.getParameterTypes().length == numberOfArguments;
             }
         };
     }

@@ -29,6 +29,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static java.util.Locale.ENGLISH;
+import org.apache.commons.lang3.math.NumberUtils;
 import static org.joda.time.DateTime.now;
 
 /**

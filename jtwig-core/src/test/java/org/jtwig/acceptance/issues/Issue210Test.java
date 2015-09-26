@@ -23,7 +23,10 @@ import java.nio.charset.Charset;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.jtwig.configuration.JtwigConfigurationBuilder.newConfiguration;
+import org.jtwig.configuration.JtwigConfiguration;
+import org.jtwig.configuration.JtwigConfigurationBuilder;
+import static org.jtwig.configuration.JtwigConfigurationBuilder.defaultConfiguration;
+import org.jtwig.extension.core.CoreJtwigExtension;
 
 /**
  * 
@@ -34,10 +37,13 @@ public class Issue210Test {
         JtwigModelMap model = new JtwigModelMap();
         model.withModelAttribute("text", "tête de bou  간편한 설치 및 사용");
 
-        String result = JtwigTemplate
-            .inlineTemplate("{{ text }}", newConfiguration()
+        JtwigConfiguration config = JtwigConfigurationBuilder.newConfiguration()
                 .withCharset(Charset.forName("ISO-8859-1"))
-                .build())
+                .build();
+        config.getExtensions().addExtension(new CoreJtwigExtension(config));
+        
+        String result = JtwigTemplate
+            .inlineTemplate("{{ text }}", config)
             .render(model);
 
         assertThat(result, is(equalTo("t�te de bou  ??? ?? ? ??")));

@@ -84,7 +84,7 @@ public class MapFunctionRepositoryTest {
 
     @Test
     public void includesBuiltInFunctions() throws Exception {
-        assertThat(underTest.retrieve("batch", InputParameters.parameters(null, 1)), not(empty()));
+        assertThat(underTest.retrieve("toDouble", InputParameters.parameters(1)), not(empty()));
     }
 
     public static class TestClass {

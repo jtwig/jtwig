@@ -66,11 +66,13 @@ public class SingleOuputStream extends ByteArrayOutputStream {
         mStreamState = streamState;
     }
 
+    @Override
     public void close() throws IOException {
         mStream.flush();
         mStreamState = StreamState.CLOSED;
     }
 
+    @Override
     public void finalize() throws IOException {
         close();
         if (!mInheritedStream) {

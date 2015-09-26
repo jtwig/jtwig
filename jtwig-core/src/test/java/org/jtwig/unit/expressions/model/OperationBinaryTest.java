@@ -20,11 +20,10 @@ import org.jtwig.exception.CompileException;
 import org.jtwig.expressions.api.CompilableExpression;
 import org.jtwig.expressions.api.Expression;
 import org.jtwig.expressions.model.OperationBinary;
-import org.jtwig.expressions.model.Operator;
-import static org.jtwig.expressions.model.Operator.UNKNOWN;
-import org.jtwig.expressions.model.Variable;
+import org.jtwig.extension.model.FilterCall;
 import org.jtwig.parser.model.JtwigPosition;
 import org.jtwig.render.RenderContext;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 import static org.mockito.Matchers.any;
@@ -40,34 +39,34 @@ public class OperationBinaryTest extends AbstractJtwigTest {
         when(right.calculate(any(RenderContext.class))).thenReturn(1);
 
         Object result = new OperationBinary(null, expression(left))
-                .add(Operator.ADD)
-                .add(expression(right))
-                .compile(null)
+                .addOperator("+")
+                .addOperand(expression(right))
+                .compile(compileContext)
                 .calculate(renderContext);
 
-        assertEquals(2, result);
+        assertEquals(2L, result);
     }
 
     @Test
     public void compositionOperator() throws Exception {
         Expression left = mock(Expression.class);
         when(left.calculate(any(RenderContext.class))).thenReturn(1);
-        Variable right = new Variable(null, "defined");
+        FilterCall filter = new FilterCall(null, "split");
 
         Object result = new OperationBinary(null, expression(left))
-                .add(Operator.COMPOSITION)
-                .add(right)
-                .compile(null)
+                .addOperator("|")
+                .addOperand(filter)
+                .compile(compileContext)
                 .calculate(renderContext);
 
-        assertEquals(true, result);
+        assertArrayEquals(new Character[]{'1'}, (Character[])result);
     }
 
     @Test(expected = CompileException.class)
     public void unknownOperation() throws Exception {
         new OperationBinary(new JtwigPosition(null, 1, 1), mock(CompilableExpression.class))
-                .add(UNKNOWN)
-                .add(mock(CompilableExpression.class)).compile(compileContext);
+                .addOperator("unknown")
+                .addOperand(mock(CompilableExpression.class)).compile(compileContext);
     }
 
     private CompilableExpression expression(final Expression expression) {

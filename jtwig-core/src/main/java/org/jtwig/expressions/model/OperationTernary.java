@@ -21,8 +21,7 @@ import org.jtwig.expressions.api.CompilableExpression;
 import org.jtwig.expressions.api.Expression;
 import org.jtwig.parser.model.JtwigPosition;
 import org.jtwig.render.RenderContext;
-
-import static org.jtwig.util.BooleanOperations.isTrue;
+import static org.jtwig.util.TypeUtil.toBoolean;
 
 public class OperationTernary extends AbstractCompilableExpression {
     private final CompilableExpression condition;
@@ -64,7 +63,7 @@ public class OperationTernary extends AbstractCompilableExpression {
 
         @Override
         public Object calculate(RenderContext context) throws CalculateException {
-            if (isTrue(condition.calculate(context))) {
+            if (toBoolean(condition.calculate(context))) {
                 return trueExpression.calculate(context);
             } else return falseExpression.calculate(context);
         }

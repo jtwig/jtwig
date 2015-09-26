@@ -22,6 +22,7 @@ import org.jtwig.exception.RenderException;
 import org.jtwig.render.RenderContext;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import org.jtwig.content.api.ability.ElementList;
 
@@ -46,6 +47,11 @@ public class Sequence extends AbstractElement implements ElementList<Compilable>
     public Sequence add (Compilable compilable) {
         this.contents.add(compilable);
         return this;
+    }
+
+    @Override
+    public Collection<Compilable> elements() {
+        return contents;
     }
 
     public Compilable previous(Compilable current) {

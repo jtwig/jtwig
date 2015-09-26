@@ -17,7 +17,7 @@ package org.jtwig.mvc;
 import org.jtwig.Environment;
 import org.jtwig.cache.JtwigTemplateCacheSystem;
 import org.jtwig.cache.impl.PersistentTemplateCacheSystem;
-import org.jtwig.functions.SpringFunctions;
+import org.jtwig.extension.spring.SpringExtension;
 import org.jtwig.functions.parameters.convert.DemultiplexerConverter;
 import org.jtwig.functions.parameters.convert.impl.ObjectToStringConverter;
 import org.jtwig.functions.parameters.input.InputParameters;
@@ -34,7 +34,6 @@ import org.jtwig.services.api.url.ResourceUrlResolver;
 import org.jtwig.services.impl.url.IdentityUrlResolver;
 import org.jtwig.services.impl.url.ThemedResourceUrlResolver;
 import static org.jtwig.util.LocalThreadHolder.getServletRequest;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.ThemeResolver;
 import org.springframework.web.servlet.view.AbstractTemplateViewResolver;
@@ -47,7 +46,7 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
     private boolean useThemeInViewPath = false;
 
     private Environment env;
-    private SpringFunctions springFunctions = null;
+    private SpringExtension springExtension;
     private CompoundParameterResolver parameterResolver = new CompoundParameterResolver();
     private CompoundFunctionResolver functionResolver;
     private JtwigTemplateCacheSystem cache = new PersistentTemplateCacheSystem();
@@ -91,10 +90,10 @@ public class JtwigViewResolver extends AbstractTemplateViewResolver {
     }
 
     public FunctionResolver functionResolver() {
-        if (springFunctions == null) {
-            springFunctions = new SpringFunctions();
-            getApplicationContext().getAutowireCapableBeanFactory().autowireBean(springFunctions);
-            env.getConfiguration().getFunctionRepository().include(springFunctions);
+        if (springExtension == null) {
+            springExtension = new SpringExtension();
+            getApplicationContext().getAutowireCapableBeanFactory().autowireBean(springExtension);
+            env.getConfiguration().getExtensions().addExtension(springExtension);
         }
         return functionResolver;
     }

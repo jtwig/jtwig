@@ -14,6 +14,8 @@
 
 package org.jtwig.content.model.compilable;
 
+import java.io.IOException;
+import org.apache.commons.lang3.StringUtils;
 import org.jtwig.compile.CompileContext;
 import org.jtwig.content.api.Compilable;
 import org.jtwig.content.api.Renderable;
@@ -22,52 +24,56 @@ import org.jtwig.exception.CompileException;
 import org.jtwig.exception.RenderException;
 import org.jtwig.render.RenderContext;
 
-import java.io.IOException;
-
 public class Text implements Compilable {
-    private final String text;
+    private final StringBuilder builder = new StringBuilder();
 
-    public Text(String text) {
-        this.text = text;
+    public Text() {}
+    public Text(final String text) {
+        builder.append(text);
+    }
+
+    public Text append (String piece) {
+        builder.append(piece);
+        return this;
     }
 
     @Override
     public Renderable compile(CompileContext context) throws CompileException {
-        String result = text;
+        String result = builder.toString();
         if (context.hasParent()) {
             Compilable before = context.parent().previous(this);
             Compilable after = context.parent().next(this);
 
-            if (mustTrimAtRightOf(before, context)) {
-                result = result.replaceAll("^\\s+", "");
+            if (mustTrimStart(before, context)) {
+                result = StringUtils.stripStart(result, null);
             }
-            if (mustTrimAtLeftOf(after, context)) {
-                result = result.replaceAll("\\s+$", "");
+            if (mustTrimEnd(after, context)) {
+                result = StringUtils.stripEnd(result, null);
             }
         }
         return new Compiled(result);
     }
 
-    private boolean mustTrimAtLeftOf(Compilable element, CompileContext context) {
-        if (element != null)
-            return element instanceof Tag && ((Tag) element).tag().whiteSpaceControl().trimBeforeBegin();
-        else {
-            Compilable container = context.parent().parent();
-            if (container != null && container instanceof Tag)
-                return ((Tag) container).tag().whiteSpaceControl().trimBeforeEnd();
-            return false;
+    private boolean mustTrimStart(Compilable element, CompileContext context) {
+        if (element != null) {
+            return element instanceof Tag && ((Tag) element).tag().whiteSpaceControl().trimAfterClose();
         }
+        Compilable container = context.parent().parent();
+        if (container != null && container instanceof Tag) {
+            return ((Tag) container).tag().whiteSpaceControl().trimAfterOpen();
+        }
+        return false;
     }
 
-    private boolean mustTrimAtRightOf(Compilable element, CompileContext context) {
-        if (element != null)
-            return element instanceof Tag && ((Tag) element).tag().whiteSpaceControl().trimAfterEnd();
-        else {
-            Compilable container = context.parent().parent();
-            if (container != null && container instanceof Tag)
-                return ((Tag) container).tag().whiteSpaceControl().trimAfterBegin();
-            return false;
+    private boolean mustTrimEnd(Compilable element, CompileContext context) {
+        if (element != null) {
+            return element instanceof Tag && ((Tag) element).tag().whiteSpaceControl().trimBeforeOpen();
         }
+        Compilable container = context.parent().parent();
+        if (container != null && container instanceof Tag) {
+            return ((Tag) container).tag().whiteSpaceControl().trimBeforeClose();
+        }
+        return false;
     }
 
     private static class Compiled implements Renderable {
@@ -84,25 +90,6 @@ public class Text implements Compilable {
             } catch (IOException e) {
                 throw new RenderException(e);
             }
-        }
-    }
-
-    public static class Builder implements Compilable {
-        private final StringBuilder builder = new StringBuilder();
-
-        public Builder append (String piece) {
-            builder.append(piece);
-            return this;
-        }
-
-
-        public Text build () {
-            return new Text(builder.toString());
-        }
-
-        @Override
-        public Renderable compile(CompileContext context) throws CompileException {
-            return null;
         }
     }
 }

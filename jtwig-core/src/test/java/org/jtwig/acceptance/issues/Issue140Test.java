@@ -24,7 +24,10 @@ import org.junit.rules.ExpectedException;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import org.jtwig.configuration.JtwigConfiguration;
+import static org.jtwig.configuration.JtwigConfigurationBuilder.defaultConfiguration;
 import static org.jtwig.configuration.JtwigConfigurationBuilder.newConfiguration;
+import org.jtwig.extension.core.CoreJtwigExtension;
 import static org.jtwig.util.matchers.ExceptionMatcher.exception;
 
 public class Issue140Test {
@@ -39,13 +42,11 @@ public class Issue140Test {
     @Test
     public void undefinedVarThrowsExceptionOnEvaluation() throws Exception {
         expectedException.expect(exception().withInnerException(exception().ofType(CalculateException.class)));
-
+        
         JtwigModelMap model = new JtwigModelMap();
 
         JtwigTemplate
-            .inlineTemplate("{{ var is null }}", newConfiguration()
-                .withStrictMode(true)
-                .build())
+            .inlineTemplate("{{ var is null }}", config(true))
             .render(model);
     }
 
@@ -55,15 +56,24 @@ public class Issue140Test {
      * @throws Exception 
      */
     @Test
-    public void outputNonexistentVarThrowsException() throws Exception {
+    public void outputNonexistentVarReturnsTrue() throws Exception {
         JtwigModelMap model = new JtwigModelMap();
 
         String result = JtwigTemplate
-            .inlineTemplate("{{ var is null }}", newConfiguration()
-                .withStrictMode(false)
-                .build())
+            .inlineTemplate("{{ var is null }}", config())
             .render(model);
 
         assertThat(result, is(equalTo("1")));
+    }
+    
+    protected JtwigConfiguration config() {
+        return config(false);
+    }
+    protected JtwigConfiguration config(boolean strict) {
+        JtwigConfiguration config = newConfiguration()
+                .withStrictMode(strict)
+                .build();
+        config.getExtensions().addExtension(new CoreJtwigExtension(config));
+        return config;
     }
 }

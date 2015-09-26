@@ -14,6 +14,9 @@
 
 package org.jtwig.content.api.ability;
 
+import java.util.Collection;
+
 public interface ElementList<T> {
     ElementList add(T element);
+    Collection<T> elements();
 }

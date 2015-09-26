@@ -4,10 +4,10 @@ import org.jtwig.cache.TemplateCache;
 import org.jtwig.functions.config.JsonConfiguration;
 import org.jtwig.functions.repository.api.FunctionRepository;
 import org.jtwig.loader.Loader;
-import org.jtwig.parser.config.AddonParserList;
 import org.jtwig.parser.config.Symbols;
 
 import java.nio.charset.Charset;
+import org.jtwig.extension.ExtensionHolder;
 
 public interface JtwigConfiguration {
 
@@ -19,7 +19,7 @@ public interface JtwigConfiguration {
 
     Symbols getSymbols();
 
-    AddonParserList getAddonParserList();
+    ExtensionHolder getExtensions();
 
     int getMinThreads();
 

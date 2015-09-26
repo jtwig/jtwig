@@ -15,77 +15,36 @@
 package org.jtwig.expressions.model;
 
 import org.jtwig.compile.CompileContext;
-import org.jtwig.exception.CalculateException;
 import org.jtwig.exception.CompileException;
-import org.jtwig.exception.OperationNotFoundException;
 import org.jtwig.expressions.api.CompilableExpression;
 import org.jtwig.expressions.api.Expression;
-import org.jtwig.expressions.api.UnaryOperation;
-import org.jtwig.expressions.operations.UnaryOperator;
+import org.jtwig.extension.api.operator.Operator;
 import org.jtwig.parser.model.JtwigPosition;
-import org.jtwig.render.RenderContext;
 
 public class OperationUnary extends AbstractCompilableExpression {
-    public static class Builder implements CompilableExpression {
-        private JtwigPosition position;
-        private Operator operator;
-        private CompilableExpression operand;
 
-        public Builder withPosition(JtwigPosition position) {
-            this.position = position;
-            return this;
-        }
-
-        public Builder withOperator(Operator operator) {
-            this.operator = operator;
-            return this;
-        }
-
-        public Builder withOperand(CompilableExpression operand) {
-            this.operand = operand;
-            return this;
-        }
-
-        public OperationUnary build () {
-            return new OperationUnary(position, operator, operand);
-        }
-
-        @Override
-        public Expression compile(CompileContext context) throws CompileException {
-            return null;
-        }
-    }
-
-    private final Operator operator;
+    private final String operator;
     private CompilableExpression operand;
 
-    public OperationUnary(JtwigPosition position, Operator operator, CompilableExpression operand) {
+    public OperationUnary(JtwigPosition position, String operator) {
         super(position);
         this.operator = operator;
+    }
+    
+    public OperationUnary withOperand(CompilableExpression operand) {
         this.operand = operand;
+        return this;
     }
 
     @Override
     public Expression compile(CompileContext context) throws CompileException {
-        try {
-            return new Operation(operand.compile(context), UnaryOperator.fromOperator(operator).operation());
-        } catch (OperationNotFoundException e) {
-            throw new CompileException(e);
+        Operator op = context.environment()
+                .getConfiguration()
+                .getExtensions()
+                .getUnaryOperator(operator);
+        if (op == null) {
+            throw new CompileException(position()+": Could not find operator '"+operator+"'.");
         }
-    }
-
-    private static class Operation implements Expression {
-        private final Expression operand;
-        private final UnaryOperation operation;
-
-        private Operation(Expression operand, UnaryOperation operation) {
-            this.operand = operand;
-            this.operation = operation;
-        }
-
-        @Override
-        public Object calculate(RenderContext context) throws CalculateException {
-            return operation.apply(context, operand);
-        }
+        return op.compile(context.environment(), position(), context, operand.compile(context));
     }
 }

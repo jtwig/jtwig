@@ -2,7 +2,7 @@ package org.jtwig.acceptance.functions;
 
 import org.jtwig.acceptance.AbstractViewAcceptanceTest;
 import org.jtwig.exceptions.AssetResolveException;
-import org.jtwig.functions.exceptions.FunctionException;
+import org.jtwig.extension.api.functions.FunctionException;
 import org.jtwig.services.api.assets.AssetResolver;
 import org.junit.Test;
 

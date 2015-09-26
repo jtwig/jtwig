@@ -46,6 +46,7 @@ public class FastByteArrayOutputStream extends OutputStream {
         return size + index;
     }
 
+    @Override
     public void close() {
         closed = true;
     }
@@ -62,6 +63,7 @@ public class FastByteArrayOutputStream extends OutputStream {
         return data;
     }
 
+    @Override
     public void write(int datum) throws IOException {
         if (closed) {
             throw new IOException("Stream closed");

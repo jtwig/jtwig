@@ -12,7 +12,9 @@ import javax.annotation.Nullable;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
-import static org.jtwig.configuration.JtwigConfigurationBuilder.newConfiguration;
+import org.jtwig.configuration.JtwigConfiguration;
+import org.jtwig.configuration.JtwigConfigurationBuilder;
+import org.jtwig.extension.core.CoreJtwigExtension;
 
 public class JsonConfigurationTest {
 
@@ -20,8 +22,7 @@ public class JsonConfigurationTest {
     public void changeJsonMapperConfigurationShouldAffectTheJsonEncodeFunction() throws Exception {
         JtwigModelMap model = new JtwigModelMap();
 
-        String result = JtwigTemplate
-            .inlineTemplate("{{ json_encode 'three' }}", newConfiguration()
+        JtwigConfiguration config = JtwigConfigurationBuilder.newConfiguration()
                 .withJsonConfiguration(new JsonConfiguration().jsonMapper(new Function<Object, String>() {
                     @Nullable
                     @Override
@@ -29,7 +30,11 @@ public class JsonConfigurationTest {
                         return "ohoh";
                     }
                 }))
-                .build())
+                .build();
+        config.getExtensions().addExtension(new CoreJtwigExtension(config));
+        
+        String result = JtwigTemplate
+            .inlineTemplate("{{ 'three'|json_encode }}", config)
             .render(model);
 
         assertThat(result, is(equalTo("ohoh")));

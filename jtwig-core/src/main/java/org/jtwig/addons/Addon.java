@@ -23,6 +23,7 @@ import org.jtwig.parser.parboiled.JtwigTagPropertyParser;
 import org.parboiled.Parboiled;
 import org.parboiled.Rule;
 
+@Deprecated
 public abstract class Addon extends JtwigBaseParser<AddonModel> {
     final JtwigBasicParser basicParser;
     final JtwigExpressionParser expressionParser;

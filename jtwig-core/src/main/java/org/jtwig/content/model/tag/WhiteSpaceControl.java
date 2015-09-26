@@ -17,43 +17,42 @@ package org.jtwig.content.model.tag;
 import org.apache.commons.lang3.tuple.MutablePair;
 
 public class WhiteSpaceControl {
-    private static final boolean DEFAULT_VALUE = true;
+    private static final boolean DEFAULT_VALUE = false;
     private MutablePair<Boolean, Boolean> begin = new MutablePair<>();
     private MutablePair<Boolean, Boolean> end = new MutablePair<>();
 
-    public boolean trimBeforeBegin () {
+    public boolean trimBeforeOpen () {
         return get(begin.getLeft());
     }
 
-    public boolean trimAfterBegin () {
+    public boolean trimAfterOpen () {
         return get(begin.getRight());
     }
 
-    public boolean trimBeforeEnd () {
+    public boolean trimBeforeClose () {
         return get(end.getLeft());
     }
 
-    public boolean trimAfterEnd () {
+    public boolean trimAfterClose () {
         return get(end.getRight());
     }
 
-    public WhiteSpaceControl trimBeforeBegin(boolean value) {
+    public WhiteSpaceControl trimBeforeOpen(boolean value) {
         begin.setLeft(value);
         return this;
     }
 
-
-    public WhiteSpaceControl trimAfterBegin(boolean value) {
+    public WhiteSpaceControl trimAfterOpen(boolean value) {
         begin.setRight(value);
         return this;
     }
 
-    public WhiteSpaceControl trimBeforeEnd(boolean value) {
+    public WhiteSpaceControl trimBeforeClose(boolean value) {
         end.setLeft(value);
         return this;
     }
 
-    public WhiteSpaceControl trimAfterEnd(boolean value) {
+    public WhiteSpaceControl trimAfterClose(boolean value) {
         end.setRight(value);
         return this;
     }

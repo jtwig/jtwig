@@ -25,15 +25,7 @@ public class MapFunctionRepository implements FunctionRepository {
     private final ConcurrentHashMap<String, Collection<Function>> repository = new ConcurrentHashMap<>();
 
     public MapFunctionRepository(JsonConfiguration configuration) {
-        include(new BooleanFunctions());
-        include(new DateFunctions());
-        include(new ListFunctions());
-        include(new MapFunctions());
-        include(new MathFunctions());
-        include(new NumberFunctions());
         include(new ObjectFunctions());
-        include(new StringFunctions());
-        include(new JsonFunctions(configuration));
     }
 
     @Override

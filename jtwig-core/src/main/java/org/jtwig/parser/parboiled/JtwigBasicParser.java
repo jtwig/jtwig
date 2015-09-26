@@ -90,6 +90,10 @@ public class JtwigBasicParser extends BaseParser<String> {
     public Rule keyword(JtwigKeyword keyword) {
         return terminal(keyword.getKeyword(), letterOrDigit());
     }
+    @SuppressNode
+    public Rule keyword(String keyword) {
+        return terminal(keyword, letterOrDigit());
+    }
 
     @SuppressNode
     public Rule symbol(JtwigSymbol symbol) {
@@ -139,7 +143,7 @@ public class JtwigBasicParser extends BaseParser<String> {
     /*
      * Pushes the String (without quotes)
      */
-    protected Rule stringLiteral() {
+    public Rule stringLiteral() {
         return FirstOf(
                 Sequence(
                         '"',

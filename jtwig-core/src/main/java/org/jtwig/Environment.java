@@ -41,21 +41,14 @@ import static org.parboiled.Parboiled.createParser;
 
 public class Environment {
     protected JtwigConfiguration configuration;
-
-    protected JtwigBasicParser basicParser;
-    protected JtwigTagPropertyParser tagPropertyParser;
-    protected JtwigConstantParser constantParser;
     
     //~ Construction ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     public Environment() {
-        this(JtwigConfigurationBuilder.newConfiguration().build());
+        this(JtwigConfigurationBuilder.defaultConfiguration());
     }
 
     public Environment(JtwigConfiguration configuration) {
         this.configuration = configuration;
-        basicParser = createParser(JtwigBasicParser.class, this);
-        tagPropertyParser = createParser(JtwigTagPropertyParser.class, this);
-        constantParser = createParser(JtwigConstantParser.class, this);
     }
 
     public JtwigConfiguration getConfiguration() {
@@ -63,13 +56,15 @@ public class Environment {
     }
     
     public JtwigBasicParser getBasicParser() {
-        return basicParser;
+        return createParser(JtwigBasicParser.class, this);
     }
+    
     public JtwigTagPropertyParser getTagPropertyParser() {
-        return tagPropertyParser;
+        return createParser(JtwigTagPropertyParser.class, this);
     }
+    
     public JtwigConstantParser getConstantParser() {
-        return constantParser;
+        return createParser(JtwigConstantParser.class, this);
     }
     
     //~ Operational methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -103,7 +98,7 @@ public class Environment {
             return cached;
         } catch (ParserRuntimeException e) {
             if (e.getCause() instanceof ParseBypassException) {
-                ParseException innerException = ((ParseBypassException) e.getCause()).getInnerException();
+                ParseException innerException = ((ParseBypassException) e.getCause()).getCause();
                 innerException.setExpression(e.getMessage());
                 throw innerException;
             } else {
@@ -114,35 +109,39 @@ public class Environment {
         }
     }
     
-    public Template.CompiledTemplate compile(final String name)
+    public Template.Compiled compile(final String name)
             throws ResourceException, ParseException, CompileException {
         Loader.Resource resource = load(name);
         Template template = parse(resource);
         return compile(template, resource);
     }
-    public Template.CompiledTemplate compile(String name,
-            CompileContext context)
+    public Template.Compiled compile(final String name,
+            final CompileContext context)
             throws ResourceException, ParseException, CompileException {
         Loader.Resource resource = load(name);
         Template template = parse(resource);
         return compile(template, resource, context);
     }
-    public Template.CompiledTemplate compile(Loader.Resource resource)
+    public Template.Compiled compile(final Loader.Resource resource)
             throws ResourceException, ParseException, CompileException {
         Template template = parse(resource);
         return compile(template, resource);
     }
-
-    public Template.CompiledTemplate compile(Template template,
-            Loader.Resource resource)
+    public Template.Compiled compile(final Loader.Resource resource,
+            final CompileContext context)
             throws ResourceException, ParseException, CompileException {
+        Template template = parse(resource);
+        return compile(template, resource);
+    }
+    public Template.Compiled compile(final Template template,
+            final Loader.Resource resource) throws CompileException {
         CompileContext compileContext = new CompileContext(resource, this);
         return compile(template, resource, compileContext);
     }
-    public Template.CompiledTemplate compile(Template template,
-            Loader.Resource resource,
-            CompileContext context) throws CompileException {
-        Template.CompiledTemplate cached = configuration.getTemplateCache().getCompiled(resource.getCacheKey());
+    public Template.Compiled compile(final Template template,
+            final Loader.Resource resource,
+            final CompileContext context) throws CompileException {
+        Template.Compiled cached = configuration.getTemplateCache().getCompiled(resource.getCacheKey());
         if (cached != null) {
             return cached;
         }

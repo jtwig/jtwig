@@ -25,21 +25,21 @@ public class WhiteSpaceControlTest {
 
     @Test
     public void trimTest() throws Exception {
-        underTest.trimAfterBegin(true);
-        underTest.trimAfterEnd(false);
-        underTest.trimBeforeBegin(false);
-        underTest.trimBeforeEnd(true);
-        assertThat(underTest.trimAfterBegin(), is(true));
-        assertThat(underTest.trimAfterEnd(), is(false));
-        assertThat(underTest.trimBeforeBegin(), is(false));
-        assertThat(underTest.trimBeforeEnd(), is(true));
+        underTest.trimAfterOpen(true);
+        underTest.trimAfterClose(false);
+        underTest.trimBeforeOpen(false);
+        underTest.trimBeforeClose(true);
+        assertThat(underTest.trimAfterOpen(), is(true));
+        assertThat(underTest.trimAfterClose(), is(false));
+        assertThat(underTest.trimBeforeOpen(), is(false));
+        assertThat(underTest.trimBeforeClose(), is(true));
     }
 
     @Test
     public void defaultTest() throws Exception {
-        assertThat(underTest.trimAfterBegin(), is(true));
-        assertThat(underTest.trimAfterEnd(), is(true));
-        assertThat(underTest.trimBeforeBegin(), is(true));
-        assertThat(underTest.trimBeforeEnd(), is(true));
+        assertThat(underTest.trimAfterOpen(), is(false));
+        assertThat(underTest.trimAfterClose(), is(false));
+        assertThat(underTest.trimBeforeOpen(), is(false));
+        assertThat(underTest.trimBeforeClose(), is(false));
     }
 }

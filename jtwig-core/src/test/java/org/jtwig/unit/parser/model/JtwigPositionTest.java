@@ -3,15 +3,14 @@ package org.jtwig.unit.parser.model;
 import org.jtwig.cache.TemplateCache;
 import org.jtwig.compile.CompileContext;
 import org.jtwig.content.api.Renderable;
-import org.jtwig.content.model.BasicTemplate;
 import org.jtwig.content.model.Template;
 import org.jtwig.loader.Loader;
 import org.jtwig.parser.model.JtwigPosition;
 import org.jtwig.render.RenderContext;
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.*;
+import org.junit.Test;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class JtwigPositionTest {
     @Test
@@ -29,8 +28,8 @@ public class JtwigPositionTest {
         when(resource.getCacheKey()).thenReturn("test.twig");
         
         // Build the templates and cache
-        Template tpl = new BasicTemplate(null);
-        Template.CompiledTemplate compiledTpl = new BasicTemplate.CompiledBasicTemplate(null, null, null, Renderable.NOOP);
+        Template tpl = new Template(null);
+        Template.Compiled compiledTpl = new Template.Compiled(null, null, null, null, Renderable.NOOP, null);
         TemplateCache cache = mock(TemplateCache.class);
         when(cache.getParsed("test.twig")).thenReturn(tpl);
         when(cache.getCompiled("test.twig")).thenReturn(compiledTpl);

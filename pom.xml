@@ -251,6 +251,8 @@
                                                             <exclude name="**/*Parser*" />
                                                             <exclude name="**/*Addon*" />
                                                             <exclude name="**/parboiled/**" />
+                                                            <exclude name="org/jtwig/extension/core/tokenparsers/**" />
+                                                            <exclude name="org/jtwig/extension/api/tokenparser/*" />
                                                         </fileset>
                                                     </classfiles>
                                                     <sourcefiles encoding="UTF-8">

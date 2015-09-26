@@ -14,6 +14,24 @@
 
 package org.jtwig.unit.render.stream;
 
-public class RenderStreamTest {
-    
+import static org.hamcrest.Matchers.isEmptyString;
+import org.jtwig.content.api.Renderable;
+import org.jtwig.render.stream.RenderStream;
+import org.jtwig.unit.AbstractJtwigTest;
+import static org.junit.Assert.assertThat;
+import org.junit.Test;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+
+public class RenderStreamTest extends AbstractJtwigTest {
+    @Test
+    public void testRenderConcurrentOutOfMemory() throws Exception {
+        Renderable renderable = mock(Renderable.class);
+        doThrow(OutOfMemoryError.class).when(renderable).render(renderContext);
+        
+        RenderStream stream = new RenderStream(output, env);
+        stream.renderConcurrent(renderable, renderContext);
+        assertThat(output.toString(),
+                isEmptyString());
+    }
 }

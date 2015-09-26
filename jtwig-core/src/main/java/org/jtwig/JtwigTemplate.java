@@ -10,6 +10,9 @@ import org.jtwig.render.RenderContext;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
+import org.jtwig.content.model.Template;
+import org.jtwig.exception.ParseException;
+import org.jtwig.exception.ResourceException;
 
 public class JtwigTemplate {
     public static JtwigTemplate inlineTemplate(String template) {
@@ -30,7 +33,7 @@ public class JtwigTemplate {
     private final Loader.Resource resource;
 
     public JtwigTemplate(Loader.Resource resource) {
-        this(resource, JtwigConfigurationBuilder.newConfiguration().build());
+        this(resource, JtwigConfigurationBuilder.defaultConfiguration());
     }
 
     public JtwigTemplate(Loader.Resource resource, JtwigConfiguration configuration) {
@@ -38,17 +41,25 @@ public class JtwigTemplate {
         this.resource = resource;
     }
 
-    public void render (JtwigModelMap modelMap, OutputStream outputStream) throws JtwigException {
-        environment.compile(resource).render(RenderContext.create(environment, modelMap, outputStream));
+    public String render () throws JtwigException {
+        return render(new JtwigModelMap());
     }
-
+    
     public String render (JtwigModelMap modelMap) throws JtwigException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         environment.compile(resource).render(RenderContext.create(environment, modelMap, output));
         return output.toString();
     }
+    
+    public void render (JtwigModelMap modelMap, OutputStream outputStream) throws JtwigException {
+        environment.compile(resource).render(RenderContext.create(environment, modelMap, outputStream));
+    }
 
     public Environment environment() {
         return environment;
+    }
+    
+    public Template asTemplate() throws ResourceException, ParseException {
+        return environment.parse(resource);
     }
 }

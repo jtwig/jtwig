@@ -14,6 +14,7 @@
 
 package org.jtwig.acceptance;
 
+import java.io.IOException;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.eclipse.jetty.server.Server;
@@ -23,8 +24,8 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.resource.Resource;
 import org.jtwig.Environment;
+import org.jtwig.extension.spring.SpringExtension;
 import org.jtwig.configuration.JtwigConfigurationBuilder;
-import org.jtwig.functions.SpringFunctions;
 import org.jtwig.loader.impl.ClasspathLoader;
 import org.jtwig.mvc.JtwigViewResolver;
 import org.junit.After;
@@ -41,6 +42,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 import org.springframework.web.servlet.theme.FixedThemeResolver;
 
 import java.io.IOException;
+import org.jtwig.configuration.JtwigConfiguration;
+import org.jtwig.extension.core.CoreJtwigExtension;
 
 public abstract class AbstractJtwigAcceptanceTest {
     private HttpClient httpClient = httpClient();
@@ -131,16 +134,17 @@ public abstract class AbstractJtwigAcceptanceTest {
             ClasspathLoader classpath = new ClasspathLoader();
 //            ChainLoader chainLoader = new ChainLoader(Arrays.asList(web, classpath));
             
-            Environment env = new Environment(JtwigConfigurationBuilder.newConfiguration()
-                                                  .withLoader(classpath)
-                                                  .build());
-            env.getConfiguration().getFunctionRepository().include(springFunctions());
-            return env;
+            JtwigConfiguration config = JtwigConfigurationBuilder.newConfiguration()
+                    .withLoader(classpath)
+                    .build();
+            config.getExtensions().addExtension(new CoreJtwigExtension(config));
+            config.getExtensions().addExtension(springExtension());
+            return new Environment(config);
         }
         
         @Bean
-        public SpringFunctions springFunctions () {
-            return new SpringFunctions();
+        public SpringExtension springExtension () {
+            return new SpringExtension();
         }
     }
 

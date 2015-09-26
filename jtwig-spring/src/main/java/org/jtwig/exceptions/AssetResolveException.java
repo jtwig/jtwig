@@ -14,7 +14,9 @@
 
 package org.jtwig.exceptions;
 
-public class AssetResolveException  extends Exception {
+import org.jtwig.extension.api.functions.FunctionException;
+
+public class AssetResolveException extends FunctionException {
     public AssetResolveException(String message) {
         super(message);
     }

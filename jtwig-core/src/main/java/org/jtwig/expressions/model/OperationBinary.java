@@ -17,18 +17,17 @@ package org.jtwig.expressions.model;
 import com.google.common.base.Function;
 import org.jtwig.compile.CompileContext;
 import org.jtwig.exception.CompileException;
-import org.jtwig.exception.OperationNotFoundException;
 import org.jtwig.expressions.api.CompilableExpression;
 import org.jtwig.expressions.api.Expression;
-import org.jtwig.expressions.operations.BinaryOperator;
 import org.jtwig.parser.model.JtwigPosition;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.jtwig.extension.api.operator.Operator;
 
 public class OperationBinary extends AbstractCompilableExpression {
     private List<CompilableExpression> operands = new ArrayList<>();
-    private List<Operator> operators = new ArrayList<Operator>();
+    private List<String> operators = new ArrayList<>();
 
 
     public OperationBinary(JtwigPosition position, CompilableExpression operand) {
@@ -36,12 +35,12 @@ public class OperationBinary extends AbstractCompilableExpression {
         operands.add(operand);
     }
 
-    public OperationBinary add (Operator operator) {
+    public OperationBinary addOperator (String operator) {
         operators.add(operator);
         return this;
     }
 
-    public OperationBinary add (CompilableExpression operand) {
+    public OperationBinary addOperand (CompilableExpression operand) {
         operands.add(operand);
         return this;
     }
@@ -50,23 +49,25 @@ public class OperationBinary extends AbstractCompilableExpression {
     public Expression compile(CompileContext context) throws CompileException {
         assert operators.size() == operands.size() - 1;
 
-        if (operands.size() == 1) return operands.get(0).compile(context);
-        else {
-            Expression left = operands.get(0).compile(context);
-            for (int i = 1; i < operands.size(); i++) {
-                Expression right = operands.get(i).compile(context);
-                Operator operator = operators.get(i - 1);
-
-                try {
-                    left = BinaryOperator
-                            .fromOperator(operator)
-                            .expression(position(), left, right);
-                } catch (OperationNotFoundException e) {
-                    throw new CompileException(position()+": "+ e.getMessage());
-                }
-            }
-            return left;
+        if (operands.size() == 1) {
+            return operands.get(0).compile(context);
         }
+        
+        Expression left = operands.get(0).compile(context);
+        for (int i = 1; i < operands.size(); i++) {
+            Expression right = operands.get(i).compile(context);
+            String operator = operators.get(i - 1);
+
+            Operator op = context.environment()
+                    .getConfiguration()
+                    .getExtensions()
+                    .getBinaryOperator(operator);
+            if (op == null) {
+                throw new CompileException(position()+": Could not find operator '"+operator+"'.");
+            }
+            left = op.compile(context.environment(), position(), context, left, right);
+        }
+        return left;
     }
 
     public void transformFirst(Function<CompilableExpression, CompilableExpression> transformation) {

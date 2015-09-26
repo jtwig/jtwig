@@ -48,17 +48,17 @@ public interface TemplateCache {
      * @param template The compiled template to store
      * @return The cache instance
      */
-    TemplateCache addCompiled(String name, Template.CompiledTemplate template);
+    TemplateCache addCompiled(String name, Template.Compiled template);
     /**
      * Retrieves the compiled template indicated by the provided name.
      * @param name The name or identifier of the template
      * @return The compiled template requested, or null if not found
      */
-    Template.CompiledTemplate getCompiled(String name);
+    Template.Compiled getCompiled(String name);
     /**
      * Removes the compiled template indicated by the provided name.
      * @param name The name or identifier of the compiled template
      * @return The removed compiled template, or null if not found
      */
-    Template.CompiledTemplate removeCompiled(String name);
+    Template.Compiled removeCompiled(String name);
 }

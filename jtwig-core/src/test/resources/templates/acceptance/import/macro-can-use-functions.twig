@@ -1,5 +1,5 @@
 {% macro text(val) %}
-{{ val|type }}
+{{ type(val) }}
 {% endmacro %}
 
 {% import _self as form %}

@@ -28,7 +28,7 @@ public class JtwigTagPropertyParser extends BaseParser<JtwigTagProperty> {
         basicParser = env.getBasicParser();
     }
 
-    Rule property() {
+    public Rule property() {
         return FirstOf(
                 Sequence(
                         basicParser.symbol(JtwigSymbol.MINUS),

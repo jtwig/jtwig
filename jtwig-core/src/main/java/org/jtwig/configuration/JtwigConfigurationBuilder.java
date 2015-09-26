@@ -10,7 +10,6 @@ import org.jtwig.loader.Loader;
 import org.jtwig.loader.impl.ChainLoader;
 import org.jtwig.loader.impl.ClasspathLoader;
 import org.jtwig.loader.impl.FileLoader;
-import org.jtwig.parser.config.AddonParserList;
 import org.jtwig.parser.config.Symbols;
 import org.jtwig.parser.config.TagSymbols;
 
@@ -19,17 +18,25 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import static java.util.Arrays.asList;
+import org.jtwig.extension.ExtensionHolder;
+import org.jtwig.extension.core.CoreJtwigExtension;
 
 public class JtwigConfigurationBuilder {
     public static JtwigConfigurationBuilder newConfiguration() {
         return new JtwigConfigurationBuilder();
+    }
+    public static JtwigConfiguration defaultConfiguration() {
+        JtwigConfiguration config = new JtwigConfigurationBuilder().build();
+        CoreJtwigExtension core = new CoreJtwigExtension(config);
+        config.getExtensions().addExtension(core);
+        return config;
     }
 
     private Charset charset = Charset.forName("UTF-8");
     private boolean strictMode = false;
     private boolean logNonStrictMode = false;
     private Symbols symbols = TagSymbols.DEFAULT;
-    private AddonParserList addonParserList = new AddonParserList();
+    private ExtensionHolder extensions = new ExtensionHolder();
     private int minThreads = 20;
     private int maxThreads = 100;
     private long keepAliveTime = 60;
@@ -65,9 +72,12 @@ public class JtwigConfigurationBuilder {
         return this;
     }
 
-    public JtwigConfigurationBuilder withAddon(Class<? extends Addon> addon) {
-        this.addonParserList.withAddon(addon);
+    public JtwigConfigurationBuilder withExtensions(ExtensionHolder extensions) {
+        this.extensions = extensions;
         return this;
+    }
+    public ExtensionHolder getExtensions() {
+        return extensions;
     }
 
     public JtwigConfigurationBuilder withMinThreads(int minThreads) {
@@ -111,7 +121,7 @@ public class JtwigConfigurationBuilder {
     }
 
     public JtwigConfiguration build() {
-        return new ImmutableJtwigConfiguration(charset, strictMode, logNonStrictMode, symbols, addonParserList, minThreads, maxThreads, keepAliveTime, jsonConfiguration, getFunctionRepository(), templateCache,
+        return new ImmutableJtwigConfiguration(charset, strictMode, logNonStrictMode, symbols, extensions, minThreads, maxThreads, keepAliveTime, jsonConfiguration, getFunctionRepository(), templateCache,
                                       loader);
     }
 

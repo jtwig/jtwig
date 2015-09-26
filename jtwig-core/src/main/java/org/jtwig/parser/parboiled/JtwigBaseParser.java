@@ -46,27 +46,27 @@ public class JtwigBaseParser<V> extends BaseParser<V> {
 
 
 
-    boolean throwException(ParseException exception) throws ParseBypassException {
+    public boolean throwException(ParseException exception) throws ParseBypassException {
         throw new ParseBypassException(exception);
     }
 
-    <T> T peek(int position, Class<T> typeClass) {
+    public <T> T peek(int position, Class<T> typeClass) {
         return typeClass.cast(peek(position));
     }
 
-    <T> T peek(Class<T> typeClass) {
+    public <T> T peek(Class<T> typeClass) {
         return peek(0, typeClass);
     }
 
-    <T> T pop(int position, Class<T> typeClass) {
+    public <T> T pop(int position, Class<T> typeClass) {
         return typeClass.cast(pop(position));
     }
 
-    <T> T pop(Class<T> typeClass) {
+    public <T> T pop(Class<T> typeClass) {
         return pop(0, typeClass);
     }
     
-    <T> T last(Class<T> cls) {
+    public <T> T last(Class<T> cls) {
         for (Object obj : this.getContext().getValueStack()) {
             if (cls.isAssignableFrom(obj.getClass())) {
                 return cls.cast(obj);

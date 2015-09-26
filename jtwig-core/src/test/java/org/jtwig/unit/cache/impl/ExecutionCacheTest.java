@@ -15,18 +15,16 @@
 package org.jtwig.unit.cache.impl;
 
 import org.jtwig.cache.impl.ExecutionCache;
-import org.jtwig.content.api.Renderable;
-import org.jtwig.content.model.BasicTemplate;
 import org.jtwig.content.model.Template;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import org.junit.Test;
 
 public class ExecutionCacheTest {
     @Test
     public void testParsedTemplateLifecycle() throws Exception {
-        Template template = new BasicTemplate(null);
-        Template.CompiledTemplate compiledTemplate = new BasicTemplate.CompiledBasicTemplate(null, null, null, Renderable.NOOP);
+        Template template = new Template(null);
+        Template.Compiled compiledTemplate = new Template.Compiled(null, null, null, null, null, null);
         
         ExecutionCache cache = new ExecutionCache();
         cache.addParsed("test1", template);

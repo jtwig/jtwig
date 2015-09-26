@@ -14,26 +14,53 @@
 
 package org.jtwig.parser.parboiled;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import org.apache.commons.lang3.ObjectUtils;
 import org.jtwig.Environment;
 import org.jtwig.exception.ParseBypassException;
 import org.jtwig.exception.ParseException;
 import org.jtwig.expressions.api.CompilableExpression;
-import org.jtwig.expressions.model.*;
+import org.jtwig.expressions.model.Constant;
+import org.jtwig.expressions.model.MapSelection;
+import org.jtwig.expressions.model.OperationBinary;
+import org.jtwig.expressions.model.OperationTernary;
+import org.jtwig.expressions.model.OperationUnary;
+import org.jtwig.expressions.model.ValueList;
+import org.jtwig.expressions.model.ValueMap;
+import org.jtwig.expressions.model.Variable;
+import org.jtwig.extension.api.operator.BinaryOperator;
+import org.jtwig.extension.api.operator.Operator;
+import org.jtwig.extension.api.operator.UnaryOperator;
+import org.jtwig.extension.model.Callable;
+import org.jtwig.extension.model.FunctionCall;
+import org.jtwig.loader.Loader;
 import org.jtwig.parser.model.JtwigKeyword;
+import org.jtwig.parser.model.JtwigPosition;
 import org.jtwig.parser.model.JtwigSymbol;
+import static org.jtwig.parser.model.JtwigSymbol.CLOSE_BRACKET;
+import static org.jtwig.parser.model.JtwigSymbol.CLOSE_CURLY_BRACKET;
+import static org.jtwig.parser.model.JtwigSymbol.CLOSE_PARENT;
+import static org.jtwig.parser.model.JtwigSymbol.COMMA;
+import static org.jtwig.parser.model.JtwigSymbol.DIV;
+import static org.jtwig.parser.model.JtwigSymbol.MINUS;
+import static org.jtwig.parser.model.JtwigSymbol.OPEN_BRACKET;
+import static org.jtwig.parser.model.JtwigSymbol.OPEN_CURLY_BRACKET;
+import static org.jtwig.parser.model.JtwigSymbol.OPEN_PARENT;
+import static org.jtwig.parser.model.JtwigSymbol.QUESTION;
 import org.parboiled.MatcherContext;
 import org.parboiled.Rule;
+import org.parboiled.annotations.Label;
 import org.parboiled.annotations.SuppressNode;
 import org.parboiled.matchers.CustomMatcher;
 import org.parboiled.support.ValueStack;
-
-import static org.jtwig.expressions.model.Operator.*;
-import org.jtwig.loader.Loader;
-import static org.jtwig.parser.model.JtwigKeyword.NULL;
-import static org.jtwig.parser.model.JtwigSymbol.*;
-import static org.jtwig.parser.model.JtwigSymbol.DIV;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JtwigExpressionParser extends JtwigBaseParser<CompilableExpression> {
+    static final Logger LOGGER = LoggerFactory.getLogger(JtwigExpressionParser.class);
     final JtwigBasicParser basic;
     final JtwigConstantParser constants;
     final Environment env;
@@ -44,159 +71,49 @@ public class JtwigExpressionParser extends JtwigBaseParser<CompilableExpression>
         constants = env.getConstantParser();
         this.env = env;
     }
-
+    
+    @Label("Expression")
     public Rule expression() {
         return Sequence(
-                specificJtwigOperators(),
+                operators(),
                 push(pop())
         );
     }
-
-
-    Rule specificJtwigOperators() {
+    
+    public Rule operators() {
         return binary(
-                orExpression(),
-                Operator.STARTS_WITH,
-                Operator.ENDS_WITH,
-                Operator.MATCHES,
-                Operator.IN,
-                Operator.NOT_IN
-        );
-    }
-
-
-    protected Rule orExpression() {
-        return binary(
-                andExpression(),
-                Operator.OR
-        );
-    }
-
-    Rule andExpression() {
-        return binary(
-                equalityExpression(),
-                Operator.AND
-        );
-    }
-
-    Rule equalityExpression() {
-        return binary(
-                relationalExpression(),
-                Operator.EQUAL,
-                Operator.DIFF
-        );
-    }
-
-    Rule relationalExpression() {
-        return binary(
-                FirstOf(
-                        negation(),
-                        addition(),
-                        negative()
-                ),
-                Operator.LTE,
-                Operator.GTE,
-                Operator.LT,
-                Operator.GT
-        );
-    }
-
-
-    Rule negation() {
-        return unary(
-                addition(),
-                Operator.NOT
-        );
-    }
-
-    Rule negative() {
-        return unary(
-                addition(),
-                Operator.SUB
-        );
-    }
-
-    Rule addition() {
-        return binary(
-                multiplication(),
-                Operator.ADD,
-                Operator.SUB
-        );
-    }
-
-    Rule multiplication() {
-        return binary(
-                concatenation(),
-                Operator.INT_DIV,
-                Operator.INT_TIMES,
-                Operator.TIMES,
-                Operator.DIV,
-                Operator.MOD
+                operatorsHierarchy(),
+                tests()
         );
     }
     
-    Rule concatenation() {
-        return binary(
-                composition(),
-                Operator.CONCATENATION
-        );
+    Rule operatorsHierarchy() {
+        List<Operator> operators = new ArrayList<>(env.getConfiguration().getExtensions().getBinaryOperators().values());
+        operators.addAll(env.getConfiguration().getExtensions().getUnaryOperators().values());
+        Collections.sort(operators, Collections.reverseOrder());
+        
+        Rule previous = primary();
+        for (Operator op : operators) {
+            if (op instanceof UnaryOperator) {
+                previous = unary(
+                        previous,
+                        op.getName()
+                );
+            } else if (op instanceof BinaryOperator) {
+                previous = binary(
+                        previous,
+                        ObjectUtils.defaultIfNull(((BinaryOperator)op).getRightSideRule(this, env), previous),
+                        op.getName()
+                );
+            } else {
+                throw new UnsupportedOperationException("Operations of types other than unary and binary are not yet supported. "+op.getClass().getName()+" given.");
+            }
+        }
+        return previous;
     }
 
-    Rule composition() {
-        return binary(
-                isOperation(),
-                FirstOf(
-                        functionWithBrackets(),
-                        variable()
-                ),
-                COMPOSITION
-        );
-    }
-
-
-    Rule isOperation() {
-        return Sequence(
-                selection(),
-                push(new OperationBinary(currentPosition(), pop())),
-                ZeroOrMore(
-                        operator(IS),
-                        popValue(),
-                        mandatory(
-                                Sequence(
-                                        FirstOf(
-                                                Sequence(
-                                                        operator(NOT),
-                                                        popValue(),
-                                                        action(peek(OperationBinary.class).add(Operator.IS_NOT))
-                                                ),
-                                                action(peek(OperationBinary.class).add(Operator.IS))
-                                        ),
-                                        FirstOf(
-                                                functionWithBrackets(),
-                                                functionWithTwoWordsAsName(),
-                                                variable(),
-                                                keywordAsVariable(NULL)
-                                        ),
-                                        action(peek(1, OperationBinary.class).add(pop()))
-                                ),
-                                new ParseException("Wrong binary operation syntax")
-                        )
-
-                )
-        );
-    }
-
-
-    Rule selection() {
-        return binary(
-                primary(),
-                FirstOf(
-                        functionWithBrackets(),
-                        mapEntry(),
-                        variable()
-                ),
-                SELECTION
-        );
+    String[] tests() {
+        return env.getConfiguration().getExtensions().getTests().keySet().toArray(new String[0]);
     }
 
     Rule primary() {
@@ -219,19 +136,22 @@ public class JtwigExpressionParser extends JtwigBaseParser<CompilableExpression>
                                 expression(),
                                 action(peek(1, OperationTernary.class).withFalseExpression(pop()))
                         ),
-                        new ParseException("Wring ternary operation syntax")
+                        new ParseException("Wrong ternary operation syntax")
                 )
         );
     }
 
-
     Rule elementar() {
         return FirstOf(
                 mapEntry(),
-                blockFunction(),
                 function(),
                 map(),
                 list(),
+                Sequence(
+                        constants.booleanValue(),
+                        push(constants.pop()),
+                        basic.spacing()
+                ),
                 variable(),
                 constant(),
                 Sequence(
@@ -242,7 +162,7 @@ public class JtwigExpressionParser extends JtwigBaseParser<CompilableExpression>
         );
     }
 
-    Rule mapEntry() {
+    public Rule mapEntry() {
         return Sequence(
                 variable(),
                 symbol(OPEN_BRACKET),
@@ -250,95 +170,53 @@ public class JtwigExpressionParser extends JtwigBaseParser<CompilableExpression>
                         Sequence(
                                 expression(),
                                 symbol(CLOSE_BRACKET),
-                                push(new MapSelection(currentPosition(), pop(1, Variable.class), pop()))
+                                push(new MapSelection(currentPosition(), pop(1), pop()))
                         ),
-                        new ParseException("Wring map selection syntax")
+                        new ParseException("Wrong map selection syntax")
                 )
         );
     }
 
     public Rule function() {
+        return callableWithBrackets(FunctionCall.class);
+    }
+    
+    public Rule callable(final Class<? extends Callable> model) {
+        return callable(model, identifierAsString());
+    }
+    public Rule callable(final Class<? extends Callable> model,
+            final Rule identifierRule) {
         return FirstOf(
-                functionWithBrackets(),
-                functionWithoutBrackets()
+                callableWithBrackets(model, identifierRule),
+                callableWithoutBrackets(model, identifierRule)
         );
     }
-
-    Rule nonExpressionFunction() {
-        return FirstOf(
-                functionWithBrackets(),
-                nonExpressionFunctionWithoutBrackets()
-        );
-    }
-
-    Rule functionWithTwoWordsAsName() {
-        return Sequence(
-                basic.identifier(),
+    public Rule callable(final Class<? extends Callable> model,
+            final String[] identifiers) {
+        return callable(model, Sequence(
+                FirstOf(identifiers),
                 push(new Constant<>(match())),
-                basic.spacing(),
-                basic.identifier(),
-                push(new Constant<>(match())),
-                basic.spacing(),
-                push(new FunctionElement(currentPosition(), popVariableName(1) + " " + popVariableName())),
-                mandatory(
-                        Sequence(
-                                expression(),
-                                action(peek(1, FunctionElement.class).add(pop()))
-                        ),
-                        new ParseException("Wrong function named with two words syntax")
-                )
-        );
+                basic.spacing()
+        ));
     }
-
-    Rule functionWithoutBrackets() {
-        return Sequence(
-                basic.identifier(),
-                push(new Constant<>(match())),
-                basic.spacing(),
-                TestNot(
-                        basic.spacing(),
-                        basic.terminal(SUB.toString())
-                ),
-                expression(),
-                push(new FunctionElement(currentPosition(), popVariableName(1))),
-                action(peek(FunctionElement.class).add(pop(1)))
-        );
+    public Rule callableWithBrackets(final Class<? extends Callable> model) {
+        return callableWithBrackets(model, identifierAsString());
     }
-
-    Rule nonExpressionFunctionWithoutBrackets() {
+    public Rule callableWithBrackets(final Class<? extends Callable> model,
+            final Rule identifierRule) {
         return Sequence(
-                basic.identifier(),
-                push(new Constant<>(match())),
-                basic.spacing(),
-                TestNot(
-                        basic.spacing(),
-                        basic.terminal(SUB.toString())
-                ),
-                FirstOf(
-                        Sequence(
-                                expression(),
-                                push(new FunctionElement(currentPosition(), popVariableName(1))) ,
-                                action(peek(FunctionElement.class).add(pop(1)))
-                        ),
-                        push(new FunctionElement(currentPosition(), popVariableName()))
-                )
-        );
-    }
-
-    public Rule functionWithBrackets() {
-        return Sequence(
-                identifierAsString(),
+                identifierRule,
                 symbol(OPEN_PARENT),
-                push(new FunctionElement(currentPosition(), popIdentifierAsString())),
+                push(createCallableModel(model)),
                 mandatory(
                         Sequence(
                                 Optional(
                                         expression(),
-                                        action(peek(1, FunctionElement.class).add(pop())),
+                                        action(peek(1, Callable.class).add(pop())),
                                         ZeroOrMore(
                                                 symbol(COMMA),
                                                 expression(),
-                                                action((peek(1, FunctionElement.class)).add(pop()))
+                                                action((peek(1, Callable.class)).add(pop()))
                                         )
                                 ),
                                 symbol(CLOSE_PARENT)
@@ -347,30 +225,26 @@ public class JtwigExpressionParser extends JtwigBaseParser<CompilableExpression>
                 )
         );
     }
-    
-    public Rule blockFunction() {
+    public Rule callableWithoutBrackets(final Class<? extends Callable> model) {
+        return callableWithoutBrackets(model, identifierAsString());
+    }
+    public Rule callableWithoutBrackets(final Class<? extends Callable> model,
+            final Rule identifierRule) {
         return Sequence(
-                "block",
-                basic.spacing(),
-                push(new BlockFunction(currentPosition())),
-                symbol(OPEN_PARENT),
-                mandatory(
-                        Sequence(
-                                expression(),
-                                action(peek(1, BlockFunction.class).add(pop())),
-                                ZeroOrMore(
-                                        symbol(COMMA),
-                                        expression(),
-                                        action((peek(1, BlockFunction.class)).add(pop()))
-                                ),
-                                symbol(CLOSE_PARENT)
-                        ),
-                        new ParseException("Invalid block function syntax")
-                )
+                identifierRule,
+                push(createCallableModel(model)),
+                basic.spacing()
         );
     }
+    Callable createCallableModel(final Class<? extends Callable> model) {
+        try {
+            return model.getConstructor(JtwigPosition.class, String.class).newInstance(currentPosition(), popIdentifierAsString());
+        } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+            throw new ParseBypassException(new ParseException(ex));
+        }
+    }
 
-    Rule map() {
+    public Rule map() {
         return Sequence(
                 symbol(OPEN_CURLY_BRACKET),
                 push(new ValueMap(currentPosition())),
@@ -405,10 +279,7 @@ public class JtwigExpressionParser extends JtwigBaseParser<CompilableExpression>
     }
 
     Rule list() {
-        return FirstOf(
-                comprehensionList(),
-                enumeratedList()
-        );
+        return enumeratedList();
     }
 
     Rule enumeratedList() {
@@ -432,24 +303,6 @@ public class JtwigExpressionParser extends JtwigBaseParser<CompilableExpression>
                 )
         );
     }
-    
-    Rule comprehensionList() {
-        return Sequence(
-                TestNot(InValueStack(ValueRange.class)),
-                push(new ValueRange()),
-                expression(),
-                action(peek(1, ValueRange.class).withStart(pop(CompilableExpression.class))),
-                symbol(TWO_DOTS),
-                mandatory(
-                        Sequence(
-                                expression(),
-                                action(peek(1, ValueRange.class).withEnd(pop(CompilableExpression.class))),
-                                basic.spacing()
-                        ),
-                        new ParseException("Invalid comprehension syntax")
-                )
-        );
-    }
 
     public Rule variable() {
         return Sequence(
@@ -459,15 +312,7 @@ public class JtwigExpressionParser extends JtwigBaseParser<CompilableExpression>
         );
     }
 
-
-    public Rule variableAsFunction() {
-        return Sequence(
-                variable(),
-                push(pop(Variable.class).toFunction())
-        );
-    }
-
-    Rule identifierAsString() {
+    public Rule identifierAsString() {
         return Sequence(
                 basic.identifier(),
                 push(new Constant<>(match())),
@@ -475,25 +320,20 @@ public class JtwigExpressionParser extends JtwigBaseParser<CompilableExpression>
         );
     }
 
-    String popIdentifierAsString () {
+    public String popIdentifierAsString () {
         return popIdentifierAsString(0);
     }
 
-    String popIdentifierAsString(int position) {
+    public String popIdentifierAsString(int position) {
         return (String) pop(position, Constant.class).as(String.class);
     }
 
-    Rule constant() {
+    public Rule constant() {
         return Sequence(
                 constants.anyConstant(),
                 push(constants.pop()),
                 basic.spacing()
         );
-    }
-
-    @Override
-    boolean throwException(ParseException exception) throws ParseBypassException {
-        throw new ParseBypassException(exception);
     }
 
     Rule symbol(JtwigSymbol symbol) {
@@ -512,15 +352,18 @@ public class JtwigExpressionParser extends JtwigBaseParser<CompilableExpression>
     }
 
     @SuppressNode
-    Rule firstOperatorOf(Operator... operators) {
+    Rule firstOperatorOf(String... operators) {
+        if (operators == null || operators.length == 0) {
+            return EMPTY;
+        }
         Rule[] rules = new Rule[operators.length];
         int i = 0;
-        for (Operator operator : operators)
+        for (String operator : operators)
             rules[i++] = operator(operator);
         return FirstOf(rules);
     }
 
-    Rule operator(Operator operator) {
+    Rule operator(String operator) {
         return Sequence(
                 TestNot(
                         FirstOf(
@@ -536,8 +379,8 @@ public class JtwigExpressionParser extends JtwigBaseParser<CompilableExpression>
                                 )
                         )
                 ),
-                basic.terminal(operator.toString()),
-                conditionalSpace(operator.toString()),
+                basic.terminal(operator),
+                conditionalSpace(operator),
                 push(new Constant<>(operator)),
                 basic.spacing()
         );
@@ -549,18 +392,18 @@ public class JtwigExpressionParser extends JtwigBaseParser<CompilableExpression>
         return Test(true);
     }
 
-    public Rule binary(Rule first, Rule rest, Operator... operators) {
+    public Rule binary(Rule first, Rule rest, String... operators) {
         return Sequence(
                 first,
                 push(new OperationBinary(currentPosition(), pop())),
                 ZeroOrMore(
                         firstOperatorOf(operators),
                         TestNot(firstOperatorOf(operators)),
-                        action(peek(1, OperationBinary.class).add((Operator) pop(Constant.class).getValue())),
+                        action(peek(1, OperationBinary.class).addOperator(pop(Constant.class).as(String.class).toString())),
                         mandatory(
                                 Sequence(
                                         rest,
-                                        action(peek(1, OperationBinary.class).add(pop()))
+                                        action(peek(1, OperationBinary.class).addOperand(pop()))
                                 ),
                                 new ParseException("Wrong binary operation syntax")
                         )
@@ -568,22 +411,24 @@ public class JtwigExpressionParser extends JtwigBaseParser<CompilableExpression>
         );
     }
 
-    public Rule binary(Rule innerExpression, Operator... operators) {
+    public Rule binary(Rule innerExpression, String... operators) {
         return binary(innerExpression, innerExpression, operators);
     }
 
-    public Rule unary(Rule innerRule, Operator... operators) {
-        return Sequence(
-                firstOperatorOf(operators),
-                push(new OperationUnary.Builder().withPosition(currentPosition()).withOperator((Operator) pop(Constant.class).getValue())),
-                mandatory(
-                        Sequence(
-                                innerRule,
-                                action(peek(1, OperationUnary.Builder.class).withOperand(pop()))
-                        ),
-                        new ParseException("Wrong unary operator syntax")
+    public Rule unary(Rule innerRule, String operator) {
+        return FirstOf(
+                Sequence(
+                        firstOperatorOf(operator),
+                        push(new OperationUnary(currentPosition(), pop(Constant.class).as(String.class).toString())),
+                        mandatory(
+                                Sequence(
+                                        innerRule,
+                                        action(peek(1, OperationUnary.class).withOperand(pop()))
+                                ),
+                                new ParseException("Wrong unary operator syntax")
+                        )
                 ),
-                push(pop(OperationUnary.Builder.class).build())
+                innerRule
         );
     }
 
@@ -617,7 +462,6 @@ public class JtwigExpressionParser extends JtwigBaseParser<CompilableExpression>
     public Rule InValueStack(Class<?> cls, int start, int end) {
         return new InValueStack(Ch('*'), cls, start, end);
     }
-    
     
     public static class InValueStack extends CustomMatcher {
         private final Class<?> cls;

@@ -19,8 +19,8 @@ import org.jtwig.exception.CompileException;
 import org.jtwig.expressions.api.CompilableExpression;
 import org.jtwig.expressions.api.Expression;
 import org.jtwig.expressions.model.OperationUnary;
-import org.jtwig.expressions.model.Operator;
 import org.jtwig.render.RenderContext;
+import org.jtwig.unit.AbstractJtwigTest;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -28,19 +28,19 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class OperationUnaryTest {
+public class OperationUnaryTest extends AbstractJtwigTest {
     @Test
     public void not() throws Exception {
         Expression expression = mock(Expression.class);
         when(expression.calculate(any(RenderContext.class))).thenReturn(true);
 
-        OperationUnary unary = new OperationUnary(null, Operator.NOT, expression(expression));
-        assertEquals(unary.compile(null).calculate(null), false);
+        OperationUnary unary = new OperationUnary(null, "not").withOperand(expression(expression));
+        assertEquals(unary.compile(compileContext).calculate(renderContext), false);
     }
 
     @Test(expected = CompileException.class)
     public void operationNotFound() throws Exception {
-        new OperationUnary(null, Operator.UNKNOWN, mock(CompilableExpression.class)).compile(mock(CompileContext.class));
+        new OperationUnary(null, "unknown").withOperand(mock(CompilableExpression.class)).compile(compileContext);
     }
 
     private CompilableExpression expression(final Expression expression) {

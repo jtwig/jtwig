@@ -20,7 +20,9 @@ import static org.jtwig.parser.config.TagSymbols.JAVASCRIPT_COLLISION_FREE;
 
 import org.jtwig.JtwigModelMap;
 import org.jtwig.JtwigTemplate;
+import org.jtwig.configuration.JtwigConfiguration;
 import org.jtwig.configuration.JtwigConfigurationBuilder;
+import org.jtwig.extension.core.CoreJtwigExtension;
 import org.junit.Test;
 
 public class CustomTagsTest {
@@ -41,10 +43,13 @@ public class CustomTagsTest {
     public void javascriptCodeTag() throws Exception {
         JtwigModelMap model = new JtwigModelMap();
 
-        String result = JtwigTemplate
-            .inlineTemplate("<# if (true) #>Hello<# endif #>", JtwigConfigurationBuilder.newConfiguration()
+        JtwigConfiguration config = JtwigConfigurationBuilder.newConfiguration()
                 .withSymbols(JAVASCRIPT_COLLISION_FREE)
-                .build())
+                .build();
+        config.getExtensions().addExtension(new CoreJtwigExtension(config));
+        
+        String result = JtwigTemplate
+            .inlineTemplate("<# if (true) #>Hello<# endif #>", config)
             .render(model);
 
         assertThat(result, is("Hello"));
@@ -54,10 +59,13 @@ public class CustomTagsTest {
     public void javascriptComment() throws Exception {
         JtwigModelMap model = new JtwigModelMap();
 
-        String result = JtwigTemplate
-            .inlineTemplate("<$ if (true) #>Hello<# endif $>", JtwigConfigurationBuilder.newConfiguration()
+        JtwigConfiguration config = JtwigConfigurationBuilder.newConfiguration()
                 .withSymbols(JAVASCRIPT_COLLISION_FREE)
-                .build())
+                .build();
+        config.getExtensions().addExtension(new CoreJtwigExtension(config));
+        
+        String result = JtwigTemplate
+            .inlineTemplate("<$ if (true) #>Hello<# endif $>", config)
             .render(model);
 
         assertThat(result, is(""));

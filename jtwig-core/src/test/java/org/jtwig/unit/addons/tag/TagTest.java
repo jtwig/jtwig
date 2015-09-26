@@ -1,6 +1,8 @@
 package org.jtwig.unit.addons.tag;
 
 import com.google.common.base.Function;
+import java.io.IOException;
+import java.io.OutputStream;
 import org.jtwig.addons.tag.Tag;
 import org.jtwig.compile.CompileContext;
 import org.jtwig.content.model.compilable.Sequence;
@@ -9,13 +11,13 @@ import org.jtwig.exception.RenderException;
 import org.jtwig.render.RenderContext;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.io.IOException;
-import java.io.OutputStream;
-
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class TagTest {
     private Function<String, String> transformation = mock(Function.class);

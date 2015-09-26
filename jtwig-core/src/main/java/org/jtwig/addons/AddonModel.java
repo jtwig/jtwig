@@ -16,5 +16,6 @@ package org.jtwig.addons;
 
 import org.jtwig.content.model.compilable.Content;
 
+@Deprecated
 public abstract class AddonModel<T extends AddonModel> extends Content<T> {
 }

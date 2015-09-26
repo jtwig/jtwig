@@ -9,7 +9,7 @@ import static org.hamcrest.core.IsEqual.equalTo;
 public class PathViewTest extends AbstractViewAcceptanceTest {
     @Test
     public void pathEndingInSlashShouldNotBeTrimmed() throws Exception {
-        String result = renderString("{{ path '/one/' }}");
+        String result = renderString("{{ path('/one/') }}");
 
         assertThat(result, equalTo("/one/"));
     }

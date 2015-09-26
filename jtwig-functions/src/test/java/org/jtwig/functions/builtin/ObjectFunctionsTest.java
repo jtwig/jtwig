@@ -3,7 +3,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,54 +14,26 @@
 
 package org.jtwig.functions.builtin;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-
 public class ObjectFunctionsTest {
-    private ObjectFunctions underTest = new ObjectFunctions();
-
+    ObjectFunctions underTest = new ObjectFunctions();
+    
     @Test
-    public void toDouble() throws Exception {
-        assertEquals(underTest.toDouble(1), (Double) 1.0);
+    public void toDoubleTests() throws Exception {
+        assertEquals(2.1D, underTest.toDouble(2.1F), 0);
+        assertEquals(2.1D, underTest.toDouble(2.1D), 0);
+        assertEquals(2D, underTest.toDouble(2), 0);
+        assertEquals(2.1D, underTest.toDouble("2.1"), 0);
     }
-
+    
     @Test
-    public void toInt() throws Exception {
-        assertEquals(underTest.toInt(2.0), (Integer) 2);
+    public void toIntTests() throws Exception {
+        assertEquals(2, (int)underTest.toInt(2D));
+        assertEquals(2, (int)underTest.toInt(2F));
+        assertEquals(2, (int)underTest.toInt(2));
+        assertEquals(2, (int)underTest.toInt("2"));
     }
-
-    @Test
-    public void first() throws Exception {
-        assertEquals(underTest.first(new String[]{"a","b","c"}), "a");
-        assertEquals(underTest.first(null), null);
-        assertEquals(underTest.first(true), true);
-    }
-
-    @Test
-    public void last() throws Exception {
-        assertEquals(underTest.last(new String[]{"a","b","c"}), "c");
-        assertEquals(underTest.last(null), null);
-        assertEquals(underTest.last(true), true);
-    }
-
-    @Test
-    public void testDefault() throws Exception {
-        assertEquals(underTest.defaultFunction(null, "a"), "a");
-        assertEquals(underTest.defaultFunction(null, 1), 1);
-    }
-
-    @Test
-    public void testNonDefault() throws Exception {
-        assertEquals(underTest.defaultFunction(1, "a"), 1);
-    }
-
-
-    @Test
-    public void testExecuteWithString() throws Exception {
-        int length = underTest.length("test");
-        assertThat(length, is(4));
-    }
+    
 }

@@ -20,15 +20,12 @@ import org.jtwig.Environment;
 import org.jtwig.JtwigModelMap;
 import org.jtwig.compile.CompileContext;
 import org.jtwig.content.api.Compilable;
-import org.jtwig.content.api.Renderable;
-import org.jtwig.content.model.BasicTemplate;
 import org.jtwig.content.model.Template;
-import org.jtwig.content.model.compilable.Block;
+import org.jtwig.extension.core.tokenparsers.model.Block;
 import org.jtwig.content.model.compilable.Text;
 import org.jtwig.render.RenderContext;
-
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import org.junit.Test;
 
 public class TemplateTest {
@@ -36,7 +33,7 @@ public class TemplateTest {
     public void ensureContentIsReturned() throws Exception {
         Compilable compilable = new  Text("hello, world");
         
-        Template template = new BasicTemplate(null);
+        Template template = new Template(null);
         template.add(compilable);
         assertEquals("hello, world", render(template));
     }
@@ -44,7 +41,7 @@ public class TemplateTest {
     public void ensureBlockTrackingWorksProperly() throws Exception {
         Block block = new Block(null, "test1");
         
-        Template template = new BasicTemplate(null);
+        Template template = new Template(null);
         assertNull(template.block("test1"));
         template.track(block);
         assertEquals(block, template.block("test1"));

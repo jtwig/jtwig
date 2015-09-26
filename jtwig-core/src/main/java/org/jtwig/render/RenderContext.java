@@ -15,10 +15,22 @@
 package org.jtwig.render;
 
 import com.google.common.base.Optional;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Stack;
 import org.apache.commons.lang3.StringUtils;
+import org.jtwig.Environment;
 import org.jtwig.JtwigModelMap;
+import org.jtwig.cache.TemplateCache;
 import org.jtwig.content.api.Renderable;
+import org.jtwig.content.model.Template;
 import org.jtwig.exception.RenderException;
+import org.jtwig.extension.core.tokenparsers.model.Block;
 import org.jtwig.functions.exceptions.FunctionException;
 import org.jtwig.functions.exceptions.FunctionNotFoundException;
 import org.jtwig.functions.parameters.convert.DemultiplexerConverter;
@@ -28,25 +40,11 @@ import org.jtwig.functions.parameters.resolve.api.InputParameterResolverFactory;
 import org.jtwig.functions.parameters.resolve.api.ParameterResolver;
 import org.jtwig.functions.parameters.resolve.impl.InputDelegateMethodParametersResolver;
 import org.jtwig.functions.parameters.resolve.impl.ParameterAnnotationParameterResolver;
-import org.jtwig.functions.repository.model.Function;
 import org.jtwig.functions.resolver.api.FunctionResolver;
 import org.jtwig.functions.resolver.impl.CompoundFunctionResolver;
 import org.jtwig.functions.resolver.impl.DelegateFunctionResolver;
 import org.jtwig.functions.resolver.model.Executable;
 import org.jtwig.render.stream.RenderStream;
-
-import java.io.IOException;
-import java.io.OutputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Stack;
-import org.jtwig.Environment;
-import org.jtwig.cache.TemplateCache;
-import org.jtwig.content.model.Template;
-
 import static org.jtwig.types.Undefined.UNDEFINED;
 
 public class RenderContext {
@@ -72,7 +70,9 @@ public class RenderContext {
 
     private final RenderStream renderStream;
     
-    private Stack<Template.CompiledTemplate> renderingTemplateStack = new Stack<>();
+    private Stack<Template.Compiled> templateStack = new Stack<>();
+    
+    private Stack<Block.CompiledBlock> blockStack = new Stack<>();
 
     private RenderContext(
             Environment env,
@@ -89,9 +89,9 @@ public class RenderContext {
             JtwigModelMap modelMap,
             FunctionResolver functionResolver,
             RenderStream renderStream,
-            Stack<Template.CompiledTemplate> renderingTemplateStack) {
+            Stack<Template.Compiled> templateStack) {
         this(env, modelMap, functionResolver, renderStream);
-        this.renderingTemplateStack = renderingTemplateStack;
+        this.templateStack = templateStack;
     }
 
     public void write(byte[] bytes) throws IOException {
@@ -105,7 +105,7 @@ public class RenderContext {
     public RenderContext newRenderContext(OutputStream outputStream) {
         return new RenderContext(env, modelMap, functionResolver,
                 new RenderStream(outputStream, env),
-                renderingTemplateStack);
+                templateStack);
     }
 
     public Environment environment() {
@@ -116,18 +116,15 @@ public class RenderContext {
         return env.getConfiguration().getTemplateCache();
     }
     
-    public Template.CompiledTemplate getRenderingTemplate() {
-        return renderingTemplateStack.peek();
-    }
-    
-    public RenderContext pushRenderingTemplate(Template.CompiledTemplate renderingTemplate) {
-        this.renderingTemplateStack.push(renderingTemplate);
+    public RenderContext clearTemplateStack() {
+        templateStack = new Stack<>();
         return this;
     }
-    
-    public RenderContext popRenderingTemplate() {
-        this.renderingTemplateStack.pop();
-        return this;
+    public Stack<Template.Compiled> getTemplateStack() {
+        return templateStack;
+    }
+    public Stack<Block.CompiledBlock> getBlockStack() {
+        return blockStack;
     }
 
     public void renderConcurrent(Renderable content) throws IOException, RenderException {
@@ -136,12 +133,12 @@ public class RenderContext {
 
     private RenderContext fork() throws IOException {
         return new RenderContext(env, modelMap, functionResolver,
-                renderStream.fork(), renderingTemplateStack);
+                renderStream.fork(), templateStack);
     }
 
     public RenderContext isolatedModel() {
         return new RenderContext(env, modelMap.clone(),
-                functionResolver, renderStream, renderingTemplateStack);
+                functionResolver, renderStream, templateStack);
     }
 
     public RenderContext with(Map calculate) {

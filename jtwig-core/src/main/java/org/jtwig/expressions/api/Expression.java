@@ -19,4 +19,11 @@ import org.jtwig.render.RenderContext;
 
 public interface Expression {
     Object calculate (RenderContext context) throws CalculateException;
+    
+    public static final Expression NOOP = new Expression() {
+        @Override
+        public Object calculate(final RenderContext context) throws CalculateException {
+            return null;
+        }
+    };
 }

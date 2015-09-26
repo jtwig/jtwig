@@ -41,6 +41,24 @@
             <version>${commons.lang3.version}</version>
         </dependency>
         <dependency>
+            <groupId>com.crosstreelabs</groupId>
+            <artifactId>phpfunctions</artifactId>
+            <version>0.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apfloat</groupId>
+            <artifactId>apfloat</artifactId>
+            <version>1.8.2</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sourceforge.jregex</groupId>
+            <artifactId>jregex</artifactId>
+            <version>1.2_01</version>
+        </dependency>
+
+
+
+        <dependency>
             <groupId>org.reflections</groupId>
             <artifactId>reflections</artifactId>
             <version>0.9.9-RC1</version>
@@ -91,6 +109,12 @@
             <version>1.9.13</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.1.2</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -104,6 +128,8 @@
                         <exclude>org/jtwig/parser/parboiled/**</exclude>
                         <exclude>org/jtwig/addons/AddonParser*</exclude>
                         <exclude>org/jtwig/addons/**/*Parser*</exclude>
+                        <exclude>org/jtwig/extension/core/tokenparsers/**</exclude>
+                        <exclude>org/jtwig/extension/api/tokenparser/*</exclude>
                     </excludes>
                 </configuration>
             </plugin>

@@ -14,11 +14,12 @@
 
 package org.jtwig.expressions.model;
 
+import static java.lang.String.format;
 import org.jtwig.compile.CompileContext;
 import org.jtwig.exception.CalculateException;
 import org.jtwig.exception.CompileException;
-import org.jtwig.expressions.api.CompilableExpression;
 import org.jtwig.expressions.api.Expression;
+import org.jtwig.expressions.api.Extractable;
 import org.jtwig.parser.model.JtwigPosition;
 import org.jtwig.render.RenderContext;
 import org.jtwig.types.Undefined;
@@ -26,12 +27,8 @@ import org.jtwig.util.ObjectExtractor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-
-import static java.lang.String.format;
-
 public class Variable extends AbstractCompilableExpression {
-    private static Logger log = LoggerFactory.getLogger(Variable.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Variable.class);
     private String name;
 
     public Variable(JtwigPosition position, String name) {
@@ -48,11 +45,11 @@ public class Variable extends AbstractCompilableExpression {
         return new Compiled(position(), name);
     }
 
-    public CompilableExpression toFunction() {
-        return new FunctionElement(position(), name);
-    }
+//    public CompilableExpression toFunction() {
+//        return new FunctionElement(position(), name);
+//    }
 
-    public static class Compiled implements Expression {
+    public static class Compiled implements Expression, Extractable {
         private final String name;
         private final JtwigPosition position;
 
@@ -62,9 +59,9 @@ public class Variable extends AbstractCompilableExpression {
         }
 
 
-        public FunctionElement.Compiled toFunction () {
-            return new FunctionElement.Compiled(position, name, new ArrayList<Expression>());
-        }
+//        public FunctionElement.Compiled toFunction () {
+//            return new FunctionElement.Compiled(position, name, new ArrayList<Expression>());
+//        }
 
         @Override
         public Object calculate(RenderContext context) throws CalculateException {
@@ -73,12 +70,13 @@ public class Variable extends AbstractCompilableExpression {
                 if (context.environment().getConfiguration().isStrictMode())
                     throw new CalculateException(position + format(": Variable '%s' does not exist", name));
                 else if (context.environment().getConfiguration().isLogNonStrictMode())
-                    log.debug(position + format(": Variable '%s' does not exist", name));
+                    LOGGER.debug("{}: Variable '{}' does not exist", position, name);
             }
             return result;
         }
 
-        public Object extract(ObjectExtractor extractor) throws ObjectExtractor.ExtractException {
+        @Override
+        public Object extract(RenderContext context, ObjectExtractor extractor) throws ObjectExtractor.ExtractException {
             // if we reach this we are already sure that the extractor content is not null/undefined
             return extractor.extract(name);
         }

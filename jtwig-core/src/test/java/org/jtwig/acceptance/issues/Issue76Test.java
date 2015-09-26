@@ -22,7 +22,8 @@ import org.junit.Test;
 
 import static org.hamcrest.core.StringContains.containsString;
 import static org.hamcrest.core.StringStartsWith.startsWith;
-import static org.jtwig.configuration.JtwigConfigurationBuilder.newConfiguration;
+import org.jtwig.configuration.JtwigConfiguration;
+import org.jtwig.extension.core.CoreJtwigExtension;
 import static org.jtwig.util.SyntacticSugar.then;
 import static org.junit.Assert.fail;
 
@@ -63,10 +64,13 @@ public class Issue76Test {
         try {
             JtwigModelMap model = new JtwigModelMap();
 
-            JtwigTemplate
-                .classpathTemplate("templates/issue76/test2.twig", newConfiguration()
+            JtwigConfiguration config = JtwigConfigurationBuilder.newConfiguration()
                     .withStrictMode(true)
-                    .build())
+                    .build();
+            config.getExtensions().addExtension(new CoreJtwigExtension(config));
+            
+            JtwigTemplate
+                .classpathTemplate("templates/issue76/test2.twig", config)
                 .render(model);
 
             fail();

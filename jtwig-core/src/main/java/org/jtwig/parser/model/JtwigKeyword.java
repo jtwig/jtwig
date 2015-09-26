@@ -25,46 +25,12 @@ public enum JtwigKeyword {
     TRUE("true"),
     FALSE("false"),
 
-    FOR("for"),
-    ENDFOR("endfor"),
-
-    IF("if"),
-    ENDIF("endif"),
-    ELSEIF("elseif"),
-    ELSE("else"),
-
-    BLOCK("block"),
-    ENDBLOCK("endblock"),
-
-    EXTENDS("extends"),
-    
-    FROM("from"),
-    SELF("_self"),
-    IMPORT("import"),
-    AS("as"),
-    
-    MACRO("macro"),
-    ENDMACRO("endmacro"),
-
-    EMBED("embed"),
-    ENDEMBED("endembed"),
-
     AND("and"),
     OR("or"),
     NULL("null"),
 
-    SET("set"),
-    INCLUDE("include"),
-    ONLY("only"),
-    IGNORE_MISSING("ignore missing"),
-    EXCLUDE("exclude"),
     IN("in"),
     IS("is"),
-    FILTER("filter"),
-    ENDFILTER("endfilter"),
-
-    VERBATIM("verbatim"),
-    ENDVERBATIM("endverbatim"),
 
     WITH("with");
 
@@ -75,6 +41,7 @@ public enum JtwigKeyword {
 
     private static Function<JtwigKeyword, String> extractWord() {
         return new Function<JtwigKeyword, String>() {
+            @Override
             public String apply(JtwigKeyword elem) {
                 return elem.getKeyword();
             }
@@ -91,6 +58,7 @@ public enum JtwigKeyword {
         return keyword;
     }
 
+    @Override
     public String toString () {
         return getKeyword();
     }

@@ -15,15 +15,12 @@
 package org.jtwig.unit.content.model;
 
 import java.io.IOException;
-
 import org.jtwig.compile.CompileContext;
 import org.jtwig.content.api.Renderable;
 import org.jtwig.content.model.compilable.Sequence;
 import org.jtwig.content.model.compilable.Text;
 import org.jtwig.exception.RenderException;
 import org.jtwig.render.RenderContext;
-import static org.junit.Assert.assertNull;
-
 import org.junit.Before;
 import org.junit.Test;
 import static org.mockito.Matchers.any;
@@ -60,12 +57,6 @@ public class TextTest {
 
         underTest.compile(compileContext)
                 .render(renderContext);
-    }
-
-    @Test
-    public void builderIsFakeContent() throws Exception {
-        Text.Builder b = new Text.Builder();
-        assertNull(b.compile(null));
     }
 
     private Renderable renderable(final String text) {

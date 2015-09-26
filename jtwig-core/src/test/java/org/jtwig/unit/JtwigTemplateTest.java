@@ -41,6 +41,8 @@ public class JtwigTemplateTest extends MultiresourceUnitTest {
         withResource("level-1", "{% extends 'root' %}{% block one %}one{% endblock %}");
         withResource("root", "Block {% block one %}1{% endblock %} and {% block two %}2{% endblock %}");
         
+//        env.parse("level-1");
+        
         assertThat(theResult(), is("Block one and two"));
     }
     

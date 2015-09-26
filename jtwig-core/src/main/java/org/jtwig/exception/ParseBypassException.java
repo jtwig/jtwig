@@ -15,13 +15,12 @@
 package org.jtwig.exception;
 
 public class ParseBypassException extends RuntimeException {
-    private ParseException innerException;
-
-    public ParseBypassException(ParseException innerException) {
-        this.innerException = innerException;
+    public ParseBypassException(ParseException cause) {
+        super(cause);
     }
 
-    public ParseException getInnerException() {
-        return innerException;
+    @Override
+    public synchronized ParseException getCause() {
+        return (ParseException) super.getCause();
     }
 }

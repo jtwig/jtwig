@@ -4,17 +4,17 @@ import org.jtwig.cache.TemplateCache;
 import org.jtwig.functions.config.JsonConfiguration;
 import org.jtwig.functions.repository.api.FunctionRepository;
 import org.jtwig.loader.Loader;
-import org.jtwig.parser.config.AddonParserList;
 import org.jtwig.parser.config.Symbols;
 
 import java.nio.charset.Charset;
+import org.jtwig.extension.ExtensionHolder;
 
 public class ImmutableJtwigConfiguration implements JtwigConfiguration {
     private final Charset charset;
     private final boolean strictMode;
     private final boolean logNonStrictMode;
     private final Symbols symbols;
-    private final AddonParserList addonParserList;
+    private final ExtensionHolder extensions;
     private final int minThreads;
     private final int maxThreads;
     private final long keepAliveTime;
@@ -23,13 +23,13 @@ public class ImmutableJtwigConfiguration implements JtwigConfiguration {
     private final TemplateCache templateCache;
     private final Loader loader;
 
-    public ImmutableJtwigConfiguration(Charset charset, boolean strictMode, boolean logNonStrictMode, Symbols symbols, AddonParserList addonParserList, int minThreads, int maxThreads, long keepAliveTime,
+    public ImmutableJtwigConfiguration(Charset charset, boolean strictMode, boolean logNonStrictMode, Symbols symbols, ExtensionHolder extensions, int minThreads, int maxThreads, long keepAliveTime,
                                 JsonConfiguration jsonConfiguration, FunctionRepository functionRepository, TemplateCache templateCache, Loader loader) {
         this.charset = charset;
         this.strictMode = strictMode;
         this.logNonStrictMode = logNonStrictMode;
         this.symbols = symbols;
-        this.addonParserList = addonParserList;
+        this.extensions = extensions;
         this.minThreads = minThreads;
         this.maxThreads = maxThreads;
         this.keepAliveTime = keepAliveTime;
@@ -60,8 +60,8 @@ public class ImmutableJtwigConfiguration implements JtwigConfiguration {
     }
 
     @Override
-    public AddonParserList getAddonParserList() {
-        return addonParserList;
+    public ExtensionHolder getExtensions() {
+        return extensions;
     }
 
     @Override

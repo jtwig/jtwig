@@ -26,7 +26,7 @@ import org.jtwig.content.model.Template;
  */
 public class ExecutionCache implements TemplateCache {
     private final Map<String, Template> parsed = new HashMap<>();
-    private final Map<String, Template.CompiledTemplate> compiled = new HashMap<>();
+    private final Map<String, Template.Compiled> compiled = new HashMap<>();
     
 
     @Override
@@ -59,13 +59,13 @@ public class ExecutionCache implements TemplateCache {
     
     @Override
     public ExecutionCache addCompiled(final String name,
-            final Template.CompiledTemplate template) {
+            final Template.Compiled template) {
         this.compiled.put(name, template);
         return this;
     }
     
     @Override
-    public Template.CompiledTemplate getCompiled(final String name) {
+    public Template.Compiled getCompiled(final String name) {
         if (name == null) {
             return null;
         }
@@ -76,7 +76,7 @@ public class ExecutionCache implements TemplateCache {
     }
 
     @Override
-    public Template.CompiledTemplate removeCompiled(final String name) {
+    public Template.Compiled removeCompiled(final String name) {
         if (name == null) {
             return null;
         }

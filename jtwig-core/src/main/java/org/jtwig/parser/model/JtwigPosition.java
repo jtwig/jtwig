@@ -18,6 +18,7 @@ import org.jtwig.compile.CompileContext;
 import org.jtwig.content.model.Template;
 import org.jtwig.loader.Loader;
 import org.jtwig.render.RenderContext;
+import org.slf4j.LoggerFactory;
 
 public class JtwigPosition {
     private final Loader.Resource resource;
@@ -25,6 +26,11 @@ public class JtwigPosition {
     private final int column;
 
     public JtwigPosition(Loader.Resource resource, int row, int column) {
+//        if (resource == null) {
+//            LoggerFactory.getLogger(JtwigPosition.class).debug("Created jtwig position without resource "+hashCode(), new Exception());
+//        } else if (resource.toString().isEmpty()) {
+//            LoggerFactory.getLogger(JtwigPosition.class).debug("Created jtwig position with empty resource path "+hashCode(), new Exception());
+//        }
         this.resource = resource;
         this.row = row;
         this.column = column;
@@ -38,7 +44,7 @@ public class JtwigPosition {
         return compileContext.cache().getParsed(resource.getCacheKey());
     }
     
-    public Template.CompiledTemplate getCompiledTemplate(CompileContext compileContext) {
+    public Template.Compiled getCompiledTemplate(CompileContext compileContext) {
         return compileContext.cache().getCompiled(resource.getCacheKey());
     }
     
@@ -46,7 +52,7 @@ public class JtwigPosition {
         return renderContext.cache().getParsed(resource.getCacheKey());
     }
     
-    public Template.CompiledTemplate getCompiledTemplate(RenderContext renderContext) {
+    public Template.Compiled getCompiledTemplate(RenderContext renderContext) {
         return renderContext.cache().getCompiled(resource.getCacheKey());
     }
 
