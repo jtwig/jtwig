@@ -2,8 +2,8 @@
 
 *JTwig is a modern Java template engine designed for web development*
 
-[![Build Status](https://travis-ci.org/jtwig/jtwig.png)](https://travis-ci.org/jtwig/jtwig)
-[![Coverage Status](https://coveralls.io/repos/jtwig/jtwig/badge.png?branch=master)](https://coveralls.io/r/jtwig/jtwig?branch=master)
+[![Build Status](https://travis-ci.org/jtwig/jtwig.svg)](https://travis-ci.org/jtwig/jtwig)
+[![Coverage Status](https://coveralls.io/repos/jtwig/jtwig/badge.svg?branch=master)](https://coveralls.io/r/jtwig/jtwig?branch=master)
 
 ### Project Information
 
