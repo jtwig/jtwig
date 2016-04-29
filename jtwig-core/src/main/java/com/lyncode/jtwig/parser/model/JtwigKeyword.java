@@ -57,8 +57,8 @@ public enum JtwigKeyword {
     VERBATIM("verbatim"),
     ENDVERBATIM("endverbatim"),
 
-    WITH("with"),
-    TEMPLATE("template");
+    WITHTEMPLATE("withtemplate"),
+    WITH("with");
 
     public static String[] keywords () {
         List<String> list = new ListBuilder<JtwigKeyword>().add(JtwigKeyword.values()).build(extractWord());

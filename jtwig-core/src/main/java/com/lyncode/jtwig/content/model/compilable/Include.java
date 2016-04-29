@@ -65,12 +65,12 @@ public class Include extends AbstractElement {
             if (!resource.exists() && ignoreMissing) {
                 return new Missing();
             }
-            context = context.clone().withResource(resource);
 
             Compiled compiled;
             if (this.templateExpression != null) {
-                compiled = new Compiled(position, context, resource, isolated);
+                compiled = new Compiled(position, context.clone(), isolated);
             } else {
+                context = context.clone().withResource(resource);
                 compiled = new Compiled(position, context.parse(resource).compile(context), isolated);
 
             }
@@ -95,28 +95,22 @@ public class Include extends AbstractElement {
         private static final String TEMPLATE_PLACEHOLDER = "%s";
         private final JtwigPosition position;
         private final boolean isolated;
-        private JtwigResource jtwigResource;
-        private Renderable renderable;
+        private Renderable withTemplate;
         private Expression withExpression = null;
         private Expression template = null;
         private CompileContext compileContext = null;
         private String relativePath;
 
-        public Compiled(JtwigPosition position, Renderable renderable, boolean isolated) {
-            this.renderable = renderable;
+        public Compiled(JtwigPosition position, Renderable withTemplate, boolean isolated) {
+            this.withTemplate = withTemplate;
             this.position = position;
             this.isolated = isolated;
         }
 
-        public Compiled(JtwigPosition position, CompileContext compileContext, JtwigResource jtwigResource, boolean isolated) throws ParseException, CompileException {
+        public Compiled(JtwigPosition position, CompileContext compileContext, boolean isolated) throws ParseException, CompileException {
             this.position = position;
             this.isolated = isolated;
-            if (jtwigResource.exists()) {
-                this.renderable = new Compiled(position, compileContext.parse(jtwigResource).compile(compileContext), isolated);
-            } else {
-                this.compileContext = compileContext;
-                this.jtwigResource = jtwigResource;
-            }
+            this.compileContext = compileContext;
         }
 
         public Compiled with (Expression expression) {
@@ -130,14 +124,16 @@ public class Include extends AbstractElement {
             if (this.template != null) {
                 try {
                     Object calculate = template.calculate(context);
-                    if (calculate instanceof String && this.jtwigResource.toString().contains(TEMPLATE_PLACEHOLDER)) {
+                    if (calculate instanceof String && this.relativePath.contains(TEMPLATE_PLACEHOLDER)) {
                         try {
-                            JtwigResource resource = compileContext.retrieve(this.relativePath.replace(TEMPLATE_PLACEHOLDER, (String) calculate));
-                            this.renderable = new Compiled(position, compileContext.parse(resource).compile(compileContext), isolated);
+                            CompileContext compileContext = this.compileContext.clone();
+                            final JtwigResource resource = compileContext.retrieve(this.relativePath.replace(TEMPLATE_PLACEHOLDER, (String) calculate));
+                            compileContext = compileContext.withResource(resource);
+                            this.withTemplate = new Compiled(position, compileContext.parse(resource).compile(compileContext), isolated);
                         } catch (ResourceException | ParseException | CompileException e) {
                             throw new RenderException(e);
                         }
-                    } else throw new RenderException(": Include 'template' must be given an existing variable and use '" + TEMPLATE_PLACEHOLDER + "' as placeholder.");
+                    } else throw new RenderException(": Include 'withtemplate' must be given an existing variable and use '" + TEMPLATE_PLACEHOLDER + "' as placeholder.");
                 } catch (CalculateException e) {
                     throw new RenderException(e);
                 }
@@ -151,13 +147,13 @@ public class Include extends AbstractElement {
                 try {
                     Object calculate = withExpression.calculate(context);
                     if (calculate instanceof Map) {
-                        renderable.render(usedContext.with((Map) calculate));
+                        withTemplate.render(usedContext.with((Map) calculate));
                     } else throw new RenderException(position+": Include 'with' must be given a map.");
                 } catch (CalculateException e) {
                     throw new RenderException(e);
                 }
             } else
-                renderable.render(usedContext);
+                withTemplate.render(usedContext);
         }
 
         public Compiled template(Expression compile) {
