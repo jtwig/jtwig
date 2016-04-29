@@ -59,22 +59,16 @@ public class Include extends AbstractElement {
     @Override
     public Renderable compile(CompileContext context) throws CompileException {
         try {
-            if (this.templateExpression != null) {
-                ignoreMissing = false;
-            }
-            JtwigResource resource = context.retrieve(relativePath);
-
-            if (!resource.exists() && ignoreMissing) {
-                return new Missing();
-            }
-
             Compiled compiled;
-            if (this.templateExpression != null) {
+            if (templateExpression != null) {
                 compiled = new Compiled(position, context.clone(), isolated);
             } else {
+                JtwigResource resource = context.retrieve(relativePath);
+                if (!resource.exists() && ignoreMissing) {
+                    return new Missing();
+                }
                 context = context.clone().withResource(resource);
                 compiled = new Compiled(position, context.parse(resource).compile(context), isolated);
-
             }
             if (withExpression != null)
                 compiled.with(withExpression.compile(context));
@@ -89,7 +83,7 @@ public class Include extends AbstractElement {
     }
 
     public Include template(CompilableExpression pop) {
-        this.templateExpression = pop;
+        templateExpression = pop;
         return this;
     }
 
@@ -116,14 +110,24 @@ public class Include extends AbstractElement {
         }
 
         public Compiled with (Expression expression) {
-            this.withExpression = expression;
+            withExpression = expression;
+            return this;
+        }
+
+        public Compiled template(Expression compile) {
+            this.template = compile;
+            return this;
+        }
+
+        public Compiled relativePath(String relativePath) {
+            this.relativePath = relativePath;
             return this;
         }
 
         @Override
         public void render(RenderContext context) throws RenderException {
             RenderContext usedContext = context;
-            if (this.template != null) {
+            if (template != null) {
                 try {
                     final Object calculate = template.calculate(context);
                     List<String> parameters = null;
@@ -134,12 +138,12 @@ public class Include extends AbstractElement {
                     if (calculate instanceof List) {
                         parameters = (List<String>) calculate;
                     }
-                    if (parameters != null && this.relativePath.contains(TEMPLATE_PLACEHOLDER)) {
+                    if (parameters != null && relativePath.contains(TEMPLATE_PLACEHOLDER)) {
                         try {
                             CompileContext compileContext = this.compileContext.clone();
-                            final JtwigResource resource = compileContext.retrieve(String.format(this.relativePath, parameters.toArray()));
+                            final JtwigResource resource = compileContext.retrieve(String.format(relativePath, parameters.toArray()));
                             compileContext = compileContext.withResource(resource);
-                            this.withTemplate = new Compiled(position, compileContext.parse(resource).compile(compileContext), isolated);
+                            withTemplate = new Compiled(position, compileContext.parse(resource).compile(compileContext), isolated);
                         } catch (ResourceException | ParseException | CompileException e) {
                             throw new RenderException(e);
                         }
@@ -166,15 +170,7 @@ public class Include extends AbstractElement {
                 withTemplate.render(usedContext);
         }
 
-        public Compiled template(Expression compile) {
-            this.template = compile;
-            return this;
-        }
 
-        public Compiled relativePath(String relativePath) {
-            this.relativePath = relativePath;
-            return this;
-        }
     }
     
     public static class Missing implements Renderable {
