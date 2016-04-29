@@ -36,8 +36,14 @@ public class IncludeTest extends AbstractJtwigTest {
     }
 
     @Test
-    public void includeWithTemplate() throws Exception {
-        when(jtwigRenders(templateResource("templates/acceptance/include/main-template.twig")));
+    public void includeWithPathParameters() throws Exception {
+        when(jtwigRenders(templateResource("templates/acceptance/include/main-template-withpathparameters.twig")));
+        then(theRenderedTemplate(), is(equalTo("Hi!")));
+    }
+
+    @Test
+    public void includeWithPathParameter() throws Exception {
+        when(jtwigRenders(templateResource("templates/acceptance/include/main-template-withpathparameter.twig")));
         then(theRenderedTemplate(), is(equalTo("test")));
     }
     

@@ -57,7 +57,7 @@ public enum JtwigKeyword {
     VERBATIM("verbatim"),
     ENDVERBATIM("endverbatim"),
 
-    WITHTEMPLATE("withtemplate"),
+    WITHPATHPARAMETERS("withpathparameters"),
     WITH("with");
 
     public static String[] keywords () {

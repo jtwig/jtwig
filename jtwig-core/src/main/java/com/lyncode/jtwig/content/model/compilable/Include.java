@@ -24,6 +24,8 @@ import com.lyncode.jtwig.parser.model.JtwigPosition;
 import com.lyncode.jtwig.render.RenderContext;
 import com.lyncode.jtwig.resource.JtwigResource;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class Include extends AbstractElement {
@@ -123,17 +125,25 @@ public class Include extends AbstractElement {
             RenderContext usedContext = context;
             if (this.template != null) {
                 try {
-                    Object calculate = template.calculate(context);
-                    if (calculate instanceof String && this.relativePath.contains(TEMPLATE_PLACEHOLDER)) {
+                    final Object calculate = template.calculate(context);
+                    List<String> parameters = null;
+                    if (calculate instanceof String) {
+                        parameters = new ArrayList<>();
+                        parameters.add((String) calculate);
+                    }
+                    if (calculate instanceof List) {
+                        parameters = (List<String>) calculate;
+                    }
+                    if (parameters != null && this.relativePath.contains(TEMPLATE_PLACEHOLDER)) {
                         try {
                             CompileContext compileContext = this.compileContext.clone();
-                            final JtwigResource resource = compileContext.retrieve(this.relativePath.replace(TEMPLATE_PLACEHOLDER, (String) calculate));
+                            final JtwigResource resource = compileContext.retrieve(String.format(this.relativePath, parameters.toArray()));
                             compileContext = compileContext.withResource(resource);
                             this.withTemplate = new Compiled(position, compileContext.parse(resource).compile(compileContext), isolated);
                         } catch (ResourceException | ParseException | CompileException e) {
                             throw new RenderException(e);
                         }
-                    } else throw new RenderException(": Include 'withtemplate' must be given an existing variable and use '" + TEMPLATE_PLACEHOLDER + "' as placeholder.");
+                    } else throw new RenderException(": Include 'withpathparameters' must be given an existing variable (string or list) and use '" + TEMPLATE_PLACEHOLDER + "' as placeholders.");
                 } catch (CalculateException e) {
                     throw new RenderException(e);
                 }
