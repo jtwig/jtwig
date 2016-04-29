@@ -315,6 +315,11 @@ public class JtwigContentParser extends JtwigBaseParser<Compilable> {
                                         action(peek(1, Include.class).with(expressionParser.pop()))
                                 ),
                                 Optional(
+                                        keyword(JtwigKeyword.WITHPATHPARAMETERS),
+                                        FirstOf(expressionParser.map(), expressionParser.variable()),
+                                        action(peek(1, Include.class).template(expressionParser.pop()))
+                                ),
+                                Optional(
                                         keyword(JtwigKeyword.ONLY),
                                         action(peek(Include.class).setIsolated(true))
                                 ),

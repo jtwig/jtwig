@@ -24,12 +24,15 @@ import com.lyncode.jtwig.parser.model.JtwigPosition;
 import com.lyncode.jtwig.render.RenderContext;
 import com.lyncode.jtwig.resource.JtwigResource;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class Include extends AbstractElement {
     private final String relativePath;
     private final JtwigPosition position;
     private CompilableExpression withExpression = null;
+    private CompilableExpression templateExpression = null;
     private boolean ignoreMissing = false;
     private boolean isolated = false;
 
@@ -56,13 +59,19 @@ public class Include extends AbstractElement {
     @Override
     public Renderable compile(CompileContext context) throws CompileException {
         try {
-            JtwigResource resource = context.retrieve(relativePath);
-            if (!resource.exists() && ignoreMissing) {
-                return new Missing();
+            Compiled compiled;
+            if (templateExpression != null) {
+                compiled = new Compiled(position, context.clone(), isolated);
+                compiled.template(templateExpression.compile(context));
+                compiled.relativePath(relativePath);
+            } else {
+                JtwigResource resource = context.retrieve(relativePath);
+                if (!resource.exists() && ignoreMissing) {
+                    return new Missing();
+                }
+                context = context.clone().withResource(resource);
+                compiled = new Compiled(position, context.parse(resource).compile(context), isolated);
             }
-            context = context.clone().withResource(resource);
-
-            Compiled compiled = new Compiled(position, context.parse(resource).compile(context), isolated);
             if (withExpression != null)
                 compiled.with(withExpression.compile(context));
             return compiled;
@@ -71,26 +80,76 @@ public class Include extends AbstractElement {
         }
     }
 
+    public Include template(CompilableExpression pop) {
+        templateExpression = pop;
+        return this;
+    }
+
     public static class Compiled implements Renderable {
-        private final Renderable renderable;
+        private static final String TEMPLATE_PLACEHOLDER = "%s";
         private final JtwigPosition position;
         private final boolean isolated;
+        private Renderable withTemplate;
         private Expression withExpression = null;
+        private Expression template = null;
+        private CompileContext compileContext = null;
+        private String relativePath;
 
-        public Compiled(JtwigPosition position, Renderable renderable, boolean isolated) {
-            this.renderable = renderable;
+        public Compiled(JtwigPosition position, Renderable withTemplate, boolean isolated) {
+            this.withTemplate = withTemplate;
             this.position = position;
             this.isolated = isolated;
         }
 
+        public Compiled(JtwigPosition position, CompileContext compileContext, boolean isolated) throws ParseException, CompileException {
+            this.position = position;
+            this.isolated = isolated;
+            this.compileContext = compileContext;
+        }
+
         public Compiled with (Expression expression) {
-            this.withExpression = expression;
+            withExpression = expression;
+            return this;
+        }
+
+        public Compiled template(Expression compile) {
+            this.template = compile;
+            return this;
+        }
+
+        Compiled relativePath(String relativePath) {
+            this.relativePath = relativePath;
             return this;
         }
 
         @Override
         public void render(RenderContext context) throws RenderException {
             RenderContext usedContext = context;
+            if (template != null) {
+                try {
+                    final Object calculate = template.calculate(context);
+                    List<String> parameters = null;
+                    if (calculate instanceof String) {
+                        parameters = new ArrayList<>();
+                        parameters.add((String) calculate);
+                    }
+                    if (calculate instanceof List) {
+                        parameters = (List<String>) calculate;
+                    }
+                    if (parameters != null && relativePath.contains(TEMPLATE_PLACEHOLDER)) {
+                        try {
+                            CompileContext compileContext = this.compileContext.clone();
+                            final JtwigResource resource = compileContext.retrieve(String.format(relativePath, parameters.toArray()));
+                            compileContext = compileContext.withResource(resource);
+                            withTemplate = new Compiled(position, compileContext.parse(resource).compile(compileContext), isolated);
+                        } catch (ResourceException | ParseException | CompileException e) {
+                            throw new RenderException(e);
+                        }
+                    } else throw new RenderException(": Include 'withpathparameters' must be given an existing variable (string or list) and use '" + TEMPLATE_PLACEHOLDER + "' as placeholders.");
+                } catch (CalculateException e) {
+                    throw new RenderException(e);
+                }
+            }
             if (isolated) {
                 usedContext = context.isolatedModel();
                 ((Map)usedContext.map("model")).clear();
@@ -100,17 +159,19 @@ public class Include extends AbstractElement {
                 try {
                     Object calculate = withExpression.calculate(context);
                     if (calculate instanceof Map) {
-                        renderable.render(usedContext.with((Map) calculate));
+                        withTemplate.render(usedContext.with((Map) calculate));
                     } else throw new RenderException(position+": Include 'with' must be given a map.");
                 } catch (CalculateException e) {
                     throw new RenderException(e);
                 }
             } else
-                renderable.render(usedContext);
+                withTemplate.render(usedContext);
         }
+
+
     }
     
-    public static class Missing implements Renderable {
+    private static class Missing implements Renderable {
         @Override
         public void render(RenderContext context) throws RenderException {}
     }

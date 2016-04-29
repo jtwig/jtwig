@@ -15,14 +15,13 @@
 package com.lyncode.jtwig.acceptance;
 
 import com.lyncode.jtwig.exception.CompileException;
+import com.lyncode.jtwig.exception.RenderException;
+import org.junit.Assert;
 import org.junit.Test;
 
-import static com.lyncode.jtwig.util.SyntacticSugar.given;
-import static com.lyncode.jtwig.util.SyntacticSugar.then;
-import static com.lyncode.jtwig.util.SyntacticSugar.when;
+import static com.lyncode.jtwig.util.SyntacticSugar.*;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
-import org.junit.Assert;
 
 public class IncludeTest extends AbstractJtwigTest {
     @Test
@@ -35,6 +34,27 @@ public class IncludeTest extends AbstractJtwigTest {
     public void includeWithVars() throws Exception {
         when(jtwigRenders(templateResource("templates/acceptance/include/main-vars.twig")));
         then(theRenderedTemplate(), is(equalTo("hello, world")));
+    }
+
+    @Test
+    public void includeWithPathParameters() throws Exception {
+        when(jtwigRenders(templateResource("templates/acceptance/include/main-template-withpathparameters.twig")));
+        then(theRenderedTemplate(), is(equalTo("Hi!")));
+    }
+
+    @Test
+    public void includeWithPathParameter() throws Exception {
+        when(jtwigRenders(templateResource("templates/acceptance/include/main-template-withpathparameter.twig")));
+        then(theRenderedTemplate(), is(equalTo("test")));
+    }
+
+    @Test
+    public void includeWithPathParametersError() throws Exception {
+        try {
+            when(jtwigRenders(templateResource("templates/acceptance/include/main-template-withpathparameterserror.twig")));
+            Assert.fail("Should have received a render exception stating that the path should contain the placeholder.");
+        } catch (RenderException e) {}
+
     }
     
     @Test
