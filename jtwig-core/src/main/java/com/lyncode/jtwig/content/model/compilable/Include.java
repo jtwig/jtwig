@@ -62,6 +62,8 @@ public class Include extends AbstractElement {
             Compiled compiled;
             if (templateExpression != null) {
                 compiled = new Compiled(position, context.clone(), isolated);
+                compiled.template(templateExpression.compile(context));
+                compiled.relativePath(relativePath);
             } else {
                 JtwigResource resource = context.retrieve(relativePath);
                 if (!resource.exists() && ignoreMissing) {
@@ -72,10 +74,6 @@ public class Include extends AbstractElement {
             }
             if (withExpression != null)
                 compiled.with(withExpression.compile(context));
-            if (templateExpression != null) {
-                compiled.template(templateExpression.compile(context));
-                compiled.relativePath(relativePath);
-            }
             return compiled;
         } catch (ResourceException | ParseException e) {
             throw new CompileException(e);
@@ -119,7 +117,7 @@ public class Include extends AbstractElement {
             return this;
         }
 
-        public Compiled relativePath(String relativePath) {
+        Compiled relativePath(String relativePath) {
             this.relativePath = relativePath;
             return this;
         }
@@ -173,7 +171,7 @@ public class Include extends AbstractElement {
 
     }
     
-    public static class Missing implements Renderable {
+    private static class Missing implements Renderable {
         @Override
         public void render(RenderContext context) throws RenderException {}
     }

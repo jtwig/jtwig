@@ -91,6 +91,28 @@ public class IncludeTest {
                 .render(renderContext);
     }
 
+    @Test(expected = RenderException.class)
+    public void renderPathParametersClauseCalculateException() throws Exception {
+        Renderable renderable = mock(Renderable.class);
+        Expression withExpression = mock(Expression.class);
+        CompilableExpression expression = mock(CompilableExpression.class);
+
+        Include include = new Include(null, "test").template(expression);
+
+        when(expression.compile(context)).thenReturn(withExpression);
+        when(context.retrieve("test")).thenReturn(jtwigResource);
+        when(context.clone()).thenReturn(context);
+        when(context.parse(jtwigResource)).thenReturn(toRender(renderable));
+        when(withExpression.calculate(any(RenderContext.class))).thenThrow(CalculateException.class);
+
+        doThrow(IOException.class)
+                .when(renderContext)
+                .write(any(byte[].class));
+
+        include.compile(context)
+                .render(renderContext);
+    }
+
     @Test(expected = CompileException.class)
     public void compileWhenResourceException() throws Exception {
         Include include = new Include(null, "test");

@@ -15,6 +15,7 @@
 package com.lyncode.jtwig.acceptance;
 
 import com.lyncode.jtwig.exception.CompileException;
+import com.lyncode.jtwig.exception.RenderException;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -45,6 +46,15 @@ public class IncludeTest extends AbstractJtwigTest {
     public void includeWithPathParameter() throws Exception {
         when(jtwigRenders(templateResource("templates/acceptance/include/main-template-withpathparameter.twig")));
         then(theRenderedTemplate(), is(equalTo("test")));
+    }
+
+    @Test
+    public void includeWithPathParametersError() throws Exception {
+        try {
+            when(jtwigRenders(templateResource("templates/acceptance/include/main-template-withpathparameterserror.twig")));
+            Assert.fail("Should have received a render exception stating that the path should contain the placeholder.");
+        } catch (RenderException e) {}
+
     }
     
     @Test
