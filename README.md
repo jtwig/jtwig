@@ -1,5 +1,7 @@
 # Jtwig Project
 
+[![Join the chat at https://gitter.im/jtwig/jtwig](https://badges.gitter.im/jtwig/jtwig.svg)](https://gitter.im/jtwig/jtwig?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 **[Documentation](https://www.gitbook.com/book/jtwig/jtwig-reference-manual/details)**
 
 **Build Stats**
