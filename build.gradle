@@ -1,0 +1,216 @@
+import org.apache.http.HttpResponse
+import org.apache.http.client.HttpClient
+import org.apache.http.client.methods.HttpGet
+import org.apache.http.client.methods.HttpPost
+import org.apache.http.entity.StringEntity
+import org.apache.http.impl.client.HttpClients
+import org.json.JSONArray
+import org.json.JSONObject
+import org.jtwig.plugins.master.GetProjectDependenciesService
+import org.jtwig.plugins.master.ResolveProjectDependenciesService
+import org.jtwig.plugins.util.ResponseUtils
+import org.jtwig.plugins.util.UrlBuilder
+
+group 'org.jtwig'
+version '1.0'
+
+apply plugin: 'java'
+apply plugin: ReleasePlugin
+
+sourceCompatibility = 1.7
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+buildscript {
+    repositories {
+        mavenCentral()
+        jcenter()
+        maven {
+            url "https://dl.bintray.com/jtwig/maven"
+        }
+    }
+
+    dependencies {
+        classpath 'org.jtwig:jtwig-release-plugin:1.+'
+    }
+}
+
+release {
+    version = System.getenv("TRAVIS_TAG")
+    token = System.getenv("TRAVIS_TOKEN")
+    projects = [
+            "jtwig-cache-extension",
+            "jtwig-highlight-extension",
+            "jtwig-hot-reloading-extension",
+            "jtwig-json-extension",
+            "jtwig-spaceless-extension",
+            "jtwig-spring-translate-extension",
+            "jtwig-xliff",
+            "jtwig-render-extension",
+            "jtwig-spring-asset-extension",
+            "jtwig-translate-extension",
+            "jtwig-spring-csrf-extension",
+            "jtwig-spring-boot-starter",
+            "jtwig-spring",
+            "jtwig-web",
+            "jtwig-pluralization",
+            "jtwig-core",
+            "jtwig-reflection"
+    ]
+}
+
+class ReleasePlugin implements Plugin<Project> {
+    @Override
+    void apply(Project project) {
+        project.extensions.create("release", ReleaseExtension)
+        project.task("release").doFirst({
+            TriggerBuildService triggerBuildService = new TriggerBuildService(HttpClients.createDefault());
+            ReleaseProcessService releaseProcessService = new ReleaseProcessService(
+                    project.extensions.release.baseUrl,
+                    project.extensions.release.token,
+                    new ResolveProjectDependenciesService(new GetProjectDependenciesService(project.extensions.release.githubRawBaseUrl, Arrays.asList(
+                            "jtwig-release-plugin"
+                    ))),
+                    new CheckVersionReleasedService(project.extensions.release.bintrayBaseUrl, HttpClients.createDefault()),
+                    triggerBuildService
+            );
+
+            releaseProcessService.release(project.extensions.release.projects, project.extensions.release.version);
+
+            // trigger jtwig-examples build
+            triggerBuildService.trigger(project.extensions.release.baseUrl, project.extensions.release.token, "jtwig/jtwig-examples", project.extensions.release.version)
+        })
+    }
+}
+
+class ReleaseProcessService {
+    private final String travisBaseUrl;
+    private final String travisToken;
+    private final ResolveProjectDependenciesService resolveProjectDependenciesService;
+    private final CheckVersionReleasedService projectVersionReleased;
+    private final TriggerBuildService triggerBuildService;
+
+    public ReleaseProcessService(String travisBaseUrl, String travisToken, ResolveProjectDependenciesService resolveProjectDependenciesService, CheckVersionReleasedService projectVersionReleased, TriggerBuildService triggerBuildService) {
+        this.travisBaseUrl = travisBaseUrl;
+        this.travisToken = travisToken;
+        this.resolveProjectDependenciesService = resolveProjectDependenciesService;
+        this.projectVersionReleased = projectVersionReleased;
+        this.triggerBuildService = triggerBuildService;
+    }
+
+    public void release(List<String> projects, String version) {
+        List<String> ordered = resolveProjectDependenciesService.resolveDependencies(projects);
+
+        for (String project : ordered) {
+            if (!projectVersionReleased.released(project, version)) {
+                println String.format("Triggering release of project %s", project);
+                triggerBuildService.trigger(travisBaseUrl, travisToken, "jtwig/" + project, version);
+                waitForRelease(project, version);
+            }
+        }
+    }
+
+    private void waitForRelease(String project, String version) {
+        println String.format("Waiting for project %s to be released with version %s", project, version);
+        boolean released = false;
+
+        while (!released) {
+            try {
+                Thread.sleep(30000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            released = projectVersionReleased.released(project, version);
+        }
+    }
+}
+
+class CheckVersionReleasedService {
+    private final String baseUrl;
+    private final HttpClient httpClient;
+
+    public CheckVersionReleasedService(String baseUrl, HttpClient httpClient) {
+        this.baseUrl = baseUrl;
+        this.httpClient = httpClient;
+    }
+
+    public boolean released(String project, String version) {
+        HttpGet httpGet = new HttpGet(UrlBuilder.url(this.baseUrl).addToPath("packages/jtwig/maven").addToPath(project).addToPath("versions").addToPath(version).addToPath("files").build());
+        HttpResponse response = this.httpClient.execute(httpGet);
+        String content = ResponseUtils.getContent(response);
+        println content;
+        if(response.getStatusLine().getStatusCode() != 200) {
+            return false;
+        } else {
+            JSONArray list = new JSONArray(content);
+
+            for(int i = 0; i < list.length(); ++i) {
+                try {
+                    JSONObject e = list.getJSONObject(i);
+                    if(String.format("%s-%s.jar", project, version).equals(e.getString("name"))) {
+                        return true;
+                    }
+                } catch (Exception var9) {
+                    ;
+                }
+            }
+
+            return false;
+        }
+    }
+}
+
+class TriggerBuildService {
+    private final HttpClient httpClient;
+
+    TriggerBuildService(HttpClient httpClient) {
+        this.httpClient = httpClient
+    }
+
+    public void trigger(String baseUrl, String token, String project, String version) {
+        HttpResponse response;
+        try {
+            String e = this.request(version);
+            StringEntity entity = new StringEntity(e);
+            String url = UrlBuilder.url(baseUrl).addToPath("repo").addToPathEscaped(project).addToPath("requests").build();
+            HttpPost post = new HttpPost(url);
+            post.addHeader("Travis-API-Version", "3");
+            post.addHeader("Accept", "application/json");
+            post.addHeader("Content-Type", "application/json");
+            post.addHeader("Authorization", String.format("token %s", token));
+            post.setEntity(entity);
+            response = this.httpClient.execute(post);
+        } catch (Exception ex) {
+            throw new RuntimeException(String.format("Cannot trigger release of project %s", project));
+        }
+
+        println ResponseUtils.toLogString(response);
+
+        if(response.getStatusLine().getStatusCode() < 200 || response.getStatusLine().getStatusCode() >= 300) {
+            throw new RuntimeException(String.format("Cannot trigger release of project %s\n%s", project, ResponseUtils.toLogString(response)));
+        }
+    }
+
+
+    private String request(String version) {
+        return (new JSONObject()).put("request", (new JSONObject()).put("message", String.format("Version %s release triggered", version)).put("config", (new JSONObject()).put("env", (new JSONObject()).put("JTWIG_VERSION", version)))).toString();
+    }
+}
+
+class ReleaseExtension {
+    String version
+    String token
+    String baseUrl = "https://api.travis-ci.org"
+    String githubRawBaseUrl = "https://raw.githubusercontent.com"
+    String bintrayBaseUrl = "https://bintray.com/api/v1"
+    List<String> projects = []
+}
+
+test {
+    testLogging {
+        showStandardStreams = true
+    }
+}

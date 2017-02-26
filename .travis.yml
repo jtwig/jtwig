@@ -1,0 +1,7 @@
+language: groovy
+
+after_success:
+ - |
+     if [ ! -z $TRAVIS_TAG ] ; then
+       gradle release
+     fi
